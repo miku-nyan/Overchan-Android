@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+    <item name="menu_open_close_drawer" type="id"/>
+    <item name="menu_open_browser" type="id"/>
+    <item name="menu_favorites" type="id"/>
+    <item name="menu_settings" type="id"/>
+    <item name="menu_add_post" type="id"/>
+    <item name="menu_update" type="id"/>
+    <item name="menu_catalog" type="id"/>
+    <item name="menu_search" type="id"/>
+    <item name="menu_attach_file" type="id"/>
+    <item name="menu_attach_gallery" type="id"/>
+    <item name="menu_save_page" type="id"/>
+    <item name="menu_board_gallery" type="id"/>
+    <item name="menu_clear_history" type="id"/>
+    <item name="menu_clear_favorites" type="id"/>
+    <item name="menu_save_attachment" type="id"/>
+    <item name="menu_open_external" type="id"/>
+    <item name="menu_share" type="id"/>
+    <item name="menu_share_link" type="id"/>
+    <item name="menu_search_google" type="id"/>
+    
+    <item name="context_menu_move" type="id"/>
+    <item name="context_menu_copy_url" type="id"/>
+    <item name="context_menu_favorites" type="id"/>
+    <item name="context_menu_favorites_from_fragment" type="id"/>
+    <item name="context_menu_remove_history" type="id"/>
+    <item name="context_menu_remove_favorites" type="id"/>
+    <item name="context_menu_open_browser" type="id"/>
+    <item name="context_menu_autoupdate_background" type="id"/>
+    <item name="context_menu_show_op_post" type="id"/>
+    <item name="context_menu_reply" type="id"/>
+    <item name="context_menu_reply_with_quote" type="id"/>
+    <item name="context_menu_reply_no_reading" type="id"/>
+    <item name="context_menu_select_text" type="id"/>
+    <item name="context_menu_download" type="id"/>
+    <item name="context_menu_share" type="id"/>
+    <item name="context_menu_hide" type="id"/>
+    <item name="context_menu_delete" type="id"/>
+    <item name="context_menu_delete_files" type="id"/>
+    
+    <item name="context_menu_thumb_load_thumb" type="id"/>
+    <item name="context_menu_thumb_download" type="id"/>
+    <item name="context_menu_thumb_copy_url" type="id"/>
+    <item name="context_menu_thumb_search_google" type="id"/>
+    
+</resources>

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="Theme_Dialog_Switch" parent="@android:style/Theme.Dialog" />
+    <style name="Theme_Light_Switch" parent="@android:style/Theme.Light" />
+    <style name="Theme_Dark_Switch" parent="@android:style/Theme" />
+	
+    <style name="SelectableItem">
+        <item name="android:background">@android:drawable/list_selector_background</item>
+    </style>
+    
+    <style name="Transparent">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.8</item>
+    </style>
+    
+    <style name="Futaba_Base" parent="@style/Theme_Light_Switch">
+        <item name="android:textColorPrimary">#800000</item>
+        <item name="activityRootBackground">#FFFFEE</item>
+        <item name="sidebarBackground">#CCFFFFEE</item>
+        <item name="sidebarSelectedItem">@drawable/sidebar_selected_futaba</item>
+        <item name="listSeparatorBackground">#F0E0D6</item>
+        <item name="postUnreadOverlay">#7FFFBF3F</item>
+        <item name="postBackground">#F0E0D6</item>
+        <item name="postIndexForeground">#789922</item>
+        <item name="postIndexOverBumpLimit">#C41E3A</item>
+        <item name="postNumberForeground">#800000</item>
+        <item name="postNameForeground">#117743</item>
+        <item name="postOpForeground">#008000</item>
+        <item name="postSageForeground">#993333</item>
+        <item name="postTripForeground">#228854</item>
+        <item name="postTitleForeground">#002244</item>
+        <item name="postQuoteForeground">#789922</item>
+        <item name="spoilerForeground">#800000</item>
+        <item name="spoilerBackground">#F0D0B6</item>
+        <item name="urlLinkForeground">#0000EE</item>
+        <item name="itemInfoForeground">#666666</item>
+        <item name="searchHighlightBackground">#EF0FFF</item>
+        
+        <item name="iconDrawer">@drawable/ic_drawer_light</item>
+        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
+        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
+        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
+        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
+        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
+        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
+        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
+        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
+        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
+        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
+        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
+        <item name="actionSave">@drawable/ic_action_save_light</item>
+    </style>
+    
+    <style name="Photon_Base" parent="@style/Theme_Light_Switch">
+        <item name="android:textColorPrimary">#333333</item>
+        <item name="activityRootBackground">#EEEEEE</item>
+        <item name="sidebarBackground">#CCEEEEEE</item>
+        <item name="sidebarSelectedItem">@drawable/sidebar_selected_photon</item>
+        <item name="listSeparatorBackground">#DDDDDD</item>
+        <item name="postUnreadOverlay">#7FFF7F7F</item>
+        <item name="postBackground">#DDDDDD</item>
+        <item name="postIndexForeground">#789922</item>
+        <item name="postIndexOverBumpLimit">#C41E3A</item>
+        <item name="postNumberForeground">#333333</item>
+        <item name="postNameForeground">#004A99</item>
+        <item name="postOpForeground">#008000</item>
+        <item name="postSageForeground">#993333</item>
+        <item name="postTripForeground">#228854</item>
+        <item name="postTitleForeground">#002244</item>
+        <item name="postQuoteForeground">#789922</item>
+        <item name="spoilerForeground">#333333</item>
+        <item name="spoilerBackground">#BBBBBB</item>
+        <item name="urlLinkForeground">#ff6600</item>
+        <item name="itemInfoForeground">#666666</item>
+        <item name="searchHighlightBackground">#EF0FFF</item>
+        
+        <item name="iconDrawer">@drawable/ic_drawer_light</item>
+        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
+        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
+        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
+        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
+        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
+        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
+        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
+        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
+        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
+        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
+        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
+        <item name="actionSave">@drawable/ic_action_save_light</item>
+    </style>
+    
+    <style name="Neutron_Base" parent="@style/Theme_Dark_Switch">
+        <item name="android:textColorPrimary">#698CC0</item>
+        <item name="activityRootBackground">#212121</item>
+        <item name="sidebarBackground">#CC212121</item>
+        <item name="sidebarSelectedItem">@drawable/sidebar_selected_neutron</item>
+        <item name="listSeparatorBackground">#191919</item>
+        <item name="postUnreadOverlay">#7F7F3F3F</item>
+        <item name="postBackground">#2C2C2C</item>
+        <item name="postIndexForeground">#789922</item>
+        <item name="postIndexOverBumpLimit">#C41E3A</item>
+        <item name="postNumberForeground">#C9BE89</item>
+        <item name="postNameForeground">#B4B9CD</item>
+        <item name="postOpForeground">#008000</item>
+        <item name="postSageForeground">#993333</item>
+        <item name="postTripForeground">#228854</item>
+        <item name="postTitleForeground">#3941AC</item>
+        <item name="postQuoteForeground">#789922</item>
+        <item name="spoilerForeground">#48B0FD</item>
+        <item name="spoilerBackground">#575757</item>
+        <item name="urlLinkForeground">#C9BE89</item>
+        <item name="itemInfoForeground">#999999</item>
+        <item name="searchHighlightBackground">#EF0FFF</item>
+        
+        <item name="iconDrawer">@drawable/ic_drawer_dark</item>
+        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_dark</item>
+        <item name="iconItemPrevious">@drawable/ic_action_previous_item_dark</item>
+        <item name="iconItemNext">@drawable/ic_action_next_item_dark</item>
+        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_dark</item>
+        <item name="sidebarBtnHistory">@drawable/sidebar_history_dark</item>
+        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_dark</item>
+        <item name="iconBtnClose">@drawable/ic_action_remove_dark</item>
+        <item name="actionRefresh">@drawable/ic_action_refresh_dark</item>
+        <item name="actionAddPost">@drawable/ic_action_edit_dark</item>
+        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_dark</item>
+        <item name="actionAddGallery">@drawable/ic_action_new_picture_dark</item>
+        <item name="actionSave">@drawable/ic_action_save_dark</item>
+    </style>
+    
+    <style name="TextAppearance_Medium.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">11sp</item> </style>
+    <style name="TextAppearance_Medium.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">13sp</item> </style>
+    <style name="TextAppearance_Medium.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">16sp</item> </style>
+    
+    <style name="TextAppearance_Large.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">14sp</item> </style>
+    <style name="TextAppearance_Large.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">16sp</item> </style>
+    <style name="TextAppearance_Large.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">19sp</item> </style>
+    
+    <style name="TextAppearance_Huge.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">17sp</item> </style>
+    <style name="TextAppearance_Huge.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">19sp</item> </style>
+    <style name="TextAppearance_Huge.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">22sp</item> </style>
+    
+    <style name="Futaba_Medium" parent="@style/Futaba_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    </style>
+    
+    <style name="Futaba_Large" parent="@style/Futaba_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    </style>
+    
+    <style name="Futaba_Huge" parent="@style/Futaba_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    </style>
+    
+    <style name="Photon_Medium" parent="@style/Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    </style>
+    
+    <style name="Photon_Large" parent="@style/Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    </style>
+    
+    <style name="Photon_Huge" parent="@style/Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    </style>
+    
+    <style name="Neutron_Medium" parent="@style/Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    </style>
+    
+    <style name="Neutron_Large" parent="@style/Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    </style>
+    
+    <style name="Neutron_Huge" parent="@style/Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    </style>
+    
+</resources>

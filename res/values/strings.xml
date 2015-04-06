@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+    <string name="app_name">Imageboards</string>
+    
+    <string name="drawer_open">Open drawer</string>
+    <string name="drawer_close">Close drawer</string>
+    <string name="previous">previous</string>
+    <string name="next">next</string>
+    <string name="error">Error</string>
+    <string name="close">Close</string>
+    <string name="captcha">Captcha</string>
+    
+    <string name="postitem_contentdescription_thumbnail_image">Thumbnail</string>
+    <string name="postitem_contentdescription_badge_icon">Icon</string>
+    <string name="postitem_op_mark">#OP</string>
+    <string name="postitem_sage_mark">SAGE</string>
+    <string name="postitem_attachment_size_kb_format">%d KB</string>
+    <string name="postitem_attachment_size_mb_format">%.1f MB</string>
+	<string name="postitem_show_full_text"><u>Show the full text</u></string>
+    <string name="postitem_gif">gif</string>
+    <string name="postitem_video">video</string>
+    <string name="postitem_audio">audio</string>
+    <string name="postitem_file">file</string>
+    <string name="postitem_link">link</string>
+    <string name="postitem_replies">Replies: </string>
+    <string name="postitem_hidden_thread">Hidden thread #%1$s: %2$s</string>
+    <string name="postitem_hidden_post">Hidden post #%1$s: %2$s</string>
+    <string name="postitem_post_number_search_header">%1$s (thread %2$s)</string>
+    <string name="postitem_sticky_thread">Thread is sticky</string>
+    <string name="postitem_closed_thread">Thread is closed</string>
+    <string name="postitem_deleted_mark">Post is deleted</string>
+    <plurals name="postitem_posts_quantity">
+        <item quantity="one">%d post</item>
+        <item quantity="other">%d posts</item>
+    </plurals>
+    <plurals name="postitem_files_quantity">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <plurals name="postitem_replies_quantity">
+        <item quantity="one">%d reply</item>
+        <item quantity="other">%d replies</item>
+    </plurals>
+    
+    <string name="postslist_list_updated">Updated</string>
+    <string name="postslist_no_new_posts">No new posts</string>
+    <plurals name="postslist_new_posts_quantity">
+        <item quantity="one">%d new post</item>
+        <item quantity="other">%d new posts</item>
+    </plurals>
+    
+    <string name="tabs_newtab">New Tab</string>
+    <string name="tabs_favorites">Favorites</string>
+    <string name="tabs_history">History</string>
+    
+    <string name="tabs_tracker_title">Auto Update</string>
+    <string name="tabs_tracker_title_unread">New Posts</string>
+    <string name="tabs_tracker_updating">Updating now</string>
+    <plurals name="tabs_tracker_timer">
+        <item quantity="one">Update in %d second</item>
+        <item quantity="other">Update in %d seconds</item>
+    </plurals>
+    
+    <string name="tabs_title_boardpage">/%1$s - Page %2$d</string>
+    <string name="tabs_title_boardpage_first">/%1$s</string>
+    <string name="tabs_title_catalogpage">/%s - Catalog</string>
+    <string name="tabs_title_searchpage">/%1$s - search: %2$s</string>
+    <string name="tabs_title_threadpage">/%1$s/%2$s</string>
+    <string name="tabs_title_threadpage_loaded">/%1$s - %2$s</string>
+    
+    <string name="newtab_address_bar">Address</string>
+    <string name="newtab_saved_threads">Saved</string>
+    <string name="newtab_address_go">GO</string>
+    <string name="newtab_address_hint">http://</string>
+    <string name="newtab_saved_threads_title">Saved threads</string>
+    <string name="newtab_select_local_file">Specify file location</string>
+    
+    <string name="history_empty">No history</string>
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+    <string name="history_last_week">Last week</string>
+    <string name="history_other">Earlier</string>
+    
+    <string name="favorites_empty">No bookmarks</string>
+    <string name="favorites_all">All bookmarks</string>
+    <string name="favorites_chans">Imageboards</string>
+    <string name="favorites_boards">Boards</string>
+    <string name="favorites_threads">Threads</string>
+    
+    <string name="boardslist_format">/%1$s - %2$s</string>
+    <string name="boardslist_hint">Board code</string>
+    <string name="boardslist_btn_go">GO</string>
+    
+    <string name="search_bar_hint">Serach</string>
+    <string name="search_bar_in_thread_hint">Search in thread</string>
+    
+    <string name="menu_open_drawer">Open drawer</string>
+    <string name="menu_close_drawer">Close drawer</string>
+    <string name="menu_preferences">Preferences</string>
+    <string name="menu_add_post">Post a Reply</string>
+    <string name="menu_add_thread">New thread</string>
+    <string name="menu_update">Update</string>
+    <string name="menu_from_internet">From Internet</string>
+    <string name="menu_catalog">Catalog</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_open_browser">Open browser</string>
+    <string name="menu_add_favorites">Add to favorites</string>
+    <string name="menu_remove_favorites">Remove from favorites</string>
+    <string name="menu_attach_file">Attach file</string>
+    <string name="menu_attach_gallery">Gallery</string>
+    <string name="menu_save_page">Save</string>
+    <string name="menu_board_gallery">Gallery</string>
+    <string name="menu_clear_history">Clear history</string>
+    <string name="menu_clear_favorites">Remove all bookmarks</string>
+    <string name="menu_save_attachment">Save</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_share_link">Share link</string>
+    <string name="menu_search_google">Search in Google</string>
+    <string name="menu_open">Open</string>
+    <string name="menu_open_player">Open external player</string>
+    
+    <string name="context_menu_move">Move</string>
+    <string name="context_menu_copy_url">Copy the link</string>
+    <string name="context_menu_add_favorites">Add to favorites</string>
+    <string name="context_menu_remove_favorites">Remove from favorites</string>
+    <string name="context_menu_remove_history">Remove from history</string>
+    <string name="context_menu_open_browser">Open browser</string>
+    <string name="context_menu_autoupdate_background">Auto-update</string>
+    <string name="context_menu_show_op_post">View the full OP post</string>
+    <string name="context_menu_reply">Reply to this post</string>
+    <string name="context_menu_reply_with_quote">Reply with quote</string>
+    <string name="context_menu_reply_no_reading">Reply without reading</string>
+    <string name="context_menu_show_thumbnail">Show thumbnail</string>
+    <string name="context_menu_download_file">Download file</string>
+    <string name="context_menu_download_attachment">Download attachment</string>
+    <string name="context_menu_download_attachments">Download attachments</string>
+    <string name="context_menu_select_text">Select text</string>
+    <string name="context_menu_copy_text">Copy text</string>
+    <string name="context_menu_hide_thread">Hide thread</string>
+    <string name="context_menu_hide_post">Hide post</string>
+    <string name="context_menu_delete_post">Delete post</string>
+    <string name="context_menu_delete_files">Delete files</string>
+    <string name="context_menu_share">Share</string>
+    <string name="context_menu_search_google">Search in Google</string>
+    <string name="context_menu_delete_autohide_rule">Remove the rule</string>
+    
+    <string name="share_via">Share via</string>
+    
+    <string name="dialog_delete_password">Password for deletion</string>
+    <string name="dialog_delete_button">Delete</string>
+    <string name="dialog_delete_progress">Deleting</string>
+    
+    <string name="dialog_cloudflare_captcha_text">Cloudflare requested the checking.\nEnter the characters shown in the image.</string>
+    <string name="dialog_cloudflare_captcha_hint">Captcha</string>
+    <string name="dialog_cloudflare_captcha_check">Check</string>
+    
+    <string name="dialog_external_url_title">Going external</string>
+    <string name="dialog_external_url_text">%s\n\nThis page will be opened by an external application.
+        Keep in mind that the site may contain malware, dangerous for your device.\n\nAre you sure you want to proceed?</string>
+    <string name="dialog_external_mail_title">E-mail</string>
+    <string name="dialog_external_mail_text">%s\n\nFor email will be open an external application.\n\nDo you want to continue?</string>
+    
+    <string name="dialog_save_thread_title">Saving the thread</string>
+    <string name="dialog_save_thread_text">All attachments and thumbnails that have already been downloaded or present in the
+        cache will be saved anyway.\nSelect what you want to download from the Internet.</string>
+    <string name="dialog_save_thread_thumbs">Thumbnails</string>
+    <string name="dialog_save_thread_all">All attachments</string>
+    <string name="dialog_save_thread_save">Save</string>
+    
+    <string name="dialog_open_chan_text">Currently opened locally saved version of the page.
+        \nDo you want to try to open the actual version of the Internet??</string>
+    
+    <string name="dialog_switch_page_title">Go to page</string>
+    <string name="dialog_switch_page_hint">Page number</string>
+    <string name="dialog_switch_page_go">Go</string>
+    <string name="dialog_switch_page_incorrect">Invalid page number</string>
+    
+    <string name="postform_title_post">Add a Reply</string>
+    <string name="postform_title_thread">New Thread</string>
+    <string name="postform_name">Name</string>
+    <string name="postform_email">Email</string>
+    <string name="postform_password">Password for deletion:</string>
+    <string name="postform_subject">Subject</string>
+    <string name="postform_comment">Comment</string>
+    <string name="postform_sage">Sage</string>
+    <string name="postform_watermark">Watermark</string>
+    <string name="postform_opmark">OP of thread</string>
+    <string name="postform_captcha_hint">Confirmation</string>
+    <string name="postform_send">Send</string>
+    <string name="postform_max_attachments">Cannot attach more files</string>
+    <string name="postform_cannot_attach">Cannot attach file</string>
+    <string name="postform_required_file">Attach a file to create a new thread</string>
+    <string name="postform_empty_comment">Write a comment</string>
+    <string name="postform_attachment_size_format">%1$s KB, %2$dx%3$d</string>
+    <string name="postform_attachment_size_format_no_image">%1$s KB</string>
+    
+    <string name="posting_post">Sending a Post</string>
+    <string name="posting_post_format">in thread /%2$s/ %3$s (%1$s)</string>
+    <string name="posting_thread">Adding a New Thread</string>
+    <string name="posting_thread_format">on board /%2$s/ (%1$s)</string>
+    <string name="posting_error">Failed to send</string>
+    <string name="posting_error_interactive_format">Requested %s checking</string>
+    <string name="posting_error_default">An unknown error occurred</string>
+    <string name="posting_success">Sent successfully</string>
+    <string name="posting_success_post">The post was sent successfully</string>
+    <string name="posting_success_thread">The thread was added successfully</string>
+    <string name="posting_dialog_hide_button">Hide</string>
+    <string name="posting_dialog_cancel_button">Cancel</string>
+    <string name="posting_cancelled">Sending canceled</string>
+    <string name="posting_now_posting">Another message is sent at the moment</string>
+    
+    <string name="downloading_start_ticker">Downloading files</string>
+    <string name="downloading_success_ticker">All downloads are completed</string>
+    <string name="downloading_error_ticker">Some files are not loaded</string>
+    <string name="downloading_error_title">Error while downloading</string>
+    <string name="downloading_error_report_title">The following files have not been downloaded.</string>
+    <string name="downloading_title">Downloading (%d remaining)</string>
+    <string name="downloading_title_simple">Downloading</string>
+    <string name="downloading_error_mkdir">Cannot create the directory</string>
+    <string name="downloading_error_mkfile">Cannot create file</string>
+    <string name="downloading_error_save_html">Cannot save the HTML file</string>
+    <string name="downloading_error_serialize">Error while serialization</string>
+    <string name="downloading_error_copy">Error while copying</string>
+    <string name="downloading_error_download">Error while downloading</string>
+    <string name="downloading_error_file_exists">File already exists</string>
+    <string name="downloading_error_interactive_format">Requested %s checking</string>
+    <string name="downloading_error_save_container">Error while writing to archive</string>
+    <string name="downloading_error_unknown">An unknown error occurred</string>
+    <string name="downloading_element_format">%1$s: %2$s</string>
+    <string name="downloading_thumbnail_format">%s thumbnail</string>
+    <string name="downloading_thread_format">thread %1$s-%2$s</string>
+    <string name="downloading_dialog_hide_button">Hide</string>
+    <string name="downloading_dialog_cancel_button">Cancel</string>
+    <string name="downloading_dialog_current_format">Remaining: %1$d\nCurrent: %2$s</string>
+    
+    <string name="html_thumbnailmsg">Thumbnail displayed, click image for full size.</string>
+    <string name="html_external">(external)</string>
+    <string name="html_file">File:</string>
+    
+    <string name="filedialog_title">Select the file</string>
+    <string name="filedialog_location">Location</string>
+    <string name="filedialog_cant_read_folder">Can\'t read!</string>
+    <string name="filedialog_new">New</string>
+    <string name="filedialog_select">Select</string>
+    <string name="filedialog_filename">File name:</string>
+    <string name="filedialog_filename_hint">file name</string>
+    <string name="filedialog_cancel">Cancel</string>
+    <string name="filedialog_create">Save</string>
+    <string name="filedialog_no_data">No Data</string>
+    <string name="filedialog_error">Error</string>
+    
+    <string name="gallery_error_incorrect_attachment">Incorrect attachment</string>
+    <string name="gallery_error_play">Cannot play the file</string>
+    <string name="gallery_tap_to_play">Tap to play</string>
+    <string name="gallery_tap_to_open">Tap to open</string>
+    <string name="gallery_tap_to_external_link">Tap to external link</string>
+    
+    <string name="autohide_title">Hiding rules</string>
+    <string name="autohide_add_rule_title">Add the rule</string>
+    <string name="autohide_edit_rule_title">Edit the rule</string>
+    <string name="autohide_add_rule_item">Add rule</string>
+    <string name="autohide_add_rule_summary">Add the new rule</string>
+    <string name="autohide_regex_hint">Regular expression</string>
+    <string name="autohide_all_chans">All Imageboards</string>
+    <string name="autohide_board_hint">Board</string>
+    <string name="autohide_thread_hint">Thread</string>
+    <string name="autohide_in_comment">Search in messages</string>
+    <string name="autohide_in_subject">Search in subjects</string>
+    <string name="autohide_in_name">Search in names and tripcodes</string>
+    <string name="autohide_save_button">Save</string>
+    <string name="autohide_error_no_condition">Unspecified neither condition</string>
+    <string name="autohide_error_empty_regex">Empty regular expression</string>
+    <string name="autohide_error_incorrect_regex">Incorrect regular expression</string>
+    
+    <string name="notification_url_copied">Address is copied to the clipboard\n%s</string>
+    <string name="notification_post_not_found">The post isn\'t found</string>
+    <string name="notification_comment_copied">Message is copied to the clipboard</string>
+    <string name="notification_download_already_in_queue">The task is already added:\n%s</string>
+    <string name="notification_download_already_exists">File already exists:\n%s</string>
+    <string name="notification_not_found">Not found</string>
+    <string name="notifacation_updating_now">The list is updated at the moment, try again later</string>
+	
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="error_deserialization">Error while deserialization</string>
+    <string name="error_cloudflare_get_captcha">Unable to get Cloudflare captcha</string>
+    <string name="error_cloudflare_cancelled">Cloudflare checking has not been passed</string>
+    <string name="error_cloudflare_antiddos">Unable to pass Cloudflare anti-DDOS checking</string>
+    <string name="error_ssl">SSL/HTTPS Error (Connection is Untrusted)</string>
+    <string name="error_ssl_help">\n\nIf you understand what\'s going on, you can set in preferences of this imageboard:
+        \n\"Ignore SSL Errors\".\n\nIn this case, the security of the connection is not guaranteed.</string>
+    <string name="error_connection">Unable to connect to server</string>
+    <string name="error_open_local">Unable to open the file as the saved thread</string>
+    <string name="error_no_space">Not enough disk space</string>
+    <string name="error_interactive_dialog_format">%s checking</string>
+    <string name="error_interactive_cancelled_format">%s checking has not been passed</string>
+    <string name="error_out_of_memory">Out of memory</string>
+    
+    <string name="makaba_catalog_standart">Sort by Bump order</string>
+    <string name="makaba_catalog_last_reply">Sort by Last Reply</string>
+    <string name="makaba_catalog_num">Sort by Creation date</string>
+    <string name="makaba_catalog_image_size">Sort by Image size</string>
+    <string name="makaba_no_icon">No Icon</string>
+    <string name="makaba_prefs_mobile_api">Mobile API</string>
+    <string name="makaba_prefs_mobile_api_summary">Load only new posts without reloading the whole thread</string>
+    <string name="makaba_prefs_force_google">Google Recaptcha</string>
+    <string name="makaba_prefs_force_google_summary">Use Recaptcha instead of captcha from Yandex</string>
+	<string name="makaba_prefs_domain_category">Domain</string>
+	<string name="makaba_prefs_domain">Domain</string>
+	<string name="makaba_prefs_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+	
+	<string name="mikuba_password_ignored">(ignored)</string>
+	
+	<string name="preferences">Preferences</string>
+    <string name="pref_cat_chans">Imageboards</string>
+    <string name="pref_cat_appearance">Appearance</string>
+    <string name="pref_cat_advanced">Advanced</string>
+    <string name="pref_cat_date_time">Date and Time</string>
+    <string name="pref_cat_personal">Personal Data</string>
+    <string name="pref_cat_downloads">Downloads</string>
+    <string name="pref_cat_autoupdate">Auto-update</string>
+    <string name="pref_cat_cache">Cache</string>
+    <string name="pref_cat_proxy">Connection</string>
+    <string name="pref_use_proxy">Proxy</string>
+	<string name="pref_use_proxy_summary">Use HTTP proxy</string>
+	<string name="pref_proxy_host">Address</string>
+	<string name="pref_proxy_host_summary">The address of the proxy server</string>
+	<string name="pref_proxy_port">Port</string>
+	<string name="pref_proxy_port_summary">The port number that is assigned to the proxy server</string>
+	<string name="pref_use_https">Use HTTPS</string>
+	<string name="pref_use_https_summary">Secure encrypted connection</string>
+	<string name="pref_ignore_ssl_errors">Ignore SSL Errors</string>
+	<string name="pref_ignore_ssl_errors_summary">Disable Hostname and Certificate Validation</string>
+	<string name="pref_cat_connection_extended">Advanced Settings</string>
+	<string name="pref_okhttp">OkHttp</string>
+	<string name="pref_okhttp_summary">Alternative HTTP-client with SPDY (may be unstable!)</string>
+	<string name="pref_okhttp_unlocked">OkHttp preference is unlocked</string>
+	<string name="pref_password_title">Password</string>
+    <string name="pref_password_summary">Password for post deletion by default</string>
+    <string name="pref_name_title">Name</string>
+    <string name="pref_name_summary">Name by default</string>
+    <string name="pref_name_hint">leave it blank</string>
+    <string name="pref_email_title">E-mail</string>
+    <string name="pref_email_summary">Email address by default</string>
+    <string name="pref_email_hint">email</string>
+    <string name="pref_hide_personal_title">Hide personal data block</string>
+    <string name="pref_hide_personal_summary">Always use the default values</string>
+    <string name="pref_random_hash_title">Random hash</string>
+    <string name="pref_random_hash_summary">Add a few bytes to the tail of attachment files</string>
+    <string name="pref_show_nsfw_boards_title">All boards</string>
+    <string name="pref_show_nsfw_boards_summary">Show unmoderated boards</string>
+    <string name="pref_autohide_title">Autohide</string>
+    <string name="pref_autohide_summary">Automatic hiding by regular expressions</string>
+    <string name="pref_show_date_title">Display the time</string>
+    <string name="pref_show_date_summary">Display the date and time of each post</string>
+    <string name="pref_local_time_title">Show local time</string>
+    <string name="pref_local_time_summary">Display your local time instead of imageboard time</string>
+    <string name="pref_cut_posts_title">Long posts</string>
+    <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
+    <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>
+    <string name="pref_gallery_screen_title">Gallery</string>
+    <string name="pref_gallery_screen_summary">Gallery advanced preferences</string>
+    <string name="pref_gallery_scaleimageview_title">Image Viewer</string>
+    <string name="pref_gallery_scaleimageview_summary">Image viewer based on built-in library skia</string>
+    <string name="pref_gallery_nativegif_title">GIF Viewer</string>
+    <string name="pref_gallery_nativegif_summary">Use a native library libgif</string>
+    <string name="pref_gallery_videoplayer_title">Built-in video player</string>
+    <string name="pref_gallery_videoplayer_summary">May not work on older versions of Android</string>
+    <string name="pref_gallery_audioplayer_title">Built-in video player</string>
+    <string name="pref_gallery_audioplayer_summary">May not work on older versions of Android</string>
+    <string name="pref_enable_autoupdate_title">Enable auto-update</string>
+    <string name="pref_enable_autoupdate_summary">Update the open threads automatically</string>
+    <string name="pref_autoupdate_delay_title">Interval (in seconds)</string>
+    <string name="pref_autoupdate_delay_summary">Auto-update interval, not less than 30 seconds</string>
+    <string name="pref_autoupdate_delay_hint">60 seconds by default</string>
+    <string name="pref_autoupdate_delay_incorrect">Incorrect value</string>
+    <string name="pref_autoupdate_background_title">Update in background</string>
+    <string name="pref_autoupdate_background_summary">Update tabs marked for auto-update in the background</string>
+    <string name="pref_autoupdate_notification_title">In the notification area</string>
+    <string name="pref_autoupdate_notification_summary">Does not allow the system to close the process when the application is minimized</string>
+    <string name="pref_cache_maxsize_title">Maximum size (MB)</string>
+    <string name="pref_cache_maxsize_summary">The maximum size of the file cache</string>
+    <string name="pref_cache_maxsize_hint">0 - unlimited; 50 MB by default</string>
+    <string name="pref_clear_cache_title">Clear cache</string>
+    <string name="pref_clear_cache_summary">%.1f MB</string>
+    <string name="pref_download_dir_title">Downloads directory</string>
+    <string name="pref_download_dir_summary">The directory where files should be saved</string>
+    <string name="pref_download_thumbs_title">Download thumbnails</string>
+    <string name="pref_download_thumbs_summary">Download thumbnails automatically, disable to reduce web traffic</string>
+    <string name="pref_download_format_title">Threads save format</string>
+    <string-array name="pref_download_format_choices">
+        <item>File folder</item>
+        <item>ZIP archive</item>
+        <item>MHTML (limited)</item>
+    </string-array>
+    <string name="pref_theme_title">Theme</string>
+    <string-array name="pref_theme_choices">
+        <item>Futaba</item>
+        <item>Photon</item>
+        <item>Neutron</item>
+    </string-array>
+    <string name="pref_font_size_title">Text size</string>
+    <string-array name="pref_font_size_choices">
+        <item>Medium</item>
+        <item>Large</item>
+        <item>Huge</item>
+    </string-array>
+    <string name="pref_sidepanel_title">Tabs panel width</string>
+    <string-array name="pref_sidepanel_choices">
+        <item>Do not show</item>
+        <item>25\uff05</item>
+        <item>30\uff05</item>
+        <item>35\uff05</item>
+        <item>40\uff05</item>
+        <item>45\uff05</item>
+        <item>50\uff05</item>
+    </string-array>
+</resources>

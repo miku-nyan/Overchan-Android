@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+    <declare-styleable name="Theme">
+        <attr name="activityRootBackground" format="color|reference" />
+        <attr name="sidebarBackground" format="color|reference" />
+        <attr name="sidebarSelectedItem" format="color|reference" />
+        <attr name="listSeparatorBackground" format="color|reference" />
+        <attr name="postUnreadOverlay" format="color|reference" />
+        <attr name="postBackground" format="color|reference" />
+        <attr name="postNumberForeground" format="color|reference" />
+        <attr name="postNameForeground" format="color|reference" />
+        <attr name="postQuoteForeground" format="color|reference" />
+        <attr name="postSageForeground" format="color|reference" />
+        <attr name="postOpForeground" format="color|reference" />
+        <attr name="postTripForeground" format="color|reference" />
+        <attr name="postIndexForeground" format="color|reference" />
+        <attr name="postIndexOverBumpLimit" format="color|reference" />
+        <attr name="postTitleForeground" format="color|reference" />
+        <attr name="spoilerForeground" format="color|reference" />
+        <attr name="spoilerBackground" format="color|reference" />
+        <attr name="urlLinkForeground" format="color|reference" />
+        <attr name="itemInfoForeground" format="color|reference" />
+        <attr name="searchHighlightBackground" format="color|reference" />
+        
+        <attr name="iconDrawer" format="reference" />
+        <attr name="dialogBackgroundShadow" format="reference" />
+        <attr name="sidebarBtnNewTab" format="reference" />
+        <attr name="sidebarBtnHistory" format="reference" />
+        <attr name="sidebarBtnFavorites" format="reference" />
+        <attr name="iconBtnClose" format="reference" />
+        <attr name="iconItemPrevious" format="reference" />
+        <attr name="iconItemNext" format="reference" />
+        <attr name="actionRefresh" format="reference" />
+        <attr name="actionAddPost" format="reference" />
+        <attr name="actionAddAttachment" format="reference" />
+        <attr name="actionAddGallery" format="reference" />
+        <attr name="actionSave" format="reference" />
+    </declare-styleable>
+    
+</resources>

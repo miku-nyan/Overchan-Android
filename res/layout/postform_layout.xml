@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/activityRootBackground"
+    android:fillViewport="true" >
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/postform_name_email_layout"
+            android:orientation="horizontal"
+            android:weightSum="2" >
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/postform_name_field"
+                android:hint="@string/postform_name"
+                android:inputType="textShortMessage|textCapSentences"
+                android:maxLength="255"
+                android:singleLine="true" />
+            <EditText 
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/postform_email_field"
+                android:hint="@string/postform_email"
+                android:inputType="textEmailAddress"
+                android:maxLength="255"
+                android:singleLine="true" />
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/postform_password_layout"
+            android:orientation="horizontal" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/postform_password" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/postform_password_field"
+                android:inputType="textVisiblePassword"
+                android:maxLength="255"
+                android:singleLine="true" />
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/postform_sage_op_watermark_layout" >
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/postform_sage_checkbox"
+                android:text="@string/postform_sage" />
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/postform_watermark_checkbox"
+                android:text="@string/postform_watermark" />
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/postform_op_checkbox"
+                android:text="@string/postform_opmark" />
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/postform_attachments_layout" />
+        
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/postform_spinner" />
+        
+        <EditText 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/postform_subject"
+            android:id="@+id/postform_subject_field"
+            android:inputType="textShortMessage|textCapSentences"
+            android:maxLength="255"
+            android:singleLine="true" />
+        
+        <EditText 
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="top|start"
+            android:hint="@string/postform_comment"
+            android:id="@+id/postform_comment_field"
+            android:inputType="textLongMessage|textMultiLine|textCapSentences"
+            android:maxLength="15000"
+            android:minLines="3" >
+            <requestFocus />
+        </EditText>
+        
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/postform_captcha_layout" >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:id="@+id/postform_captcha_view"
+                android:contentDescription="@string/captcha" />
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="90dp"
+                android:id="@+id/postform_captcha_loading"
+                android:layout_gravity="center_horizontal"
+                android:indeterminate="true" />
+        </FrameLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="5" >
+            <EditText 
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/postform_captcha_hint"
+                android:id="@+id/postform_captcha_field"
+                android:imeOptions="flagNoExtractUi|flagNoFullscreen|actionSend"
+                android:singleLine="true" />
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:id="@+id/postform_send_button"
+                android:text="@string/postform_send" />
+        </LinearLayout>
+        
+    </LinearLayout>
+    
+</ScrollView>

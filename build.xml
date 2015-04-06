@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Overchan" default="help">
+
+    <property file="local.properties" />
+    <property file="ant.properties" />
+
+    <property name="java.target" value="1.7" />
+    <property name="java.source" value="1.7" />
+
+    <property environment="env" />
+    
+    <condition property="sdk.dir" value="${env.ANDROID_HOME}">
+        <isset property="env.ANDROID_HOME" />
+    </condition>
+    <condition property="ndk.dir" value="${env.ANDROID_NDK_HOME}">
+        <isset property="env.ANDROID_NDK_HOME" />
+    </condition>
+    <condition property="ndk.cmd" value="ndk-build.cmd" else="ndk-build">
+        <os family="windows" />
+    </condition>
+
+    <loadproperties srcFile="project.properties" />
+
+    <fail
+        message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
+        unless="sdk.dir"
+    />
+    <fail
+        message="ndk.dir is missing. Make sure to add ndk.dir=/path/to/android-ndk to local.properties or to inject it through the ANDROID_NDK_HOME environment variable."
+        unless="ndk.dir"
+    />
+
+    <!-- version-tag: custom -->
+    <import file="${sdk.dir}/tools/ant/build.xml" />
+
+    <target name="-pre-build">
+        <exec executable="${ndk.dir}/${ndk.cmd}" failonerror="true"/>
+    </target>
+
+    <target name="clean" depends="android_rules.clean">
+        <exec executable="${ndk.dir}/${ndk.cmd}" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="javadoc">
+        <javadoc encoding="UTF-8" charset="UTF-8" docencoding="UTF-8" sourcepath="src:gen" destdir="javadoc" source="1.7" >
+            <classpath>
+                <fileset dir="${sdk.dir}">
+                    <include name="platforms/${target}/android.jar"/>
+                </fileset>
+                <fileset dir="libs">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javadoc>
+    </target>
+
+</project>

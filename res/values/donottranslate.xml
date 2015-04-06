@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+    <string name="empty"></string>
+    
+    <string name="pref_key_cat_appearance">PREF_KEY_CAT_APPEARANCE</string>
+    <string name="pref_key_download_thread_mode">PREF_KEY_DOWNLOAD_THREAD_MODE</string>
+    <string name="pref_key_last_favorites_page">PREF_KEY_LAST_FAVORITES_PAGE</string>
+    <string name="pref_key_name">PREF_KEY_NAME</string>
+    <string name="pref_key_email">PREF_KEY_EMAIL</string>
+    <string name="pref_key_hide_personal">PREF_KEY_HIDE_PERSONAL</string>
+    <string name="pref_key_random_hash">PREF_KEY_RANDOM_HASH</string>
+    <string name="pref_key_show_nsfw_boards">PREF_KEY_SHOW_NSFW_BOARDS</string>
+    <string name="pref_key_autohide">PREF_KEY_AUTOHIDE</string>
+    <string name="pref_key_autohide_json">PREF_KEY_AUTOHIDE_JSON</string>
+    <string name="pref_key_show_date">PREF_KEY_SHOW_DATE</string>
+    <string name="pref_key_local_time">PREF_KEY_LOCAL_TIME</string>
+    <string name="pref_key_cut_posts">PREF_KEY_CUT_POSTS</string>
+    <string name="pref_key_flow_text">PREF_KEY_FLOW_TEXT</string>
+    <string name="pref_key_gallery_screen">PREF_KEY_GALLERY_SCREEN</string>
+    <string name="pref_key_gallery_scaleimageview">PREF_KEY_GALLERY_SCALEIMAGEVIEW</string>
+    <string name="pref_key_gallery_nativegif">PREF_KEY_GALLERY_NATIVEGIF</string>
+    <string name="pref_key_gallery_videoplayer">PREF_KEY_GALLERY_VIDEOPLAYER</string>
+    <string name="pref_key_gallery_audioplayer">PREF_KEY_GALLERY_AUDIOPLAYER</string>
+    <string name="pref_key_enable_autoupdate">PREF_KEY_ENABLE_AUTOUPDATE</string>
+    <string name="pref_key_autoupdate_delay">PREF_KEY_AUTOUPDATE_DELAY</string>
+    <string name="pref_key_autoupdate_background">PREF_KEY_AUTOUPDATE_BACKGROUND</string>
+    <string name="pref_key_autoupdate_notification">PREF_KEY_AUTOUPDATE_NOTIFICATION</string>
+    <string name="pref_key_cache_maxsize">PREF_KEY_CACHE_MAXSIZE</string>
+    <string name="pref_key_clear_cache">PREF_KEY_CLEAR_CACHE</string>
+    <string name="pref_key_download_dir">PREF_KEY_DOWNLOAD_DIR</string>
+    <string name="pref_key_download_thumbs">PREF_KEY_DOWNLOAD_THUMBS</string>
+    <string name="pref_key_download_format">PREF_KEY_DOWNLOAD_FORMAT</string>
+    <string name="pref_download_format_value_default">@string/pref_download_format_value_directory</string>
+    <string name="pref_download_format_value_directory">PREF_DOWNLOAD_FORMAT_VALUE_DIRECTORY</string>
+    <string name="pref_download_format_value_zip">PREF_DOWNLOAD_FORMA_VALUE_ZIP</string>
+    <string name="pref_download_format_value_mhtml">PREF_DOWNLOAD_FORMAT_VALUE_MHTML</string>
+    <string-array name="pref_download_format_values">
+        <item>@string/pref_download_format_value_directory</item>
+        <item>@string/pref_download_format_value_zip</item>
+        <item>@string/pref_download_format_value_mhtml</item>
+    </string-array>
+    <string name="pref_key_theme">PREF_KEY_THEME</string>
+    <string name="pref_theme_value_default">@string/pref_theme_value_photon</string>
+    <string name="pref_theme_value_futaba">PREF_THEME_VALUE_FUTABA</string>
+    <string name="pref_theme_value_photon">PREF_THEME_VALUE_PHOTON</string>
+    <string name="pref_theme_value_neutron">PREF_THEME_VALUE_NEUTRON</string>
+    <string-array name="pref_theme_values" translatable="false">
+        <item>@string/pref_theme_value_futaba</item>
+        <item>@string/pref_theme_value_photon</item>
+        <item>@string/pref_theme_value_neutron</item>
+    </string-array>
+    <string name="pref_key_font_size">PREF_KEY_FONT_SIZE</string>
+    <string name="pref_font_size_value_default">@string/pref_font_size_value_medium</string>
+    <string name="pref_font_size_value_medium">PREF_FONT_SIZE_VALUE_MEDIUM</string>
+    <string name="pref_font_size_value_large">PREF_FONT_SIZE_VALUE_LARGE</string>
+    <string name="pref_font_size_value_huge">PREF_FONT_SIZE_VALUE_HUGE</string>
+    <string-array name="pref_font_size_values" translatable="false">
+        <item>@string/pref_font_size_value_medium</item>
+        <item>@string/pref_font_size_value_large</item>
+        <item>@string/pref_font_size_value_huge</item>
+    </string-array>
+    <string name="pref_key_sidepanel">PREF_KEY_SIDEPANEL</string>
+    <string name="pref_sidepanel_value_default">@string/pref_sidepanel_value_30percent</string>
+    <string name="pref_sidepanel_value_invisible">PREF_SIDEPANEL_VALUE_INVISIBLE</string>
+    <string name="pref_sidepanel_value_25percent">PREF_SIDEPANEL_VALUE_25PERCENT</string>
+    <string name="pref_sidepanel_value_30percent">PREF_SIDEPANEL_VALUE_30PERCENT</string>
+    <string name="pref_sidepanel_value_35percent">PREF_SIDEPANEL_VALUE_35PERCENT</string>
+    <string name="pref_sidepanel_value_40percent">PREF_SIDEPANEL_VALUE_40PERCENT</string>
+    <string name="pref_sidepanel_value_45percent">PREF_SIDEPANEL_VALUE_45PERCENT</string>
+    <string name="pref_sidepanel_value_50percent">PREF_SIDEPANEL_VALUE_50PERCENT</string>
+    <string-array name="pref_sidepanel_values" translatable="false">
+        <item>@string/pref_sidepanel_value_invisible</item>
+        <item>@string/pref_sidepanel_value_25percent</item>
+        <item>@string/pref_sidepanel_value_30percent</item>
+        <item>@string/pref_sidepanel_value_35percent</item>
+        <item>@string/pref_sidepanel_value_40percent</item>
+        <item>@string/pref_sidepanel_value_45percent</item>
+        <item>@string/pref_sidepanel_value_50percent</item>
+    </string-array>
+</resources>
