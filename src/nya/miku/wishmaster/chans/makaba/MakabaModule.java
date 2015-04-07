@@ -136,6 +136,11 @@ public class MakabaModule extends AbstractChanModule {
     }
     
     @Override
+    public String getDisplayingName() {
+        return "Два.ч (.hk)";
+    }
+    
+    @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_makaba, null);
     }

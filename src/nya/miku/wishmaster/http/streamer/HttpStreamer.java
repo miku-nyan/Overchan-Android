@@ -163,6 +163,7 @@ public class HttpStreamer {
                 } catch (IOException e) {
                     Logger.e(TAG, e);
                     responseException = e;
+                    if (e.getMessage() == null) break;
                     if (e.getMessage().indexOf("Connection reset by peer") != -1 ||
                             e.getMessage().indexOf("I/O error during system call, Broken pipe") != -1) {
                         continue;

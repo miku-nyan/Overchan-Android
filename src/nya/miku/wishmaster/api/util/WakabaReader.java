@@ -281,7 +281,7 @@ public class WakabaReader implements Closeable {
                 inDate = true;
                 break;
             case FILTER_TRIPCODE:
-                currentPost.trip = StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTERS_CLOSE[filterIndex])).trim();
+                currentPost.trip = StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTERS_CLOSE[filterIndex]).replaceAll("<[^>]*>", "")).trim();
                 inDate = true;
                 break;
             case FILTER_ENDDATE:

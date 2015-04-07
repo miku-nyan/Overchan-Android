@@ -79,10 +79,10 @@ public class HtmlParser {
      * @param subject тема (заголовок) сообщения, будет вставлена в начале итоговой Spanned строки.
      * Может принимать null или пустую строку, тогда заголовок вставлен не будет 
      * @param source исходный html текст. Поддерживаются тэги, поддерживаемые {@link android.text.Html#fromHtml(String)}, а также:<ul>
-     * <li><b>&lt;s&gt;</b>, <b>&lt;strike&gt;</b> - перечёркнутый текст</li>
+     * <li><b>&lt;s&gt;</b>, <b>&lt;strike&gt;</b>, <b>&lt;del&gt;</b> - перечёркнутый текст</li>
      * <li><b>&lt;code&gt;</b> - отображается моноширинным шрифтом</li>
      * <li><b>&lt;blockquote class="unkfunc"&gt;</b> - форумная цитата (отображается цветом выбранной темы оформления), выделяется абзацами</li>
-     * <li><b>&lt;span class="unkfunc"&gt;</b> - аналогично предыдущему, не выделяется абзацами</li>
+     * <li><b>&lt;span class="unkfunc"&gt;</b>, <b>&lt;span class="quote"&gt;</b> - аналогично предыдущему, не выделяется абзацами</li>
      * <li><b>&lt;span class="spoiler"&gt;</b> - спойлер, затемнённый текст (отображается цветами выбранной темы оформления)</li>
      * <li><b>&lt;span class="s"&gt;</b> - перечёркнутый текст</li>
      * <li><b>&lt;span class="u"&gt;</b> - подчёркнутый текст</li>
@@ -266,6 +266,8 @@ class HtmlToSpannedConverter implements ContentHandler {
             start(mSpannableStringBuilder, new Strike());
         } else if (tag.equalsIgnoreCase("strike")) {
             start(mSpannableStringBuilder, new Strike());
+        } else if (tag.equalsIgnoreCase("del")) {
+            start(mSpannableStringBuilder, new Strike());
         } else if (tag.equalsIgnoreCase("big")) {
             start(mSpannableStringBuilder, new Big());
         } else if (tag.equalsIgnoreCase("small")) {
@@ -329,6 +331,8 @@ class HtmlToSpannedConverter implements ContentHandler {
             end(mSpannableStringBuilder, Strike.class, new StrikethroughSpan());
         } else if (tag.equalsIgnoreCase("strike")) {
             end(mSpannableStringBuilder, Strike.class, new StrikethroughSpan());
+        } else if (tag.equalsIgnoreCase("del")) {
+            end(mSpannableStringBuilder, Strike.class, new StrikethroughSpan());    
         } else if (tag.equalsIgnoreCase("big")) {
             end(mSpannableStringBuilder, Big.class, new RelativeSizeSpan(1.25f));
         } else if (tag.equalsIgnoreCase("small")) {
@@ -567,7 +571,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     private static void startSpan(SpannableStringBuilder text, Attributes attributes) {
         String style = attributes.getValue("", "style");
         String classAttr = attributes.getValue("", "class");
-        boolean isAibquote = classAttr != null && classAttr.equals("unkfunc");
+        boolean isAibquote = classAttr != null && (classAttr.equals("unkfunc") || classAttr.equals("quote"));
         boolean isAibspoiler = classAttr != null && classAttr.equals("spoiler");
         boolean isUnderline = classAttr != null && classAttr.equals("u");
         boolean isStrike = classAttr != null && classAttr.equals("s");

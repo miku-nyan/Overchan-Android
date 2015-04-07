@@ -141,6 +141,8 @@ import android.widget.Toast;
 public class BoardFragment extends Fragment implements AdapterView.OnItemClickListener, VolatileSpanClickListener.Listener {
     private static final String TAG = "BoardFragment";
     
+    private boolean isFailInstance = false;
+    
     private PagesCache pagesCache = MainApplication.getInstance().pagesCache;
     private BitmapCache bitmapCache = MainApplication.getInstance().bitmapCache;
     private ApplicationSettings settings = MainApplication.getInstance().settings;
@@ -264,7 +266,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (tabsState == null) throw new IllegalStateException("tabsState was not initialized in the MainApplication singleton");
         long tabId = getArguments().getLong("TabModelId");
         tabModel = tabsState.findTabById(tabId);
-        if (tabModel == null) throw new IllegalStateException("cannot find the selected tab (TabModelId = " + tabId + ")");
+        if (tabModel == null) { //периодически (видно в крашрепортах ACRA) создаются инстансы с несуществующим (удалённым??) tabId
+            isFailInstance = true;
+            return;
+        }
         
         startItem = tabModel.startItemNumber;
         startItemTop = tabModel.startItemTop;
@@ -275,7 +280,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             tabModel.autoupdateError = false;
             tabModel.unreadPostsCount = 0;
             MainApplication.getInstance().serializer.serializeTabsState(tabsState);
-            activity.tabsAdapter.notifyDataSetChanged(false);
+            if (activity.tabsAdapter != null) activity.tabsAdapter.notifyDataSetChanged(false);
         }
         
         chan = MainApplication.getInstance().getChanModule(tabModel.pageModel.chanName);
@@ -306,6 +311,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (isFailInstance) {
+            Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
+            return new View(activity);
+        }
         rootView = inflater.inflate(R.layout.board_fragment, container, false);
         loadingView = rootView.findViewById(R.id.board_loading);
         errorView = rootView.findViewById(R.id.board_error);
@@ -351,14 +360,18 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         presentationModel = null; //если фрагмент всё-таки не уничтожится, позволить GC убрать хотя бы основные данные
         
         finalizeSearchBar();
-        listView.setOnCreateContextMenuListener(null);
-        listView.setOnItemClickListener(null);
-        listView.setOnScrollListener(null);
-        listView.setAdapter(null);
-        pullableLayout.setOnRefreshListener(null);
-        pullableLayout.setOnEdgeReachedListener(null);
+        if (listView != null) {
+            listView.setOnCreateContextMenuListener(null);
+            listView.setOnItemClickListener(null);
+            listView.setOnScrollListener(null);
+            listView.setAdapter(null);
+        }
+        if (pullableLayout != null) {
+            pullableLayout.setOnRefreshListener(null);
+            pullableLayout.setOnEdgeReachedListener(null);
+        }
         
-        if (tabModel.type == TabModel.TYPE_LOCAL) {
+        if (tabModel != null && tabModel.type == TabModel.TYPE_LOCAL) {
             try {
                 if (localFile != null) localFile.close();
             } catch (Exception e) {

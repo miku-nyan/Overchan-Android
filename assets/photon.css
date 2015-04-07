@@ -79,7 +79,7 @@ a:hover {
         background:#CCCCCC;
         color:#002244;
 }
-.unkfunc {
+.unkfunc, .quote {
 	background:inherit;
 	color:#789922;
 }

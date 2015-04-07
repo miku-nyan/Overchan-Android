@@ -85,6 +85,11 @@ public class CirnoModule extends AbstractChanModule {
     }
     
     @Override
+    public String getDisplayingName() {
+        return "Ычан";
+    }
+    
+    @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_cirno, null);
     }

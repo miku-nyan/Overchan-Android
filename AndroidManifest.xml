@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nya.miku.wishmaster"
-    android:versionCode="1"
-    android:versionName="0.9.0" >
+    android:versionCode="2"
+    android:versionName="0.9.1" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -54,6 +54,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="iichan.hk" />
                 <data android:host="hatsune.ru" />
                 <data android:host="410chan.org" />
+                <data android:host="4chan.org" />
+                <data android:host="krautchan.net" />
                 <data android:host="2ch.hk" />
                 <data android:host="2ch.pm" />
                 <data android:host="2-ch.so" />

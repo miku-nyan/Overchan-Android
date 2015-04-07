@@ -63,6 +63,8 @@ import android.widget.Toast;
 public class BoardsListFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
     public static final String TAG = "BoardsListFragment";
     
+    private boolean isFailInstance = false;
+    
     private PagesCache pagesCache = MainApplication.getInstance().pagesCache;
     private ChanModule chan;
     
@@ -116,7 +118,10 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         TabsState tabsState = MainApplication.getInstance().tabsState;
         if (tabsState == null) throw new IllegalStateException("tabsState was not initialized in the MainApplication singleton");
         tabModel = tabsState.findTabById(getArguments().getLong("TabModelId"));
-        if (tabModel == null) throw new IllegalStateException("cannot find selected tab");
+        if (tabModel == null) {
+            isFailInstance = true;
+            return;
+        }
         
         if (tabModel.forceUpdate) {
             tabModel.forceUpdate = false;
@@ -152,6 +157,10 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (isFailInstance) {
+            Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
+            return new View(activity);
+        }
         startItem = tabModel.startItemNumber;
         startItemTop = tabModel.startItemTop;
         rootView = inflater.inflate(R.layout.boardslist_fragment, container, false);
@@ -288,12 +297,14 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
     @Override
     public void onDestroy() {
         super.onDestroy();
-        listView.setOnLongClickListener(null);
-        listView.setAdapter(null);
+        if (listView != null) {
+            listView.setOnLongClickListener(null);
+            listView.setAdapter(null);
+        }
     }
     
     private void saveCurrentPostPosition() {
-        if (listView != null && listView.getChildCount() > 0 && adapter != null) {
+        if (tabModel != null && listView != null && listView.getChildCount() > 0 && adapter != null) {
             View v = listView.getChildAt(0);
             int position = listView.getPositionForView(v);
             BoardsListEntry model = adapter.getItem(position);

@@ -273,7 +273,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
         public View getView(int position, View convertView, ViewGroup parent) {
             ChanModule chan = getItem(position);
             TextView view = (TextView) (convertView == null ? inflater.inflate(android.R.layout.simple_list_item_1, parent, false) : convertView);
-            view.setText(chan.getChanName());
+            view.setText(chan.getDisplayingName());
             view.setCompoundDrawablesWithIntrinsicBounds(chan.getChanFavicon(), null, null, null);
             view.setCompoundDrawablePadding(drawablePadding);
             return view;

@@ -83,6 +83,11 @@ public class Chan410Module extends AbstractChanModule {
     }
     
     @Override
+    public String getDisplayingName() {
+        return "410chan";
+    }
+    
+    @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_410chan, null);
     }

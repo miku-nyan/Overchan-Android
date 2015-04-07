@@ -20,7 +20,6 @@ package nya.miku.wishmaster.ui.settings;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
-import nya.miku.wishmaster.chans.cirno.MikubaModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.BoardsListFragment;
@@ -32,7 +31,6 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -60,12 +58,12 @@ public class PreferencesActivity extends PreferenceActivity {
         PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(this);
         setPreferenceScreen(rootScreen);
         
-        PreferenceCategory chansCat = new PreferenceCategory(this);
+        PreferenceScreen chansCat = getPreferenceManager().createPreferenceScreen(this);
         chansCat.setTitle(R.string.pref_cat_chans);
         rootScreen.addPreference(chansCat);
         for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
             PreferenceScreen curScreen = getPreferenceManager().createPreferenceScreen(this);
-            curScreen.setTitle(chan instanceof MikubaModule ? chan.getChanName() + " (iichan)" : chan.getChanName());
+            curScreen.setTitle(chan.getDisplayingName());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 CompatibilityImpl.setIcon(curScreen, chan.getChanFavicon());
             }

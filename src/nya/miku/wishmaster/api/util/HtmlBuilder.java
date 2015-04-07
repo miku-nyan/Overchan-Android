@@ -316,7 +316,14 @@ public class HtmlBuilder implements Closeable {
             
             String url;
             if (found.startsWith("#")) {
-                url = found;
+                try {
+                    String thisThreadUrl = chan.buildUrl(pageModel);
+                    int i = thisThreadUrl.indexOf('#');
+                    if (i != -1) thisThreadUrl = thisThreadUrl.substring(0, i);
+                    url = "#" + chan.parseUrl(thisThreadUrl + found).postNumber;
+                } catch (Exception e) {
+                    url = found;
+                }
             } else {
                 url = chan.fixRelativeUrl(found);
                 try {

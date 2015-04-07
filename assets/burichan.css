@@ -98,7 +98,7 @@ a:hover {
         font-size:12px;
         color:#000000;
 }
-.unkfunc {
+.unkfunc, .quote {
 	background:#C4C2EE;
 	color:#FFFFFF;
 }

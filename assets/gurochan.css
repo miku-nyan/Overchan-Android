@@ -49,7 +49,7 @@ a.quotelink {
   text-align:center;
   font-size:12px;
 }
-.unkfunc {
+.unkfunc, .quote {
 	background:inert;
 	color:#789922;
 }

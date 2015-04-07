@@ -76,7 +76,7 @@ a:hover {
         background:#DDDDAA;
         color:#800000;
 }
-.unkfunc {
+.unkfunc, .quote {
 	background:inert;
 	color:#789922;
 }

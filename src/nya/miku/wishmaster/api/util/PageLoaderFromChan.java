@@ -29,6 +29,7 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.cloudflare.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestException;
+import nya.miku.wishmaster.lib.org_json.JSONException;
 import android.content.res.Resources;
 
 /**
@@ -112,6 +113,8 @@ public class PageLoaderFromChan implements Runnable, CancellableTask {
                     } else {
                         callback.onError(resources.getString(R.string.error_connection));
                     }
+                } else if (e instanceof JSONException) {
+                    callback.onError(MainApplication.getInstance().resources.getString(R.string.error_parse));
                 } else {
                     callback.onError(e.getMessage());
                 }

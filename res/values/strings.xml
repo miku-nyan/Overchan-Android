@@ -307,6 +307,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_ssl_help">\n\nIf you understand what\'s going on, you can set in preferences of this imageboard:
         \n\"Ignore SSL Errors\".\n\nIn this case, the security of the connection is not guaranteed.</string>
     <string name="error_connection">Unable to connect to server</string>
+    <string name="error_parse">Unable to parse the page</string>
     <string name="error_open_local">Unable to open the file as the saved thread</string>
     <string name="error_no_space">Not enough disk space</string>
     <string name="error_interactive_dialog_format">%s checking</string>

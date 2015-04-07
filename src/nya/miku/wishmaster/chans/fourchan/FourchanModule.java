@@ -81,6 +81,11 @@ public class FourchanModule extends AbstractChanModule {
     }
     
     @Override
+    public String getDisplayingName() {
+        return "4chan";
+    }
+    
+    @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_4chan, null);
     }
@@ -141,9 +146,12 @@ public class FourchanModule extends AbstractChanModule {
     
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
-        if (boardsMap == null) getBoardsList(listener, task, null);
+        if (boardsMap == null) {
+            try {
+                getBoardsList(listener, task, null);
+            } catch (Exception e) {}
+        }
         if (boardsMap != null && boardsMap.containsKey(shortName)) return boardsMap.get(shortName);
-        System.out.println("from default");
         return FourchanJsonMapper.getDefaultBoardModel(shortName);
     }
     
@@ -212,6 +220,11 @@ public class FourchanModule extends AbstractChanModule {
             result = ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(result));
         }
         return result;
+    }
+    
+    @Override
+    public PostModel[] search(String boardName, String searchRequest, ProgressListener listener, CancellableTask task) throws Exception {
+        throw new Exception("Open this page in the browser");
     }
     
     @Override
@@ -333,12 +346,26 @@ public class FourchanModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher threadPage = Pattern.compile("([^/]+)/thread/(\\d+)(?:.*?)(?:#p(\\d+))?").matcher(path);
+        Matcher threadPage = Pattern.compile("([^/]+)/thread/(\\d+)[^#]*(?:#p(\\d+))?").matcher(path);
         if (threadPage.find()) {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.boardName = threadPage.group(1);
             model.threadNumber = threadPage.group(2);
             model.postNumber = threadPage.group(3);
+            return model;
+        }
+        
+        Matcher pageCatalogSearch = Pattern.compile("([^/]+)/catalog(?:#s=(.+))?").matcher(path);
+        if (pageCatalogSearch.find()) {
+            model.boardName = pageCatalogSearch.group(1);
+            String search = pageCatalogSearch.group(2);
+            if (search != null) {
+                model.type = UrlPageModel.TYPE_SEARCHPAGE;
+                model.searchRequest = search;
+            } else {
+                model.type = UrlPageModel.TYPE_CATALOGPAGE;
+                model.catalogType = 0;
+            }
             return model;
         }
         
@@ -348,20 +375,6 @@ public class FourchanModule extends AbstractChanModule {
             model.boardName = boardPage.group(1);
             String page = boardPage.group(2);
             model.boardPage = page == null ? 1 : Integer.parseInt(page);
-            return model;
-        }
-        
-        Matcher pageCatalogSearch = Pattern.compile("([^/]+)/catalog(?:#s=(.+?))?").matcher(path);
-        if (pageCatalogSearch.find()) {
-            model.boardName = pageCatalogSearch.group(1);
-            String search = pageCatalogSearch.group(2);
-            if (search == null) {
-                model.type = UrlPageModel.TYPE_SEARCHPAGE;
-                model.searchRequest = search;
-            } else {
-                model.type = UrlPageModel.TYPE_CATALOGPAGE;
-                model.catalogType = 0;
-            }
             return model;
         }
         

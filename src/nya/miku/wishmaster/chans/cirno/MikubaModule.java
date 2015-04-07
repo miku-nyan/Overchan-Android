@@ -130,6 +130,11 @@ public class MikubaModule extends AbstractChanModule {
     public String getChanName() {
         return MIKUBA_NAME;
     }
+    
+    @Override
+    public String getDisplayingName() {
+        return "hatsune.ru (Ычан - Vocaloid)";
+    }
 
     @Override
     public Drawable getChanFavicon() {

@@ -57,6 +57,11 @@ public interface ChanModule {
     String getChanName();
     
     /**
+     * Получить отображаемое (пользователю) название имиджборды, напр. "Два.ч (.hk)"
+     */
+    String getDisplayingName();
+    
+    /**
      * Получить значок имиджборды (объект Drawable)
      */
     Drawable getChanFavicon();

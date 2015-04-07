@@ -314,6 +314,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_ssl_help">\n\nЕсли вы понимаете, что происходит, вы можете установить в настройках данной имиджборды:
         \n\"Игнорировать ошибки SSL\".\n\nПри этом безопасность соединения не гарантирована.</string>
     <string name="error_connection">Ошибка при загрузке</string>
+    <string name="error_parse">Невозможно распарсить страницу</string>
     <string name="error_open_local">Невозможно открыть файл как сохранённый тред</string>
     <string name="error_no_space">Недостаточно места на диске</string>
     <string name="error_interactive_dialog_format">Выполняется проверка %s</string>
