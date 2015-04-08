@@ -230,6 +230,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_nsfw_boards), false);
     }
     
+    public boolean askExternalLinks() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_external_links_confirmation), true);
+    }
+    
     public boolean isAutoupdateEnabled() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_enable_autoupdate), false);
     }

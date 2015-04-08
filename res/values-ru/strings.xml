@@ -391,6 +391,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_show_nsfw_boards_summary">Отображать доски с немодерируемым содержимым</string>
     <string name="pref_autohide_title">Автоскрытие</string>
     <string name="pref_autohide_summary">Автоскрытие по регулярным выражениям</string>
+    <string name="pref_external_links_confirmation_title">Подтверждение ссылок</string>
+    <string name="pref_external_links_confirmation_summary">Спрашивать, предже чем открывать внешние ссылки</string>
     <string name="pref_show_date_title">Показывать время</string>
     <string name="pref_show_date_summary">Показывать дату и время создания сообщения</string>
     <string name="pref_local_time_title">Локальное время</string>

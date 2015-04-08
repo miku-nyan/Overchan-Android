@@ -55,12 +55,16 @@ public class UrlHandler {
                 }
             }
         };
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity).
-                setTitle(isEmail ? R.string.dialog_external_mail_title : R.string.dialog_external_url_title).
-                setMessage(activity.getString(isEmail ? R.string.dialog_external_mail_text : R.string.dialog_external_url_text, url)).
-                setPositiveButton(android.R.string.yes, dialogClickListener).
-                setNegativeButton(android.R.string.no, dialogClickListener);
-        dialogBuilder.show();
+        if (MainApplication.getInstance().settings.askExternalLinks()) {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity).
+                    setTitle(isEmail ? R.string.dialog_external_mail_title : R.string.dialog_external_url_title).
+                    setMessage(activity.getString(isEmail ? R.string.dialog_external_mail_text : R.string.dialog_external_url_text, url)).
+                    setPositiveButton(android.R.string.yes, dialogClickListener).
+                    setNegativeButton(android.R.string.no, dialogClickListener);
+            dialogBuilder.show();
+        } else {
+            launchExternalBrowser(activity, url);
+        }
     }
     
     public static void open(UrlPageModel urlPageModel, MainActivity activity) {

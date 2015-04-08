@@ -37,6 +37,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -277,7 +278,7 @@ public class KrautReader implements Closeable {
         int buflen = commentBuffer.length();
         if (buflen > len) {
             commentBuffer.setLength(buflen - len);
-            return commentBuffer.toString();
+            return CryptoUtils.fixCloudflareEmails(commentBuffer.toString());
         } else {
             return "";
         }

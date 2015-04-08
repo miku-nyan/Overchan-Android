@@ -127,6 +127,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:key="@string/pref_key_autohide"
             android:title="@string/pref_autohide_title"
             android:summary="@string/pref_autohide_summary" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_external_links_confirmation"
+            android:title="@string/pref_external_links_confirmation_title"
+            android:summary="@string/pref_external_links_confirmation_summary" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_downloads" >
