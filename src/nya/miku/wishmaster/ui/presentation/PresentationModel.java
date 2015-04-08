@@ -19,9 +19,11 @@
 package nya.miku.wishmaster.ui.presentation;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -125,8 +127,12 @@ public class PresentationModel {
         } catch (Exception e) {
             Logger.e(TAG, "error while processing regex autohide rules", e);
         }
-        this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-        this.dateFormat.setTimeZone(localTime ? TimeZone.getDefault() : TimeZone.getTimeZone(source.boardModel.timeZoneId));
+        AndroidDateFormat.initPattern();
+        String datePattern = AndroidDateFormat.getPattern();
+        DateFormat dateFormat = datePattern == null ?
+                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT) : new SimpleDateFormat(datePattern, Locale.US);
+        dateFormat.setTimeZone(localTime ? TimeZone.getDefault() : TimeZone.getTimeZone(source.boardModel.timeZoneId));
+        this.dateFormat = dateFormat;
         this.size = getSerializablePageSize(source);
     }
     

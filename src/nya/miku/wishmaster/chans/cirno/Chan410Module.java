@@ -229,7 +229,7 @@ public class Chan410Module extends AbstractChanModule {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
             if (response.statusCode == 302) {
                 for (Header header : response.headers) {
-                    if (header.getName().equalsIgnoreCase(HttpHeaders.LOCATION)) {
+                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
                         if (header.getValue().trim().length() == 0) throw new Exception();
                         return fixRelativeUrl(header.getValue());
                     }

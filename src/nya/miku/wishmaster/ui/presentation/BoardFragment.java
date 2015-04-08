@@ -457,7 +457,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (tabModel.type != TabModel.TYPE_LOCAL && pageType == TYPE_POSTSLIST && listLoaded) {
             savePageMenuVisible = true;
         }
-        menu.findItem(R.id.menu_add_post).setVisible(addPostMenuVisible);
+        menu.findItem(R.id.menu_add_post).setVisible(addPostMenuVisible); //FIXME
         menu.findItem(R.id.menu_update).setVisible(updateMenuVisible);
         menu.findItem(R.id.menu_catalog).setVisible(catalogMenuVisible);
         menu.findItem(R.id.menu_search).setVisible(searchMenuVisible);
@@ -897,7 +897,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     private void switchToLoadingView() {
-        loadingView.setVisibility(View.VISIBLE);
+        loadingView.setVisibility(View.VISIBLE); //FIXME (NPE from update() here)
         errorView.setVisibility(View.GONE);
         pullableLayout.setVisibility(View.GONE);
         catalogBarView.setVisibility(View.GONE);
@@ -1180,7 +1180,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             String oldTabTitle = tabModel.title != null ? tabModel.title : "";
             if (isThreadPage) {
                 String tabTitle;
-                String subject = presentationModel.presentationList.get(0).sourceModel.subject;
+                String subject = presentationModel.presentationList.get(0).sourceModel.subject; //FIXME
                 if (subject != null && subject.length() != 0) {
                     tabTitle = subject;
                 } else {
@@ -1209,7 +1209,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (presentationModel.isNotReady()) Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
+                    if (presentationModel.isNotReady()) Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show(); //FIXME
                     
                     listView.setAdapter(adapter);
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1) {
@@ -1325,7 +1325,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         private OnAttachmentClickListener onAttachmentClickListener;
         
         public PostsListAdapter(BoardFragment fragment) {
-            super(fragment.activity, 0, fragment.presentationModel.presentationList);
+            super(fragment.activity, 0, fragment.presentationModel.presentationList); //FIXME (3 reports)
             fragmentRef = new WeakReference<BoardFragment>(fragment);
             onUnreadFrameListener = new OnUnreadFrameListener(fragmentRef);
             onAttachmentClickListener = new OnAttachmentClickListener(fragmentRef);
@@ -1664,7 +1664,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 @Override
                                 public boolean onPreDraw() {
                                     tag.commentView.getViewTreeObserver().removeOnPreDrawListener(this);
-                                    if (tag.commentView.getHeight() < fragment().staticSettings.itemHeight) {
+                                    if (tag.commentView.getHeight() < fragment().staticSettings.itemHeight) { //FIXME
                                         return true;
                                     }
                                     tag.showFullTextView.setVisibility(View.VISIBLE);
@@ -1946,7 +1946,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 pullableLayout.setRefreshing(true);
             }
         } else {
-            switchToLoadingView();
+            switchToLoadingView(); //FIXME -> NPE
         }
         PageGetter pageGetter = new PageGetter(forceUpdate, silent);
         currentTask = pageGetter;

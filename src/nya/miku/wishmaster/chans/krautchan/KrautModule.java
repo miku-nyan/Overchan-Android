@@ -352,7 +352,7 @@ public class KrautModule extends AbstractChanModule {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
             if (response.statusCode == 302) {
                 for (Header header : response.headers) {
-                    if (header.getName().equalsIgnoreCase(HttpHeaders.LOCATION)) {
+                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
                         String location = header.getValue();
                         if (location.contains("banned")) throw new Exception("You are banned");
                         return fixRelativeUrl(header.getValue());
@@ -395,7 +395,7 @@ public class KrautModule extends AbstractChanModule {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
             if (response.statusCode == 302) {
                 for (Header header : response.headers) {
-                    if (header.getName().equalsIgnoreCase(HttpHeaders.LOCATION)) {
+                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
                         String location = header.getValue();
                         if (location.contains("banned")) throw new Exception("You are banned");
                         break;

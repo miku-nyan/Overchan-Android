@@ -217,7 +217,7 @@ public class CirnoModule extends AbstractChanModule {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
             if (response.statusCode == 303) {
                 for (Header header : response.headers) {
-                    if (header.getName().equalsIgnoreCase(HttpHeaders.LOCATION)) {
+                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
                         return fixRelativeUrl(header.getValue());
                     }
                 }

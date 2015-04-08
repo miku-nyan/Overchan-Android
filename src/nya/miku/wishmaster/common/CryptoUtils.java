@@ -81,7 +81,7 @@ public class CryptoUtils {
             int c = random.nextInt(62);
             if (c < 10) {
                 ch = Character.forDigit(c, 10);
-            } else if (c < 37) {
+            } else if (c < 36) {
                 c -= 10;
                 ch = (char) ('a' + c);
             } else {
