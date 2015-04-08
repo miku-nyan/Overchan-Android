@@ -84,7 +84,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:background="?android:attr/listDivider"
         android:contentDescription="@string/empty" />
     
-    <ListView
+    <nya.miku.wishmaster.lib.dslv.DragSortListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="0dp"

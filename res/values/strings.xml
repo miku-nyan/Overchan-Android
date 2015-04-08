@@ -28,6 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="close">Close</string>
     <string name="captcha">Captcha</string>
     
+    <string name="mark_quote">Quote</string>
+    <string name="mark_bold">Bold</string>
+    <string name="mark_italic">Italic</string>
+    <string name="mark_strike">Strikethrough</string>
+    <string name="mark_spoiler">Spoiler</string>
+    
     <string name="postitem_contentdescription_thumbnail_image">Thumbnail</string>
     <string name="postitem_contentdescription_badge_icon">Icon</string>
     <string name="postitem_op_mark">#OP</string>
@@ -92,6 +98,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="newtab_address_hint">http://</string>
     <string name="newtab_saved_threads_title">Saved threads</string>
     <string name="newtab_select_local_file">Specify file location</string>
+    <string name="newtab_quickaccess_all_boards">All Imageboards</string>
+    <string name="newtab_quickaccess_addcustom_title">Add the board from %s</string>
+    <string name="newtab_quickaccess_addcustom_boardcode">Board code</string>
+    <string name="newtab_quickaccess_addcustom_boarddesc">Description</string>
+    <string name="newtab_quickaccess_addcustom_incorrect_code">Incorrect board code</string>
+    <string name="newtab_quickaccess_addcustom_already_exists">This board is already in the list</string>
     
     <string name="history_empty">No history</string>
     <string name="history_today">Today</string>
@@ -161,6 +173,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_share">Share</string>
     <string name="context_menu_search_google">Search in Google</string>
     <string name="context_menu_delete_autohide_rule">Remove the rule</string>
+    <string name="context_menu_quickaccess_add">Add to Quick Access</string>
+    <string name="context_menu_quickaccess_remove">Remove from Quick Access</string>
+    <string name="context_menu_quickaccess_custom_board">Add custom board</string>
     
     <string name="share_via">Share via</string>
     

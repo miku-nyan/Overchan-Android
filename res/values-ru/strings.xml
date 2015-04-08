@@ -28,6 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="close">Закрыть</string>
     <string name="captcha">Капча</string>
     
+    <string name="mark_quote">Цитата</string>
+    <string name="mark_bold">Жирный</string>
+    <string name="mark_italic">Курсив</string>
+    <string name="mark_strike">Зачёркнутый</string>
+    <string name="mark_spoiler">Спойлер</string>
+    
     <string name="postitem_contentdescription_thumbnail_image">Превью</string>
     <string name="postitem_contentdescription_badge_icon">Значок</string>
     <string name="postitem_op_mark">#OP</string>
@@ -97,6 +103,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="newtab_address_hint">http://</string>
     <string name="newtab_saved_threads_title">Сохранённые треды</string>
     <string name="newtab_select_local_file">Указать расположение файла</string>
+    <string name="newtab_quickaccess_all_boards">Все имиджборды</string>
+    <string name="newtab_quickaccess_addcustom_title">Добавить доску с %s</string>
+    <string name="newtab_quickaccess_addcustom_boardcode">Код доски</string>
+    <string name="newtab_quickaccess_addcustom_boarddesc">Описание</string>
+    <string name="newtab_quickaccess_addcustom_incorrect_code">Некорректный код доски</string>
+    <string name="newtab_quickaccess_addcustom_already_exists">Доска уже присутствует в списке</string>
     
     <string name="history_empty">Нет истории</string>
     <string name="history_today">Сегодня</string>
@@ -166,6 +178,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_share">Поделиться</string>
     <string name="context_menu_search_google">Искать в Google</string>
     <string name="context_menu_delete_autohide_rule">Удалить правило</string>
+    <string name="context_menu_quickaccess_add">Добавить в быстрый доступ</string>
+    <string name="context_menu_quickaccess_remove">Удалить из быстого доступа</string>
+    <string name="context_menu_quickaccess_custom_board">Добавить свою доску</string>
     
     <string name="share_via">Способ отправки</string>
     

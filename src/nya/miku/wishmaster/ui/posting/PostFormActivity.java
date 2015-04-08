@@ -50,6 +50,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.text.Editable;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -87,6 +88,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     private Spinner spinner;
     private EditText subjectField;
     private EditText commentField;
+    private LinearLayout markLayout;
     private View captchaLayout;
     private ImageView captchaView;
     private View captchaLoading;
@@ -115,6 +117,57 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.postform_send_button:
                 send();
+                break;
+            case R.id.postform_mark_bold:
+            case R.id.postform_mark_italic:
+            case R.id.postform_mark_strike:
+            case R.id.postform_mark_spoiler:
+            case R.id.postform_mark_quote:
+                Editable comment = commentField.getEditableText();
+                String text = comment.toString();
+                int selectionStart = Math.max(0, commentField.getSelectionStart());
+                int selectionEnd = Math.min(text.length(), commentField.getSelectionEnd());
+                text = text.substring(selectionStart, selectionEnd);
+                
+                if (boardModel.markType == BoardModel.MARK_WAKABAMARK) {
+                    switch (v.getId()) {
+                        case R.id.postform_mark_bold:
+                            comment.replace(selectionStart, selectionEnd, "**" + text + "**");
+                            break;
+                        case R.id.postform_mark_italic:
+                            comment.replace(selectionStart, selectionEnd, "*" + text + "*");
+                            break;
+                        case R.id.postform_mark_strike:
+                            StringBuilder strike = new StringBuilder();
+                            for (int i=0, len=selectionEnd-selectionStart; i<len; ++i) strike.append("^H");
+                            comment.replace(selectionStart, selectionEnd, text + strike.toString());
+                            break;
+                        case R.id.postform_mark_spoiler:
+                            comment.replace(selectionStart, selectionEnd, "%%" + text + "%%");
+                            break;
+                        case R.id.postform_mark_quote:
+                            comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
+                            break;
+                    }
+                } else if (boardModel.markType == BoardModel.MARK_BBCODE) {
+                    switch (v.getId()) {
+                        case R.id.postform_mark_bold:
+                            comment.replace(selectionStart, selectionEnd, "[b]" + text + "[/b]");
+                            break;
+                        case R.id.postform_mark_italic:
+                            comment.replace(selectionStart, selectionEnd, "[i]" + text + "[/i]");
+                            break;
+                        case R.id.postform_mark_strike:
+                            comment.replace(selectionStart, selectionEnd, "[s]" + text + "[/s]");
+                            break;
+                        case R.id.postform_mark_spoiler:
+                            comment.replace(selectionStart, selectionEnd, "[spoiler]" + text + "[/spoiler]");
+                            break;
+                        case R.id.postform_mark_quote:
+                            comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
+                            break;
+                    }
+                }
                 break;
         }
     }
@@ -356,6 +409,8 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         spinner = (Spinner) findViewById(R.id.postform_spinner);
         subjectField = (EditText) findViewById(R.id.postform_subject_field);
         commentField = (EditText) findViewById(R.id.postform_comment_field);
+        markLayout = (LinearLayout) findViewById(R.id.postform_mark_layout);
+        for (int i=0, len=markLayout.getChildCount(); i<len; ++i) markLayout.getChildAt(i).setOnClickListener(this);
         captchaLayout = findViewById(R.id.postform_captcha_layout);
         captchaView = (ImageView) findViewById(R.id.postform_captcha_view);
         captchaView.setOnClickListener(this);
@@ -387,6 +442,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             else if (!boardModel.allowNames && boardModel.allowEmails) emailField.setLayoutParams(getWideLayoutParams());
         }
         
+        markLayout.setVisibility(boardModel.markType != BoardModel.MARK_NOMARK ? View.VISIBLE : View.GONE);
         subjectField.setVisibility(boardModel.allowSubjects ? View.VISIBLE : View.GONE);
         chkboxLayout.setVisibility(boardModel.allowSage || boardModel.allowWatermark || boardModel.allowOpMark ? View.VISIBLE : View.GONE);
         sageChkbox.setVisibility(boardModel.allowSage ? View.VISIBLE : View.GONE);

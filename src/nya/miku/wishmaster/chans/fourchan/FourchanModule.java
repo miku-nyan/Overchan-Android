@@ -288,7 +288,7 @@ public class FourchanModule extends AbstractChanModule {
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN_NAME)) throw new IllegalArgumentException("wrong chan");
-        if (model.boardName != null && !model.boardName.matches("\\w*")) throw new IllegalArgumentException("wrong board name");
+        if (model.boardName != null && !model.boardName.matches("\\w+")) throw new IllegalArgumentException("wrong board name");
         StringBuilder url = new StringBuilder(useHttps() ? "https://" : "http://");
         try {
             switch (model.type) {

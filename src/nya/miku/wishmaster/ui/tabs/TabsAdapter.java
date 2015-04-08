@@ -188,12 +188,9 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
         TextView title = (TextView)view.findViewById(R.id.tab_text_view);
         ImageView closeBtn = (ImageView)view.findViewById(R.id.tab_close_button);
         
-        if (position == draggingItem) {
-            dragHandler.setVisibility(View.VISIBLE);
-        } else {
-            dragHandler.setVisibility(View.GONE);
-        }
-        
+        dragHandler.getLayoutParams().width = position == draggingItem ? ViewGroup.LayoutParams.WRAP_CONTENT : 0;
+        dragHandler.setLayoutParams(dragHandler.getLayoutParams());
+                
         if (position == selectedItem) {
             TypedValue typedValue = new TypedValue();
             context.getTheme().resolveAttribute(R.attr.sidebarSelectedItem, typedValue, true);

@@ -22,9 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_height="wrap_content"
     android:minHeight="@dimen/tab_height"
     android:orientation="horizontal" >
- 
+    
     <nya.miku.wishmaster.lib.DragGripView
-        android:id="@+id/tab_drag_handle" 
+        android:id="@+id/newtab_quickaccess_drag_handle" 
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -32,35 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:paddingRight="16dp"
         android:visibility="visible" />
     
-    <ImageView
-        android:id="@+id/tab_favicon"
-        android:layout_gravity="center_vertical"
-        android:layout_width="40dp"
-        android:layout_height="match_parent"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:contentDescription="@string/empty" />
- 
-    <TextView
-        android:id="@+id/tab_text_view"
-        android:layout_gravity="center_vertical"
+    <include
+        layout="@android:layout/simple_list_item_1"
+        android:id="@+id/newtab_quickaccess_text"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="?android:attr/textColorSecondary"
-        android:singleLine="true" />
-    
-    <nya.miku.wishmaster.lib.NonParentFocusableImageView
-        style="@style/SelectableItem"
-        android:id="@+id/tab_close_button"
-        android:scaleType="center"
-        android:layout_gravity="center_vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:contentDescription="@string/close"
-        android:src="?attr/iconBtnClose" />
+        android:layout_height="wrap_content" />
  
 </LinearLayout>

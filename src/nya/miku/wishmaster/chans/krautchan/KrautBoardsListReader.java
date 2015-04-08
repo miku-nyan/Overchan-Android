@@ -1,3 +1,21 @@
+/*
+ * Overchan Android (Meta Imageboard Client)
+ * Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+ *     
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package nya.miku.wishmaster.chans.krautchan;
 
 import java.io.BufferedReader;
@@ -169,6 +187,7 @@ public class KrautBoardsListReader implements Closeable {
         bm.allowIcons = false;
         bm.attachmentsMaxCount = 4;
         bm.attachmentsFormatFilters = ATTACHMENT_FORMATS;
+        bm.markType = BoardModel.MARK_BBCODE;
         bm.firstPage = 1;
         bm.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
         bm.searchAllowed = false;

@@ -91,6 +91,10 @@ public class BoardModel implements Serializable {
     /** Массив с фильтрами допустимых форматов (расширений) прикрепляемых файлов, например: ["jpg", "png", "gif"].
      *  Только если {@link #readonlyBoard} равно false, в противном случае может принимать null. */
     @Tag(24) public String[] attachmentsFormatFilters;
+    /** Тип допустимой разметки в теле отправляемого поста,
+     *  одно из константных значений: {@link #MARK_NOMARK}, {@link #MARK_WAKABAMARK}, {@link #MARK_BBCODE}.
+     *  Только если {@link #readonlyBoard} равно false. */
+    @Tag(30) public int markType;
     
     /** Номер первой (нулевой) страницы на данной доске. */
     @Tag(25) public int firstPage;
@@ -106,7 +110,15 @@ public class BoardModel implements Serializable {
      *  Только если {@link #catalogAllowed} равно true, в противном случае может принимать null. */
     @Tag(29) public String[] catalogTypeDescriptions;
     
-    /** Константное значения для обозначения номера последней страницы, если настоящий номер неизвестен. */
+    /** Константное значение для обозначения номера последней страницы, если настоящий номер неизвестен. */
     public static final int LAST_PAGE_UNDEFINED = Integer.MAX_VALUE;
     
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - без разметки */
+    public static final int MARK_NOMARK = 0;
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - модифицированный wakabamark.<br>
+     *  *italic* **bold** %%spoiler%% strike^H^H^H^H^H^H */
+    public static final int MARK_WAKABAMARK = 1;
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - BBCode.<br>
+     *  [i]italic[/i] [b]bold[/b] [spoiler]spoiler[/spoiler] [s]strike[/s] */
+    public static final int MARK_BBCODE = 2;
 }

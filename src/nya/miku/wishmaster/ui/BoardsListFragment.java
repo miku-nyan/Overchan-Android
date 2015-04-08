@@ -18,6 +18,8 @@
 
 package nya.miku.wishmaster.ui;
 
+import java.util.List;
+
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -183,7 +185,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         });
         buttonGo = (Button) rootView.findViewById(R.id.boardslist_btn_go);
         buttonGo.setOnClickListener(this);
-        activity.setTitle(tabModel.pageModel.chanName);
+        activity.setTitle(chan.getDisplayingName());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             CompatibilityImpl.setActionBarCustomFavicon(activity, chan.getChanFavicon());
         update(false);
@@ -234,6 +236,12 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                         menu.add(Menu.NONE, R.id.context_menu_favorites_from_fragment, 1,
                                 isFavorite ? R.string.context_menu_remove_favorites : R.string.context_menu_add_favorites);
                     }
+                    List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
+                    for (QuickAccess.Entry entry : quickAccess)
+                        if (entry.boardName != null && entry.chan != null)
+                            if (entry.chan.getChanName().equals(model.chanName) && entry.boardName.equals(model.boardName))
+                                return;
+                    menu.add(Menu.NONE, R.id.context_menu_quickaccess_add, 2, R.string.context_menu_quickaccess_add);
                 }
             }
         } catch (Exception e) {
@@ -257,6 +265,16 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                     }
                     return true;
                 }
+            } else if (item.getItemId() == R.id.context_menu_quickaccess_add) {
+                List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
+                QuickAccess.Entry newEntry = new QuickAccess.Entry();
+                newEntry.chan = chan;
+                SimpleBoardModel simleBoardModel = adapter.getItem(menuInfo.position).model;
+                newEntry.boardName = simleBoardModel.boardName;
+                newEntry.boardDescription = simleBoardModel.boardDescription;
+                quickAccess.add(0, newEntry);
+                QuickAccess.saveQuickAccessToPreferences(quickAccess);
+                return true;
             }
         } catch (Exception e) {
             Logger.e(TAG, e);

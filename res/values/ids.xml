@@ -57,6 +57,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item name="context_menu_delete" type="id"/>
     <item name="context_menu_delete_files" type="id"/>
     
+    <item name="context_menu_quickaccess_move" type="id"/>
+    <item name="context_menu_quickaccess_remove" type="id"/>
+    <item name="context_menu_quickaccess_add" type="id"/>
+    <item name="context_menu_quickaccess_custom_board" type="id"/>
+    
     <item name="context_menu_thumb_load_thumb" type="id"/>
     <item name="context_menu_thumb_download" type="id"/>
     <item name="context_menu_thumb_copy_url" type="id"/>

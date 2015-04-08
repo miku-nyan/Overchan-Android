@@ -73,6 +73,7 @@ public class MakabaJsonMapper {
         };
         model.firstPage = 0;
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
+        model.markType = BoardModel.MARK_BBCODE;
         
         if (fromMobileBoardsList) {
             model.boardName = source.getString("id");

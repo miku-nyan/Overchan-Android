@@ -66,6 +66,7 @@ public class FourchanJsonMapper {
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
+        model.markType = BoardModel.MARK_WAKABAMARK;
         model.firstPage = 1;
         model.lastPage = 10;
         model.searchAllowed = false;

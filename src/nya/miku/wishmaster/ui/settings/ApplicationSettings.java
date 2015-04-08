@@ -180,6 +180,14 @@ public class ApplicationSettings {
         preferences.edit().putString(resources.getString(R.string.pref_key_autohide_json), json).commit();
     }
     
+    public String getQuickAccessListJson() {
+        return preferences.getString(resources.getString(R.string.pref_key_quickaccess_json), "[{}]");
+    }
+    
+    public void saveQuickAccessListJson(String json) {
+        preferences.edit().putString(resources.getString(R.string.pref_key_quickaccess_json), json).commit();
+    }
+    
     public int getLastFavoritesPage() {
         return preferences.getInt(resources.getString(R.string.pref_key_last_favorites_page), FavoritesFragment.PAGE_ALL);
     }

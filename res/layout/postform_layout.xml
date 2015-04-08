@@ -114,6 +114,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:maxLength="255"
             android:singleLine="true" />
         
+        <LinearLayout
+            android:id="@+id/postform_mark_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+            <ImageButton
+                android:id="@+id/postform_mark_quote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/mark_quote"
+                android:contentDescription="@string/mark_quote" />
+            <ImageButton
+                android:id="@+id/postform_mark_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/mark_bold"
+                android:contentDescription="@string/mark_bold" />
+            <ImageButton
+                android:id="@+id/postform_mark_italic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/mark_italic"
+                android:contentDescription="@string/mark_italic" />
+            <ImageButton
+                android:id="@+id/postform_mark_strike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/mark_strike"
+                android:contentDescription="@string/mark_strike" />
+            <ImageButton
+                android:id="@+id/postform_mark_spoiler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/mark_spoiler"
+                android:contentDescription="@string/mark_spoiler" />
+        </LinearLayout>
+        
         <EditText 
             android:layout_width="match_parent"
             android:layout_height="0dp"

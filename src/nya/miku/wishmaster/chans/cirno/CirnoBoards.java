@@ -143,6 +143,7 @@ public class CirnoBoards {
         model.allowIcons = false;
         model.attachmentsMaxCount = name.equals("d") ? 0 : 1;
         model.attachmentsFormatFilters = ATTACHMENT_FILTERS;
+        model.markType = BoardModel.MARK_WAKABAMARK;
         
         model.firstPage = 0;
         model.lastPage = BoardModel.LAST_PAGE_UNDEFINED;

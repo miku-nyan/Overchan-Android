@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_show_nsfw_boards">PREF_KEY_SHOW_NSFW_BOARDS</string>
     <string name="pref_key_autohide">PREF_KEY_AUTOHIDE</string>
     <string name="pref_key_autohide_json">PREF_KEY_AUTOHIDE_JSON</string>
+    <string name="pref_key_quickaccess_json">PREF_KEY_QUICKACCESS_JSON</string>
     <string name="pref_key_show_date">PREF_KEY_SHOW_DATE</string>
     <string name="pref_key_local_time">PREF_KEY_LOCAL_TIME</string>
     <string name="pref_key_cut_posts">PREF_KEY_CUT_POSTS</string>
