@@ -93,7 +93,9 @@ public class FourchanJsonMapper {
             model.icons = new BadgeIconModel[] { icon };
         }
         model.op = false;
-        model.sage = false; //TODO ???
+        String id = object.optString("id", "");
+        model.sage = id.equalsIgnoreCase("Heaven");
+        if (!id.equals("")) model.name += (" ID:" + id);
         model.timestamp = object.getLong("time") * 1000;
         model.parentThread = object.optString("resto", "0");
         if (model.parentThread.equals("0")) model.parentThread = model.number;

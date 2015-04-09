@@ -20,6 +20,7 @@ package nya.miku.wishmaster.ui.presentation;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -406,7 +407,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        this.menu = menu;
         MenuItem itemAddPost = menu.add(Menu.NONE, R.id.menu_add_post, 101,
                 resources.getString(pageType == TYPE_POSTSLIST ? R.string.menu_add_post : R.string.menu_add_thread));
         MenuItem itemUpdate = menu.add(Menu.NONE, R.id.menu_update, 102, 
@@ -425,6 +425,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         menu.add(Menu.NONE, R.id.menu_save_page, 105, resources.getString(R.string.menu_save_page)).setIcon(android.R.drawable.ic_menu_save);
         menu.add(Menu.NONE, R.id.menu_board_gallery, 106, resources.getString(R.string.menu_board_gallery)).setIcon(android.R.drawable.
                 ic_menu_slideshow);
+        this.menu = menu;
         updateMenu();
     }
     
@@ -457,7 +458,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (tabModel.type != TabModel.TYPE_LOCAL && pageType == TYPE_POSTSLIST && listLoaded) {
             savePageMenuVisible = true;
         }
-        menu.findItem(R.id.menu_add_post).setVisible(addPostMenuVisible); //FIXME
+        menu.findItem(R.id.menu_add_post).setVisible(addPostMenuVisible);
         menu.findItem(R.id.menu_update).setVisible(updateMenuVisible);
         menu.findItem(R.id.menu_catalog).setVisible(catalogMenuVisible);
         menu.findItem(R.id.menu_search).setVisible(searchMenuVisible);
@@ -655,7 +656,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (nullAdapterIsSet || position == -1 || adapter.getCount() <= position) return false;
         switch (item.getItemId()) {
             case R.id.context_menu_show_op_post:
-                showPostPopupDialog(position, false, null);
+                showThreadPreviewDialog(position);
                 return true;
             case R.id.context_menu_reply_no_reading:
                 UrlPageModel model = new UrlPageModel();
@@ -897,7 +898,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     private void switchToLoadingView() {
-        loadingView.setVisibility(View.VISIBLE); //FIXME (NPE from update() here)
+        loadingView.setVisibility(View.VISIBLE);
         errorView.setVisibility(View.GONE);
         pullableLayout.setVisibility(View.GONE);
         catalogBarView.setVisibility(View.GONE);
@@ -1173,14 +1174,15 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         /** @param needUpdateAfter - требуется ли обновить страницу на чане после показа */
         private void toListView(final boolean needUpdateAfter) {
+            if (presentationModel == null || presentationModel.presentationList == null) return;
             adapter = new PostsListAdapter(BoardFragment.this);
             if (pageType == TYPE_POSTSLIST && tabModel.firstUnreadPosition == 0) {
                 resetFirstUnreadPosition();
             }
             String oldTabTitle = tabModel.title != null ? tabModel.title : "";
-            if (isThreadPage) {
+            if (isThreadPage && presentationModel.presentationList.size() > 0) {
                 String tabTitle;
-                String subject = presentationModel.presentationList.get(0).sourceModel.subject; //FIXME
+                String subject = presentationModel.presentationList.get(0).sourceModel.subject;
                 if (subject != null && subject.length() != 0) {
                     tabTitle = subject;
                 } else {
@@ -1209,7 +1211,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (presentationModel.isNotReady()) Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show(); //FIXME
+                    if (presentationModel == null || presentationModel.isNotReady())
+                        Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
                     
                     listView.setAdapter(adapter);
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1) {
@@ -1325,7 +1328,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         private OnAttachmentClickListener onAttachmentClickListener;
         
         public PostsListAdapter(BoardFragment fragment) {
-            super(fragment.activity, 0, fragment.presentationModel.presentationList); //FIXME (3 reports)
+            super(fragment.activity, 0, fragment.presentationModel.presentationList);
             fragmentRef = new WeakReference<BoardFragment>(fragment);
             onUnreadFrameListener = new OnUnreadFrameListener(fragmentRef);
             onAttachmentClickListener = new OnAttachmentClickListener(fragmentRef);
@@ -1663,8 +1666,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             tag.commentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                                 @Override
                                 public boolean onPreDraw() {
+                                    if (fragment() == null) return false;
                                     tag.commentView.getViewTreeObserver().removeOnPreDrawListener(this);
-                                    if (tag.commentView.getHeight() < fragment().staticSettings.itemHeight) { //FIXME
+                                    if (tag.commentView.getHeight() < fragment().staticSettings.itemHeight) {
                                         return true;
                                     }
                                     tag.showFullTextView.setVisibility(View.VISIBLE);
@@ -1946,7 +1950,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 pullableLayout.setRefreshing(true);
             }
         } else {
-            switchToLoadingView(); //FIXME -> NPE
+            switchToLoadingView();
         }
         PageGetter pageGetter = new PageGetter(forceUpdate, silent);
         currentTask = pageGetter;
@@ -2469,6 +2473,70 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
         };
         
+        if (tmpV.getWidth() != 0) {
+            next.run();
+        } else {
+            AppearanceUtils.callWhenLoaded(tmpDlg.getWindow().getDecorView(), next);
+        }
+    }
+    
+    private void showThreadPreviewDialog(final int position) {
+        final List<View> views = new ArrayList<>();
+        final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
+        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
+        final View tmpV = new View(activity);
+        final Dialog tmpDlg = new Dialog(activity);
+        tmpDlg.getWindow().setBackgroundDrawableResource(bgShadowResource);
+        tmpDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        tmpDlg.setCanceledOnTouchOutside(true);
+        tmpDlg.setContentView(tmpV);
+        tmpDlg.show();
+        Runnable next = new Runnable() {
+            @SuppressLint("RtlHardcoded")//XXX XXX
+            @Override
+            public void run() {
+                dlgWidth = tmpV.getWidth();
+                tmpDlg.hide();
+                tmpDlg.cancel();
+                views.add(getView(position));
+                final Dialog dialog = new Dialog(activity);
+                for (int i=1; i<presentationModel.source.threads[position].posts.length; ++i) {
+                    presentationModel.presentationList.add(new PresentationItemModel(
+                            presentationModel.source.threads[position].posts[i],
+                            chan.getChanName(),
+                            presentationModel.source.pageModel.boardName,
+                            presentationModel.source.pageModel.threadNumber,
+                            DateFormat.getDateTimeInstance(),
+                            new ClickableURLSpan.URLSpanClickListener() {
+                                @Override
+                                public void onClick(View v, ClickableURLSpan span, String url) {
+                                    dialog.dismiss();
+                                    onURLSpanClick(v, span, url);
+                                }
+                            }, imageGetter, ThemeUtils.ThemeColors.getInstance(activity.getTheme()), floatingModels));
+                    views.add(getView(presentationModel.presentationList.size() - 1));
+                    presentationModel.presentationList.remove(presentationModel.presentationList.size() - 1);
+                }
+                ListView dlgList = new ListView(activity);
+                dlgList.setAdapter(new ArrayAdapter<View>(activity, 0, views) {
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        return getItem(position);
+                    }
+                });
+                dialog.getWindow().setBackgroundDrawableResource(bgShadowResource);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.setContentView(dlgList);
+                dialog.show();
+            }
+            int dlgWidth;
+            private View getView(int position) {
+                View view = adapter.getView(position, null, null, dlgWidth);
+                view.setBackgroundColor(bgColor);
+                return view;
+            }
+        };
         if (tmpV.getWidth() != 0) {
             next.run();
         } else {

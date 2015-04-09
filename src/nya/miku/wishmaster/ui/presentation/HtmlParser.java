@@ -545,8 +545,9 @@ class HtmlToSpannedConverter implements ContentHandler {
         text.removeSpan(obj);
         
         if (where != len && colors != null) {
-            text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            //text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            //text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(new SpoilerSpan(colors.spoilerForeground, colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
     
@@ -601,8 +602,9 @@ class HtmlToSpannedConverter implements ContentHandler {
             }
             
             if (colors != null && s.mIsAibspoiler) {
-                text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                //text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                //text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                text.setSpan(new SpoilerSpan(colors.spoilerForeground, colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             
             if (s.mIsUnderline) {
