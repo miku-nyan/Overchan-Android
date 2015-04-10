@@ -360,6 +360,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_downloads">Загрузки</string>
     <string name="pref_cat_autoupdate">Автообновление</string>
     <string name="pref_cat_cache">Кэширование</string>
+    <string name="pref_cat_about">О программе</string>
     <string name="pref_cat_proxy">Настройки соединения</string>
     <string name="pref_use_proxy">Прокси</string>
 	<string name="pref_use_proxy_summary">Использовать HTTP прокси</string>
@@ -425,6 +426,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cache_maxsize_hint">0 - неограниченный; 50 МБ по умолчанию</string>
     <string name="pref_clear_cache_title">Очистить кэш</string>
     <string name="pref_clear_cache_summary">%.1f MБ</string>
+    <string name="pref_about_updateapp_title">Overchan Android v%s</string>
+    <string name="pref_about_updateapp_summary">Проверить наличие обновлений</string>
     <string name="pref_download_dir_title">Директория загрузок</string>
     <string name="pref_download_dir_summary">Директория, куда будут скачиваться файлы</string>
     <string name="pref_download_thumbs_title">Загружать картинки</string>

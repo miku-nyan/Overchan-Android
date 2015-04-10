@@ -221,4 +221,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:title="@string/pref_clear_cache_title" />
     </PreferenceCategory>
     
+    <PreferenceCategory android:title="@string/pref_cat_about">
+        <Preference
+            android:key="@string/pref_key_about_updateapp"
+            android:summary="@string/pref_about_updateapp_summary" />
+    </PreferenceCategory>
+    
 </PreferenceScreen>

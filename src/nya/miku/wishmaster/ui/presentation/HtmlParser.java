@@ -62,6 +62,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -181,6 +182,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     //костыли для правильной обработки (обрезки) <p>...</p> в начале и в конце
     private int mStartLength = 0; //длина subject + '\n'
     private int[] mLastPTagLength = new int[] {-1, -1}; //2 целых числа {before, after}, длина до и после обработки последнего тэга (</p>)
+    private LinkedList<Object> mListTags = new LinkedList<>();
     private ThemeColors mColors;
     private HtmlParser.ImageGetter mImageGetter;
     
@@ -282,6 +284,12 @@ class HtmlToSpannedConverter implements ContentHandler {
             start(mSpannableStringBuilder, new Monospace());
         } else if (tag.equalsIgnoreCase("code")) {
             start(mSpannableStringBuilder, new Monospace());
+        } else if (tag.equalsIgnoreCase("ul")) {
+            mListTags.addFirst(new UlTag());
+        } else if (tag.equalsIgnoreCase("ol")) {
+            mListTags.addFirst(new OlTag());
+        } else if (tag.equalsIgnoreCase("li")) {
+            handleLi(mSpannableStringBuilder, mListTags.peek(), mListTags.size());
         } else if (tag.equalsIgnoreCase("a")) {
             startA(mSpannableStringBuilder, attributes);
         } else if (tag.equalsIgnoreCase("u")) {
@@ -346,6 +354,12 @@ class HtmlToSpannedConverter implements ContentHandler {
             end(mSpannableStringBuilder, Monospace.class, new TypefaceSpan("monospace"));
         } else if (tag.equalsIgnoreCase("code")) {
             end(mSpannableStringBuilder, Monospace.class, new TypefaceSpan("monospace"));
+        } else if (tag.equalsIgnoreCase("ul")) {
+            if (!mListTags.isEmpty()) mListTags.removeFirst();
+        } else if (tag.equalsIgnoreCase("ol")) {
+            if (!mListTags.isEmpty()) mListTags.removeFirst();
+        } else if (tag.equalsIgnoreCase("li")) {
+            //обрабатывается только открывающийся <li>
         } else if (tag.equalsIgnoreCase("a")) {
             endA(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("u")) {
@@ -393,6 +407,16 @@ class HtmlToSpannedConverter implements ContentHandler {
 
     private static void handleBr(SpannableStringBuilder text) {
         text.append("\n");
+    }
+    
+    private static void handleLi(SpannableStringBuilder text, Object tag, int level) {
+        if (tag == null) return;
+        
+        int len = text.length();
+        if (len >= 1 && text.charAt(len - 1) != '\n') text.append("\n");
+        for (int i=1; i<level; ++i) text.append("\t");
+        if (tag instanceof OlTag) text.append(Integer.toString(((OlTag) tag).curIndex++) + ". ");
+        else if (tag instanceof UlTag) text.append("\u2022 ");
     }
 
     private static Object getLast(Spanned text, Class<?> kind) {
@@ -792,6 +816,11 @@ class HtmlToSpannedConverter implements ContentHandler {
             mIsUnderline = isUnderline;
             mIsStrike = isStrike;
         }
+    }
+    
+    private static class UlTag {}
+    private static class OlTag {
+        public int curIndex = 1;
     }
 }
 

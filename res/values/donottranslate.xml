@@ -47,6 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_autoupdate_notification">PREF_KEY_AUTOUPDATE_NOTIFICATION</string>
     <string name="pref_key_cache_maxsize">PREF_KEY_CACHE_MAXSIZE</string>
     <string name="pref_key_clear_cache">PREF_KEY_CLEAR_CACHE</string>
+    <string name="pref_key_about_updateapp">PREF_KEY_ABOUT_UPDATEAPP</string>
     <string name="pref_key_download_dir">PREF_KEY_DOWNLOAD_DIR</string>
     <string name="pref_key_download_thumbs">PREF_KEY_DOWNLOAD_THUMBS</string>
     <string name="pref_key_download_format">PREF_KEY_DOWNLOAD_FORMAT</string>

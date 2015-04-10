@@ -91,6 +91,20 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
         
+        String versionName = "";
+        try {
+            versionName += getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception e) {}
+        Preference aboutPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_updateapp));
+        aboutPreference.setTitle(getString(R.string.pref_about_updateapp_title, versionName));
+        aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                AppUpdatesChecker.checkForUpdates(PreferencesActivity.this);
+                return true;
+            }
+        });
+        
         getPreferenceManager().findPreference(getString(R.string.pref_key_autohide)).setOnPreferenceClickListener(
                 new Preference.OnPreferenceClickListener() {
             @Override
