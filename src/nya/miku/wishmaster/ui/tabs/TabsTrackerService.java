@@ -190,7 +190,7 @@ public class TabsTrackerService extends Service {
                             tab.autoupdateError = false;
                             int newCount = serializablePage.posts != null ? serializablePage.posts.length : 0;
                             if (oldCount != newCount) {
-                                tab.unreadPostsCount += (newCount - oldCount);
+                                if (oldCount != 0) tab.unreadPostsCount += (newCount - oldCount);
                                 unread = true;
                             }
                             if (presentationModel != null) {

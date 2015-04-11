@@ -268,6 +268,15 @@ public class MainActivity extends FragmentActivity {
         return false;
     }
     
+    private void updateTabPanelTabletWeight() {
+        if (MainApplication.getInstance().settings.isRealTablet() && !MainApplication.getInstance().settings.showSidePanel()) {
+            DrawerLayout.LayoutParams sidebarLayoutParams = (DrawerLayout.LayoutParams) findViewById(R.id.sidebar).getLayoutParams();
+            Point displaySize = AppearanceUtils.getDisplaySize(getWindowManager().getDefaultDisplay());
+            sidebarLayoutParams.width = (int) (displaySize.x * MainApplication.getInstance().settings.getTabPanelTabletWeight());
+            findViewById(R.id.sidebar).setLayoutParams(sidebarLayoutParams);
+        }
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "main activity creating");
@@ -283,8 +292,10 @@ public class MainActivity extends FragmentActivity {
             Point displaySize = AppearanceUtils.getDisplaySize(getWindowManager().getDefaultDisplay());
             int rootWidth = (int) (displaySize.x * rootViewWeight);
             sidebarLayoutParams.width = displaySize.x - rootWidth;
+            findViewById(R.id.sidebar).setLayoutParams(sidebarLayoutParams);
         } else {
             setContentView(R.layout.main_activity_drawer);
+            updateTabPanelTabletWeight();
         }
         initDrawer();
         
@@ -393,6 +404,7 @@ public class MainActivity extends FragmentActivity {
             return;
         } else {
             MainApplication.getInstance().settings.updateStaticSettings(settings);
+            updateTabPanelTabletWeight();
         }
         handleOrientationChange(getResources().getConfiguration());
     }

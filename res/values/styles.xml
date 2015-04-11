@@ -148,17 +148,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="actionSave">@drawable/ic_action_save_dark</item>
     </style>
     
-    <style name="TextAppearance_Medium.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">11sp</item> </style>
-    <style name="TextAppearance_Medium.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">13sp</item> </style>
-    <style name="TextAppearance_Medium.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">16sp</item> </style>
+    <style name="TextAppearance_Small.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">11sp</item> </style>
+    <style name="TextAppearance_Small.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">13sp</item> </style>
+    <style name="TextAppearance_Small.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">16sp</item> </style>
     
-    <style name="TextAppearance_Large.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">14sp</item> </style>
-    <style name="TextAppearance_Large.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">16sp</item> </style>
-    <style name="TextAppearance_Large.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">19sp</item> </style>
+    <style name="TextAppearance_Medium.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">13sp</item> </style>
+    <style name="TextAppearance_Medium.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">15sp</item> </style>
+    <style name="TextAppearance_Medium.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">18sp</item> </style>
+    
+    <style name="TextAppearance_Large.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">15sp</item> </style>
+    <style name="TextAppearance_Large.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">17sp</item> </style>
+    <style name="TextAppearance_Large.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">20sp</item> </style>
     
     <style name="TextAppearance_Huge.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">17sp</item> </style>
     <style name="TextAppearance_Huge.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">19sp</item> </style>
     <style name="TextAppearance_Huge.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">22sp</item> </style>
+    
+    <style name="Futaba_Small" parent="@style/Futaba_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
+    </style>
     
     <style name="Futaba_Medium" parent="@style/Futaba_Base">
         <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
@@ -178,6 +188,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
     </style>
     
+    <style name="Photon_Small" parent="@style/Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
+    </style>
+    
     <style name="Photon_Medium" parent="@style/Photon_Base">
         <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
@@ -194,6 +210,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
         <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    </style>
+    
+    <style name="Neutron_Small" parent="@style/Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
     </style>
     
     <style name="Neutron_Medium" parent="@style/Neutron_Base">

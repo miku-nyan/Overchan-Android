@@ -21,10 +21,12 @@ package nya.miku.wishmaster.ui.presentation;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -606,7 +608,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 menu.findItem(R.id.context_menu_download).setTitle(R.string.context_menu_download_attachment);
             }
         } else if (pageType == TYPE_THREADSLIST && isList) {
-            menu.add(Menu.NONE, R.id.context_menu_show_op_post, 1, R.string.context_menu_show_op_post);
+            menu.add(Menu.NONE, R.id.context_menu_thread_preview, 1, R.string.context_menu_thread_preview);
             menu.add(Menu.NONE, R.id.context_menu_reply_no_reading, 2, R.string.context_menu_reply_no_reading);
             menu.add(Menu.NONE, R.id.context_menu_hide, 3, R.string.context_menu_hide_thread);
             if (presentationModel.source.boardModel.readonlyBoard || tabModel.type == TabModel.TYPE_LOCAL) {
@@ -655,7 +657,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         if (nullAdapterIsSet || position == -1 || adapter.getCount() <= position) return false;
         switch (item.getItemId()) {
-            case R.id.context_menu_show_op_post:
+            case R.id.context_menu_thread_preview:
                 showThreadPreviewDialog(position);
                 return true;
             case R.id.context_menu_reply_no_reading:
@@ -818,6 +820,11 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     @Override
     public void onURLSpanClick(View v, ClickableURLSpan span, String url) {
+        if (tabModel.pageModel.type != UrlPageModel.TYPE_THREADPAGE) {
+            if (!url.startsWith("#")) UrlHandler.open(chan.fixRelativeUrl(url), activity);
+            return;
+        }
+        
         boolean sameThread = false;
         if (url.startsWith("#")) {
             UrlPageModel thisThreadModel = new UrlPageModel();
@@ -1080,7 +1087,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (presentationModel.isNotReady()) Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
+                                if (presentationModel == null || presentationModel.isNotReady())
+                                    Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
                                 
                                 if (nullAdapterIsSet) {
                                     listView.setAdapter(adapter);
@@ -1441,7 +1449,15 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
          * @return
          */
         public View getView(int position, View convertView, ViewGroup parent, Integer popupWidth) {
-            final PresentationItemModel model = this.getItem(position);
+            return getView(position, convertView, parent, popupWidth, null);
+        }
+        
+        /**
+         * @param custom если != null, строится View (только для всплывающего диалога, popupWidth не должно быть равно null)
+         * не для элемента на позиции position, а для этой модели. При этом комментарий не переносится в ScrollView (т.к. в диалоге будет ListView)
+         */
+        public View getView(int position, View convertView, ViewGroup parent, Integer popupWidth, PresentationItemModel custom) {
+            final PresentationItemModel model = custom == null ? this.getItem(position) : custom;
             
             //(popupWidth == null) <=> (элемент не для всплывающего диалога, а для ListView)            
 
@@ -1735,6 +1751,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             //для построения диалогового окна
             if (popupWidth != null) {
+                if (custom != null) return view;
                 weakRegisterForContextMenu(view);
                 weakRegisterForContextMenu(view.findViewById(R.id.post_content_layout)); 
                 tag.isPopupDialog = true;
@@ -2481,7 +2498,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     private void showThreadPreviewDialog(final int position) {
-        final List<View> views = new ArrayList<>();
+        final List<PresentationItemModel> items = new ArrayList<>();
         final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
         final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
         final View tmpV = new View(activity);
@@ -2492,36 +2509,63 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         tmpDlg.setContentView(tmpV);
         tmpDlg.show();
         Runnable next = new Runnable() {
-            @SuppressLint("RtlHardcoded")//XXX XXX
             @Override
             public void run() {
-                dlgWidth = tmpV.getWidth();
+                final int dlgWidth = tmpV.getWidth();
                 tmpDlg.hide();
                 tmpDlg.cancel();
-                views.add(getView(position));
                 final Dialog dialog = new Dialog(activity);
-                for (int i=1; i<presentationModel.source.threads[position].posts.length; ++i) {
-                    presentationModel.presentationList.add(new PresentationItemModel(
-                            presentationModel.source.threads[position].posts[i],
-                            chan.getChanName(),
-                            presentationModel.source.pageModel.boardName,
-                            presentationModel.source.pageModel.threadNumber,
-                            DateFormat.getDateTimeInstance(),
-                            new ClickableURLSpan.URLSpanClickListener() {
-                                @Override
-                                public void onClick(View v, ClickableURLSpan span, String url) {
-                                    dialog.dismiss();
-                                    onURLSpanClick(v, span, url);
-                                }
-                            }, imageGetter, ThemeUtils.ThemeColors.getInstance(activity.getTheme()), floatingModels));
-                    views.add(getView(presentationModel.presentationList.size() - 1));
-                    presentationModel.presentationList.remove(presentationModel.presentationList.size() - 1);
+                
+                if (presentationModel.source != null &&
+                        presentationModel.source.threads != null &&
+                        presentationModel.source.threads.length > position &&
+                        presentationModel.source.threads[position].posts != null &&
+                        presentationModel.source.threads[position].posts.length > 0) {
+                    
+                    ClickableURLSpan.URLSpanClickListener spanClickListener = new ClickableURLSpan.URLSpanClickListener() {
+                        @Override
+                        public void onClick(View v, ClickableURLSpan span, String url) {
+                            dialog.dismiss();
+                            onURLSpanClick(v, span, url);
+                        }
+                    };
+                    
+                    AndroidDateFormat.initPattern();
+                    String datePattern = AndroidDateFormat.getPattern();
+                    DateFormat dateFormat = datePattern == null ?
+                            DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT) : new SimpleDateFormat(datePattern, Locale.US);
+                    dateFormat.setTimeZone(settings.isLocalTime() ?
+                            TimeZone.getDefault() : TimeZone.getTimeZone(presentationModel.source.boardModel.timeZoneId));
+                    
+                    int postsCount = presentationModel.source.threads[position].postsCount;
+                    boolean showIndex = presentationModel.source.threads[position].posts.length <= postsCount;
+                    int curPostIndex = postsCount - presentationModel.source.threads[position].posts.length + 1;
+                    
+                    for (int i=0; i<presentationModel.source.threads[position].posts.length; ++i) {
+                        PresentationItemModel model = new PresentationItemModel(
+                                presentationModel.source.threads[position].posts[i],
+                                chan.getChanName(),
+                                presentationModel.source.pageModel.boardName,
+                                presentationModel.source.pageModel.threadNumber,
+                                dateFormat,
+                                spanClickListener,
+                                imageGetter,
+                                ThemeUtils.ThemeColors.getInstance(activity.getTheme()),
+                                floatingModels);
+                        model.buildSpannedHeader(showIndex ? (i == 0 ? 1 : ++curPostIndex) : -1,
+                                presentationModel.source.boardModel.bumpLimit, presentationModel.source.boardModel.defaultUserName, null);
+                        items.add(model);
+                    }
+                } else {
+                    items.add(presentationModel.presentationList.get(position));
                 }
                 ListView dlgList = new ListView(activity);
-                dlgList.setAdapter(new ArrayAdapter<View>(activity, 0, views) {
+                dlgList.setAdapter(new ArrayAdapter<PresentationItemModel>(activity, 0, items) {
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
-                        return getItem(position);
+                        View view = adapter.getView(position, null, null, dlgWidth, getItem(position));
+                        view.setBackgroundColor(bgColor);
+                        return view;
                     }
                 });
                 dialog.getWindow().setBackgroundDrawableResource(bgShadowResource);
@@ -2529,12 +2573,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 dialog.setCanceledOnTouchOutside(true);
                 dialog.setContentView(dlgList);
                 dialog.show();
-            }
-            int dlgWidth;
-            private View getView(int position) {
-                View view = adapter.getView(position, null, null, dlgWidth);
-                view.setBackgroundColor(bgColor);
-                return view;
             }
         };
         if (tmpV.getWidth() != 0) {

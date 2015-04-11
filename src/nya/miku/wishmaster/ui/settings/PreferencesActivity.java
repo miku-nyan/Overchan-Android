@@ -24,6 +24,7 @@ import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
+import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -91,16 +92,21 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
         
-        String versionName = "";
-        try {
-            versionName += getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (Exception e) {}
-        Preference aboutPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_updateapp));
-        aboutPreference.setTitle(getString(R.string.pref_about_updateapp_title, versionName));
+        Preference aboutPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_version));
+        try { aboutPreference.setSummary(getPackageManager().getPackageInfo(getPackageName(), 0).versionName); } catch (Exception e) {}
         aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                AppUpdatesChecker.checkForUpdates(PreferencesActivity.this);
+                UrlHandler.launchExternalBrowser(PreferencesActivity.this, "https://github.com/miku-nyan/Overchan-Android");
+                return true;
+            }
+        });
+        
+        Preference licensePreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_license));
+        licensePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UrlHandler.launchExternalBrowser(PreferencesActivity.this, "https://www.gnu.org/licenses/gpl-3.0.html");
                 return true;
             }
         });
@@ -176,10 +182,13 @@ public class PreferencesActivity extends PreferenceActivity {
         }
         
         if (!MainApplication.getInstance().settings.isRealTablet()) {
-            Preference p = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel));
-            ((PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_appearance))).removePreference(p);
+            Preference pHide = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel_hide));
+            Preference pWidth = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel_width));
+            PreferenceGroup appearanceGroup = (PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_appearance));
+            appearanceGroup.removePreference(pHide);
+            appearanceGroup.removePreference(pWidth);
         } else {
-            updateListSummary(R.string.pref_key_sidepanel);
+            updateListSummary(R.string.pref_key_sidepanel_width);
         }
     }
     

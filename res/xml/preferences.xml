@@ -72,13 +72,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:singleLine="true"
             android:maxLength="4" />
         
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_sidepanel_hide"
+            android:title="@string/pref_sidepanel_hide_title"
+            android:summary="@string/pref_sidepanel_hide_summary" />
+        
         <ListPreference
-            android:key="@string/pref_key_sidepanel"
-            android:title="@string/pref_sidepanel_title"
-            android:dialogTitle="@string/pref_sidepanel_title"
-            android:entries="@array/pref_sidepanel_choices"
-            android:entryValues="@array/pref_sidepanel_values"
-            android:defaultValue="@string/pref_sidepanel_value_default" />
+            android:key="@string/pref_key_sidepanel_width"
+            android:title="@string/pref_sidepanel_width_title"
+            android:dialogTitle="@string/pref_sidepanel_width_title"
+            android:entries="@array/pref_sidepanel_width_choices"
+            android:entryValues="@array/pref_sidepanel_width_values"
+            android:defaultValue="@string/pref_sidepanel_width_value_default" />
         
         <PreferenceScreen
             android:key="@string/pref_key_gallery_screen"
@@ -223,8 +229,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <PreferenceCategory android:title="@string/pref_cat_about">
         <Preference
-            android:key="@string/pref_key_about_updateapp"
-            android:summary="@string/pref_about_updateapp_summary" />
+            android:key="@string/pref_key_about_version"
+            android:title="@string/pref_about_version_title" />
+        
+        <Preference
+            android:key="@string/pref_key_about_license"
+            android:title="@string/pref_about_license_title"
+            android:summary="@string/pref_about_license_summary" />
     </PreferenceCategory>
     
 </PreferenceScreen>

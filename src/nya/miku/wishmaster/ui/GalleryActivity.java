@@ -807,6 +807,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 if (message == null || message.length() == 0) {
                     return getString(R.string.error_unknown);
                 }
+                if (message.equals(getString(R.string.error_ssl))) message += getString(R.string.error_ssl_help);
                 return message;
             }
         });

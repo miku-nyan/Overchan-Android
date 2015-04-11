@@ -156,7 +156,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_remove_history">Remove from history</string>
     <string name="context_menu_open_browser">Open browser</string>
     <string name="context_menu_autoupdate_background">Auto-update</string>
-    <string name="context_menu_show_op_post">View the full OP post</string>
+    <string name="context_menu_thread_preview">Thread preview</string>
     <string name="context_menu_reply">Reply to this post</string>
     <string name="context_menu_reply_with_quote">Reply with quote</string>
     <string name="context_menu_reply_no_reading">Reply without reading</string>
@@ -419,8 +419,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cache_maxsize_hint">0 - unlimited; 50 MB by default</string>
     <string name="pref_clear_cache_title">Clear cache</string>
     <string name="pref_clear_cache_summary">%.1f MB</string>
-    <string name="pref_about_updateapp_title">Overchan Android v%s</string>
-    <string name="pref_about_updateapp_summary">Check for Updates</string>
+    <string name="pref_about_version_title">Overchan Android</string>
+    <string name="pref_about_license_title">License</string>
+    <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Downloads directory</string>
     <string name="pref_download_dir_summary">The directory where files should be saved</string>
     <string name="pref_download_thumbs_title">Download thumbnails</string>
@@ -439,13 +440,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="pref_font_size_title">Text size</string>
     <string-array name="pref_font_size_choices">
+        <item>Small</item>
         <item>Medium</item>
         <item>Large</item>
         <item>Huge</item>
     </string-array>
-    <string name="pref_sidepanel_title">Tabs panel width</string>
-    <string-array name="pref_sidepanel_choices">
-        <item>Do not show</item>
+    <string name="pref_sidepanel_hide_title">Hide Tabs panel</string>
+    <string name="pref_sidepanel_hide_summary">Do not show the Tabs panel forever</string>
+    <string name="pref_sidepanel_width_title">Tabs panel width</string>
+    <string-array name="pref_sidepanel_width_choices">
         <item>25\uff05</item>
         <item>30\uff05</item>
         <item>35\uff05</item>

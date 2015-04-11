@@ -38,11 +38,6 @@ public class CirnoBoards {
     
     static {
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
-        addBoard("vo", "Vocaloid", "На пробу", "", false); //hatsune
-        addBoard("gnx", "Gainax", "На пробу", "Ноно", false);
-        //addBoard("abe", "ёситоси абэ", "На пробу", "Chada", false); boards.haruhiism.net
-        addBoard("int", "International", "На пробу", "Anonymous", false);
-        addBoard("ts", "Цундере", "На пробу", "Baka Inu", false);
         addBoard("au", "Автомобили", "Общее", "Джереми Кларксон", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
         addBoard("vg", "Видеоигры", "Общее", "Марио", false);
@@ -51,6 +46,7 @@ public class CirnoBoards {
         addBoard("an", "Живопись", "Общее", "Кот Синкая", false);
         addBoard("ne", "Животные", "Общее", "Пушок", false);
         addBoard("tran", "Иностранные языки", "Общее", "Е. Д. Поливанов", false);
+        addBoard("int", "International", "Общее", "Anonymous", false);
         addBoard("tv", "Кино и ТВ", "Общее", "К. С. Станиславский", false);
         addBoard("cu", "Кулинария", "Общее", "Аноним", false);
         addBoard("l", "Литература", "Общее", "Ф. М. Достоевский", false);
@@ -76,11 +72,13 @@ public class CirnoBoards {
         addBoard("ph", "Фото", "Общее", "Аноним", false);
         addBoard("fr", "Фурри", "Общее", "Аноним", false);
         addBoard("s", "Электроника и ПО", "Общее", "Чии", false);
-        addBoard("jp", "Япония", "Общее", "名無しさん", false);
         addBoard("a", "Аниме", "Аниме", "Мокона", false);
         addBoard("aa", "Аниме-арт", "Аниме", "Ракка", false);
         addBoard("azu", "Azumanga Daioh", "Аниме", "Осака", false);
         addBoard("vn", "Визуальные новеллы", "Аниме", "Сэйбер", false);
+        addBoard("vo", "Vocaloid", "Аниме", "", false); //hatsune
+        addBoard("gnx", "Gainax", "Аниме", "Ноно", false);
+        //addBoard("abe", "ёситоси абэ", "Аниме", "Chada", false); boards.haruhiism.net
         addBoard("c", "Косплей", "Аниме", "Аноним", false);
         addBoard("ls", "Lucky☆Star", "Аниме", "Цукаса", false);
         addBoard("ma", "Манга", "Аниме", "Иноуэ Орихимэ", false);
@@ -91,6 +89,8 @@ public class CirnoBoards {
         addBoard("to", "Touhou", "Аниме", "Нитори", false);
         addBoard("fi", "Фигурки", "Аниме", "Фигурка анонима", false);
         addBoard("hau", "Higurashi no Naku Koro ni", "Аниме", "Ханю", false);
+        addBoard("ts", "Цундере", "На пробу", "Baka Inu", false);
+        addBoard("jp", "Япония", "Общее", "名無しさん", false);
         
         SIMPLE_ARRAY_IICHAN = new SimpleBoardModel[LIST_IICHAN.size()];
         for (int i=0; i<LIST_IICHAN.size(); ++i) SIMPLE_ARRAY_IICHAN[i] = new SimpleBoardModel(LIST_IICHAN.get(i));
@@ -128,7 +128,7 @@ public class CirnoBoards {
         model.defaultUserName = defaultPosterName;
         model.bumpLimit = 500;
         
-        model.readonlyBoard = name.equals("o");
+        model.readonlyBoard = name.equals("o") || name.equals("w");
         model.requiredFileForNewThread = !name.equals("d");
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;

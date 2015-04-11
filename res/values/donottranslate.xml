@@ -47,7 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_autoupdate_notification">PREF_KEY_AUTOUPDATE_NOTIFICATION</string>
     <string name="pref_key_cache_maxsize">PREF_KEY_CACHE_MAXSIZE</string>
     <string name="pref_key_clear_cache">PREF_KEY_CLEAR_CACHE</string>
-    <string name="pref_key_about_updateapp">PREF_KEY_ABOUT_UPDATEAPP</string>
+    <string name="pref_key_about_version">PREF_KEY_ABOUT_VERSION</string>
+    <string name="pref_key_about_license">PREF_KEY_ABOUT_LICENSE</string>
     <string name="pref_key_download_dir">PREF_KEY_DOWNLOAD_DIR</string>
     <string name="pref_key_download_thumbs">PREF_KEY_DOWNLOAD_THUMBS</string>
     <string name="pref_key_download_format">PREF_KEY_DOWNLOAD_FORMAT</string>
@@ -71,31 +72,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_theme_value_neutron</item>
     </string-array>
     <string name="pref_key_font_size">PREF_KEY_FONT_SIZE</string>
-    <string name="pref_font_size_value_default">@string/pref_font_size_value_medium</string>
-    <string name="pref_font_size_value_medium">PREF_FONT_SIZE_VALUE_MEDIUM</string>
+    <string name="pref_font_size_value_default">@string/pref_font_size_value_small</string>
+    <string name="pref_font_size_value_small">PREF_FONT_SIZE_VALUE_SMALL</string>
+    <string name="pref_font_size_value_medium">PREF_FONT_SIZE_VALUE_MEDIUM1</string>
     <string name="pref_font_size_value_large">PREF_FONT_SIZE_VALUE_LARGE</string>
     <string name="pref_font_size_value_huge">PREF_FONT_SIZE_VALUE_HUGE</string>
     <string-array name="pref_font_size_values" translatable="false">
+        <item>@string/pref_font_size_value_small</item>
         <item>@string/pref_font_size_value_medium</item>
         <item>@string/pref_font_size_value_large</item>
         <item>@string/pref_font_size_value_huge</item>
     </string-array>
-    <string name="pref_key_sidepanel">PREF_KEY_SIDEPANEL</string>
-    <string name="pref_sidepanel_value_default">@string/pref_sidepanel_value_30percent</string>
-    <string name="pref_sidepanel_value_invisible">PREF_SIDEPANEL_VALUE_INVISIBLE</string>
-    <string name="pref_sidepanel_value_25percent">PREF_SIDEPANEL_VALUE_25PERCENT</string>
-    <string name="pref_sidepanel_value_30percent">PREF_SIDEPANEL_VALUE_30PERCENT</string>
-    <string name="pref_sidepanel_value_35percent">PREF_SIDEPANEL_VALUE_35PERCENT</string>
-    <string name="pref_sidepanel_value_40percent">PREF_SIDEPANEL_VALUE_40PERCENT</string>
-    <string name="pref_sidepanel_value_45percent">PREF_SIDEPANEL_VALUE_45PERCENT</string>
-    <string name="pref_sidepanel_value_50percent">PREF_SIDEPANEL_VALUE_50PERCENT</string>
-    <string-array name="pref_sidepanel_values" translatable="false">
-        <item>@string/pref_sidepanel_value_invisible</item>
-        <item>@string/pref_sidepanel_value_25percent</item>
-        <item>@string/pref_sidepanel_value_30percent</item>
-        <item>@string/pref_sidepanel_value_35percent</item>
-        <item>@string/pref_sidepanel_value_40percent</item>
-        <item>@string/pref_sidepanel_value_45percent</item>
-        <item>@string/pref_sidepanel_value_50percent</item>
+    <string name="pref_key_sidepanel_hide">PREF_KEY_SIDEPANEL_HIDE</string>
+    <string name="pref_key_sidepanel_width">PREF_KEY_SIDEPANEL_WIDTH</string>
+    <string name="pref_sidepanel_width_value_default">@string/pref_sidepanel_width_value_30percent</string>
+    <string name="pref_sidepanel_width_value_25percent">PREF_SIDEPANEL_WIDTH_VALUE_25PERCENT</string>
+    <string name="pref_sidepanel_width_value_30percent">PREF_SIDEPANEL_WIDTH_VALUE_30PERCENT</string>
+    <string name="pref_sidepanel_width_value_35percent">PREF_SIDEPANEL_WIDTH_VALUE_35PERCENT</string>
+    <string name="pref_sidepanel_width_value_40percent">PREF_SIDEPANEL_WIDTH_VALUE_40PERCENT</string>
+    <string name="pref_sidepanel_width_value_45percent">PREF_SIDEPANEL_WIDTH_VALUE_45PERCENT</string>
+    <string name="pref_sidepanel_width_value_50percent">PREF_SIDEPANEL_WIDTH_VALUE_50PERCENT</string>
+    <string-array name="pref_sidepanel_width_values" translatable="false">
+        <item>@string/pref_sidepanel_width_value_25percent</item>
+        <item>@string/pref_sidepanel_width_value_30percent</item>
+        <item>@string/pref_sidepanel_width_value_35percent</item>
+        <item>@string/pref_sidepanel_width_value_40percent</item>
+        <item>@string/pref_sidepanel_width_value_45percent</item>
+        <item>@string/pref_sidepanel_width_value_50percent</item>
     </string-array>
 </resources>

@@ -103,19 +103,26 @@ public class ApplicationSettings {
         String theme = preferences.getString(resources.getString(R.string.pref_key_theme), defaultThemeValue);
         String fontSize = preferences.getString(resources.getString(R.string.pref_key_font_size), defaultFontSizeValue);
         if (theme.equals(resources.getString(R.string.pref_theme_value_futaba))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Futaba_Medium;
+            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Futaba_Small;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Futaba_Medium;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Futaba_Large;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Futaba_Huge;
+            else return R.style.Futaba_Small;
         } else if (theme.equals(resources.getString(R.string.pref_theme_value_photon))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Photon_Medium;
+            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Photon_Small;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Photon_Medium;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Photon_Large;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Photon_Huge;
+            else return R.style.Photon_Small;
         } else if (theme.equals(resources.getString(R.string.pref_theme_value_neutron))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Neutron_Medium;
+            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Neutron_Small;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Neutron_Medium;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Neutron_Large;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Neutron_Huge;
+            else return R.style.Neutron_Small;
+        } else {
+            return R.style.Futaba_Small;
         }
-        return R.style.Futaba_Medium;
     }
     
     public long getMaxCacheSize() {
@@ -137,15 +144,21 @@ public class ApplicationSettings {
     
     public float getRootViewWeight() {
         if (!isRealTablet()) return 1.0f;
-        String key =
-                preferences.getString(resources.getString(R.string.pref_key_sidepanel), resources.getString(R.string.pref_sidepanel_value_default));
-        if (key.equals(resources.getString(R.string.pref_sidepanel_value_25percent))) return 0.75f;
-        if (key.equals(resources.getString(R.string.pref_sidepanel_value_30percent))) return 0.70f;
-        if (key.equals(resources.getString(R.string.pref_sidepanel_value_35percent))) return 0.65f;
-        if (key.equals(resources.getString(R.string.pref_sidepanel_value_40percent))) return 0.60f;
-        if (key.equals(resources.getString(R.string.pref_sidepanel_value_45percent))) return 0.55f;
-        if (key.equals(resources.getString(R.string.pref_sidepanel_value_50percent))) return 0.50f;
-        return 1.0f;
+        boolean isHidden = preferences.getBoolean(resources.getString(R.string.pref_key_sidepanel_hide), false);
+        if (isHidden) return 1.0f;
+        return 1.0f - getTabPanelTabletWeight();
+    }
+    
+    public float getTabPanelTabletWeight() {
+        String key = preferences.getString(resources.getString(R.string.pref_key_sidepanel_width),
+                resources.getString(R.string.pref_sidepanel_width_value_default));
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_25percent))) return 0.25f;
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_30percent))) return 0.30f;
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_35percent))) return 0.35f;
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_40percent))) return 0.40f;
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_45percent))) return 0.45f;
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_50percent))) return 0.50f;
+        return 0.30f;
     }
     
     public boolean showSidePanel() {

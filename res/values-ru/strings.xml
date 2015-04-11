@@ -161,7 +161,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_remove_history">Удалить из истории</string>
     <string name="context_menu_open_browser">Открыть в браузере</string>
     <string name="context_menu_autoupdate_background">Автообновление</string>
-    <string name="context_menu_show_op_post">Показать ОП-пост полностью</string>
+    <string name="context_menu_thread_preview">Предпросмотр треда</string>
     <string name="context_menu_reply">Ответить</string>
     <string name="context_menu_reply_with_quote">Ответить с цитатой</string>
     <string name="context_menu_reply_no_reading">Ответить не читая</string>
@@ -426,8 +426,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cache_maxsize_hint">0 - неограниченный; 50 МБ по умолчанию</string>
     <string name="pref_clear_cache_title">Очистить кэш</string>
     <string name="pref_clear_cache_summary">%.1f MБ</string>
-    <string name="pref_about_updateapp_title">Overchan Android v%s</string>
-    <string name="pref_about_updateapp_summary">Проверить наличие обновлений</string>
+    <string name="pref_about_version_title">Overchan Android</string>
+    <string name="pref_about_license_title">Лицензия</string>
+    <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Директория загрузок</string>
     <string name="pref_download_dir_summary">Директория, куда будут скачиваться файлы</string>
     <string name="pref_download_thumbs_title">Загружать картинки</string>
@@ -446,13 +447,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="pref_font_size_title">Размер текста</string>
     <string-array name="pref_font_size_choices">
-        <item>Обычный</item>
+        <item>Мелкий</item>
+        <item>Средний</item>
         <item>Большой</item>
-        <item>Оче большой</item>
+        <item>Очень большой</item>
     </string-array>
-    <string name="pref_sidepanel_title">Ширина панели вкладок</string>
-    <string-array name="pref_sidepanel_choices">
-        <item>Не показывать</item>
+    <string name="pref_sidepanel_hide_title">Скрывать панель вкладок</string>
+    <string name="pref_sidepanel_hide_summary">Не показывать панель вкладок постоянно</string>
+    <string name="pref_sidepanel_width_title">Ширина панели вкладок</string>
+    <string-array name="pref_sidepanel_width_choices">
         <item>25\uff05</item>
         <item>30\uff05</item>
         <item>35\uff05</item>

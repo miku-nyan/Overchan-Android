@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item name="context_menu_remove_favorites" type="id"/>
     <item name="context_menu_open_browser" type="id"/>
     <item name="context_menu_autoupdate_background" type="id"/>
-    <item name="context_menu_show_op_post" type="id"/>
+    <item name="context_menu_thread_preview" type="id"/>
     <item name="context_menu_reply" type="id"/>
     <item name="context_menu_reply_with_quote" type="id"/>
     <item name="context_menu_reply_no_reading" type="id"/>
