@@ -845,7 +845,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (sameThread) {
             if (TextUtils.isEmpty(model.postNumber)) model.postNumber = model.threadNumber;
             int itemPosition = -1;
-            for (int i=0; i<presentationModel.presentationList.size(); ++i) {
+            for (int i=0; i<presentationModel.presentationList.size(); ++i) { //XXX NPE here
                 if (presentationModel.presentationList.get(i).sourceModel.number.equals(model.postNumber)) {
                     itemPosition = i;
                     break;
@@ -1400,7 +1400,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         @Override
         public void notifyDataSetChanged() {
-            currentCount = fragment().presentationModel.presentationList.size();
+            currentCount = fragment().presentationModel.presentationList.size(); //XXX NPE here
             super.notifyDataSetChanged();
         }
         
