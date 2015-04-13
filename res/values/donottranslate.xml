@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_show_date">PREF_KEY_SHOW_DATE</string>
     <string name="pref_key_local_time">PREF_KEY_LOCAL_TIME</string>
     <string name="pref_key_cut_posts">PREF_KEY_CUT_POSTS</string>
-    <string name="pref_key_flow_text">PREF_KEY_FLOW_TEXT</string>
+    <string name="pref_key_open_spoilers">PREF_KEY_OPEN_SPOILERS</string>
     <string name="pref_key_gallery_screen">PREF_KEY_GALLERY_SCREEN</string>
     <string name="pref_key_gallery_scaleimageview">PREF_KEY_GALLERY_SCALEIMAGEVIEW</string>
     <string name="pref_key_gallery_nativegif">PREF_KEY_GALLERY_NATIVEGIF</string>

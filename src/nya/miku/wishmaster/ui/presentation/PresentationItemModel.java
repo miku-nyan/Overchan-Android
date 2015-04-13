@@ -58,6 +58,7 @@ public class PresentationItemModel {
     private URLSpanClickListener spanClickListener;
     private ImageGetter imageGetter;
     private ThemeColors themeColors;
+    private boolean openSpoilers;
     private FloatingModel[] floatingModels;
     private String chanName;
     private ChanModule chanModule;
@@ -117,12 +118,14 @@ public class PresentationItemModel {
      * @param spanClickListener обработчик нажатий на ссылки
      * @param imageGetter загрузчик картинок, содержищихся в теле поста (например, смайлики на 1 апреля)
      * @param themeColors объект {@link ThemeUtils.ThemeColors}, содержащий цвета текущей темы
+     * @param openSpoilers отображать спойлеры открытыми
      * @param floatingModels массив из двух моделей обтекания картинки текстом
      * Первый элемент - обычная превьюшка, второй - со строкой с дополнительной информацией о вложении (gif, видео, аудио).
      * Допустимо значение null, если обтекание не нужно вообще.
      */
     public PresentationItemModel(PostModel source, String chanName, String boardName, String threadNumber, DateFormat dateFormat,
-            URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors, FloatingModel[] floatingModels) {
+            URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors, boolean openSpoilers,
+            FloatingModel[] floatingModels) {
         this.sourceModel = source;
         this.sourceModelHash = ChanModels.hashPostModel(source);
         this.chanName = chanName;
@@ -132,9 +135,10 @@ public class PresentationItemModel {
         this.spanClickListener = spanClickListener;
         this.imageGetter = imageGetter;
         this.themeColors = themeColors;
+        this.openSpoilers = openSpoilers;
         this.floatingModels = floatingModels;
         
-        this.spannedComment = HtmlParser.createSpanned(source.subject, source.comment, spanClickListener, imageGetter, themeColors);
+        this.spannedComment = HtmlParser.createSpanned(source.subject, source.comment, spanClickListener, imageGetter, themeColors, openSpoilers);
         this.dateString = dateFormat.format(source.timestamp);
         parseReferences();
         parseBadge();
@@ -178,7 +182,7 @@ public class PresentationItemModel {
         
         boolean flow;
         SpannableStringBuilder builder =
-                HtmlParser.createSpanned(sourceModel.subject, sourceModel.comment, spanClickListener, imageGetter, themeColors);
+                HtmlParser.createSpanned(sourceModel.subject, sourceModel.comment, spanClickListener, imageGetter, themeColors, openSpoilers);
         int attachmentType = sourceModel.attachments[0].type;
         if (attachmentType == AttachmentModel.TYPE_IMAGE_STATIC || attachmentType == AttachmentModel.TYPE_OTHER_NOTFILE) {
             flow = FlowTextHelper.flowText(builder, floatingModels[0], textFullWidth);

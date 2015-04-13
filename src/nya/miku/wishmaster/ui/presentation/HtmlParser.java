@@ -94,11 +94,12 @@ public class HtmlParser {
      * @param spanClickListener обработчик нажатий на ссылки
      * @param imageGetter обработчик загрузки изображений (тэг &lt;img&gt; внутри html текста)
      * @param themeColors объект {@link ThemeUtils.ThemeColors} для текущей темы оформления
+     * @param openSpoilers отображать спойлеры открытыми
      * @return объект SpannableStringBuilder
      */
     public static SpannableStringBuilder createSpanned(String subject, String source,
-            URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors) {
-        SpannableStringBuilder spanned = fromHtml(subject, source, themeColors, imageGetter);
+            URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors, boolean openSpoilers) {
+        SpannableStringBuilder spanned = fromHtml(subject, source, themeColors, imageGetter, openSpoilers);
         replaceUrls(spanned, spanClickListener, themeColors);
         return spanned;
     }
@@ -149,7 +150,7 @@ public class HtmlParser {
      *
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness found in the wild.
      */
-    private static SpannableStringBuilder fromHtml(String subject, String source, ThemeColors colors, ImageGetter imageGetter) {
+    private static SpannableStringBuilder fromHtml(String subject, String source, ThemeColors colors, ImageGetter imageGetter, boolean openSpoilers) {
         Parser parser = new Parser();
         try {
             parser.setProperty(Parser.schemaProperty, HtmlParserHolder.schema);
@@ -161,7 +162,7 @@ public class HtmlParser {
             throw new RuntimeException(e);
         }
 
-        HtmlToSpannedConverter converter = new HtmlToSpannedConverter(subject, source, colors, imageGetter, parser);
+        HtmlToSpannedConverter converter = new HtmlToSpannedConverter(subject, source, colors, imageGetter, openSpoilers, parser);
         return converter.convert();
     }
 
@@ -184,9 +185,11 @@ class HtmlToSpannedConverter implements ContentHandler {
     private int[] mLastPTagLength = new int[] {-1, -1}; //2 целых числа {before, after}, длина до и после обработки последнего тэга (</p>)
     private LinkedList<Object> mListTags = new LinkedList<>();
     private ThemeColors mColors;
+    private boolean mOpenSpoilers;
     private HtmlParser.ImageGetter mImageGetter;
     
-    public HtmlToSpannedConverter(String subject, String source, ThemeColors colors, HtmlParser.ImageGetter imageGetter, Parser parser) {
+    public HtmlToSpannedConverter(String subject, String source, ThemeColors colors, HtmlParser.ImageGetter imageGetter, boolean openSpoilers,
+            Parser parser) {
         mSource = source;
         mSpannableStringBuilder = new SpannableStringBuilder();
         if (!TextUtils.isEmpty(subject)) {
@@ -201,6 +204,7 @@ class HtmlToSpannedConverter implements ContentHandler {
             mStartLength = mSpannableStringBuilder.length();
         }
         mColors = colors;
+        mOpenSpoilers = openSpoilers;
         mImageGetter = imageGetter;
         mReader = parser;
     }
@@ -374,11 +378,11 @@ class HtmlToSpannedConverter implements ContentHandler {
             handleP(mSpannableStringBuilder, mStartLength, mLastPTagLength);
             endHeader(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("span")) {
-            endSpan(mSpannableStringBuilder, mColors);
+            endSpan(mSpannableStringBuilder, mColors, mOpenSpoilers);
         } else if (tag.equalsIgnoreCase("aibquote")) {
             end(mSpannableStringBuilder, Aibquote.class, new ForegroundColorSpan(mColors != null ? mColors.quoteForeground : Color.GREEN));
         } else if (tag.equalsIgnoreCase("aibspoiler")) {
-            endAibspoiler(mSpannableStringBuilder, mColors);
+            endAibspoiler(mSpannableStringBuilder, mColors, mOpenSpoilers);
         }/* else if (mTagHandler != null) {
             mTagHandler.handleTag(false, tag, mSpannableStringBuilder, mReader);
         }*/
@@ -562,16 +566,19 @@ class HtmlToSpannedConverter implements ContentHandler {
         }
     }
     
-    private static void endAibspoiler(SpannableStringBuilder text, ThemeColors colors) {
+    private static void endAibspoiler(SpannableStringBuilder text, ThemeColors colors, boolean openSpoilers) {
         int len = text.length();
         Object obj = getLast(text, Aibspoiler.class);
         int where = text.getSpanStart(obj);
         text.removeSpan(obj);
         
         if (where != len && colors != null) {
-            //text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            //text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            text.setSpan(new SpoilerSpan(colors.spoilerForeground, colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if (openSpoilers) {
+                text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                text.setSpan(new SpoilerSpan(colors.spoilerForeground, colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
         }
     }
     
@@ -605,7 +612,7 @@ class HtmlToSpannedConverter implements ContentHandler {
         text.setSpan(new Span(style, isAibquote, isAibspoiler, isUnderline, isStrike), len, len, Spannable.SPAN_MARK_MARK);
     }
     
-    private static void endSpan(SpannableStringBuilder text, ThemeColors colors) {
+    private static void endSpan(SpannableStringBuilder text, ThemeColors colors, boolean openSpoilers) {
         int len = text.length();
         Object obj = getLast(text, Span.class);
         int where = text.getSpanStart(obj);
@@ -626,9 +633,12 @@ class HtmlToSpannedConverter implements ContentHandler {
             }
             
             if (colors != null && s.mIsAibspoiler) {
-                //text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                //text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                text.setSpan(new SpoilerSpan(colors.spoilerForeground, colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if (openSpoilers) {
+                    text.setSpan(new ForegroundColorSpan(colors.spoilerForeground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    text.setSpan(new BackgroundColorSpan(colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                } else {
+                    text.setSpan(new SpoilerSpan(colors.spoilerForeground, colors.spoilerBackground), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
             }
             
             if (s.mIsUnderline) {

@@ -97,6 +97,10 @@ public class ApplicationSettings {
         }
     }
     
+    public boolean openSpoilers() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_open_spoilers), true);
+    }
+    
     public int getTheme() {
         String defaultThemeValue = resources.getString(R.string.pref_theme_value_default);
         String defaultFontSizeValue = resources.getString(R.string.pref_font_size_value_default);

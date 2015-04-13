@@ -33,6 +33,7 @@ import nya.miku.wishmaster.cache.Serializer;
 import nya.miku.wishmaster.chans.cirno.Chan410Module;
 import nya.miku.wishmaster.chans.cirno.CirnoModule;
 import nya.miku.wishmaster.chans.cirno.MikubaModule;
+import nya.miku.wishmaster.chans.cirno.NowereModule;
 import nya.miku.wishmaster.chans.fourchan.FourchanModule;
 import nya.miku.wishmaster.chans.krautchan.KrautModule;
 import nya.miku.wishmaster.chans.makaba.MakabaModule;
@@ -97,6 +98,7 @@ public class MainApplication extends Application {
         addChanModule(new CirnoModule(preferences, resources));
         addChanModule(new MikubaModule(preferences, resources));
         addChanModule(new Chan410Module(preferences, resources));
+        addChanModule(new NowereModule(preferences, resources));
         addChanModule(new MakabaModule(preferences, resources));
         addChanModule(new FourchanModule(preferences, resources));
         addChanModule(new KrautModule(preferences, resources));

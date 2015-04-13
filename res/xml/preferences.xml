@@ -73,6 +73,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:maxLength="4" />
         
         <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_open_spoilers"
+            android:title="@string/pref_open_spoilers_title"
+            android:summary="@string/pref_open_spoilers_summary" />
+        
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_key_sidepanel_hide"
             android:title="@string/pref_sidepanel_hide_title"

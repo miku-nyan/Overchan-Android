@@ -401,6 +401,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cut_posts_title">Длинные сообщения</string>
     <string name="pref_cut_posts_summary">Обрезать длинные сообщения, если их высота больше заданного значения</string>
     <string name="pref_cut_posts_hint">0 - не обрезать; 400px по умолчанию</string>
+    <string name="pref_open_spoilers_title">Открывать спойлеры</string>
+    <string name="pref_open_spoilers_summary">Открывать текстовые спойлеры по умолчанию</string>
     <string name="pref_gallery_screen_title">Галерея</string>
     <string name="pref_gallery_screen_summary">Дополнительные настройки галереи</string>
     <string name="pref_gallery_scaleimageview_title">Просмотрщик изображений</string>

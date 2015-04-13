@@ -79,7 +79,9 @@ public class WakabaUtils {
         model.chanName = mainDomain;
         
         try {
-            if (path.contains("/res/")) {
+            if (path == null || path.length() == 0 || path.equals("/") || path.equals("wakaba.html") || path.equals("index.html")) {
+                model.type = UrlPageModel.TYPE_INDEXPAGE;
+            } else if (path.contains("/res/")) {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
                 Matcher matcher = Pattern.compile("(.+?)/res/([0-9]+?).html(.*)").matcher(path);
                 if (!matcher.find()) throw new Exception();
@@ -105,12 +107,8 @@ public class WakabaUtils {
                 }
             }
         } catch (Exception e) {
-            if (path == null || path.length() == 0 || path.equals("/")) {
-                model.type = UrlPageModel.TYPE_INDEXPAGE;
-            } else {
-                model.type = UrlPageModel.TYPE_OTHERPAGE;
-                model.otherPath = path;
-            }
+            model.type = UrlPageModel.TYPE_OTHERPAGE;
+            model.otherPath = path;
         }
         
         return model;

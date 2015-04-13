@@ -32,6 +32,7 @@ public class DateFormats {
     static final DateFormat RU_410_DATE_FORMAT;
     static final DateFormat INT_410_DATE_FORMAT;
     static final DateFormat MIKUBA_DATE_FORMAT;
+    static final DateFormat NOWERE_DATE_FORMAT;
     
     static {
         DateFormatSymbols iichanSymbols = new DateFormatSymbols();
@@ -53,5 +54,8 @@ public class DateFormats {
         
         MIKUBA_DATE_FORMAT = new SimpleDateFormat("EEE dd MMM yyyy hh:mm:ss", Locale.US);
         MIKUBA_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        
+        NOWERE_DATE_FORMAT = new SimpleDateFormat("yy/MM/dd(EEE)hh:mm", Locale.US);
+        NOWERE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
     }
 }

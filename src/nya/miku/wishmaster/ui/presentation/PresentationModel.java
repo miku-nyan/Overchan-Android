@@ -250,6 +250,8 @@ public class PresentationModel {
             attachments.clear();
         }
         
+        final boolean openSpoilers = MainApplication.getInstance().settings.openSpoilers();
+        
         for (int i=presentationList.size(); i<posts.length; ++i) {
             if (task.isCancelled()) return;
             PresentationItemModel model = new PresentationItemModel( //TODO распараллелить
@@ -261,6 +263,7 @@ public class PresentationModel {
                     spanClickListener,
                     imageGetter,
                     ThemeUtils.ThemeColors.getInstance(theme),
+                    openSpoilers,
                     floatingModels);
             postNumbersMap.put(posts[i].number, i);
             if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {

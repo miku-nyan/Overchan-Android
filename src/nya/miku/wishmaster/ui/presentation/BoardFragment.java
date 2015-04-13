@@ -820,6 +820,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     @Override
     public void onURLSpanClick(View v, ClickableURLSpan span, String url) {
+        if (presentationModel == null || presentationModel.presentationList == null) return;
         if (tabModel.pageModel.type != UrlPageModel.TYPE_THREADPAGE) {
             if (!url.startsWith("#")) UrlHandler.open(chan.fixRelativeUrl(url), activity);
             return;
@@ -845,7 +846,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (sameThread) {
             if (TextUtils.isEmpty(model.postNumber)) model.postNumber = model.threadNumber;
             int itemPosition = -1;
-            for (int i=0; i<presentationModel.presentationList.size(); ++i) { //XXX NPE here
+            for (int i=0; i<presentationModel.presentationList.size(); ++i) {
                 if (presentationModel.presentationList.get(i).sourceModel.number.equals(model.postNumber)) {
                     itemPosition = i;
                     break;
@@ -1285,6 +1286,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         private int currentCount;
         
+        private int[] hackListViewPosition = null; //смещение скроллинга, если в последних есть сокращённый длинный пост ("Показать весь текст")
+        
         private BoardFragment fragment() {
             return fragmentRef.get();
         }
@@ -1400,7 +1403,29 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         @Override
         public void notifyDataSetChanged() {
-            currentCount = fragment().presentationModel.presentationList.size(); //XXX NPE here
+            try {
+                currentCount = fragment().presentationModel.presentationList.size();
+                if (fragment().pageType != TYPE_THREADSLIST && fragment().staticSettings.itemHeight != 0) {
+                    boolean needHack = false;
+                    for (int i=0, len=fragment().listView.getChildCount(); i<len; ++i) {
+                        View v = fragment().listView.getChildAt(i);
+                        if (v.getTag() instanceof PostViewTag && ((PostViewTag) v.getTag()).showFullTextIsVisible) {
+                            needHack = true;
+                            break;
+                        }
+                    }
+                    if (needHack) {
+                        View v = fragment().listView.getChildAt(0);
+                        int position = fragment().listView.getPositionForView(v);
+                        hackListViewPosition = new int[] { position, v.getTop() };
+                    } else {
+                        hackListViewPosition = null;
+                    }
+                }
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+                hackListViewPosition = null;
+            }
             super.notifyDataSetChanged();
         }
         
@@ -1683,6 +1708,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 @Override
                                 public boolean onPreDraw() {
                                     if (fragment() == null) return false;
+                                    if (hackListViewPosition != null) {
+                                        fragment().listView.setSelectionFromTop(hackListViewPosition[0], hackListViewPosition[1]);
+                                        hackListViewPosition = null;
+                                    }
                                     tag.commentView.getViewTreeObserver().removeOnPreDrawListener(this);
                                     if (tag.commentView.getHeight() < fragment().staticSettings.itemHeight) {
                                         return true;
@@ -2522,11 +2551,28 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         presentationModel.source.threads[position].posts != null &&
                         presentationModel.source.threads[position].posts.length > 0) {
                     
+                    final String threadNumber = presentationModel.source.threads[position].posts[0].number;
+                    
                     ClickableURLSpan.URLSpanClickListener spanClickListener = new ClickableURLSpan.URLSpanClickListener() {
                         @Override
                         public void onClick(View v, ClickableURLSpan span, String url) {
-                            dialog.dismiss();
-                            onURLSpanClick(v, span, url);
+                            if (url.startsWith("#")) {
+                                try {
+                                    UrlPageModel threadPageModel = new UrlPageModel();
+                                    threadPageModel.chanName = chan.getChanName();
+                                    threadPageModel.type = UrlPageModel.TYPE_THREADPAGE;
+                                    threadPageModel.boardName = tabModel.pageModel.boardName;
+                                    threadPageModel.threadNumber = threadNumber;
+                                    url = chan.buildUrl(threadPageModel) + url;
+                                    dialog.dismiss();
+                                    UrlHandler.open(chan.fixRelativeUrl(url), activity);
+                                } catch (Exception e) {
+                                    Logger.e(TAG, e);
+                                }
+                            } else {
+                                dialog.dismiss();
+                                UrlHandler.open(chan.fixRelativeUrl(url), activity);
+                            }
                         }
                     };
                     
@@ -2541,6 +2587,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     boolean showIndex = presentationModel.source.threads[position].posts.length <= postsCount;
                     int curPostIndex = postsCount - presentationModel.source.threads[position].posts.length + 1;
                     
+                    boolean openSpoilers = settings.openSpoilers();
+                    
                     for (int i=0; i<presentationModel.source.threads[position].posts.length; ++i) {
                         PresentationItemModel model = new PresentationItemModel(
                                 presentationModel.source.threads[position].posts[i],
@@ -2551,6 +2599,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 spanClickListener,
                                 imageGetter,
                                 ThemeUtils.ThemeColors.getInstance(activity.getTheme()),
+                                openSpoilers,
                                 floatingModels);
                         model.buildSpannedHeader(showIndex ? (i == 0 ? 1 : ++curPostIndex) : -1,
                                 presentationModel.source.boardModel.bumpLimit, presentationModel.source.boardModel.defaultUserName, null);
@@ -2563,7 +2612,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 dlgList.setAdapter(new ArrayAdapter<PresentationItemModel>(activity, 0, items) {
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
-                        View view = adapter.getView(position, null, null, dlgWidth, getItem(position));
+                        View view = adapter.getView(position, convertView, parent, dlgWidth, getItem(position));
                         view.setBackgroundColor(bgColor);
                         return view;
                     }

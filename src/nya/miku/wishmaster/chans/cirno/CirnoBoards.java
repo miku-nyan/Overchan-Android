@@ -68,29 +68,29 @@ public class CirnoBoards {
         addBoard("sp", "Спорт", "Общее", "Спортакус", false);
         addBoard("t", "Торренты", "Общее", "Аноним", true); //???
         addBoard("tr", "Транспорт", "Общее", "Аноним", false);
-        //addBoard("tu", "Туризм", "Общее", "Аноним", false); nowere.net
+        addBoard("tu", "Туризм", "Общее", "Аноним", false);
         addBoard("ph", "Фото", "Общее", "Аноним", false);
         addBoard("fr", "Фурри", "Общее", "Аноним", false);
         addBoard("s", "Электроника и ПО", "Общее", "Чии", false);
-        addBoard("a", "Аниме", "Аниме", "Мокона", false);
-        addBoard("aa", "Аниме-арт", "Аниме", "Ракка", false);
-        addBoard("azu", "Azumanga Daioh", "Аниме", "Осака", false);
-        addBoard("vn", "Визуальные новеллы", "Аниме", "Сэйбер", false);
-        addBoard("vo", "Vocaloid", "Аниме", "", false); //hatsune
-        addBoard("gnx", "Gainax", "Аниме", "Ноно", false);
-        //addBoard("abe", "ёситоси абэ", "Аниме", "Chada", false); boards.haruhiism.net
-        addBoard("c", "Косплей", "Аниме", "Аноним", false);
-        addBoard("ls", "Lucky☆Star", "Аниме", "Цукаса", false);
-        addBoard("ma", "Манга", "Аниме", "Иноуэ Орихимэ", false);
-        addBoard("me", "Меха", "Аниме", "Лакс Кляйн", false);
-        addBoard("rm", "Rozen Maiden", "Аниме", "Суйгинто", false);
-        addBoard("tan", "Сетевые персонажи", "Аниме", "Уныл-тян", false);
-        addBoard("sos", "Suzumiya Haruhi no Yūutsu", "Аниме", "Кёнко", false);
-        addBoard("to", "Touhou", "Аниме", "Нитори", false);
-        addBoard("fi", "Фигурки", "Аниме", "Фигурка анонима", false);
-        addBoard("hau", "Higurashi no Naku Koro ni", "Аниме", "Ханю", false);
-        addBoard("ts", "Цундере", "На пробу", "Baka Inu", false);
-        addBoard("jp", "Япония", "Общее", "名無しさん", false);
+        addBoard("a", "Аниме", "Японская культура", "Мокона", false);
+        addBoard("aa", "Аниме-арт", "Японская культура", "Ракка", false);
+        addBoard("azu", "Azumanga Daioh", "Японская культура", "Осака", false);
+        addBoard("vn", "Визуальные новеллы", "Японская культура", "Сэйбер", false);
+        addBoard("vo", "Vocaloid", "Японская культура", "", false); //hatsune
+        addBoard("gnx", "Gainax", "Японская культура", "Ноно", false);
+        //addBoard("abe", "ёситоси абэ", "Японская культура", "Chada", false); boards.haruhiism.net
+        addBoard("c", "Косплей", "Японская культура", "Аноним", false);
+        addBoard("ls", "Lucky☆Star", "Японская культура", "Цукаса", false);
+        addBoard("ma", "Манга", "Японская культура", "Иноуэ Орихимэ", false);
+        addBoard("me", "Меха", "Японская культура", "Лакс Кляйн", false);
+        addBoard("rm", "Rozen Maiden", "Японская культура", "Суйгинто", false);
+        addBoard("tan", "Сетевые персонажи", "Японская культура", "Уныл-тян", false);
+        addBoard("sos", "Suzumiya Haruhi no Yūutsu", "Японская культура", "Кёнко", false);
+        addBoard("to", "Touhou", "Японская культура", "Нитори", false);
+        addBoard("fi", "Фигурки", "Японская культура", "Фигурка анонима", false);
+        addBoard("hau", "Higurashi no Naku Koro ni", "Японская культура", "Ханю", false);
+        addBoard("ts", "Цундере", "Японская культура", "Baka Inu", false);
+        addBoard("jp", "Япония", "Японская культура", "名無しさん", false);
         
         SIMPLE_ARRAY_IICHAN = new SimpleBoardModel[LIST_IICHAN.size()];
         for (int i=0; i<LIST_IICHAN.size(); ++i) SIMPLE_ARRAY_IICHAN[i] = new SimpleBoardModel(LIST_IICHAN.get(i));

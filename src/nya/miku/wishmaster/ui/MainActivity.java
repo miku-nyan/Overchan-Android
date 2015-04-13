@@ -87,6 +87,7 @@ public class MainActivity extends FragmentActivity {
     public StaticSettingsContainer settings;
     private int autohideRulesHash;
     private float rootViewWeight = 0;
+    private boolean openSpoilers;
     private boolean isHorizontalOrientation;
     private boolean isPaused = false;
     private boolean isDestroyed = false;
@@ -283,6 +284,7 @@ public class MainActivity extends FragmentActivity {
         settings = MainApplication.getInstance().settings.getStaticSettings();
         autohideRulesHash = MainApplication.getInstance().settings.getAutohideRulesJson().hashCode();
         rootViewWeight = MainApplication.getInstance().settings.getRootViewWeight();
+        openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         setTheme(settings.theme);
         super.onCreate(savedInstanceState);
@@ -398,7 +400,8 @@ public class MainActivity extends FragmentActivity {
         if (settings.theme != newSettings.theme || settings.isDisplayDate != newSettings.isDisplayDate ||
                 (settings.isDisplayDate && (settings.isLocalTime != newSettings.isLocalTime)) ||
                 MainApplication.getInstance().settings.getAutohideRulesJson().hashCode() != autohideRulesHash ||
-                MainApplication.getInstance().settings.getRootViewWeight() != rootViewWeight) {
+                MainApplication.getInstance().settings.getRootViewWeight() != rootViewWeight ||
+                MainApplication.getInstance().settings.openSpoilers() != openSpoilers) {
             Logger.d(TAG, "appearance settings were changed; clearing LRU cache and restarting activity");
             restartActivityClearCache();
             return;
