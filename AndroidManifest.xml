@@ -52,12 +52,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:scheme="https" />
                 <!-- domains -->
                 <data android:host="iichan.hk" />
+                <data android:host="www.iichan.hk" />
                 <data android:host="hatsune.ru" />
                 <data android:host="410chan.org" />
+                <data android:host="www.410chan.org" />
+                <data android:host="nowere.net" />
+                <data android:host="www.nowere.net" />
+                
                 <data android:host="4chan.org" />
+                <data android:host="www.4chan.org" />
                 <data android:host="boards.4chan.org" />
+                
                 <data android:host="krautchan.net" />
+                <data android:host="www.krautchan.net" />
+                
                 <data android:host="2ch.hk" />
+                <data android:host="www.2ch.hk" />
                 <data android:host="2ch.pm" />
                 <data android:host="2-ch.so" />
                 <data android:host="2ch.re" />
