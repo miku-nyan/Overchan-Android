@@ -141,7 +141,8 @@ public class NowereModule extends AbstractChanModule {
     }
     
     @Override
-    public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList) throws Exception {
+    public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
+            throws Exception {
         UrlPageModel urlModel = new UrlPageModel();
         urlModel.chanName = NOWERE_NAME;
         urlModel.type = UrlPageModel.TYPE_BOARDPAGE;
@@ -158,7 +159,8 @@ public class NowereModule extends AbstractChanModule {
     }
     
     @Override
-    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList) throws Exception {
+    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
+            throws Exception {
         UrlPageModel urlModel = new UrlPageModel();
         urlModel.chanName = NOWERE_NAME;
         urlModel.type = UrlPageModel.TYPE_THREADPAGE;
@@ -202,7 +204,7 @@ public class NowereModule extends AbstractChanModule {
         if (model.threadNumber != null) postEntityBuilder.addString("parent", model.threadNumber);
         postEntityBuilder.
                 addString("field1", model.name).
-                addString("field2", model.email).
+                addString("field2", model.sage ? "sage" : model.email).
                 addString("field3", model.subject).
                 addString("field4", model.comment).
                 addString("captcha", model.captchaAnswer).

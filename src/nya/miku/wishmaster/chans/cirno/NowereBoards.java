@@ -85,8 +85,8 @@ public class NowereBoards {
         model.allowNames = true;
         model.allowSubjects = true;
         model.allowSage = true;
-        model.allowEmails = false;
-        model.ignoreEmailIfSage = false;
+        model.allowEmails = true;
+        model.ignoreEmailIfSage = true;
         model.allowWatermark = false;
         model.allowOpMark = false;
         model.allowRandomHash = true;
