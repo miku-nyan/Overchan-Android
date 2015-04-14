@@ -53,7 +53,7 @@ public class WakabaReader implements Closeable {
     private static final class DateFormatHolder {
         private static final DateFormat DEFAULT_WAKABA_DATEFORMAT;
         static {
-            DEFAULT_WAKABA_DATEFORMAT = new SimpleDateFormat("yy/MM/dd(EEE)hh:mm", Locale.US);
+            DEFAULT_WAKABA_DATEFORMAT = new SimpleDateFormat("yy/MM/dd(EEE)HH:mm", Locale.US);
             DEFAULT_WAKABA_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
     }

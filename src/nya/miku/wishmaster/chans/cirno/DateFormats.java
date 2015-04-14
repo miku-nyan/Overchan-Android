@@ -39,23 +39,23 @@ public class DateFormats {
         iichanSymbols.setShortWeekdays(new String[] { "", "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" });
         iichanSymbols.setMonths(new String[] {
                     "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря" });
-        IICHAN_DATE_FORMAT = new SimpleDateFormat("EEE dd MMMM yyyy hh:mm:ss", iichanSymbols);
+        IICHAN_DATE_FORMAT = new SimpleDateFormat("EEE dd MMMM yyyy HH:mm:ss", iichanSymbols);
         IICHAN_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
         
         DateFormatSymbols ru410Symbols = new DateFormatSymbols();
         ru410Symbols.setShortWeekdays(new String[] { "", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Сбт", "Вск" });
-        RU_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy (EEE) hh:mm:ss", ru410Symbols);
+        RU_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy (EEE) HH:mm:ss", ru410Symbols);
         RU_410_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
         
         DateFormatSymbols int410Symbols = new DateFormatSymbols();
         int410Symbols.setShortWeekdays(new String[] { "", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" });
-        INT_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy (EEE) hh:mm:ss", int410Symbols);
+        INT_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy (EEE) HH:mm:ss", int410Symbols);
         INT_410_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
         
-        MIKUBA_DATE_FORMAT = new SimpleDateFormat("EEE dd MMM yyyy hh:mm:ss", Locale.US);
+        MIKUBA_DATE_FORMAT = new SimpleDateFormat("EEE dd MMM yyyy HH:mm:ss", Locale.US);
         MIKUBA_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
         
-        NOWERE_DATE_FORMAT = new SimpleDateFormat("yy/MM/dd(EEE)hh:mm", Locale.US);
+        NOWERE_DATE_FORMAT = new SimpleDateFormat("yy/MM/dd(EEE)HH:mm", Locale.US);
         NOWERE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
     }
 }
