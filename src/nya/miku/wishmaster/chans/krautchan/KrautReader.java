@@ -47,7 +47,7 @@ public class KrautReader implements Closeable {
     
     private static final DateFormat KRAUT_DATEFORMAT;
     static {
-        KRAUT_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
+        KRAUT_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         KRAUT_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
     }
     
