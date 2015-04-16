@@ -826,6 +826,11 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             return;
         }
         
+        if (url.startsWith(PresentationItemModel.ALL_REFERENCES_URI)) {
+            openReferencesList(url.substring(PresentationItemModel.ALL_REFERENCES_URI.length()));
+            return;
+        }
+        
         boolean sameThread = false;
         if (url.startsWith("#")) {
             UrlPageModel thisThreadModel = new UrlPageModel();
@@ -1739,8 +1744,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
             }
             //ссылки на ответы
-            if (model.referencesString != null && model.referencesString.length() != 0) {
-                tag.repliesView.setText(model.referencesString);
+            Spanned usingReferencesString = model.referencesString;//referencesQuantityString TODO get from preferences
+            if (usingReferencesString != null && usingReferencesString.length() != 0) {
+                tag.repliesView.setText(usingReferencesString);
                 if (!tag.repliesIsVisible) {
                     tag.repliesView.setVisibility(View.VISIBLE);
                     tag.repliesIsVisible = true;
@@ -2617,6 +2623,84 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         return view;
                     }
                 });
+                dialog.getWindow().setBackgroundDrawableResource(bgShadowResource);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.setContentView(dlgList);
+                dialog.show();
+            }
+        };
+        if (tmpV.getWidth() != 0) {
+            next.run();
+        } else {
+            AppearanceUtils.callWhenLoaded(tmpDlg.getWindow().getDecorView(), next);
+        }
+    }
+    
+    private void openReferencesList(final String from) {
+        final List<Integer> positions = new ArrayList<>();
+        final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
+        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
+        final View tmpV = new View(activity);
+        final Dialog tmpDlg = new Dialog(activity);
+        tmpDlg.getWindow().setBackgroundDrawableResource(bgShadowResource);
+        tmpDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        tmpDlg.setCanceledOnTouchOutside(true);
+        tmpDlg.setContentView(tmpV);
+        tmpDlg.show();
+        Runnable next = new Runnable() {
+            @Override
+            public void run() {
+                final int dlgWidth = tmpV.getWidth();
+                tmpDlg.hide();
+                tmpDlg.cancel();
+                
+                int fromPosition = -1;
+                for (int i=0; i<presentationModel.presentationList.size(); ++i) {
+                    if (presentationModel.presentationList.get(i).sourceModel.number.equals(from)) {
+                        fromPosition = i;
+                        break;
+                    }
+                }
+                if (fromPosition != -1) {
+                    Spanned referencesString = presentationModel.presentationList.get(fromPosition).referencesString;
+                    ClickableURLSpan[] spans = referencesString.getSpans(0, referencesString.length(), ClickableURLSpan.class);
+                    for (ClickableURLSpan span : spans) {
+                        String url = span.getURL();
+                        try {
+                            //url уже в нормальном виде, т.к. строится в PresentationItemModel (модулем чана)
+                            UrlPageModel model = UrlHandler.getPageModel(url);
+                            int itemPosition = -1;
+                            for (int i=0; i<presentationModel.presentationList.size(); ++i) {
+                                if (presentationModel.presentationList.get(i).sourceModel.number.equals(model.postNumber)) {
+                                    itemPosition = i;
+                                    break;
+                                }
+                            }
+                            if (itemPosition != -1) positions.add(itemPosition);
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                        }
+                    }
+                }
+                
+                if (positions.size() == 0) {
+                    Logger.e(TAG, "no references");
+                    return;
+                }
+                
+                ListView dlgList = new ListView(activity);
+                dlgList.setAdapter(new ArrayAdapter<Integer>(activity, 0, positions) {
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        int adapterPositon = getItem(position);
+                        View view = adapter.getView(adapterPositon, convertView, parent, dlgWidth, adapter.getItem(adapterPositon));
+                        view.setBackgroundColor(bgColor);
+                        return view;
+                    }
+                });
+                
+                Dialog dialog = new Dialog(activity);
                 dialog.getWindow().setBackgroundDrawableResource(bgShadowResource);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCanceledOnTouchOutside(true);

@@ -32,33 +32,37 @@ public class ClickableURLSpan extends ClickableSpan {
     
     private final String url;
     private URLSpanClickListener listener;
-
+    
     public ClickableURLSpan(String url) {
         this.url = url;
     }
-
+    
     @Override
     public void onClick(View widget) {
         if (this.listener != null) {
             this.listener.onClick(widget, this, this.url);
         }
     }
-
+    
     public void setOnClickListener(URLSpanClickListener listener) {
         this.listener = listener;
     }
-
+    
+    public String getURL() {
+        return url;
+    }
+    
     public static ClickableURLSpan replaceURLSpan(SpannableStringBuilder builder, URLSpan span, int color) {
         int start = builder.getSpanStart(span);
         int end = builder.getSpanEnd(span);
         String url = span.getURL();
-
+        
         builder.removeSpan(span);
-
+        
         ClickableURLSpan newSpan = new ClickableURLSpan(url);
         builder.setSpan(newSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+        
         return newSpan;
     }
 }

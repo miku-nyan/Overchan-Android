@@ -54,6 +54,8 @@ import android.text.style.StyleSpan;
 public class PresentationItemModel {
     private static final Pattern REPLY_LINK_FULL_PATTERN = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)</a>");
     
+    public static final String ALL_REFERENCES_URI = "references://all?from=";
+    
     private Resources resources = MainApplication.getInstance().resources;
     private URLSpanClickListener spanClickListener;
     private ImageGetter imageGetter;
@@ -83,6 +85,10 @@ public class PresentationItemModel {
      *  Необходимо предварительно добавить ссылки ({@link #addReferenceFrom(String)}) и построить ({@link #buildReferencesString()}).
      *  Построение возможно, только если элемент - пост со страницы треда. */
     public Spanned referencesString;
+    /** spanned строка со ссылкой на список ссылок на данный пост (т.е. количество ответов).
+     *  Необходимо предварительно добавить ссылки ({@link #addReferenceFrom(String)}) и построить ({@link #buildReferencesString()}).
+     *  Построение возможно, только если элемент - пост со страницы треда. */
+    public Spanned referencesQuantityString;
     /** spanned строка с заголовком поста.
      *  Если нужна, необходимо предварительно построить (метод {@link #buildSpannedHeader(int, int, String)}) */
     public Spanned spannedHeader;
@@ -336,6 +342,7 @@ public class PresentationItemModel {
     public void addReferenceFrom(String postNumber) {
         referencesFrom.add(postNumber);
         referencesString = null;
+        referencesQuantityString = null;
     }
     
     /**
@@ -344,6 +351,7 @@ public class PresentationItemModel {
     public void buildReferencesString() {
         if (threadNumber == null || referencesFrom.isEmpty()) {
             referencesString = null;
+            referencesQuantityString = null;
             return;
         }
         
@@ -377,7 +385,16 @@ public class PresentationItemModel {
             builder.setSpan(new ForegroundColorSpan(themeColors.urlLinkForeground), positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             refLinkSpan.setOnClickListener(spanClickListener);
         }
+        builder.setSpan(new StyleSpan(Typeface.ITALIC), 0, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         referencesString = builder;
+        
+        int repliesQuantity = referencesFrom.size();
+        builder = new SpannableStringBuilder(resources.getQuantityString(R.plurals.postitem_replies_quantity, repliesQuantity, repliesQuantity));
+        ClickableURLSpan refQuantityLinkSpan = new ClickableURLSpan(ALL_REFERENCES_URI + sourceModel.number);
+        builder.setSpan(refQuantityLinkSpan, 0, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.setSpan(new ForegroundColorSpan(themeColors.urlLinkForeground), 0, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        refQuantityLinkSpan.setOnClickListener(spanClickListener);
+        referencesQuantityString = builder;
     }
     
     

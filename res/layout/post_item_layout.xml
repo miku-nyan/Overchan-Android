@@ -165,7 +165,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_marginTop="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="?android:attr/textColorPrimary"
-        android:textStyle="italic"
         android:visibility="gone" />
     
     <TextView
