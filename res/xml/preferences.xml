@@ -80,6 +80,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         <CheckBoxPreference
             android:defaultValue="false"
+            android:key="@string/pref_key_replies_only_quantity"
+            android:title="@string/pref_replies_only_quantity_title"
+            android:summary="@string/pref_replies_only_quantity_summary" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="@string/pref_key_sidepanel_hide"
             android:title="@string/pref_sidepanel_hide_title"
             android:summary="@string/pref_sidepanel_hide_summary" />

@@ -399,6 +399,7 @@ public class MainActivity extends FragmentActivity {
         StaticSettingsContainer newSettings = MainApplication.getInstance().settings.getStaticSettings();
         if (settings.theme != newSettings.theme || settings.isDisplayDate != newSettings.isDisplayDate ||
                 (settings.isDisplayDate && (settings.isLocalTime != newSettings.isLocalTime)) ||
+                settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
                 MainApplication.getInstance().settings.getAutohideRulesJson().hashCode() != autohideRulesHash ||
                 MainApplication.getInstance().settings.getRootViewWeight() != rootViewWeight ||
                 MainApplication.getInstance().settings.openSpoilers() != openSpoilers) {

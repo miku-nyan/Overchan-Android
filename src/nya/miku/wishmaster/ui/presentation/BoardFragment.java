@@ -1744,7 +1744,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
             }
             //ссылки на ответы
-            Spanned usingReferencesString = model.referencesString;//referencesQuantityString TODO get from preferences
+            Spanned usingReferencesString = fragment().staticSettings.repliesOnlyQuantity ? model.referencesQuantityString : model.referencesString;
             if (usingReferencesString != null && usingReferencesString.length() != 0) {
                 tag.repliesView.setText(usingReferencesString);
                 if (!tag.repliesIsVisible) {

@@ -101,6 +101,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_open_spoilers), true);
     }
     
+    public boolean repliesOnlyQuantity() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_replies_only_quantity), false);
+    }
+    
     public int getTheme() {
         String defaultThemeValue = resources.getString(R.string.pref_theme_value_default);
         String defaultFontSizeValue = resources.getString(R.string.pref_font_size_value_default);
@@ -288,6 +292,7 @@ public class ApplicationSettings {
         public boolean downloadThumbnails;
         public boolean isDisplayDate;
         public boolean isLocalTime;
+        public boolean repliesOnlyQuantity;
     }
 
     public void updateStaticSettings(StaticSettingsContainer container) {
@@ -296,6 +301,7 @@ public class ApplicationSettings {
         container.downloadThumbnails = isDownloadThumbnails();
         container.isDisplayDate = isDisplayDate();
         container.isLocalTime = isLocalTime();
+        container.repliesOnlyQuantity = repliesOnlyQuantity();
     }
     
 }
