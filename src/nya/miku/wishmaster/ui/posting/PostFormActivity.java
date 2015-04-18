@@ -465,6 +465,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         if (boardModel.allowSubjects) subjectField.setText(sendPostModel.subject != null ? sendPostModel.subject : "");
         if (boardModel.allowEmails) emailField.setText(sendPostModel.email != null ? sendPostModel.email : "");
         commentField.setText(sendPostModel.comment != null ? sendPostModel.comment : "");
+        if (commentField.getText() != null) commentField.setSelection(commentField.getText().length());
         if (boardModel.allowDeletePosts || boardModel.allowDeleteFiles)
             passwordField.setText(sendPostModel.password != null ? sendPostModel.password : "");
         if (boardModel.allowIcons) spinner.setSelection(sendPostModel.icon != -1 ? sendPostModel.icon : 0);

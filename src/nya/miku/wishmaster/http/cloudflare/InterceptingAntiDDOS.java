@@ -166,7 +166,7 @@ import android.webkit.WebViewClient;
         return currentCookie;
     }
     
-    private class BufOutputStream extends ByteArrayOutputStream {
+    private static class BufOutputStream extends ByteArrayOutputStream {
         public BufOutputStream() {
             super(1024);
         }

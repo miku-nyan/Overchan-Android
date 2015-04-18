@@ -1483,6 +1483,11 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         /**
+         * @param position позиция элемента в списке
+         * @param convertView старый view для вторичного использования (при вызове через адаптер)
+         * @param parent родительский view, к которому будет прикреплён создающийся (при вызове через адаптер)
+         * @param popupWidth ширина окна, в котором вид будет отображён (если необходимо получить view для всплывающего диалога).
+         * Для получения вида по умолчанию (в адаптере listview) необходимо передать null.
          * @param custom если != null, строится View (только для всплывающего диалога, popupWidth не должно быть равно null)
          * не для элемента на позиции position, а для этой модели. При этом комментарий не переносится в ScrollView (т.к. в диалоге будет ListView)
          */
@@ -1786,10 +1791,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             //для построения диалогового окна
             if (popupWidth != null) {
+                if (fragment().pageType == TYPE_POSTSLIST) {
+                    weakRegisterForContextMenu(view);
+                    weakRegisterForContextMenu(view.findViewById(R.id.post_content_layout));
+                    tag.isPopupDialog = true;
+                }
                 if (custom != null) return view;
-                weakRegisterForContextMenu(view);
-                weakRegisterForContextMenu(view.findViewById(R.id.post_content_layout)); 
-                tag.isPopupDialog = true;
                 
                 final ScrollView scrollContent = (ScrollView) view.findViewById(R.id.post_scroll_content);
                 RelativeLayout contentLayout = (RelativeLayout) view.findViewById(R.id.post_content_layout);
@@ -2639,6 +2646,38 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     private void openReferencesList(final String from) {
         final List<Integer> positions = new ArrayList<>();
+        int position = -1;
+        for (int i=0; i<presentationModel.presentationList.size(); ++i) {
+            if (presentationModel.presentationList.get(i).sourceModel.number.equals(from)) {
+                position = i;
+                break;
+            }
+        }
+        if (position != -1) {
+            Spanned referencesString = presentationModel.presentationList.get(position).referencesString;
+            ClickableURLSpan[] spans = referencesString.getSpans(0, referencesString.length(), ClickableURLSpan.class);
+            for (ClickableURLSpan span : spans) {
+                String url = span.getURL();
+                try {
+                    //url уже в нормальном виде, т.к. строится в PresentationItemModel (модулем чана)
+                    UrlPageModel model = UrlHandler.getPageModel(url);
+                    for (; position<presentationModel.presentationList.size(); ++position) {
+                        if (presentationModel.presentationList.get(position).sourceModel.number.equals(model.postNumber)) {
+                            break;
+                        }
+                    }
+                    if (position<presentationModel.presentationList.size()) positions.add(position);
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                }
+            }
+        }
+        
+        if (positions.size() == 0) {
+            Logger.e(TAG, "no references");
+            return;
+        }
+        
         final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
         final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
         final View tmpV = new View(activity);
@@ -2654,40 +2693,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 final int dlgWidth = tmpV.getWidth();
                 tmpDlg.hide();
                 tmpDlg.cancel();
-                
-                int fromPosition = -1;
-                for (int i=0; i<presentationModel.presentationList.size(); ++i) {
-                    if (presentationModel.presentationList.get(i).sourceModel.number.equals(from)) {
-                        fromPosition = i;
-                        break;
-                    }
-                }
-                if (fromPosition != -1) {
-                    Spanned referencesString = presentationModel.presentationList.get(fromPosition).referencesString;
-                    ClickableURLSpan[] spans = referencesString.getSpans(0, referencesString.length(), ClickableURLSpan.class);
-                    for (ClickableURLSpan span : spans) {
-                        String url = span.getURL();
-                        try {
-                            //url уже в нормальном виде, т.к. строится в PresentationItemModel (модулем чана)
-                            UrlPageModel model = UrlHandler.getPageModel(url);
-                            int itemPosition = -1;
-                            for (int i=0; i<presentationModel.presentationList.size(); ++i) {
-                                if (presentationModel.presentationList.get(i).sourceModel.number.equals(model.postNumber)) {
-                                    itemPosition = i;
-                                    break;
-                                }
-                            }
-                            if (itemPosition != -1) positions.add(itemPosition);
-                        } catch (Exception e) {
-                            Logger.e(TAG, e);
-                        }
-                    }
-                }
-                
-                if (positions.size() == 0) {
-                    Logger.e(TAG, "no references");
-                    return;
-                }
                 
                 ListView dlgList = new ListView(activity);
                 dlgList.setAdapter(new ArrayAdapter<Integer>(activity, 0, positions) {
