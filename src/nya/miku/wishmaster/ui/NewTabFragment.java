@@ -24,6 +24,7 @@ import java.util.List;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.chans.cirno.MikubaModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -473,6 +474,8 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
                         setVisible(canAddToQuickAccess);
                 menu.add(Menu.NONE, R.id.context_menu_quickaccess_custom_board, 3, R.string.context_menu_quickaccess_custom_board).
                         setOnMenuItemClickListener(contextMenuHandler);
+                if (chansAdapter.getItem(((AdapterView.AdapterContextMenuInfo) menuInfo).position) instanceof MikubaModule)
+                    menu.findItem(R.id.context_menu_quickaccess_custom_board).setVisible(false);
             }
         });
         chansListDialog.show();

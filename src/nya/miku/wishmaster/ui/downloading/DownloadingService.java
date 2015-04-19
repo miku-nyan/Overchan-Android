@@ -206,7 +206,10 @@ public class DownloadingService extends Service {
     
     @Override
     public void onStart(Intent intent, int startId) {
-        if (intent != null) downloadingQueue.add((DownloadingQueueItem) intent.getSerializableExtra(EXTRA_DOWNLOADING_ITEM));
+        if (intent != null) {
+            DownloadingQueueItem item = (DownloadingQueueItem) intent.getSerializableExtra(EXTRA_DOWNLOADING_ITEM);
+            if (item != null) downloadingQueue.add(item);
+        }
         if (currentTask == null || !nowTaskRunning) {
             Logger.d(TAG, "starting downloading task");
             nowTaskRunning = true;

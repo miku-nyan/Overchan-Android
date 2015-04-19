@@ -1305,7 +1305,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
                 BoardFragment fragment = fragmentRef.get();
-                if (fragment != null) fragment.onCreateContextMenu(menu, v, menuInfo);
+                if (fragment != null) {
+                    try {
+                        fragment.onCreateContextMenu(menu, v, menuInfo);
+                    } catch (Exception e) {
+                        Logger.e(TAG, e);
+                    }
+                }
             }
         }
         
@@ -1991,7 +1997,11 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
      * Обновить страницу, без вывода всплывающего уведомления
      */
     public void updateSilent() {
-        update(true, true, true);
+        if (!listLoaded) {
+            Logger.e(TAG, "called updateSilent() but the list is not loaded");
+        } else {
+            update(true, true, true);
+        }
     }
     
     /**
@@ -2912,6 +2922,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             UrlHandler.open(chan.fixRelativeUrl(attachment.path), activity);
             return;
         }
+        if (presentationModel == null || presentationModel.source == null || presentationModel.source.boardModel == null) return;
         Intent galleryIntent = new Intent(activity.getApplicationContext(), GalleryActivity.class);
         galleryIntent.putExtra(GalleryActivity.EXTRA_ATTACHMENT, attachment);
         galleryIntent.putExtra(GalleryActivity.EXTRA_BOARDMODEL, presentationModel.source.boardModel);

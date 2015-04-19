@@ -222,7 +222,11 @@ public class TabsTrackerService extends Service {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        ((BoardFragment) tabsSwitcher.currentFragment).updateSilent();
+                        try {
+                            ((BoardFragment) tabsSwitcher.currentFragment).updateSilent();
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                        }
                     }
                 });
             }
