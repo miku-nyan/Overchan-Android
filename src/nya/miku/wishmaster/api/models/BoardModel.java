@@ -89,7 +89,8 @@ public class BoardModel implements Serializable {
      *  Если {@link #requiredFileForNewThread} равно true, должно быть больше нуля. */
     @Tag(23) public int attachmentsMaxCount;
     /** Массив с фильтрами допустимых форматов (расширений) прикрепляемых файлов, например: ["jpg", "png", "gif"].
-     *  Только если {@link #readonlyBoard} равно false, в противном случае может принимать null. */
+     *  Значение null означает, что допустимо прикреплять любые файлы.
+     *  Только если {@link #readonlyBoard} равно false. */
     @Tag(24) public String[] attachmentsFormatFilters;
     /** Тип допустимой разметки в теле отправляемого поста,
      *  одно из константных значений: {@link #MARK_NOMARK}, {@link #MARK_WAKABAMARK}, {@link #MARK_BBCODE}.

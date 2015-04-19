@@ -102,8 +102,10 @@ public class WakabaUtils {
                     model.boardName = path.substring(0, path.lastIndexOf("/"));
                     
                     String page = path.substring(path.lastIndexOf("/") + 1);
-                    if (!page.equals("")) model.boardPage = Integer.parseInt(page.substring(0, page.indexOf(".html")));
-                    else model.boardPage = 0;
+                    if (!page.equals("")) {
+                        String pageNum = page.substring(0, page.indexOf(".html"));
+                        model.boardPage = pageNum.equals("index") ? 0 : Integer.parseInt(pageNum);
+                    } else model.boardPage = 0;
                 }
             }
         } catch (Exception e) {

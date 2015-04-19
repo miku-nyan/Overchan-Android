@@ -351,6 +351,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 	<string name="mikuba_password_ignored">(игнорируется)</string>
 	
+	<string name="dobrochan_prefs_only_new_posts">Только новые посты</string>
+	<string name="dobrochan_prefs_only_new_posts_summary">Загружать только новые посты вместо обновления всего треда</string>
+	<string name="dobrochan_prefs_domain">Домен</string>
+	<string name="dobrochan_prefs_domain_summary">Резервные адреса: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+	
 	<string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
 	<string name="fourchan_prefs_new_recaptcha_summary">Использовать новую версию Recaptcha</string>
 	

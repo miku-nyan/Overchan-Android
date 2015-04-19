@@ -24,7 +24,6 @@ import java.util.List;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.chans.cirno.MikubaModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -337,7 +336,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             
             {
                 for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-                    if (!(chan instanceof MikubaModule)) add(chan);
+                    add(chan);
                 }
             }
             

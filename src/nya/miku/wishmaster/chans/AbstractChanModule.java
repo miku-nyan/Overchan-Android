@@ -286,7 +286,11 @@ public abstract class AbstractChanModule implements ChanModule {
     }
     
     @Override
-    public void saveCookie(Cookie cookie) {}
+    public void saveCookie(Cookie cookie) {
+        if (cookie != null) {
+            httpClient.getCookieStore().addCookie(cookie);
+        }
+    }
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
