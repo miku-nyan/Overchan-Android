@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nya.miku.wishmaster"
-    android:versionCode="7"
-    android:versionName="0.9.6" >
+    android:versionCode="8"
+    android:versionName="0.9.7" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -65,6 +65,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="krautchan.net" />
                 <data android:host="www.krautchan.net" />
+                
+                <data android:host="dobrochan.ru" />
+                <data android:host="dobrochan.com" />
+                <data android:host="dobrochan.org" />
+                <data android:host="www.dobrochan.ru" />
+                <data android:host="www.dobrochan.com" />
+                <data android:host="www.dobrochan.org" />
                 
                 <data android:host="2ch.hk" />
                 <data android:host="www.2ch.hk" />
