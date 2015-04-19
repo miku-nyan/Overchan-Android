@@ -165,8 +165,8 @@ public class DobroModule extends AbstractChanModule {
     private void addOnlyNewPostsPreference(PreferenceGroup group) {
         Context context = group.getContext();
         CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
-        onlyNewPostsPreference.setTitle("Only New Posts");
-        onlyNewPostsPreference.setSummary("Only New Posts");
+        onlyNewPostsPreference.setTitle(R.string.dobrochan_prefs_only_new_posts);
+        onlyNewPostsPreference.setSummary(R.string.dobrochan_prefs_only_new_posts_summary);
         onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
         onlyNewPostsPreference.setDefaultValue(true);
         group.addItemFromInflater(onlyNewPostsPreference);
@@ -246,7 +246,7 @@ public class DobroModule extends AbstractChanModule {
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
         boolean loadOnlyNewPosts = loadOnlyNewPosts();
-        String lastPost = (loadOnlyNewPosts && oldList != null && oldList.length > 0) ? lastPost = oldList[oldList.length-1].number : null;
+        String lastPost = (loadOnlyNewPosts && oldList != null && oldList.length > 0) ? oldList[oldList.length-1].number : null;
         String url = getDomainUrl() + "api/thread/" + boardName + "/" + threadNumber +
                 (lastPost == null ? "/all.json?new_format&message_html" : ("/new.json?last_post=" + lastPost + "&new_format&message_html"));
         JSONObject response = downloadJSONObject(url, oldList != null, listener, task);
