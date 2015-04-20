@@ -456,6 +456,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Futaba</item>
         <item>Photon</item>
         <item>Neutron</item>
+        <item>Gurochan</item>
     </string-array>
     <string name="pref_font_size_title">Размер текста</string>
     <string-array name="pref_font_size_choices">

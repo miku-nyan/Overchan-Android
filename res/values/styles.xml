@@ -148,6 +148,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="actionSave">@drawable/ic_action_save_dark</item>
     </style>
     
+    <style name="Gurochan_Base" parent="@style/Theme_Light_Switch">
+        <item name="android:textColorPrimary">#000000</item>
+        <item name="activityRootBackground">#EDDAD2</item>
+        <item name="sidebarBackground">#CCEDDAD2</item>
+        <item name="sidebarSelectedItem">@drawable/sidebar_selected_gurochan</item>
+        <item name="listSeparatorBackground">#D9AF9E</item>
+        <item name="postUnreadOverlay">#7FFF623F</item>
+        <item name="postBackground">#D9AF9E</item>
+        <item name="postIndexForeground">#789922</item>
+        <item name="postIndexOverBumpLimit">#C41E3A</item>
+        <item name="postNumberForeground">#000000</item>
+        <item name="postNameForeground">#117743</item>
+        <item name="postOpForeground">#008000</item>
+        <item name="postSageForeground">#993333</item>
+        <item name="postTripForeground">#228854</item>
+        <item name="postTitleForeground">#0F0C5D</item>
+        <item name="postQuoteForeground">#789922</item>
+        <item name="spoilerForeground">#000000</item>
+        <item name="spoilerBackground">#E6CBC0</item>
+        <item name="urlLinkForeground">#34345C</item>
+        <item name="itemInfoForeground">#666666</item>
+        <item name="searchHighlightBackground">#EF0FFF</item>
+        
+        <item name="iconDrawer">@drawable/ic_drawer_light</item>
+        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
+        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
+        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
+        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
+        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
+        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
+        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
+        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
+        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
+        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
+        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
+        <item name="actionSave">@drawable/ic_action_save_light</item>
+    </style>
+    
     <style name="TextAppearance_Small.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">11sp</item> </style>
     <style name="TextAppearance_Small.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">13sp</item> </style>
     <style name="TextAppearance_Small.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">16sp</item> </style>
@@ -231,6 +269,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </style>
     
     <style name="Neutron_Huge" parent="@style/Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    </style>
+    
+    <style name="Gurochan_Small" parent="@style/Gurochan_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
+    </style>
+    
+    <style name="Gurochan_Medium" parent="@style/Gurochan_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    </style>
+    
+    <style name="Gurochan_Large" parent="@style/Gurochan_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    </style>
+    
+    <style name="Gurochan_Huge" parent="@style/Gurochan_Base">
         <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
         <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
