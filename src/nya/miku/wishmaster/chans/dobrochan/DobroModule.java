@@ -20,6 +20,8 @@ package nya.miku.wishmaster.chans.dobrochan;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -411,6 +413,7 @@ public class DobroModule extends AbstractChanModule {
             throw new Exception(response.statusCode + " - " + response.statusReason);
         } finally {
             if (response != null) response.release();
+            saveHanabiraCookie();
         }
     }
     
@@ -438,6 +441,7 @@ public class DobroModule extends AbstractChanModule {
             }
         } finally {
             if (response != null) response.release();
+            saveHanabiraCookie();
         }
         return null;
     }
@@ -522,6 +526,23 @@ public class DobroModule extends AbstractChanModule {
             }
         }
         return model;
+    }
+    
+    @Override
+    public String fixRelativeUrl(String url) {
+        return sanitizeUrl(super.fixRelativeUrl(url));
+    }
+    
+    private String sanitizeUrl(String urlStr) {
+        if (urlStr == null) return null;
+        try {
+            URL url = new URL(urlStr);
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+            return uri.toURL().toString();
+        } catch (Exception e) {
+            Logger.e(TAG, "sanitize url", e);
+            return urlStr;
+        }
     }
     
 }
