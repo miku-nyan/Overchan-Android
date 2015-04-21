@@ -11,3 +11,12 @@ local.properties
 
 proguard/
 .settings/
+
+.idea/
+.gradle/
+build/
+gradle/
+gradlew
+gradlew.bat
+*.iml
+*.eml
