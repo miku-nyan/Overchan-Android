@@ -2,9 +2,9 @@
 
 Overchan Android (Meta Imageboard Client) is an application for browsing imageboards.
 
-## Imageboards support
+### Supported Imageboards
 
-Currently support: [iichan.hk](http://iichan.hk/), [410chan.org](http://410chan.org), [2ch.hk](https://2ch.hk/), [Nowere.net](http://nowere.net/), [krautchan.net](https://krautchan.net), [4chan.org](https://www.4chan.org), [Dobrochan](http://dobrochan.com).
+Currently support: [4chan.org](https://www.4chan.org), [krautchan.net](https://krautchan.net), [iichan.hk](http://iichan.hk/), [hatsune.ru](http://hatsune.ru/), [dobrochan](http://dobrochan.com), [nowere.net](http://nowere.net/), [410chan.org](http://410chan.org), [2ch.hk](https://2ch.hk/).
 
 ## Download APK
 
@@ -25,14 +25,18 @@ Open the source code directory and run (in the command line):
 
 `ant -Dsdk.dir=/path/to/android-sdk -Dndk.dir=/path/to/android-ndk debug`
 
-*Note for Windows platforms:*
-NDK path cannot contain any spaces but you can use the short name of the path (example: `C:\Program Files` → `C:\PROGRA~1`). The short directory name can be found usings `dir /x` (example: `dir /x c:\`)
-
 The .apk file (`bin/Overchan-debug.apk`) will be signed with the debug key.
 
-### Using Eclipse
+*Note for Windows platforms:*
+NDK path cannot contain any spaces but you can use the short name of the path (example: `C:\Program Files` → `C:\PROGRA~1`). The short directory name can be found using `dir /x` (example: `dir /x c:\`)
+
+### Using Eclipse with ADT
 
 Just import the project into your workspace (File → Import → Android → Existing Android code into workspace → select the folder).
+
+### Android Studio/IntelliJ IDEA
+
+You may use Android Studio/IntelliJ IDEA at your own risk. If you need to keep the directory structure (for further contributing) put this [build.gradle](https://yadi.sk/d/QxOq3anxg94NJ) file into the project directory before the import.
 
 ## License
 
