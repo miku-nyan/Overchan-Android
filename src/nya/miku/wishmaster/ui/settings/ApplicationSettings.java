@@ -128,6 +128,12 @@ public class ApplicationSettings {
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Neutron_Large;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Neutron_Huge;
             else return R.style.Neutron_Small;
+        } else if (theme.equals(resources.getString(R.string.pref_theme_value_gurochan))) {
+            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Gurochan_Small;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Gurochan_Medium;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Gurochan_Large;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Gurochan_Huge;
+            else return R.style.Gurochan_Small;
         } else {
             return R.style.Futaba_Small;
         }
