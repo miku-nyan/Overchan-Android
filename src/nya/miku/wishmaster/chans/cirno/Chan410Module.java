@@ -281,7 +281,7 @@ public class Chan410Module extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return WakabaUtils.parseUrl(url, CHAN410_DOMAIN);
+        return WakabaUtils.parseUrl(url, CHAN410_NAME, CHAN410_DOMAIN);
     }
     
 }

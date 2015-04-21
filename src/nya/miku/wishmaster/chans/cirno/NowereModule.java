@@ -119,8 +119,7 @@ public class NowereModule extends AbstractChanModule {
         return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), false) ? NOWERE_URL_HTTPS : NOWERE_URL_HTTP;
     }
     
-    private ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkIfModified)
-            throws Exception {
+    private ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkIfModified) throws Exception {
         HttpResponseModel responseModel = null;
         WakabaReader in = null;
         HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModified).build();
@@ -282,7 +281,7 @@ public class NowereModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return WakabaUtils.parseUrl(url, NOWERE_DOMAIN);
+        return WakabaUtils.parseUrl(url, NOWERE_NAME, NOWERE_DOMAIN);
     }
     
 }

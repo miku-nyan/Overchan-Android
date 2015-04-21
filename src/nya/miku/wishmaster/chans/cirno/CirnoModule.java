@@ -293,6 +293,6 @@ public class CirnoModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return WakabaUtils.parseUrl(url, IICHAN_DOMAIN);
+        return WakabaUtils.parseUrl(url, IICHAN_NAME, IICHAN_DOMAIN);
     }
 }

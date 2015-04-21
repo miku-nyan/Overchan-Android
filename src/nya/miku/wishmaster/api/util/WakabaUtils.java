@@ -51,7 +51,7 @@ public class WakabaUtils {
         return url.toString();
     }
     
-    public static UrlPageModel parseUrl(String url, String mainDomain, String... altDomains) {
+    public static UrlPageModel parseUrl(String url, String chanName, String... domains) {
         String domain;
         String path = "";
         Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)").matcher(url);
@@ -64,19 +64,17 @@ public class WakabaUtils {
             domain = parseUrl.group(1).toLowerCase(Locale.US);
         }
         
-        boolean matchDomain = mainDomain.equals(domain);
-        if (!matchDomain) {
-            for (String d : altDomains) {
-                if (d.equals(domain)) {
-                    matchDomain = true;
-                    break;
-                }
+        boolean matchDomain = false;
+        for (String d : domains) {
+            if (d.equals(domain)) {
+                matchDomain = true;
+                break;
             }
-            if (!matchDomain) throw new IllegalArgumentException("wrong chan");
         }
+        if (!matchDomain) throw new IllegalArgumentException("wrong chan");
         
         UrlPageModel model = new UrlPageModel();
-        model.chanName = mainDomain;
+        model.chanName = chanName;
         
         try {
             if (path == null || path.length() == 0 || path.equals("/") || path.equals("wakaba.html") || path.equals("index.html")) {
