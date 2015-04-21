@@ -64,7 +64,6 @@ import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.chans.AbstractChanModule;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.HttpConstants;
 import nya.miku.wishmaster.http.cloudflare.InteractiveException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -289,16 +288,16 @@ public class FourchanModule extends AbstractChanModule {
     private static class Recaptcha2Exception extends InteractiveException {
         private static final long serialVersionUID = 1L;
         
-        private static final String INTERCEPT = "_intercept";
+        private static final String INTERCEPT = "_intercept?";
         
-        private static final String RECAPTCHA_HTML = 
-                "<script src=\"https://www.google.com/recaptcha/api.js\" async defer></script>"+
-                "<form action=\"" + INTERCEPT + "\" method=\"GET\">"+
-                "  <div class=\"g-recaptcha\" data-sitekey=\"" + RECAPTCHA_KEY + "\"></div>"+
-                "  <input type=\"submit\" value=\"Submit\">"+
-                "</form>";
-        
-        private static final String HASH_FILTER = "g-recaptcha-response=";
+        private static final String RECAPTCHA_HTML =
+                "<script type=\"text/javascript\">" +
+                    "window.globalOnCaptchaEntered = function(res) { " +
+                        "location.href = \"" + INTERCEPT + "\" + res; " +
+                    "}" +
+                "</script>" +
+                "<script src=\"https://www.google.com/recaptcha/api.js\" async defer></script>" +
+                "<div class=\"g-recaptcha\" data-sitekey=\"" + RECAPTCHA_KEY + "\" data-callback=\"globalOnCaptchaEntered\"></div>";
         
         @Override
         public String getServiceName() {
@@ -323,30 +322,23 @@ public class FourchanModule extends AbstractChanModule {
                         @SuppressWarnings("deprecation")
                         @Override
                         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                            System.out.println(url);
                             if (url.contains(INTERCEPT)) {
-                                if (url.contains(HASH_FILTER)) {
-                                    String hash = url.substring(url.indexOf(HASH_FILTER) + HASH_FILTER.length());
-                                    ((FourchanModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).recaptcha2 = hash;
-                                    activity.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callback.onSuccess();
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                } else {
-                                    activity.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callback.onError("Couldn't get hash");
-                                        }
-                                    });
-                                }
+                                String hash = url.substring(url.indexOf(INTERCEPT) + INTERCEPT.length());
+                                ((FourchanModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).recaptcha2 = hash;
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onSuccess();
+                                        dialog.dismiss();
+                                    }
+                                });
                             }
                             return super.shouldInterceptRequest(view, url);
                         }
                     });
-                    webView.getSettings().setUserAgentString(HttpConstants.USER_AGENT_STRING);
+                    //webView.getSettings().setUserAgentString(HttpConstants.USER_AGENT_STRING);
+                    webView.getSettings().setUserAgentString("Mozilla/5.0"); //should get easier captcha
                     webView.getSettings().setJavaScriptEnabled(true);
                     dialog.setTitle("Recaptcha");
                     dialog.setContentView(webView);
