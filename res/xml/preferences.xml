@@ -151,6 +151,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:key="@string/pref_key_external_links_confirmation"
             android:title="@string/pref_external_links_confirmation_title"
             android:summary="@string/pref_external_links_confirmation_summary" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_do_not_close_tabs"
+            android:title="@string/pref_do_not_close_tabs_title"
+            android:summary="@string/pref_do_not_close_tabs_summary" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_downloads" >

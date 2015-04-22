@@ -261,6 +261,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_external_links_confirmation), true);
     }
     
+    public boolean doNotCloseTabs() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_do_not_close_tabs), false);
+    }
+    
     public boolean isAutoupdateEnabled() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_enable_autoupdate), false);
     }

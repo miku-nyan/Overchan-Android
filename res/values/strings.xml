@@ -395,6 +395,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_autohide_summary">Automatic hiding by regular expressions</string>
     <string name="pref_external_links_confirmation_title">Links confirmation</string>
     <string name="pref_external_links_confirmation_summary">Ask before going external links</string>
+    <string name="pref_do_not_close_tabs_title">Do not close tabs</string>
+    <string name="pref_do_not_close_tabs_summary">Do not close tabs by pressing the Back button</string>
     <string name="pref_show_date_title">Display the time</string>
     <string name="pref_show_date_summary">Display the date and time of each post</string>
     <string name="pref_local_time_title">Show local time</string>

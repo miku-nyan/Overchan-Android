@@ -163,18 +163,16 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
                 return true;
             }
         } else {
-            closeTab(selectedItem);
-            /* XXX
-            возможно, стоит добавить возможность (настраивать поведение) не закрывать вкладки по нажатию клавиши "Назад" а просто разворачивать стек
-            (вместо closeTab(selectedItem))
-            
-            mTabsIdStack.removeTab(getItem(selectedItem).id);
-            if (mTabsIdStack.isEmpty()) {
-                setSelectedItem(TabModel.POSITION_NEWTAB);
+            if (MainApplication.getInstance().settings.doNotCloseTabs()) {
+                tabsIdStack.removeTab(getItem(selectedItem).id);
+                if (tabsIdStack.isEmpty()) {
+                    setSelectedItem(TabModel.POSITION_NEWTAB);
+                } else {
+                    setSelectedItemId(tabsIdStack.getCurrentTab());
+                }
             } else {
-                setSelectedItemId(mTabsIdStack.getCurrentTab());
+                closeTab(selectedItem);
             }
-            */
             return true;
         }
         return false;
