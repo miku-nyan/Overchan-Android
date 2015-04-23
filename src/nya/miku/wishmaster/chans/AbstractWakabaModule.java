@@ -21,6 +21,8 @@ package nya.miku.wishmaster.chans;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookieHC4;
@@ -61,6 +63,8 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
     private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
     private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
     private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
+    
+    private Map<String, SimpleBoardModel> boardsMap = null;
     
     public AbstractWakabaModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -182,8 +186,20 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
     
     protected abstract SimpleBoardModel[] getBoardsList();
     
+    
+    protected Map<String, SimpleBoardModel> getBoardsMap() {
+        if (boardsMap == null) {
+            Map<String, SimpleBoardModel> map = new HashMap<>();
+            for (SimpleBoardModel board : getBoardsList()) map.put(board.boardName, board);
+            boardsMap = map;
+        }
+        return boardsMap;
+    }
+    
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
+        Map<String, SimpleBoardModel> map = getBoardsMap();
+        SimpleBoardModel simpleModel = map.get(shortName);
         BoardModel model = new BoardModel();
         model.chan = getChanName();
         model.boardName = shortName;
@@ -197,17 +213,11 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
         model.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
         model.searchAllowed = false;
         model.catalogAllowed = false;
-        
-        SimpleBoardModel[] list = getBoardsList();
-        for (SimpleBoardModel board : list) {
-            if (shortName.equals(board.boardName)) {
-                model.boardDescription = board.boardDescription;
-                model.boardCategory = board.boardCategory;
-                model.nsfw = board.nsfw;
-                break;
-            }
+        if (simpleModel != null) {
+            model.boardDescription = simpleModel.boardDescription;
+            model.boardCategory = simpleModel.boardCategory;
+            model.nsfw = simpleModel.nsfw;
         }
-        
         return model;
     }
     

@@ -142,6 +142,11 @@ public class PostingService extends Service {
         
         @Override
         public void run() {
+            if (sendPostModel == null) {
+                Logger.e(TAG, "sendPostModel == null");
+                return;
+            }
+            
             Logger.d(TAG, "start; nowPosting = true");
             nowPosting = true;
             
