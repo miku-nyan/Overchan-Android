@@ -55,6 +55,7 @@ import nya.miku.wishmaster.containers.ReadableContainer;
 import nya.miku.wishmaster.http.cloudflare.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.ClickableLinksTextView;
+import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.lib.JellyBeanSpanFixTextView;
 import nya.miku.wishmaster.lib.pullable_layout.SwipeRefreshLayout;
 import nya.miku.wishmaster.ui.AppearanceUtils;
@@ -1109,6 +1110,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                     startItemPosition = -1;
                                 }
                                 String notification;
+                                boolean toastToNewPosts = false;
                                 if (isThreadPage) {
                                     int newPostsCount = adapter.getCount() - itemsCountBefore;
                                     if (newPostsCount <= 0) {
@@ -1116,11 +1118,23 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                     } else {
                                         notification = resources.getQuantityString(
                                                 R.plurals.postslist_new_posts_quantity, newPostsCount, newPostsCount);
+                                        toastToNewPosts = true;
                                     }
                                 } else {
                                     notification = resources.getString(R.string.postslist_list_updated);
                                 }
-                                if (!silent) Toast.makeText(activity, notification, Toast.LENGTH_LONG).show();
+                                if (!silent) {
+                                    if (toastToNewPosts) {
+                                        ClickableToast.showText(activity, notification, new ClickableToast.OnClickListener() {
+                                            @Override
+                                            public void onClick() {
+                                                listView.setSelection(itemsCountBefore);
+                                            }
+                                        });
+                                    } else {
+                                        Toast.makeText(activity, notification, Toast.LENGTH_LONG).show();
+                                    }
+                                }
                             }
                         });
                     }
