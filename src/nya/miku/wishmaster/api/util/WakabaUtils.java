@@ -66,7 +66,7 @@ public class WakabaUtils {
         
         boolean matchDomain = false;
         for (String d : domains) {
-            if (d.equals(domain)) {
+            if (d.equalsIgnoreCase(domain)) {
                 matchDomain = true;
                 break;
             }

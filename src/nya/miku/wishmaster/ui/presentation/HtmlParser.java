@@ -80,6 +80,7 @@ public class HtmlParser {
      * @param subject тема (заголовок) сообщения, будет вставлена в начале итоговой Spanned строки.
      * Может принимать null или пустую строку, тогда заголовок вставлен не будет 
      * @param source исходный html текст. Поддерживаются тэги, поддерживаемые {@link android.text.Html#fromHtml(String)}, а также:<ul>
+     * <li><b>&lt;ol&gt;</b>, <b>&lt;ul&gt;</b>, <b>&lt;li&gt;</b> - списки</li>
      * <li><b>&lt;s&gt;</b>, <b>&lt;strike&gt;</b>, <b>&lt;del&gt;</b> - перечёркнутый текст</li>
      * <li><b>&lt;code&gt;</b> - отображается моноширинным шрифтом</li>
      * <li><b>&lt;blockquote class="unkfunc"&gt;</b> - форумная цитата (отображается цветом выбранной темы оформления), выделяется абзацами</li>
@@ -392,8 +393,8 @@ class HtmlToSpannedConverter implements ContentHandler {
         lastPTagLengthRefs[0] = text.length();
         int len = text.length() - startLength;
 
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-            if (len >= 2 && text.charAt(len - 2) == '\n') {
+        if (len >= 1 && text.charAt(text.length() - 1) == '\n') {
+            if (len >= 2 && text.charAt(text.length() - 2) == '\n') {
                 lastPTagLengthRefs[1] = text.length();
                 return;
             }

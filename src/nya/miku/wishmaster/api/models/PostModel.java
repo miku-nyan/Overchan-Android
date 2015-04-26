@@ -39,6 +39,7 @@ public class PostModel implements Serializable {
     @Tag(2) public String subject;
     /** Комментарий в формате HTML.<br>
      *  Допустимо использовать все тэги, поддерживаемые {@link android.text.Html#fromHtml(String)}, а также:<ul>
+     *  <li><b>&lt;ol&gt;</b>, <b>&lt;ul&gt;</b>, <b>&lt;li&gt;</b> - списки</li>
      *  <li><b>&lt;s&gt;</b>, <b>&lt;strike&gt;</b>, <b>&lt;del&gt;</b> - перечёркнутый текст</li>
      *  <li><b>&lt;code&gt;</b> - отображается моноширинным шрифтом</li>
      *  <li><b>&lt;blockquote class="unkfunc"&gt;</b> - форумная цитата (отображается цветом выбранной темы оформления), выделяется абзацами</li>

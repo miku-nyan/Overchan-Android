@@ -63,6 +63,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="www.4chan.org" />
                 <data android:host="boards.4chan.org" />
                 
+                <data android:host="8ch.net" />
+                <data android:host="8chan.co" />
+                <data android:host="fullchan4jtta4sx.onion" />
+                <data android:host="www.8ch.net" />
+                <data android:host="www.8chan.co" />
+                <data android:host="www.fullchan4jtta4sx.onion" />
+                
                 <data android:host="krautchan.net" />
                 <data android:host="www.krautchan.net" />
                 

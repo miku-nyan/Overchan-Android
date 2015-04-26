@@ -251,7 +251,7 @@ public class CloudflareChecker {
         String url = String.format(Locale.US, exception.getCheckCaptchaUrlFormat(), challenge, recaptchaAnswer);
         HttpResponseModel responseModel = null;
         try {
-            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setNoRedirect(true).build();
+            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setNoRedirect(false).build();
             CookieStore cookieStore = httpClient.getCookieStore();
             removeCookie(cookieStore, exception.getRequiredCookieName());
             responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, null, task);

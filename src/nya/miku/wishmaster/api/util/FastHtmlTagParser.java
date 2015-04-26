@@ -71,6 +71,14 @@ public class FastHtmlTagParser {
     }
     
     /**
+     * Получить объект-парсер тэга &lt;p&gt;
+     */
+    public static FastHtmlTagParser getPTagParser() {
+        if (pTagParser == null) pTagParser = new FastHtmlTagParser("p");
+        return pTagParser;
+    }
+    
+    /**
      * Получить объект-обработчик тэгов, который удаляет тэги (заменяет на "")
      */
     public static TagReplaceHandler getRemoveTagsReplaceHandler() {
@@ -85,6 +93,7 @@ public class FastHtmlTagParser {
     
     private static FastHtmlTagParser spanTagParser = null;
     private static FastHtmlTagParser fontTagParser = null;
+    private static FastHtmlTagParser pTagParser = null;
     
     private static TagReplaceHandler removeTagsReplaceHandler = null;
     
