@@ -19,7 +19,12 @@
 package nya.miku.wishmaster.cache;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.ListIterator;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import nya.miku.wishmaster.common.Logger;
 
@@ -169,18 +174,30 @@ public class FileCache {
     }
     
     private synchronized void trim() {
-        if (maxSize == 0) return;
+        if (maxSize == 0 || size <= maxSize) return;
+        
+        LinkedList<Pair<File, Long>> files = new LinkedList<>();
+        for (File file : allFilesOfDir(directory)) {
+            if (!isUndeletable(file)) {
+                long age = file.lastModified();
+                if (age != 0L) files.add(Pair.of(file, age));
+            }
+        }
+        Collections.sort(files, new Comparator<Pair<File, Long>>() {
+            @Override
+            public int compare(Pair<File, Long> lhs, Pair<File, Long> rhs) {
+                return lhs.getRight().compareTo(rhs.getRight());
+            }
+        });
+        
         while (size > maxSize) {
-            long age = Long.MAX_VALUE;
             File oldest = null;
-            for (File file : allFilesOfDir(directory)) {
-                if (isUndeletable(file)) continue;
+            for (ListIterator<Pair<File, Long>> it = files.listIterator(); it.hasNext();) {
+                File file = it.next().getLeft();
                 if (isPageFile(file) && pagesSize < maxPagesSize) continue;
-                long last = file.lastModified();
-                if (last < age && last != 0L) {
-                    age = last;
-                    oldest = file;
-                }
+                it.remove();
+                oldest = file;
+                break;
             }
             if (oldest == null) {
                 Logger.e(TAG, "No files to trim");
