@@ -1908,6 +1908,16 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
         }
         
+        @SuppressWarnings("deprecation")
+        private void setImageViewSpoiler(ImageView imageView, boolean isSpoiler) {
+            int alphaValue = isSpoiler ? 7 : 255;
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                imageView.setAlpha((int) alphaValue);
+            } else {
+                CompatibilityImpl.setImageAlpha(imageView, alphaValue);
+            }
+        }
+        
         private void fillThumbnail(View thumbnailView, AttachmentModel attachment, String hash, boolean nonBusy) {
             weakRegisterForContextMenu(thumbnailView);
             thumbnailView.setOnClickListener(onAttachmentClickListener);
@@ -1915,6 +1925,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             ImageView thumbnailPic = (ImageView) thumbnailView.findViewById(R.id.post_thumbnail_image);
             TextView size = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_size);
             TextView type = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
+            setImageViewSpoiler(thumbnailPic, attachment.isSpoiler);
             switch (attachment.type) {
                 case AttachmentModel.TYPE_IMAGE_GIF:
                     type.setText(R.string.postitem_gif);

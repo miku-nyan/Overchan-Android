@@ -89,8 +89,8 @@ public class ChanModels {
                     hash = hash*31 + (o==null ? 0 : o.hashCode());
         
         if (m.attachments != null)
-            for (AttachmentModel attachment : m.attachments)
-                for (Object o : new Object[] { attachment.thumbnail, attachment.path, attachment.originalName, attachment.type, attachment.size })
+            for (AttachmentModel attach : m.attachments)
+                for (Object o : new Object[] { attach.thumbnail, attach.path, attach.originalName, attach.type, attach.size, attach.isSpoiler })
                     hash = hash*31 + (o==null ? 0 : o.hashCode());
         
         return hash;
@@ -133,7 +133,7 @@ public class ChanModels {
     }
     
     /**
-     * Рассчитать хэш для модели вложения
+     * Рассчитать хэш для модели вложения. Параметр {@link AttachmentModel#isSpoiler} не учитывается.
      * @param model модель
      * @return строка хэша
      */

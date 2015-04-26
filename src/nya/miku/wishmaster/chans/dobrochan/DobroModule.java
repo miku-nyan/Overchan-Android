@@ -344,6 +344,7 @@ public class DobroModule extends AbstractChanModule {
         if (model.type == AttachmentModel.TYPE_AUDIO && "/thumb/generic/sound.png".equals(model.thumbnail)) model.thumbnail = null;
         model.size = json.optInt("size", -1);
         if (model.size > 0) model.size = Math.round(model.size / 1024f);
+        model.isSpoiler = json.optString("rating", "sfw").toLowerCase(Locale.US).startsWith("r-18");
         return model;
     }
     

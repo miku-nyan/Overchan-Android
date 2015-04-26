@@ -74,6 +74,10 @@ public class AttachmentModel implements Serializable {
      */
     @Tag(6) public String originalName;
     
+    /**
+     * Должно принимать true, если вложение является спойлером (или nsfw на некоторых чанах)
+     */
+    @Tag(7) public boolean isSpoiler;
     
     /**
      * Константное значение для обозначения типа вложения - статичное изображение (файл JPG или PNG)

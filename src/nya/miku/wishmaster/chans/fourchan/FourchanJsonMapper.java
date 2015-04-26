@@ -121,6 +121,7 @@ public class FourchanJsonMapper {
             attachment.width = object.optInt("w", -1);
             attachment.height = object.optInt("h", -1);
             attachment.originalName = object.optString("filename", "") + ext;
+            attachment.isSpoiler = object.optInt("spoiler") == 1;
             long tim = object.optLong("tim");
             if (tim != 0) {
                 attachment.thumbnail = "t.4cdn.org/" + boardName + "/" + Long.toString(tim) + "s.jpg";

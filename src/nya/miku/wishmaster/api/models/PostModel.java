@@ -27,6 +27,7 @@ import com.esotericsoftware.kryo.serializers.TaggedFieldSerializer.Tag;
  * @author miku-nyan
  *
  */
+//при изменении полей не забывать обновить методы класса ChanModels (хэширование и др.)
 public class PostModel implements Serializable {
     private static final long serialVersionUID = 1L;
     

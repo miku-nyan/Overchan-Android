@@ -43,6 +43,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -206,6 +207,11 @@ public class CompatibilityImpl {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void recreateActivity(Activity activity) {
         activity.recreate();
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public static void setImageAlpha(ImageView imageView, int alpha) {
+        imageView.setImageAlpha(alpha);
     }
     
 }
