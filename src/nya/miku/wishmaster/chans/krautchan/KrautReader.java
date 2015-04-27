@@ -247,7 +247,8 @@ public class KrautReader implements Closeable {
                 break;
             case FILTER_ATTACHMENT:
             case FILTER_ATTACHMENT_OP:
-                parseAttachment(readUntilSequence(FILTERS_CLOSE[filterIndex]));
+                String[] attachments = readUntilSequence(FILTERS_CLOSE[filterIndex]).split("</div>");
+                for (String attachment : attachments) parseAttachment(attachment);
                 break;
             case FILTER_START_COMMENT:
                 skipUntilSequence(FILTERS_CLOSE[filterIndex]);
