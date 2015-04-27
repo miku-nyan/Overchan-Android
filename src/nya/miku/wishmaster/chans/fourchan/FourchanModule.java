@@ -441,7 +441,7 @@ public class FourchanModule extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         String urlPath = parseUrl.group(1);
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(urlPath);

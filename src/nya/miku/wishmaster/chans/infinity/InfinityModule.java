@@ -30,10 +30,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.cookie.BasicClientCookieHC4;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.TextUtils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
@@ -44,7 +54,10 @@ import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
+import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
@@ -52,12 +65,21 @@ import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.FastHtmlTagParser;
 import nya.miku.wishmaster.chans.AbstractChanModule;
 import nya.miku.wishmaster.common.IOUtils;
+import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
+import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
+
+/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
+ * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
+ * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
+@SuppressWarnings("deprecation")
 
 public class InfinityModule extends AbstractChanModule {
     
@@ -79,10 +101,23 @@ public class InfinityModule extends AbstractChanModule {
     private static final Pattern ATTACHMENT_EMBEDDED_LINK = Pattern.compile("<a[^>]*href=\"([^\">]*)\"[^>]*>");
     private static final Pattern ATTACHMENT_EMBEDDED_THUMB = Pattern.compile("<img[^>]*src=\"([^\">]*)\"[^>]*>");
     
+    private static final Pattern CAPTCHA_BASE64 = Pattern.compile("data:image/png;base64,([^\"]*)\"");
+    private static final Pattern CAPTCHA_COOKIE = Pattern.compile("<input[^>]*name='captcha_cookie'[^>]*value='([^']*)'");
+    
+    private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
+    
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
+    private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
+    private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
+    private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
+    private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
+    private static final String TAG = null;
     
     private Map<String, BoardModel> boardsMap = new HashMap<>();
+    private boolean needTorCaptcha = false;
+    private String torCaptchaCookie = null;
+    
     
     public InfinityModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -101,6 +136,26 @@ public class InfinityModule extends AbstractChanModule {
     @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_8chan, null);
+    }
+    
+    @Override
+    protected void initHttpClient() {
+        String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
+        if (cloudflareCookie != null) {
+            BasicClientCookieHC4 c = new BasicClientCookieHC4(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
+            c.setDomain(DEFAULT_DOMAIN);
+            httpClient.getCookieStore().addCookie(c);
+        }
+    }
+    
+    @Override
+    public void saveCookie(Cookie cookie) {
+        if (cookie != null) {
+            httpClient.getCookieStore().addCookie(cookie);
+            if (cookie.getName().equals(CLOUDFLARE_COOKIE_NAME)) {
+                preferences.edit().putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), cookie.getValue()).commit();
+            }
+        }
     }
     
     private JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
@@ -190,8 +245,17 @@ public class InfinityModule extends AbstractChanModule {
         }
     }
     
-    private void checkCloudflareError(HttpWrongStatusCodeException e, String url) {
-        //TODO
+    private void checkCloudflareError(HttpWrongStatusCodeException e, String url) throws CloudflareException {
+        if (e.getStatusCode() == 403) {
+            if (e.getHtmlString() != null && e.getHtmlString().contains("CAPTCHA")) {
+                throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
+                        getUsingUrl() + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT, CLOUDFLARE_COOKIE_NAME, getChanName());
+            }
+        } else if (e.getStatusCode() == 503) {
+            if (e.getHtmlString() != null && e.getHtmlString().contains("Just a moment...")) {
+                throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, getChanName());
+            }
+        }
     }
 
     @Override
@@ -208,7 +272,7 @@ public class InfinityModule extends AbstractChanModule {
         model.timeZoneId = "US/Eastern";
         model.defaultUserName = json.optString("anonymous", "Anonymous");
         model.bumpLimit = json.optInt("reply_limit", 500);
-        model.readonlyBoard = true;//false;
+        model.readonlyBoard = false;
         model.requiredFileForNewThread = false;
         model.allowDeletePosts = json.optBoolean("allow_delete", false);
         model.allowDeleteFiles = model.allowDeletePosts;
@@ -400,6 +464,161 @@ public class InfinityModule extends AbstractChanModule {
     }
     
     @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (needTorCaptcha) {
+            String url = getUsingUrl() + "dnsbls_bypass.php";
+            String response =
+                    HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false);
+            Matcher base64Matcher = CAPTCHA_BASE64.matcher(response);
+            Matcher cookieMatcher = CAPTCHA_COOKIE.matcher(response);
+            if (base64Matcher.find() && cookieMatcher.find()) {
+                byte[] bitmap = Base64.decode(base64Matcher.group(1), Base64.DEFAULT);
+                torCaptchaCookie = cookieMatcher.group(1);
+                CaptchaModel captcha = new CaptchaModel();
+                captcha.type = CaptchaModel.TYPE_NORMAL;
+                captcha.bitmap = BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length);
+                return captcha;
+            }
+        }
+        return null;
+    }
+    
+    private void checkCaptcha(String answer, CancellableTask task) throws Exception {
+        try {
+            if (torCaptchaCookie == null) throw new Exception("Invalid captcha");
+            String url = getUsingUrl() + "dnsbls_bypass.php";
+            List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+            pairs.add(new BasicNameValuePair("captcha_text", answer));
+            pairs.add(new BasicNameValuePair("captcha_cookie", torCaptchaCookie));
+            HttpRequestModel rqModel = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setTimeout(30000).build();
+            String response = HttpStreamer.getInstance().getStringFromUrl(url, rqModel, httpClient, null, task, true);
+            if (response.contains("Error") && !response.contains("Success")) throw new HttpWrongStatusCodeException(400, "400");
+            needTorCaptcha = false;
+        } catch (HttpWrongStatusCodeException e) {
+            if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
+            if (e.getStatusCode() == 400) throw new Exception("You failed the CAPTCHA");
+            throw e;
+        }
+    }
+    
+    @Override
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        if (needTorCaptcha) checkCaptcha(model.captchaAnswer, task);
+        if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
+        String url = getUsingUrl() + "post.php";
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
+                addString("name", model.name).
+                addString("email", model.sage ? "sage" : model.email).
+                addString("subject", model.subject).
+                addString("body", model.comment).
+                addString("post", model.threadNumber == null ? "New Topic" : "New Reply").
+                addString("board", model.boardName);
+        if (model.threadNumber != null) postEntityBuilder.addString("thread", model.threadNumber);
+        postEntityBuilder.addString("password", TextUtils.isEmpty(model.password) ? getDefaultPassword() : model.password);
+        if (model.attachments != null) {
+            String[] images = new String[] { "file", "file2", "file3", "file4", "file5" };
+            for (int i=0; i<model.attachments.length; ++i) {
+                postEntityBuilder.addFile(images[i], model.attachments[i]);
+            }
+        }
+        
+        UrlPageModel refererPage = new UrlPageModel();
+        refererPage.chanName = CHAN_NAME;
+        refererPage.boardName = model.boardName;
+        if (model.threadNumber == null) {
+            refererPage.type = UrlPageModel.TYPE_BOARDPAGE;
+            refererPage.boardPage = UrlPageModel.DEFAULT_FIRST_PAGE;
+        } else {
+            refererPage.type = UrlPageModel.TYPE_THREADPAGE;
+            refererPage.threadNumber = model.threadNumber;
+        }
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
+        HttpRequestModel request =
+                HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, listener, task);
+            if (response.statusCode == 200) {
+                Logger.d(TAG, "200 OK");
+                return null;
+            } else if (response.statusCode == 303) {
+                for (Header header : response.headers) {
+                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
+                        return fixRelativeUrl(header.getValue());
+                    }
+                }
+            } else if (response.statusCode == 400) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                if (htmlResponse.contains("dnsbls_bypass.php")) {
+                    needTorCaptcha = true;
+                    throw new Exception("Please complete your CAPTCHA.");
+                } else if (htmlResponse.contains("<h1>Error</h1>")) {
+                    Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                    if (errorMatcher.find()) {
+                        String error = errorMatcher.group(1);
+                        if (error.contains("To post on 8chan over Tor, you must use the hidden service for security reasons."))
+                            throw new Exception("To post on 8chan over Tor, you must use the onion domain.");
+                        throw new Exception(error);
+                    }
+                }
+            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
+    }
+    
+    @Override
+    public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "post.php";
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("delete_" + model.postNumber, "on"));
+        if (model.onlyFiles) pairs.add(new BasicNameValuePair("file", "on"));
+        pairs.add(new BasicNameValuePair("password", model.password));
+        pairs.add(new BasicNameValuePair("delete", "Delete"));
+        pairs.add(new BasicNameValuePair("reason", ""));
+        
+        UrlPageModel refererPage = new UrlPageModel();
+        refererPage.type = UrlPageModel.TYPE_THREADPAGE;
+        refererPage.chanName = CHAN_NAME;
+        refererPage.boardName = model.boardName;
+        refererPage.threadNumber = model.threadNumber;
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
+        HttpRequestModel rqModel = HttpRequestModel.builder().
+                setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
+            if (response.statusCode == 200 || response.statusCode == 303) {
+                Logger.d(TAG, response.statusCode + " - " + response.statusReason);
+                return null;
+            } else if (response.statusCode == 400) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                if (htmlResponse.contains("dnsbls_bypass.php")) {
+                    needTorCaptcha = true;
+                    throw new Exception("Please complete your CAPTCHA.\n(try to post anything)");
+                } else if (htmlResponse.contains("<h1>Error</h1>")) {
+                    Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                    if (errorMatcher.find()) {
+                        String error = errorMatcher.group(1);
+                        if (error.contains("To post on 8chan over Tor, you must use the hidden service for security reasons."))
+                            throw new Exception("To post on 8chan over Tor, you must use the onion domain."); //? Tor users cannot into deleting
+                        throw new Exception(error);
+                    }
+                }
+            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
+    }
+    
+    @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN_NAME)) throw new IllegalArgumentException("wrong chan");
         if (model.boardName != null && !model.boardName.matches("\\w+")) throw new IllegalArgumentException("wrong board name");
@@ -428,7 +647,7 @@ public class InfinityModule extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         String urlPath = parseUrl.group(1);
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(urlPath);
@@ -456,7 +675,7 @@ public class InfinityModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher threadPage = Pattern.compile("([^/]+)/res/(\\d+).html(?:#(\\d+))?").matcher(path);
+        Matcher threadPage = Pattern.compile("([^/]+)/res/(\\d+)\\.html(?:#(\\d+))?").matcher(path);
         if (threadPage.find()) {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.boardName = threadPage.group(1);
@@ -465,7 +684,7 @@ public class InfinityModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher catalogPage = Pattern.compile("([^/]+)/catalog.html").matcher(path);
+        Matcher catalogPage = Pattern.compile("([^/]+)/catalog\\.html").matcher(path);
         if (catalogPage.find()) {
             model.boardName = catalogPage.group(1);
             model.type = UrlPageModel.TYPE_CATALOGPAGE;
@@ -473,7 +692,7 @@ public class InfinityModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher firstBoardPage = Pattern.compile("([^/]+)/index.html").matcher(path);
+        Matcher firstBoardPage = Pattern.compile("([^/]+)/index\\.html").matcher(path);
         if (firstBoardPage.find()) {
             model.boardName = firstBoardPage.group(1);
             model.type = UrlPageModel.TYPE_BOARDPAGE;
@@ -481,7 +700,7 @@ public class InfinityModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher boardPage = Pattern.compile("([^/]+)(?:/(?:(\\d+).html)?)?").matcher(path);
+        Matcher boardPage = Pattern.compile("([^/]+)(?:/(?:(\\d+)\\.html)?)?").matcher(path);
         if (boardPage.find()) {
             model.type = UrlPageModel.TYPE_BOARDPAGE;
             model.boardName = boardPage.group(1);

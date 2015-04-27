@@ -451,7 +451,7 @@ public class KrautModule extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
         if (parsePath.find()) {
@@ -470,7 +470,7 @@ public class KrautModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher threadPage = Pattern.compile("([^/]+)/thread-(\\d+).html[^#]*(?:#(\\d+))?").matcher(path);
+        Matcher threadPage = Pattern.compile("([^/]+)/thread-(\\d+)\\.html[^#]*(?:#(\\d+))?").matcher(path);
         if (threadPage.find()) {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.boardName = threadPage.group(1);
@@ -487,7 +487,7 @@ public class KrautModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher boardPage = Pattern.compile("([^/]+)(?:/(\\d+).html?)?").matcher(path);
+        Matcher boardPage = Pattern.compile("([^/]+)(?:/(\\d+)\\.html?)?").matcher(path);
         if (boardPage.find()) {
             model.type = UrlPageModel.TYPE_BOARDPAGE;
             model.boardName = boardPage.group(1);

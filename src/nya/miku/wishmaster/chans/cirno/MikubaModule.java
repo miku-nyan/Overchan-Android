@@ -77,7 +77,7 @@ public class MikubaModule extends AbstractChanModule {
     private static final String MIKUBA_NAME = "hatsune.ru";
     private static final String MIKUBA_DOMAIN = "hatsune.ru";
     
-    private static final Pattern YOUTUBE_PATTERN = Pattern.compile("(?:\\s|^)(?:https?://)?(?:www.)?youtube.com/watch\\?v=(\\w+)(?:.*?)(?:\\s|$)",
+    private static final Pattern YOUTUBE_PATTERN = Pattern.compile("(?:\\s|^)(?:https?://)?(?:www\\.)?youtube.com/watch\\?v=(\\w+)(?:.*?)(?:\\s|$)",
             Pattern.CASE_INSENSITIVE);
     
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
@@ -377,7 +377,7 @@ public class MikubaModule extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
         if (parsePath.find()) {

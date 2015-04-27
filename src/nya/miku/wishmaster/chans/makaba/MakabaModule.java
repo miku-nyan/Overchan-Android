@@ -753,7 +753,7 @@ public class MakabaModule extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)").matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)").matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
         if (parsePath.find()) {

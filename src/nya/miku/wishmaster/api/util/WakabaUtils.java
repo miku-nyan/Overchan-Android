@@ -54,7 +54,7 @@ public class WakabaUtils {
     public static UrlPageModel parseUrl(String url, String chanName, String... domains) {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)").matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)").matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
         if (parsePath.find()) {
@@ -81,7 +81,7 @@ public class WakabaUtils {
                 model.type = UrlPageModel.TYPE_INDEXPAGE;
             } else if (path.contains("/res/")) {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
-                Matcher matcher = Pattern.compile("(.+?)/res/([0-9]+?).html(.*)").matcher(path);
+                Matcher matcher = Pattern.compile("(.+?)/res/([0-9]+?)\\.html(.*)").matcher(path);
                 if (!matcher.find()) throw new Exception();
                 model.boardName = matcher.group(1);
                 model.threadNumber = matcher.group(2);

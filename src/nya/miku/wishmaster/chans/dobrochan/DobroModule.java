@@ -474,7 +474,7 @@ public class DobroModule extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www.)?(.+)").matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)").matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
         if (parsePath.find()) {
@@ -493,7 +493,7 @@ public class DobroModule extends AbstractChanModule {
         try {
             if (path.contains("/res/")) {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
-                Matcher matcher = Pattern.compile("(.+?)/res/([0-9]+?).xhtml(.*)").matcher(path);
+                Matcher matcher = Pattern.compile("(.+?)/res/([0-9]+?)\\.xhtml(.*)").matcher(path);
                 if (!matcher.find()) throw new Exception();
                 model.boardName = matcher.group(1);
                 model.threadNumber = matcher.group(2);
