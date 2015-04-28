@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_sage_mark">SAGE</string>
     <string name="postitem_attachment_size_kb_format">%d KB</string>
     <string name="postitem_attachment_size_mb_format">%.1f MB</string>
-	<string name="postitem_show_full_text"><u>Show the full text</u></string>
+    <string name="postitem_show_full_text"><u>Show the full text</u></string>
     <string name="postitem_gif">gif</string>
     <string name="postitem_video">video</string>
     <string name="postitem_audio">audio</string>
@@ -312,7 +312,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_download_already_exists">File already exists:\n%s</string>
     <string name="notification_not_found">Not found</string>
     <string name="notifacation_updating_now">The list is updated at the moment, try again later</string>
-	
+    
     <string name="error_unknown">An unknown error occurred</string>
     <string name="error_deserialization">Error while deserialization</string>
     <string name="error_cloudflare_get_captcha">Unable to get Cloudflare captcha</string>
@@ -338,21 +338,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_prefs_mobile_api_summary">Load only new posts without reloading the whole thread</string>
     <string name="makaba_prefs_force_google">Google Recaptcha</string>
     <string name="makaba_prefs_force_google_summary">Use Recaptcha instead of captcha from Yandex</string>
-	<string name="makaba_prefs_domain_category">Domain</string>
-	<string name="makaba_prefs_domain">Domain</string>
-	<string name="makaba_prefs_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
-	
-	<string name="mikuba_password_ignored">(ignored)</string>
-	
-	<string name="dobrochan_prefs_only_new_posts">Only new posts</string>
-	<string name="dobrochan_prefs_only_new_posts_summary">Load only new posts without reloading the whole thread</string>
-	<string name="dobrochan_prefs_domain">Domain</string>
-	<string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
-	
-	<string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
-	<string name="fourchan_prefs_new_recaptcha_summary">Use the new version of Recaptcha</string>
-	
-	<string name="preferences">Preferences</string>
+    <string name="makaba_prefs_domain_category">Domain</string>
+    <string name="makaba_prefs_domain">Domain</string>
+    <string name="makaba_prefs_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    
+    <string name="mikuba_password_ignored">(ignored)</string>
+    
+    <string name="dobrochan_prefs_only_new_posts">Only new posts</string>
+    <string name="dobrochan_prefs_only_new_posts_summary">Load only new posts without reloading the whole thread</string>
+    <string name="dobrochan_prefs_domain">Domain</string>
+    <string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+    
+    <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
+    <string name="fourchan_prefs_new_recaptcha_summary">Use the new version of Recaptcha</string>
+    
+    <string name="preferences">Preferences</string>
     <string name="pref_cat_chans">Imageboards</string>
     <string name="pref_cat_appearance">Appearance</string>
     <string name="pref_cat_advanced">Advanced</string>
@@ -364,20 +364,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_about">About</string>
     <string name="pref_cat_proxy">Connection</string>
     <string name="pref_use_proxy">Proxy</string>
-	<string name="pref_use_proxy_summary">Use HTTP proxy</string>
-	<string name="pref_proxy_host">Address</string>
-	<string name="pref_proxy_host_summary">The address of the proxy server</string>
-	<string name="pref_proxy_port">Port</string>
-	<string name="pref_proxy_port_summary">The port number that is assigned to the proxy server</string>
-	<string name="pref_use_https">Use HTTPS</string>
-	<string name="pref_use_https_summary">Secure encrypted connection</string>
-	<string name="pref_ignore_ssl_errors">Ignore SSL Errors</string>
-	<string name="pref_ignore_ssl_errors_summary">Disable Hostname and Certificate Validation</string>
-	<string name="pref_cat_connection_extended">Advanced Settings</string>
-	<string name="pref_okhttp">OkHttp</string>
-	<string name="pref_okhttp_summary">Alternative HTTP-client with SPDY (may be unstable!)</string>
-	<string name="pref_okhttp_unlocked">OkHttp preference is unlocked</string>
-	<string name="pref_password_title">Password</string>
+    <string name="pref_use_proxy_summary">Use HTTP proxy</string>
+    <string name="pref_proxy_host">Address</string>
+    <string name="pref_proxy_host_summary">The address of the proxy server</string>
+    <string name="pref_proxy_port">Port</string>
+    <string name="pref_proxy_port_summary">The port number that is assigned to the proxy server</string>
+    <string name="pref_use_onion">Use .onion domain</string>
+    <string name="pref_use_onion_summary">Requires a connection through the Tor network</string>
+    <string name="pref_use_https">Use HTTPS</string>
+    <string name="pref_use_https_summary">Secure encrypted connection</string>
+    <string name="pref_ignore_ssl_errors">Ignore SSL Errors</string>
+    <string name="pref_ignore_ssl_errors_summary">Disable Hostname and Certificate Validation</string>
+    <string name="pref_cat_connection_extended">Advanced Settings</string>
+    <string name="pref_okhttp">OkHttp</string>
+    <string name="pref_okhttp_summary">Alternative HTTP-client with SPDY (may be unstable!)</string>
+    <string name="pref_okhttp_unlocked">OkHttp preference is unlocked</string>
+    <string name="pref_password_title">Password</string>
     <string name="pref_password_summary">Password for post deletion by default</string>
     <string name="pref_name_title">Name</string>
     <string name="pref_name_summary">Name by default</string>

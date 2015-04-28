@@ -301,8 +301,8 @@ public class MainActivity extends FragmentActivity {
         }
         initDrawer();
         
-		View[] sidebarButtons =
-		    new View[] { findViewById(R.id.sidebar_btn_newtab), findViewById(R.id.sidebar_btn_history), findViewById(R.id.sidebar_btn_favorites) };
+        View[] sidebarButtons =
+            new View[] { findViewById(R.id.sidebar_btn_newtab), findViewById(R.id.sidebar_btn_history), findViewById(R.id.sidebar_btn_favorites) };
         hiddenTabsSection = new HiddenTabsSection(sidebarButtons);
         
         DragSortListView list = (DragSortListView)findViewById(R.id.sidebar_tabs_list);
@@ -361,15 +361,15 @@ public class MainActivity extends FragmentActivity {
     
     @Override
     protected void onStart() {
-    	super.onStart();
-    	registerReceiver(broadcastReceiver, intentFilter);
-    	tabsAdapter.notifyDataSetChanged(false);
+        super.onStart();
+        registerReceiver(broadcastReceiver, intentFilter);
+        tabsAdapter.notifyDataSetChanged(false);
     }
     
     @Override
     protected void onStop() {
-    	super.onStop();
-    	unregisterReceiver(broadcastReceiver);
+        super.onStop();
+        unregisterReceiver(broadcastReceiver);
     }
     
     @Override

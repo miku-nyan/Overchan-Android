@@ -807,7 +807,7 @@ public class SwipeRefreshLayout extends ViewGroup {
                     return false;
                 }
                 final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                final float y = MotionEventCompat.getY(ev, pointerIndex);
+                final float y; try { y = MotionEventCompat.getY(ev, pointerIndex); } catch (NullPointerException e) { return false; }
                 final float overscrollTop = Math.abs(y - mInitialMotionY) * DRAG_RATE; //изменено
                 if (y - mInitialMotionY < 0 && canChildScrollDown()) {
                     return false;

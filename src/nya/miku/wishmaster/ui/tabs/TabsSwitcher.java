@@ -81,7 +81,12 @@ public class TabsSwitcher {
     }
     
     private void replace(FragmentManager fragmentManager, Fragment newFragment) {
-        fragmentManager.beginTransaction().setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right).
-                replace(R.id.main_fragment_container, newFragment).commit();
+        try {
+            fragmentManager.beginTransaction().setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right).
+                    replace(R.id.main_fragment_container, newFragment).commit();
+        } catch (Exception e) {
+            fragmentManager.beginTransaction().setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right).
+                    replace(R.id.main_fragment_container, newFragment).commitAllowingStateLoss();
+        }
     }
 }

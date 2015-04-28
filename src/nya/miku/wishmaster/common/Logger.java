@@ -21,30 +21,28 @@ package nya.miku.wishmaster.common;
 import android.util.Log;
 
 public class Logger {
-    public static final boolean DEBUG = true;
-    
     private Logger() {}
     
     public static void d(String tag, String msg) {
-        if (DEBUG) {
+        if (Debug.DEBUG) {
             Log.d(tag, msg != null ? msg : "");
         }
     }
 
     public static void i(String tag, String msg) {
-        if (DEBUG) {
+        if (Debug.DEBUG) {
             Log.i(tag, msg != null ? msg : "");
         }
     }
 
     public static void w(String tag, String msg) {
-        if (DEBUG) {
+        if (Debug.DEBUG) {
             Log.w(tag, msg != null ? msg : "");
         }
     }
     
     public static void v(String tag, String msg) {
-        if (DEBUG) {
+        if (Debug.DEBUG) {
             Log.v(tag, msg != null ? msg : "");
         }
     }

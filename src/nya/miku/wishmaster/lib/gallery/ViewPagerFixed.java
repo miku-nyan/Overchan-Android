@@ -34,7 +34,7 @@ public class ViewPagerFixed extends ViewPager {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         try {
             return super.onInterceptTouchEvent(ev);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             Logger.e("ViewPager", e);
             return false;
         }

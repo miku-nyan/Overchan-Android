@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_sage_mark">SAGE</string>
     <string name="postitem_attachment_size_kb_format">%d КБ</string>
     <string name="postitem_attachment_size_mb_format">%.1f МБ</string>
-	<string name="postitem_show_full_text"><u>Показать полный текст</u></string>
+    <string name="postitem_show_full_text"><u>Показать полный текст</u></string>
     <string name="postitem_gif">gif</string>
     <string name="postitem_video">видео</string>
     <string name="postitem_audio">аудио</string>
@@ -319,7 +319,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_download_already_exists">Файл уже существует:\n%s</string>
     <string name="notification_not_found">Ничего не найдено</string>
     <string name="notifacation_updating_now">В данный момент список обновляется, попробуйте позже</string>
-	
+    
     <string name="error_unknown">Неизвестная ошибка</string>
     <string name="error_deserialization">Ошибка десериализации</string>
     <string name="error_cloudflare_get_captcha">Не удалось получить Cloudflare капчу</string>
@@ -345,21 +345,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_prefs_mobile_api_summary">Загружать только новые посты вместо обновления всего треда</string>
     <string name="makaba_prefs_force_google">Google Recaptcha</string>
     <string name="makaba_prefs_force_google_summary">Использовать рекапчу вместо капчи от Яндекса</string>
-	<string name="makaba_prefs_domain_category">Настройки домена</string>
-	<string name="makaba_prefs_domain">Домен</string>
-	<string name="makaba_prefs_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
-	
-	<string name="mikuba_password_ignored">(игнорируется)</string>
-	
-	<string name="dobrochan_prefs_only_new_posts">Только новые посты</string>
-	<string name="dobrochan_prefs_only_new_posts_summary">Загружать только новые посты вместо обновления всего треда</string>
-	<string name="dobrochan_prefs_domain">Домен</string>
-	<string name="dobrochan_prefs_domain_summary">Резервные адреса: dobrochan.com, dobrochan.org, dobrochan.ru</string>
-	
-	<string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
-	<string name="fourchan_prefs_new_recaptcha_summary">Использовать новую версию Recaptcha</string>
-	
-	<string name="preferences">Настройки</string>
+    <string name="makaba_prefs_domain_category">Настройки домена</string>
+    <string name="makaba_prefs_domain">Домен</string>
+    <string name="makaba_prefs_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    
+    <string name="mikuba_password_ignored">(игнорируется)</string>
+    
+    <string name="dobrochan_prefs_only_new_posts">Только новые посты</string>
+    <string name="dobrochan_prefs_only_new_posts_summary">Загружать только новые посты вместо обновления всего треда</string>
+    <string name="dobrochan_prefs_domain">Домен</string>
+    <string name="dobrochan_prefs_domain_summary">Резервные адреса: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+    
+    <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
+    <string name="fourchan_prefs_new_recaptcha_summary">Использовать новую версию Recaptcha</string>
+    
+    <string name="preferences">Настройки</string>
     <string name="pref_cat_chans">Настройки имиджборд</string>
     <string name="pref_cat_appearance">Внешний вид</string>
     <string name="pref_cat_advanced">Дополнительные</string>
@@ -371,20 +371,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_about">О программе</string>
     <string name="pref_cat_proxy">Настройки соединения</string>
     <string name="pref_use_proxy">Прокси</string>
-	<string name="pref_use_proxy_summary">Использовать HTTP прокси</string>
-	<string name="pref_proxy_host">Адрес</string>
-	<string name="pref_proxy_host_summary">Адрес прокси-сервера</string>
-	<string name="pref_proxy_port">Порт</string>
-	<string name="pref_proxy_port_summary">Порт прокси-сервера</string>
-	<string name="pref_use_https">Использовать HTTPS</string>
-	<string name="pref_use_https_summary">Защищённое шифрованное соединение</string>
-	<string name="pref_ignore_ssl_errors">Игнорировать ошибки SSL</string>
-	<string name="pref_ignore_ssl_errors_summary">Отключить проверку имени и сертификата</string>
-	<string name="pref_cat_connection_extended">Дополнительные настройки</string>
-	<string name="pref_okhttp">OkHttp</string>
-	<string name="pref_okhttp_summary">Альтернативный HTTP-клиент с поддержкой SPDY (может работать нестабильно!)</string>
-	<string name="pref_okhttp_unlocked">Настройка OkHttp разблокирована</string>
-	<string name="pref_password_title">Пароль</string>
+    <string name="pref_use_proxy_summary">Использовать HTTP прокси</string>
+    <string name="pref_proxy_host">Адрес</string>
+    <string name="pref_proxy_host_summary">Адрес прокси-сервера</string>
+    <string name="pref_proxy_port">Порт</string>
+    <string name="pref_proxy_port_summary">Порт прокси-сервера</string>
+    <string name="pref_use_onion">Использовать .onion домен</string>
+    <string name="pref_use_onion_summary">Требуется подключение через сеть Tor</string>
+    <string name="pref_use_https">Использовать HTTPS</string>
+    <string name="pref_use_https_summary">Защищённое шифрованное соединение</string>
+    <string name="pref_ignore_ssl_errors">Игнорировать ошибки SSL</string>
+    <string name="pref_ignore_ssl_errors_summary">Отключить проверку имени и сертификата</string>
+    <string name="pref_cat_connection_extended">Дополнительные настройки</string>
+    <string name="pref_okhttp">OkHttp</string>
+    <string name="pref_okhttp_summary">Альтернативный HTTP-клиент с поддержкой SPDY (может работать нестабильно!)</string>
+    <string name="pref_okhttp_unlocked">Настройка OkHttp разблокирована</string>
+    <string name="pref_password_title">Пароль</string>
     <string name="pref_password_summary">Пароль для удаления постов по умолчанию</string>
     <string name="pref_name_title">Имя</string>
     <string name="pref_name_summary">Имя отправителя по умолчанию</string>

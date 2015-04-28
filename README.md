@@ -4,7 +4,7 @@ Overchan Android (Meta Imageboard Client) is an application for browsing imagebo
 
 ### Supported Imageboards
 
-Currently support: [4chan.org](https://www.4chan.org), [krautchan.net](https://krautchan.net), [iichan.hk](http://iichan.hk/), [hatsune.ru](http://hatsune.ru/), [dobrochan](http://dobrochan.com), [nowere.net](http://nowere.net/), [410chan.org](http://410chan.org), [2ch.hk](https://2ch.hk/).
+Currently support: [4chan.org](https://www.4chan.org), [8chan](https://8ch.net), [krautchan.net](https://krautchan.net), [iichan.hk](http://iichan.hk/), [hatsune.ru](http://hatsune.ru/), [dobrochan](http://dobrochan.com), [nowere.net](http://nowere.net/), [410chan.org](http://410chan.org), [2ch.hk](https://2ch.hk/).
 
 ## Download APK
 

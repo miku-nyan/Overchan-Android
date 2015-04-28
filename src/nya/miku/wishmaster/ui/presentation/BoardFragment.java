@@ -434,39 +434,43 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     private void updateMenu() {
         if (this.menu == null) return;
-        boolean addPostMenuVisible = false;
-        boolean updateMenuVisible = false;
-        boolean catalogMenuVisible = false;
-        boolean searchMenuVisible = false;
-        boolean savePageMenuVisible = false;
-        boolean boardGallryMenuVisible = false;
-        if (tabModel.type != TabModel.TYPE_LOCAL && pageType != TYPE_SEARCHLIST && listLoaded && !presentationModel.source.boardModel.readonlyBoard) {
-            addPostMenuVisible = true;
-        }
-        if (tabModel.type != TabModel.TYPE_LOCAL || listLoaded) {
-            updateMenuVisible = true;
-        }
-        if (pageType == TYPE_THREADSLIST && listLoaded) {
-            if (presentationModel.source.boardModel.catalogAllowed) {
-                catalogMenuVisible = true;
+        try {
+            boolean addPostMenuVisible = false;
+            boolean updateMenuVisible = false;
+            boolean catalogMenuVisible = false;
+            boolean searchMenuVisible = false;
+            boolean savePageMenuVisible = false;
+            boolean boardGallryMenuVisible = false;
+            if (tabModel.type != TabModel.TYPE_LOCAL && pageType != TYPE_SEARCHLIST && listLoaded && !presentationModel.source.boardModel.readonlyBoard) {
+                addPostMenuVisible = true;
             }
-            if (presentationModel.source.boardModel.searchAllowed) {
+            if (tabModel.type != TabModel.TYPE_LOCAL || listLoaded) {
+                updateMenuVisible = true;
+            }
+            if (pageType == TYPE_THREADSLIST && listLoaded) {
+                if (presentationModel.source.boardModel.catalogAllowed) {
+                    catalogMenuVisible = true;
+                }
+                if (presentationModel.source.boardModel.searchAllowed) {
+                    searchMenuVisible = true;
+                }
+            }
+            if (pageType == TYPE_POSTSLIST && listLoaded) {
                 searchMenuVisible = true;
+                boardGallryMenuVisible = true;
             }
+            if (tabModel.type != TabModel.TYPE_LOCAL && pageType == TYPE_POSTSLIST && listLoaded) {
+                savePageMenuVisible = true;
+            }
+            menu.findItem(R.id.menu_add_post).setVisible(addPostMenuVisible);
+            menu.findItem(R.id.menu_update).setVisible(updateMenuVisible);
+            menu.findItem(R.id.menu_catalog).setVisible(catalogMenuVisible);
+            menu.findItem(R.id.menu_search).setVisible(searchMenuVisible);
+            menu.findItem(R.id.menu_save_page).setVisible(savePageMenuVisible);
+            menu.findItem(R.id.menu_board_gallery).setVisible(boardGallryMenuVisible);
+        } catch (NullPointerException e) {
+            Logger.e(TAG, e);
         }
-        if (pageType == TYPE_POSTSLIST && listLoaded) {
-            searchMenuVisible = true;
-            boardGallryMenuVisible = true;
-        }
-        if (tabModel.type != TabModel.TYPE_LOCAL && pageType == TYPE_POSTSLIST && listLoaded) {
-            savePageMenuVisible = true;
-        }
-        menu.findItem(R.id.menu_add_post).setVisible(addPostMenuVisible);
-        menu.findItem(R.id.menu_update).setVisible(updateMenuVisible);
-        menu.findItem(R.id.menu_catalog).setVisible(catalogMenuVisible);
-        menu.findItem(R.id.menu_search).setVisible(searchMenuVisible);
-        menu.findItem(R.id.menu_save_page).setVisible(savePageMenuVisible);
-        menu.findItem(R.id.menu_board_gallery).setVisible(boardGallryMenuVisible);
     }
     
     @Override
@@ -2733,10 +2737,16 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 dlgList.setAdapter(new ArrayAdapter<Integer>(activity, 0, positions) {
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
-                        int adapterPositon = getItem(position);
-                        View view = adapter.getView(adapterPositon, convertView, parent, dlgWidth, adapter.getItem(adapterPositon));
-                        view.setBackgroundColor(bgColor);
-                        return view;
+                        try {
+                            int adapterPositon = getItem(position);
+                            View view = adapter.getView(adapterPositon, convertView, parent, dlgWidth, adapter.getItem(adapterPositon));
+                            view.setBackgroundColor(bgColor);
+                            return view;
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                            Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
+                            return new View(activity);
+                        }
                     }
                 });
                 

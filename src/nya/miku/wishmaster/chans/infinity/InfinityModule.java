@@ -198,8 +198,8 @@ public class InfinityModule extends AbstractChanModule {
         preferenceGroup.addPreference(httpsPref);
         addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         CheckBoxPreference onionPref = new CheckBoxPreference(context);
-        onionPref.setTitle("Use onion mirror");
-        onionPref.setSummary("fullchan4jtta4sx.onion");
+        onionPref.setTitle(R.string.pref_use_onion);
+        onionPref.setSummary(R.string.pref_use_onion_summary);
         onionPref.setKey(getSharedKey(PREF_KEY_USE_ONION));
         onionPref.setDefaultValue(false);
         onionPref.setDisableDependentsState(true);

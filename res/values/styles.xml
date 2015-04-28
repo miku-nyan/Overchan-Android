@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <style name="Theme_Dialog_Switch" parent="@android:style/Theme.Dialog" />
     <style name="Theme_Light_Switch" parent="@android:style/Theme.Light" />
     <style name="Theme_Dark_Switch" parent="@android:style/Theme" />
-	
+    
     <style name="SelectableItem">
         <item name="android:background">@android:drawable/list_selector_background</item>
     </style>
