@@ -22,15 +22,17 @@ import android.annotation.SuppressLint;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+@SuppressWarnings("serial")
 @SuppressLint("SimpleDateFormat")
 public class DateFormats {
     static final DateFormat IICHAN_DATE_FORMAT;
-    static final DateFormat RU_410_DATE_FORMAT;
-    static final DateFormat INT_410_DATE_FORMAT;
+    static final DateFormat CHAN_410_DATE_FORMAT;
     static final DateFormat MIKUBA_DATE_FORMAT;
     static final DateFormat NOWERE_DATE_FORMAT;
     
@@ -42,15 +44,12 @@ public class DateFormats {
         IICHAN_DATE_FORMAT = new SimpleDateFormat("EEE dd MMMM yyyy HH:mm:ss", iichanSymbols);
         IICHAN_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
         
-        DateFormatSymbols ru410Symbols = new DateFormatSymbols();
-        ru410Symbols.setShortWeekdays(new String[] { "", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Сбт", "Вск" });
-        RU_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy (EEE) HH:mm:ss", ru410Symbols);
-        RU_410_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-        
-        DateFormatSymbols int410Symbols = new DateFormatSymbols();
-        int410Symbols.setShortWeekdays(new String[] { "", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" });
-        INT_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy (EEE) HH:mm:ss", int410Symbols);
-        INT_410_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        CHAN_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US) {
+            public Date parse(String string) throws ParseException {
+                return super.parse(string.replaceAll(" ?\\(.*?\\)", ""));
+            }
+        };
+        CHAN_410_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
         
         MIKUBA_DATE_FORMAT = new SimpleDateFormat("EEE dd MMM yyyy HH:mm:ss", Locale.US);
         MIKUBA_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));

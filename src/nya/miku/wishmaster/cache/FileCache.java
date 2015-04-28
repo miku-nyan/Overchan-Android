@@ -33,7 +33,7 @@ import nya.miku.wishmaster.common.Logger;
  * @author miku-nyan
  *
  */
-public class FileCache {
+public class FileCache { //TODO database
     private static final String TAG = "FileCache";
     
     public static final String PREFIX_ORIGINALS = "orig_";

@@ -34,7 +34,7 @@ public class Chan410IntReader extends Chan410Reader {
     private int curPos = 0;
     
     public Chan410IntReader(InputStream in) {
-        super(in, DateFormats.INT_410_DATE_FORMAT);
+        super(in, DateFormats.CHAN_410_DATE_FORMAT);
     }
     
     @Override

@@ -32,7 +32,7 @@ import nya.miku.wishmaster.api.util.WakabaReader;
 public class Chan410Reader extends WakabaReader {
     
     public Chan410Reader(InputStream in) {
-        super(in, DateFormats.RU_410_DATE_FORMAT);
+        super(in, DateFormats.CHAN_410_DATE_FORMAT);
     }
     
     public Chan410Reader(InputStream in, DateFormat dateFormat) {
