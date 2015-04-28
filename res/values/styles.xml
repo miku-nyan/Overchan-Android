@@ -35,6 +35,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </style>
     
     <style name="Futaba_Base" parent="@style/Theme_Light_Switch">
+        <item name="materialPrimary">#FFFFEE</item>
+        <!-- <item name="materialPrimaryDark"></item>
+        <item name="materialNavigationBar"></item> -->
         <item name="android:textColorPrimary">#800000</item>
         <item name="activityRootBackground">#FFFFEE</item>
         <item name="sidebarBackground">#CCFFFFEE</item>
@@ -149,6 +152,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </style>
     
     <style name="Gurochan_Base" parent="@style/Theme_Light_Switch">
+        <item name="materialPrimary">#EDDAD2</item>
         <item name="android:textColorPrimary">#000000</item>
         <item name="activityRootBackground">#EDDAD2</item>
         <item name="sidebarBackground">#CCEDDAD2</item>

@@ -19,6 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <resources>
     <declare-styleable name="Theme">
+        <attr name="materialPrimary" format="color|reference" />
+        <attr name="materialPrimaryDark" format="color|reference" />
+        <attr name="materialNavigationBar" format="color|reference" />
+        
         <attr name="activityRootBackground" format="color|reference" />
         <attr name="sidebarBackground" format="color|reference" />
         <attr name="sidebarSelectedItem" format="color|reference" />

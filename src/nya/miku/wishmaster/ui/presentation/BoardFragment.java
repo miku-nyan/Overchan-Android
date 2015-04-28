@@ -1914,7 +1914,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         @SuppressWarnings("deprecation")
         private void setImageViewSpoiler(ImageView imageView, boolean isSpoiler) {
-            int alphaValue = isSpoiler ? 7 : 255;
+            int alphaValue = isSpoiler ? 8 : 255;
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                 imageView.setAlpha((int) alphaValue);
             } else {

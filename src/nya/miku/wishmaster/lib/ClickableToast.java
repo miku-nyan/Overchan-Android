@@ -88,10 +88,10 @@ public class ClickableToast extends FrameLayout {
         params.width = WindowManager.LayoutParams.WRAP_CONTENT;
         params.alpha = 1;
         params.format = PixelFormat.RGBA_8888;
-        params.gravity = Gravity.CENTER;
+        params.gravity = Gravity.BOTTOM;
         params.verticalMargin = isNarrow() ? 0.05f : 0.07f;
         params.flags =  WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        params.type = WindowManager.LayoutParams.LAST_SYSTEM_WINDOW + 30;
+        //params.type = WindowManager.LayoutParams.LAST_SYSTEM_WINDOW + 30;
         try {
             if (internalResources == null) internalResources = Resources.getSystem();
             params.windowAnimations = internalResources.getIdentifier("Animation.Toast", "style", "android");

@@ -19,6 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <resources>
     <style name="Theme_Dialog_Switch" parent="@android:style/Theme.Material.Dialog" />
-    <style name="Theme_Light_Switch" parent="@android:style/Theme.Material.Light" />
-    <style name="Theme_Dark_Switch" parent="@android:style/Theme.Material" />
+    <style name="Theme_Light_Switch" parent="@android:style/Theme.Material.Light">
+        <!-- default colors from android sdk sources (android-22) -->
+        <item name="materialPrimary">#EFEFEF</item>
+        <item name="materialPrimaryDark">#757575</item>
+        <item name="materialNavigationBar">#000000</item>
+        <item name="android:colorPrimary">?attr/materialPrimary</item>
+        <item name="android:colorPrimaryDark">?attr/materialPrimaryDark</item>
+        <item name="android:navigationBarColor">?attr/materialNavigationBar</item>
+    </style>
+    <style name="Theme_Dark_Switch" parent="@android:style/Theme.Material">
+        <!-- default colors from android sdk sources (android-22) -->
+        <item name="materialPrimary">#212121</item>
+        <item name="materialPrimaryDark">#000000</item>
+        <item name="materialNavigationBar">#000000</item>
+        <item name="android:colorPrimary">?attr/materialPrimary</item>
+        <item name="android:colorPrimaryDark">?attr/materialPrimaryDark</item>
+        <item name="android:navigationBarColor">?attr/materialNavigationBar</item>
+    </style>
 </resources>
