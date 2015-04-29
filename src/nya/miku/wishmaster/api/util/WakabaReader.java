@@ -449,7 +449,7 @@ public class WakabaReader implements Closeable {
             if (originalNameMatcher.find(indexEndPxSize)) {
                 String originalName = originalNameMatcher.group(1).trim();
                 if (originalName != null && originalName.length() > 0) {
-                    attachment.originalName = originalName;
+                    attachment.originalName = StringEscapeUtils.unescapeHtml4(originalName);
                 }
             }
         }

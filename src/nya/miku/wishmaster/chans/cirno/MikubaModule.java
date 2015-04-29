@@ -133,7 +133,7 @@ public class MikubaModule extends AbstractChanModule {
     
     @Override
     public String getDisplayingName() {
-        return "hatsune.ru (Ычан - Vocaloid)";
+        return "hatsune.ru (Miku-chan)";
     }
 
     @Override

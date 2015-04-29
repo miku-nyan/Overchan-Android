@@ -295,6 +295,10 @@ class HtmlToSpannedConverter implements ContentHandler {
             mListTags.addFirst(new OlTag());
         } else if (tag.equalsIgnoreCase("li")) {
             handleLi(mSpannableStringBuilder, mListTags.peek(), mListTags.size());
+        } else if (tag.equalsIgnoreCase("tr")) {
+            handleTr(mSpannableStringBuilder, true);
+        } else if (tag.equalsIgnoreCase("td")) {
+            handleTd(mSpannableStringBuilder, true);
         } else if (tag.equalsIgnoreCase("a")) {
             startA(mSpannableStringBuilder, attributes);
         } else if (tag.equalsIgnoreCase("u")) {
@@ -365,6 +369,10 @@ class HtmlToSpannedConverter implements ContentHandler {
             if (!mListTags.isEmpty()) mListTags.removeFirst();
         } else if (tag.equalsIgnoreCase("li")) {
             //обрабатывается только открывающийся <li>
+        } else if (tag.equalsIgnoreCase("tr")) {
+            handleTr(mSpannableStringBuilder, false);
+        } else if (tag.equalsIgnoreCase("td")) {
+            handleTd(mSpannableStringBuilder, false);
         } else if (tag.equalsIgnoreCase("a")) {
             endA(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("u")) {
@@ -422,6 +430,14 @@ class HtmlToSpannedConverter implements ContentHandler {
         for (int i=1; i<level; ++i) text.append("\t");
         if (tag instanceof OlTag) text.append(Integer.toString(((OlTag) tag).curIndex++) + ". ");
         else if (tag instanceof UlTag) text.append("\u2022 ");
+    }
+    
+    private static void handleTd(SpannableStringBuilder text, boolean open) {
+        if (!open) text.append(" | ");
+    }
+    
+    private static void handleTr(SpannableStringBuilder text, boolean open) {
+        text.append(open ? "| " : "\n");
     }
 
     private static Object getLast(Spanned text, Class<?> kind) {

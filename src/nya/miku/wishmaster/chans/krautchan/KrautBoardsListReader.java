@@ -41,6 +41,13 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
  *
  */
 public class KrautBoardsListReader implements Closeable {
+    private static final List<String> SFW_BOARDS = Arrays.asList(new String[] {
+            "a", "c", "co", "d", "e", "f", "fb", "fe", "fit", "jp", "k", "l", "li", "m", "n", "ng", "p",
+            "ph", "prog", "rvss", "sp", "t", "trv", "tu", "tv", "v", "w", "we", "wk", "wp", "z", "zp" 
+    });
+    private static final String[] ATTACHMENT_FORMATS =
+            new String[] { "gif", "jpg", "jpeg", "png", "psd", "webm", "mp3", "ogg", "rar", "zip", "torrent", "swf" };
+    
     private final Reader _in;
     private StringBuilder readBuffer = new StringBuilder();
     private String currentCategory;
@@ -110,6 +117,7 @@ public class KrautBoardsListReader implements Closeable {
                     model.boardName = boardMatcher.group(1);
                     model.boardDescription = boardMatcher.group(2);
                     model.boardCategory = currentCategory;
+                    model.nsfw = SFW_BOARDS.indexOf(model.boardName) == -1;
                     boards.add(model);
                 }
         }
@@ -159,16 +167,13 @@ public class KrautBoardsListReader implements Closeable {
         _in.close();
     }
     
-    private static final List<String> NSFW_BOARDS = Arrays.asList(new String[] { "b", "ft", "r", "h", "s" });
-    private static final String[] ATTACHMENT_FORMATS =
-            new String[] { "gif", "jpg", "jpeg", "png", "psd", "webm", "mp3", "ogg", "rar", "zip", "torrent", "swf" };
     public static BoardModel getDefaultBoardModel(String boardName, String description, String category) {
         BoardModel bm = new BoardModel();
         bm.chan = KrautModule.CHAN_NAME;
         bm.boardName = boardName;
         bm.boardDescription = description;
         bm.boardCategory = category;
-        bm.nsfw = NSFW_BOARDS.indexOf(boardName) != -1;
+        bm.nsfw = SFW_BOARDS.indexOf(boardName) == -1;
         bm.uniqueAttachmentNames = true;
         bm.timeZoneId = "Europe/Berlin";
         bm.defaultUserName = "Bernd";

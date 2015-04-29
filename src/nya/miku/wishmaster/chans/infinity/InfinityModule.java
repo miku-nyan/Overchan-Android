@@ -607,7 +607,7 @@ public class InfinityModule extends AbstractChanModule {
                     if (errorMatcher.find()) {
                         String error = errorMatcher.group(1);
                         if (error.contains("To post on 8chan over Tor, you must use the hidden service for security reasons."))
-                            throw new Exception("To post on 8chan over Tor, you must use the onion domain."); //? Tor users cannot into deleting
+                            throw new Exception(resources.getString(R.string.infinity_tor_message)); //? Tor users cannot into deleting
                         throw new Exception(error);
                     }
                 }

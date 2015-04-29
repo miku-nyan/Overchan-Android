@@ -325,7 +325,7 @@ public class KrautReader implements Closeable {
             else if (ext.equals("mp3") || ext.equals("ogg")) model.type = AttachmentModel.TYPE_VIDEO;
             Matcher origFilenameMatcher = ATTACHMENT_FILENAME_PATTERN.matcher(html);
             if (origFilenameMatcher.find()) {
-                model.originalName = origFilenameMatcher.group(1).replaceAll("<[^>]*>", "").trim();
+                model.originalName = StringEscapeUtils.unescapeHtml4(origFilenameMatcher.group(1).replaceAll("<[^>]*>", "").trim());
             }
             Matcher infoMatcher = ATTACHMENT_INFO_PATTERN.matcher(html);
             if (infoMatcher.find()) {
