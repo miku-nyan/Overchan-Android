@@ -97,7 +97,7 @@ public class PreferencesActivity extends PreferenceActivity {
         aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                UrlHandler.launchExternalBrowser(PreferencesActivity.this, "https://github.com/miku-nyan/Overchan-Android");
+                UrlHandler.launchExternalBrowser(PreferencesActivity.this, "http://miku-nyan.github.io/Overchan-Android");
                 return true;
             }
         });

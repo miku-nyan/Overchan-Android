@@ -121,7 +121,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="boardslist_hint">Board code</string>
     <string name="boardslist_btn_go">GO</string>
     
-    <string name="search_bar_hint">Serach</string>
+    <string name="search_bar_hint">Search</string>
     <string name="search_bar_in_thread_hint">Search in thread</string>
     
     <string name="menu_open_drawer">Open drawer</string>
@@ -201,7 +201,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_save_thread_save">Save</string>
     
     <string name="dialog_open_chan_text">Currently opened locally saved version of the page.
-        \nDo you want to try to open the actual version of the Internet??</string>
+        \nDo you want to try to open the actual version from the Internet?</string>
     
     <string name="dialog_switch_page_title">Go to page</string>
     <string name="dialog_switch_page_hint">Page number</string>
@@ -361,7 +361,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_downloads">Downloads</string>
     <string name="pref_cat_autoupdate">Auto-update</string>
     <string name="pref_cat_cache">Cache</string>
-    <string name="pref_cat_about">About</string>
+    <string name="pref_cat_about">About Overchan</string>
     <string name="pref_cat_proxy">Connection</string>
     <string name="pref_use_proxy">Proxy</string>
     <string name="pref_use_proxy_summary">Use HTTP proxy</string>
@@ -418,7 +418,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_gallery_nativegif_summary">Use a native library libgif</string>
     <string name="pref_gallery_videoplayer_title">Built-in video player</string>
     <string name="pref_gallery_videoplayer_summary">May not work on older versions of Android</string>
-    <string name="pref_gallery_audioplayer_title">Built-in video player</string>
+    <string name="pref_gallery_audioplayer_title">Built-in audio player</string>
     <string name="pref_gallery_audioplayer_summary">May not work on older versions of Android</string>
     <string name="pref_enable_autoupdate_title">Enable auto-update</string>
     <string name="pref_enable_autoupdate_summary">Update the open threads automatically</string>
@@ -446,7 +446,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string-array name="pref_download_format_choices">
         <item>File folder</item>
         <item>ZIP archive</item>
-        <item>MHTML (limited)</item>
+        <item>MHTML</item>
     </string-array>
     <string name="pref_theme_title">Theme</string>
     <string-array name="pref_theme_choices">

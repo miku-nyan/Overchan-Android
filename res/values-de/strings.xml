@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+    <string name="app_name">Overchan</string>
+    
+    <string name="drawer_open">Drawer öffnen</string>
+    <string name="drawer_close">Drawer schließen</string>
+    <string name="previous">vorherige</string>
+    <string name="next">nächste</string>
+    <string name="error">Fehler</string>
+    <string name="close">Schließen</string>
+    <string name="captcha">Captcha</string>
+    
+    <string name="mark_quote">Zitat</string>
+    <string name="mark_bold">Fett</string>
+    <string name="mark_italic">Kursiv</string>
+    <string name="mark_strike">Durchgestrichen</string>
+    <string name="mark_spoiler">Spoiler</string>
+    
+    <string name="postitem_contentdescription_thumbnail_image">Thumbnail</string>
+    <string name="postitem_contentdescription_badge_icon">Symbol</string>
+    <string name="postitem_op_mark">#OP</string>
+    <string name="postitem_sage_mark">SÄGE</string>
+    <string name="postitem_attachment_size_kb_format">%d KB</string>
+    <string name="postitem_attachment_size_mb_format">%.1f MB</string>
+    <string name="postitem_show_full_text"><u>den vollständigen Text zeigen</u></string>
+    <string name="postitem_gif">gif</string>
+    <string name="postitem_video">video</string>
+    <string name="postitem_audio">audio</string>
+    <string name="postitem_file">datei</string>
+    <string name="postitem_link">link</string>
+    <string name="postitem_replies">Antworten: </string>
+    <string name="postitem_hidden_thread">Versteckte Thread #%1$s: %2$s</string>
+    <string name="postitem_hidden_post">Versteckte Post #%1$s: %2$s</string>
+    <string name="postitem_post_number_search_header">%1$s (thread %2$s)</string>
+    <string name="postitem_sticky_thread">Thread ist wichtig</string>
+    <string name="postitem_closed_thread">Thread ist geschlossen</string>
+    <string name="postitem_deleted_mark">Post ist gelöscht</string>
+    <plurals name="postitem_posts_quantity">
+        <item quantity="one">%d Post</item>
+        <item quantity="other">%d Posts</item>
+    </plurals>
+    <plurals name="postitem_files_quantity">
+        <item quantity="one">%d Datei</item>
+        <item quantity="other">%d Dateien</item>
+    </plurals>
+    <plurals name="postitem_replies_quantity">
+        <item quantity="one">%d Antwort</item>
+        <item quantity="other">%d Antworten</item>
+    </plurals>
+    
+    <string name="postslist_list_updated">Aktualisiert</string>
+    <string name="postslist_no_new_posts">Keine neuen Posts</string>
+    <plurals name="postslist_new_posts_quantity">
+        <item quantity="one">%d neuer Post</item>
+        <item quantity="other">%d neue Posts</item>
+    </plurals>
+    
+    <string name="tabs_newtab">Neuer Tab</string>
+    <string name="tabs_favorites">Favoriten</string>
+    <string name="tabs_history">Browserverlauf</string>
+    
+    <string name="tabs_tracker_title">Auto Update</string>
+    <string name="tabs_tracker_title_unread">Neue Posts</string>
+    <string name="tabs_tracker_updating">Jetzt wird aktualisiert</string>
+    <plurals name="tabs_tracker_timer">
+        <item quantity="one">Update in %d Sekunde</item>
+        <item quantity="other">Update in %d Sekunden</item>
+    </plurals>
+    
+    <string name="tabs_title_boardpage">/%1$s - Seite %2$d</string>
+    <string name="tabs_title_boardpage_first">/%1$s</string>
+    <string name="tabs_title_catalogpage">/%s - Katalog</string>
+    <string name="tabs_title_searchpage">/%1$s - Suche: %2$s</string>
+    <string name="tabs_title_threadpage">/%1$s/%2$s</string>
+    <string name="tabs_title_threadpage_loaded">/%1$s - %2$s</string>
+    
+    <string name="newtab_address_bar">Adresse</string>
+    <string name="newtab_saved_threads">Gespeichert</string>
+    <string name="newtab_address_go">GO</string>
+    <string name="newtab_address_hint">http://</string>
+    <string name="newtab_saved_threads_title">Gespeicherte Threads</string>
+    <string name="newtab_select_local_file">Dateipfad angeben</string>
+    <string name="newtab_quickaccess_all_boards">Alle Imageboards</string>
+    <string name="newtab_quickaccess_addcustom_title">Das gesamte Board von %s hinzufügen</string>
+    <string name="newtab_quickaccess_addcustom_boardcode">Board code</string>
+    <string name="newtab_quickaccess_addcustom_boarddesc">Beschreibung</string>
+    <string name="newtab_quickaccess_addcustom_incorrect_code">Falsche board code</string>
+    <string name="newtab_quickaccess_addcustom_already_exists">Dieses Board ist bereits in der Liste</string>
+    
+    <string name="history_empty">Kein Browserverlauf</string>
+    <string name="history_today">Heute</string>
+    <string name="history_yesterday">Gestern</string>
+    <string name="history_last_week">Letzte Woche</string>
+    <string name="history_other">Früher</string>
+    
+    <string name="favorites_empty">Keine Lesezeichen</string>
+    <string name="favorites_all">Alle Lesezeichen</string>
+    <string name="favorites_chans">Imageboards</string>
+    <string name="favorites_boards">Boards</string>
+    <string name="favorites_threads">Threads</string>
+    
+    <string name="boardslist_format">/%1$s - %2$s</string>
+    <string name="boardslist_hint">Board code</string>
+    <string name="boardslist_btn_go">GO</string>
+    
+    <string name="search_bar_hint">Suche</string>
+    <string name="search_bar_in_thread_hint">Suche in Thread</string>
+    
+    <string name="menu_open_drawer">Drawer öffnen</string>
+    <string name="menu_close_drawer">Drawer schließen</string>
+    <string name="menu_preferences">Einstellungen</string>
+    <string name="menu_add_post">Antwort schreiben</string>
+    <string name="menu_add_thread">Neuer Thread</string>
+    <string name="menu_update">Aktualisieren</string>
+    <string name="menu_from_internet">Von Internet</string>
+    <string name="menu_catalog">Katalog</string>
+    <string name="menu_search">Suche</string>
+    <string name="menu_open_browser">Browser öffnen</string>
+    <string name="menu_add_favorites">Zu den Favoriten hinzufügen</string>
+    <string name="menu_remove_favorites">Aus den Favoriten entfernen</string>
+    <string name="menu_attach_file">Datei anhängen</string>
+    <string name="menu_attach_gallery">Galerie</string>
+    <string name="menu_save_page">Speichern</string>
+    <string name="menu_board_gallery">Galerie</string>
+    <string name="menu_clear_history">Verlauf löschen</string>
+    <string name="menu_clear_favorites">Alle Lesezeichen entfernen</string>
+    <string name="menu_save_attachment">Speichern</string>
+    <string name="menu_share">Teilen</string>
+    <string name="menu_share_link">Link teilen</string>
+    <string name="menu_search_google">In Google suchen</string>
+    <string name="menu_open">Öffnen</string>
+    <string name="menu_open_player">Den externen Player öffnen</string>
+    
+    <string name="context_menu_move">Bewegen</string>
+    <string name="context_menu_copy_url">Den Link Kopieren</string>
+    <string name="context_menu_add_favorites">Zu den Favoriten hinzufügen</string>
+    <string name="context_menu_remove_favorites">Aus den Favoriten entfernen</string>
+    <string name="context_menu_remove_history">Aus dem Verlauf entfernen</string>
+    <string name="context_menu_open_browser">Browser öffnen</string>
+    <string name="context_menu_autoupdate_background">Auto-update</string>
+    <string name="context_menu_thread_preview">Vorschau von Thread</string>
+    <string name="context_menu_reply">Antworten</string>
+    <string name="context_menu_reply_with_quote">Mit Zitat antworten</string>
+    <string name="context_menu_reply_no_reading">Ohne zu lesen Antworten</string>
+    <string name="context_menu_show_thumbnail">Miniaturansicht anzeigen</string>
+    <string name="context_menu_download_file">Datei herunterladen</string>
+    <string name="context_menu_download_attachment">Anhang herunterladen</string>
+    <string name="context_menu_download_attachments">Anhänge herunterladen</string>
+    <string name="context_menu_select_text">Text wählen</string>
+    <string name="context_menu_copy_text">Text kopieren</string>
+    <string name="context_menu_hide_thread">Thread verstecken</string>
+    <string name="context_menu_hide_post">Post verstecken</string>
+    <string name="context_menu_delete_post">Posts löschen</string>
+    <string name="context_menu_delete_files">Dateien löschen</string>
+    <string name="context_menu_share">Teile</string>
+    <string name="context_menu_search_google">In Google suchen</string>
+    <string name="context_menu_delete_autohide_rule">Die Regel entfernen</string>
+    <string name="context_menu_quickaccess_add">Zum Schnellzugang</string>
+    <string name="context_menu_quickaccess_remove">Von Schnellzugang entfernen</string>
+    <string name="context_menu_quickaccess_custom_board">Benutzerdefinierte Board fügen</string><!--  -->
+    
+    <string name="share_via">Teilen per</string>
+    
+    <string name="dialog_delete_password">Passwort zum Löschen</string>
+    <string name="dialog_delete_button">Löschen</string>
+    <string name="dialog_delete_progress">Löschung</string>
+    
+    <string name="dialog_cloudflare_captcha_text">Cloudflare beantragt die Überprüfung.\nGeben Sie die folgenden Zeichen ein:</string>
+    <string name="dialog_cloudflare_captcha_hint">Captcha</string>
+    <string name="dialog_cloudflare_captcha_check">Überprüfen</string>
+    
+    <string name="dialog_external_url_title">Externe Link</string>
+    <string name="dialog_external_url_text">%s\n\nDiese Seite wird von einer externen Anwendung geöffnet werden.
+        Beachten Sie, dass die Website kann Malware enthalten.\n\nSind Sie sicher, dass Sie fortfahren möchten?</string>
+    <string name="dialog_external_mail_title">E-mail</string>
+    <string name="dialog_external_mail_text">%s\n\nFür E-Mail wird eine externe Anwendung geöffnet werden.\n\nMöchten Sie weitermachen?</string>
+    
+    <string name="dialog_save_thread_title">Thread Speichern</string>
+    <string name="dialog_save_thread_text">Alle Anhänge und Thumbnails, die bereits im heruntergeladen wurden oder im Cache vorhanden sind,
+        werden sowieso gespeichert werden.\nWählen Sie, was Sie aus dem Internet herunterladen möchten:</string>
+    <string name="dialog_save_thread_thumbs">Thumbnails</string>
+    <string name="dialog_save_thread_all">Alle Anhänge</string>
+    <string name="dialog_save_thread_save">Speichern</string>
+    
+    <string name="dialog_open_chan_text">In der Zeit ist gespeicherte Version der Seite geöffnet.
+        \nMöchten Sie versuchen, die aktuelle Version aus dem Internet zu öffnen?</string>
+    
+    <string name="dialog_switch_page_title">Zu Seite gehen</string>
+    <string name="dialog_switch_page_hint">Seitennummer</string>
+    <string name="dialog_switch_page_go">Gehen</string>
+    <string name="dialog_switch_page_incorrect">Ungültige Seitennummer</string>
+    
+    <string name="postform_title_post">Antwort hinzufügen</string>
+    <string name="postform_title_thread">Neuer Thread</string>
+    <string name="postform_name">Name</string>
+    <string name="postform_email">E-mail</string>
+    <string name="postform_password">Passwort zum Löschen:</string>
+    <string name="postform_subject">Betreff</string>
+    <string name="postform_comment">Kommentar</string>
+    <string name="postform_sage">Säge</string>
+    <string name="postform_watermark">Wasserzeichen</string>
+    <string name="postform_opmark">OP</string>
+    <string name="postform_captcha_hint">Bestätigung</string>
+    <string name="postform_send">Senden</string>
+    <string name="postform_max_attachments">Weitere Dateien können nicht angehängt werden</string>
+    <string name="postform_cannot_attach">Datei Kann nicht angehängt werden</string>
+    <string name="postform_required_file">Hängen sie Datei an, um einen neuen Thread zu erstellen</string>
+    <string name="postform_empty_comment">Schreibe einen Kommentar</string>
+    <string name="postform_attachment_size_format">%1$s KB, %2$dx%3$d</string>
+    <string name="postform_attachment_size_format_no_image">%1$s KB</string>
+    
+    <string name="posting_post">Sendung eines Posten</string>
+    <string name="posting_post_format">zu Thread /%2$s/ %3$s (%1$s)</string>
+    <string name="posting_thread">Hinzufügung eines neuen Thread</string>
+    <string name="posting_thread_format">an Board /%2$s/ (%1$s)</string>
+    <string name="posting_error">Senden fehlgeschlagen</string>
+    <string name="posting_error_interactive_format">%s Überprüfung wurde beantragt</string>
+    <string name="posting_error_default">Ein unbekannter Fehler</string>
+    <string name="posting_success">Erfolgreich gesendet</string>
+    <string name="posting_success_post">Der Post wurde erfolgreich versendet</string>
+    <string name="posting_success_thread">Der Thread wurde erfolgreich hinzugefügt</string>
+    <string name="posting_dialog_hide_button">Verbergen</string>
+    <string name="posting_dialog_cancel_button">Abbrechen</string>
+    <string name="posting_cancelled">Senden abgebrochen</string>
+    <string name="posting_now_posting">Eine andere Meldung wird im Moment geschickt</string>
+    
+    <string name="downloading_start_ticker">Herunterladung von Dateien</string>
+    <string name="downloading_success_ticker">Alle Herunterladungen sind abgeschlossen</string>
+    <string name="downloading_error_ticker">Einige Dateien werden nicht geladen</string>
+    <string name="downloading_error_title">Fehler beim Herunterladen</string>
+    <string name="downloading_error_report_title">Die folgenden Dateien wurden nicht heruntergeladen:</string>
+    <string name="downloading_title">Herunterladen (%d verbleibend)</string>
+    <string name="downloading_title_simple">Herunterladen</string>
+    <string name="downloading_error_mkdir">Das Verzeichnis kann nicht erstellt werden</string>
+    <string name="downloading_error_mkfile">Datei kann nicht erstellt werden</string>
+    <string name="downloading_error_save_html">Die HTML-Datei kann nicht gespeichert werden</string>
+    <string name="downloading_error_serialize">Fehler bei Serialisierung</string>
+    <string name="downloading_error_copy">Fehler beim Kopieren</string>
+    <string name="downloading_error_download">Fehler beim Herunterladen</string>
+    <string name="downloading_error_file_exists">Datei ist bereits vorhanden</string>
+    <string name="downloading_error_interactive_format">%s Überprüfung wurde beantragt</string>
+    <string name="downloading_error_save_container">Fehler beim Archivieren</string>
+    <string name="downloading_error_unknown">Ein unbekannter Fehler</string>
+    <string name="downloading_element_format">%1$s: %2$s</string>
+    <string name="downloading_thumbnail_format">%s Thumbnail</string>
+    <string name="downloading_thread_format">Thread %1$s-%2$s</string>
+    <string name="downloading_dialog_hide_button">Verbergen</string>
+    <string name="downloading_dialog_cancel_button">Abbrechen</string>
+    <string name="downloading_dialog_current_format">Rest: %1$d\nLaufend: %2$s</string>
+    
+    <string name="html_thumbnailmsg">Thumbnail wird angezeigt, klicken Sie auf Bild für volle Größe.</string>
+    <string name="html_external">(extern)</string>
+    <string name="html_file">Datei:</string>
+    
+    <string name="filedialog_title">Wählen Sie die Datei</string>
+    <string name="filedialog_location">Pfad</string>
+    <string name="filedialog_cant_read_folder">Kann nicht gelesen werden!</string>
+    <string name="filedialog_new">Neu</string>
+    <string name="filedialog_select">Wählen</string>
+    <string name="filedialog_filename">Dateiname:</string>
+    <string name="filedialog_filename_hint">dateiname</string>
+    <string name="filedialog_cancel">Abbrechen</string>
+    <string name="filedialog_create">Speichern</string>
+    <string name="filedialog_no_data">Keine Daten</string>
+    <string name="filedialog_error">Fehler</string>
+    
+    <string name="gallery_error_incorrect_attachment">Falscher Anhang</string>
+    <string name="gallery_error_play">Die Datei kann nicht wiedergeben werden</string>
+    <string name="gallery_tap_to_play">Tippen Sie, um zu wiedergeben</string>
+    <string name="gallery_tap_to_open">Tippen Sie zum Öffnen</string>
+    <string name="gallery_tap_to_external_link">Tippen Sie zum externen Link</string>
+    
+    <string name="autohide_title">Regeln von Verstecken</string>
+    <string name="autohide_add_rule_title">Die Regel hinzufügen</string>
+    <string name="autohide_edit_rule_title">Die Regel bearbeiten</string>
+    <string name="autohide_add_rule_item">Die Regel hinzufügen</string>
+    <string name="autohide_add_rule_summary">Die neue Regel fügen</string>
+    <string name="autohide_regex_hint">Regulärer Ausdruck</string>
+    <string name="autohide_all_chans">Alle Imageboards</string>
+    <string name="autohide_board_hint">Board</string>
+    <string name="autohide_thread_hint">Thread</string>
+    <string name="autohide_in_comment">Suche in Kommentaren</string>
+    <string name="autohide_in_subject">Suche in Betreffen</string>
+    <string name="autohide_in_name">Suchen in Namen und Tripcodes</string>
+    <string name="autohide_save_button">Speichern</string>
+    <string name="autohide_error_no_condition">Keine Bedingung gewählt</string>
+    <string name="autohide_error_empty_regex">Leerer regulärer Ausdruck</string>
+    <string name="autohide_error_incorrect_regex">Falscher regulärer Ausdruck</string>
+    
+    <string name="notification_url_copied">Adresse ist in die Zwischenablage kopiert\n%s</string>
+    <string name="notification_post_not_found">Post ist nicht gefunden</string>
+    <string name="notification_comment_copied">Meldung ist in die Zwischenablage kopiert</string>
+    <string name="notification_download_already_in_queue">Die Aufgabe ist bereits hinzugefügt:\n%s</string>
+    <string name="notification_download_already_exists">Datei ist bereits vorhanden:\n%s</string>
+    <string name="notification_not_found">Nicht gefunden</string>
+    <string name="notifacation_updating_now">Die Liste wird im Moment aktualisiert, versuchen Sie es später</string>
+    
+    <string name="error_unknown">Ein unbekannter Fehler</string>
+    <string name="error_deserialization">Fehler bei Deserialisierung</string>
+    <string name="error_cloudflare_get_captcha">Nicht möglich Cloudflare captcha zu erhalten</string>
+    <string name="error_cloudflare_cancelled">Cloudflare Überprüfung nicht bestanden</string>
+    <string name="error_cloudflare_antiddos">Cloudflare anti-DDOS Überprüfung ist nicht möglich</string>
+    <string name="error_ssl">SSL/HTTPS-Fehler (Verbindung wird nicht vertraut)</string>
+    <string name="error_ssl_help">\n\nWenn Sie verstehen, was los ist, können Sie in den Einstellungen dieser Imageboard wählen:
+        \n\"SSL-Fehler ignorieren\".\n\nIn diesem Fall wird die Sicherheit der Verbindung nicht gewährleistet.</string>
+    <string name="error_connection">Keine Verbindung zum Server</string>
+    <string name="error_parse">Nicht möglich, die Seite zu parsen</string>
+    <string name="error_open_local">Nicht möglich, die Datei als gespeicherter Thread zu eröffnen</string>
+    <string name="error_no_space">Nicht genügend Speicherplatz</string>
+    <string name="error_interactive_dialog_format">%s Überprüfung läuft</string>
+    <string name="error_interactive_cancelled_format">%s Überprüfung nicht bestanden</string>
+    <string name="error_out_of_memory">Out of Memory</string>
+    
+    <string name="makaba_catalog_standart">Nach Bump sortieren</string>
+    <string name="makaba_catalog_last_reply">Nach Letzten Antworten sortieren</string>
+    <string name="makaba_catalog_num">Nach Erstellungsdatum sortieren</string>
+    <string name="makaba_catalog_image_size">Nach Bildgröße sortieren</string>
+    <string name="makaba_no_icon">Kein Symbol</string>
+    <string name="makaba_prefs_mobile_api">Mobile API</string>
+    <string name="makaba_prefs_mobile_api_summary">Laden Sie nur neue Posts ohne Neuladen der ganzen Thread</string>
+    <string name="makaba_prefs_force_google">Google Recaptcha</string>
+    <string name="makaba_prefs_force_google_summary">Verwenden Sie Recaptcha anstelle Captcha von Yandex</string>
+    <string name="makaba_prefs_domain_category">Domain</string>
+    <string name="makaba_prefs_domain">Domain</string>
+    <string name="makaba_prefs_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    
+    <string name="mikuba_password_ignored">(wird ignoriert)</string>
+    
+    <string name="dobrochan_prefs_only_new_posts">Nur neue Posts</string>
+    <string name="dobrochan_prefs_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
+    <string name="dobrochan_prefs_domain">Domain</string>
+    <string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+    
+    <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
+    <string name="fourchan_prefs_new_recaptcha_summary">Verwenden Sie die neue Version von Recaptcha</string>
+    
+    <string name="preferences">Einstellungen</string>
+    <string name="pref_cat_chans">Imageboards</string>
+    <string name="pref_cat_appearance">Aussehen</string>
+    <string name="pref_cat_advanced">Erweiterte</string>
+    <string name="pref_cat_date_time">Datum und Uhrzeit</string>
+    <string name="pref_cat_personal">Persönliche Daten</string>
+    <string name="pref_cat_downloads">Herunterladen</string>
+    <string name="pref_cat_autoupdate">Auto-update</string>
+    <string name="pref_cat_cache">Cache</string>
+    <string name="pref_cat_about">Über Overchan</string>
+    <string name="pref_cat_proxy">Anschluss</string>
+    <string name="pref_use_proxy">Proxy</string>
+    <string name="pref_use_proxy_summary">HTTP Proxy verwenden</string>
+    <string name="pref_proxy_host">Adresse</string>
+    <string name="pref_proxy_host_summary">Die Adresse des Proxy-Servers</string>
+    <string name="pref_proxy_port">Port</string>
+    <string name="pref_proxy_port_summary">Die Port-Nummer, die auf dem Proxy-Server zugeordnet ist</string>
+    <string name="pref_use_onion">.onion Domain verwenden</string>
+    <string name="pref_use_onion_summary">Eine Verbindung durch das Tor-Netzwerk ist erfordert</string>
+    <string name="pref_use_https">HTTPS verwenden</string>
+    <string name="pref_use_https_summary">Sichere, verschlüsselte Verbindung</string>
+    <string name="pref_ignore_ssl_errors">SSL-Fehler ignorieren</string>
+    <string name="pref_ignore_ssl_errors_summary">Hostname und Certificate Validation deaktivieren</string>
+    <string name="pref_cat_connection_extended">Erweiterte Einstellungen</string>
+    <string name="pref_okhttp">OkHttp</string>
+    <string name="pref_okhttp_summary">Alternativer HTTP-Client mit SPDY (kann instabil sein!)</string>
+    <string name="pref_okhttp_unlocked">OkHttp Einstellung ist entriegelt</string>
+    <string name="pref_password_title">Passwort</string>
+    <string name="pref_password_summary">Passwort zum Löschen von Posts standardmäßig</string>
+    <string name="pref_name_title">Name</string>
+    <string name="pref_name_summary">Name standardmäßig</string>
+    <string name="pref_name_hint">lassen Sie es leer</string>
+    <string name="pref_email_title">E-mail</string>
+    <string name="pref_email_summary">E-Mail-Adresse standardmäßig</string>
+    <string name="pref_email_hint">email</string>
+    <string name="pref_hide_personal_title">Persönliche Daten verbergen</string>
+    <string name="pref_hide_personal_summary">Immer die Standardwerte verwenden</string>
+    <string name="pref_random_hash_title">Zufällige Hash</string>
+    <string name="pref_random_hash_summary">Ein paar Bytes an das Ende der Anlagedateien fügen</string>
+    <string name="pref_show_nsfw_boards_title">Alle Boards</string>
+    <string name="pref_show_nsfw_boards_summary">Unmoderated Boards anzeigen</string>
+    <string name="pref_autohide_title">Autohide</string>
+    <string name="pref_autohide_summary">Automatisches Verstecken von regulären Ausdrücken</string>
+    <string name="pref_external_links_confirmation_title">Links Bestätigung</string>
+    <string name="pref_external_links_confirmation_summary">Bestätigen Sie, bevor Sie externe Links öffnen</string>
+    <string name="pref_do_not_close_tabs_title">Tabs nicht schließen</string>
+    <string name="pref_do_not_close_tabs_summary">Tabs durch Drücken der Zurück-Taste nicht schließen</string>
+    <string name="pref_show_date_title">Die Zeit anzeigen</string>
+    <string name="pref_show_date_summary">Das Datum und die Uhrzeit jedes Posts zeigen</string>
+    <string name="pref_local_time_title">Lokalzeit zeigen</string>
+    <string name="pref_local_time_summary">Lokalzeit statt Imageboard Zeit zeigen</string>
+    <string name="pref_cut_posts_title">Lange Posts</string>
+    <string name="pref_cut_posts_summary">Posts kürzen, wenn sie länger als der angegebene Wert sind</string>
+    <string name="pref_cut_posts_hint">0 - nicht kürzen; 400px standardmäßig</string>
+    <string name="pref_open_spoilers_title">Spoiler öffnen</string>
+    <string name="pref_open_spoilers_summary">Text Spoiler standardmäßig öffnen</string>
+    <string name="pref_replies_only_quantity_title">Antworten als Liste anzeigen</string>
+    <string name="pref_replies_only_quantity_summary">Alternative Verweise auf Posts anzeigen</string>
+    <string name="pref_gallery_screen_title">Galerie</string>
+    <string name="pref_gallery_screen_summary">Erweiterte Einstellungen von Galerie</string>
+    <string name="pref_gallery_scaleimageview_title">Image Viewer</string>
+    <string name="pref_gallery_scaleimageview_summary">Bildbetrachter auf Basis integrierter Bibliothek skia</string>
+    <string name="pref_gallery_nativegif_title">GIF-Viewer</string>
+    <string name="pref_gallery_nativegif_summary">Eine native Bibliothek libgif verwenden</string>
+    <string name="pref_gallery_videoplayer_title">Built-in video-player</string> 
+    <string name="pref_gallery_videoplayer_summary">Kann manchmal nicht in älteren Versionen von Android arbeiten</string>
+    <string name="pref_gallery_audioplayer_title">Built-in audio-player</string>
+    <string name="pref_gallery_audioplayer_summary">Kann manchmal nicht in älteren Versionen von Android arbeiten</string>
+    <string name="pref_enable_autoupdate_title">Auto-Update aktivieren</string>
+    <string name="pref_enable_autoupdate_summary">Die offenen Threads automatisch aktualisieren</string>
+    <string name="pref_autoupdate_delay_title">Intervall (in Sekunden)</string>
+    <string name="pref_autoupdate_delay_summary">Auto-Aktualisierungsintervall nicht weniger als 30 Sekunden</string>
+    <string name="pref_autoupdate_delay_hint">60 Sekunden standardmäßig</string>
+    <string name="pref_autoupdate_delay_incorrect">Falscher Wert</string>
+    <string name="pref_autoupdate_background_title">Update im Hintergrund</string>
+    <string name="pref_autoupdate_background_summary">Markierte Tabs für Auto-Update im Hintergrund aktualisieren</string>
+    <string name="pref_autoupdate_notification_title">Im Infobereich</string>
+    <string name="pref_autoupdate_notification_summary">Das System darf den Prozess nicht schließen, wenn die Anwendung minimiert wird</string>
+    <string name="pref_cache_maxsize_title">Maximale Größe (MB)</string>
+    <string name="pref_cache_maxsize_summary">Die maximale Größe der Datei-Cache</string>
+    <string name="pref_cache_maxsize_hint">0 - unbegrenzt; 50 MB standardmäßig</string>
+    <string name="pref_clear_cache_title">Cache löschen</string>
+    <string name="pref_clear_cache_summary">%.1f MB</string>
+    <string name="pref_about_version_title">Overchan Android</string>
+    <string name="pref_about_license_title">Lizenz</string>
+    <string name="pref_about_license_summary">GPLv3</string>
+    <string name="pref_download_dir_title">Verzeichnis für Herunterladen</string>
+    <string name="pref_download_dir_summary">Das Verzeichnis, in dem Dateien gespeichert werden sollen</string>
+    <string name="pref_download_thumbs_title">Thumbnails herunterladen</string>
+    <string name="pref_download_thumbs_summary">Laden Sie die Thumbnails automatisch, kann deaktiviert werden, um Web-Traffic zu reduzieren</string>
+    <string name="pref_download_format_title">Threads Speicherformat</string>
+    <string-array name="pref_download_format_choices">
+        <item>Dateiordner</item>
+        <item>ZIP-Archiv</item>
+        <item>MHTML</item>
+    </string-array>
+    <string name="pref_theme_title">Thema</string> <!-- appearance -->
+    <string-array name="pref_theme_choices">
+        <item>Futaba</item>
+        <item>Photon</item>
+        <item>Neutron</item>
+        <item>Gurochan</item>
+    </string-array>
+    <string name="pref_font_size_title">Textgröße</string>
+    <string-array name="pref_font_size_choices">
+        <item>Klein</item>
+        <item>Mittelgroß</item>
+        <item>Groß</item>
+        <item>Riesig</item>
+    </string-array>
+    <string name="pref_sidepanel_hide_title">Tabs Panel nicht zeigen</string>
+    <string name="pref_sidepanel_hide_summary">Tabs Panel nicht ständig zeigen</string>
+    <string name="pref_sidepanel_width_title">Tabs Panelbreite</string>
+    <string-array name="pref_sidepanel_width_choices">
+        <item>25\uff05</item>
+        <item>30\uff05</item>
+        <item>35\uff05</item>
+        <item>40\uff05</item>
+        <item>45\uff05</item>
+        <item>50\uff05</item>
+    </string-array>
+</resources>

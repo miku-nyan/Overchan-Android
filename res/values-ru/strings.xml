@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <resources>
-    <string name="app_name">Имиджборды</string>
+    <string name="app_name">Overchan</string>
     
     <string name="drawer_open">Открыть панель</string>
     <string name="drawer_close">Закрыть панель</string>
@@ -453,7 +453,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string-array name="pref_download_format_choices">
         <item>Папка с файлами</item>
         <item>ZIP архив</item>
-        <item>MHTML (ограниченная функциональность)</item>
+        <item>MHTML</item>
     </string-array>
     <string name="pref_theme_title">Тема</string>
     <string-array name="pref_theme_choices">
