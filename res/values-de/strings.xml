@@ -349,6 +349,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dobrochan_prefs_domain">Domain</string>
     <string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
     
+    <string name="infinity_tor_message">Um 8chan über Tor zu senden, müssen Sie den .onion Domain verwenden.</string>
+    
+    <string name="inach_prefs_ajax_update">JSON-Update</string>
+    <string name="inach_prefs_ajax_update_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
+    
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Verwenden Sie die neue Version von Recaptcha</string>
     

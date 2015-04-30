@@ -40,7 +40,7 @@ import nya.miku.wishmaster.common.Logger;
 public class InachReader extends WakabaReader {
     private static final String TAG = "InachReader";
     
-    private static final DateFormat DATE_FORMAT;
+    static final DateFormat DATE_FORMAT;
     static {
         DateFormatSymbols inachSymbols = new DateFormatSymbols();
         inachSymbols.setShortWeekdays(new String[] { "", "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" });
@@ -126,6 +126,7 @@ public class InachReader extends WakabaReader {
         if (index == -1) return;
         String id = html.substring(0, index);
         if (id.equals("image")) return;
+        id = html.substring(0, html.lastIndexOf('_'));
         AttachmentModel attachment = new AttachmentModel();
         attachment.size = -1;
         attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;

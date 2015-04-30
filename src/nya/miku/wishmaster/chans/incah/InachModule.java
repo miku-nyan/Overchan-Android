@@ -21,7 +21,10 @@ package nya.miku.wishmaster.chans.incah;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
@@ -29,18 +32,23 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
+import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
@@ -48,10 +56,13 @@ import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.chans.AbstractWakabaModule;
 import nya.miku.wishmaster.common.IOUtils;
+import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 /* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
  * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
@@ -59,11 +70,12 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 @SuppressWarnings("deprecation")
 
 public class InachModule extends AbstractWakabaModule {
-    
-//TODO JSON API (AJAX) http://inach.org/cached.pl?task=updatethread&board=[board]&thread=[thread]&posts=[skip_count]
+    private static final String TAG = "InachReader";
     
     private static final String CHAN_NAME = "inach.org";
     private static final String DOMAIN_NAME = "inach.org";
+    
+    private static final String PREF_AJAX_UPDATE = "PREF_AJAX_UPDATE";
     
     private static final SimpleBoardModel[] BOARDS;
     private static final String[] ATTACHMENT_FORMATS = new String[] {
@@ -83,6 +95,8 @@ public class InachModule extends AbstractWakabaModule {
                 ChanModels.obtainSimpleBoardModel(CHAN_NAME, "bl", "Blogs", null, true)
         };
     }
+    
+    private StringBuilder buffer = null;
     
     public InachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -109,6 +123,30 @@ public class InachModule extends AbstractWakabaModule {
     }
     
     @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        Context context = preferenceGroup.getContext();
+        CheckBoxPreference ajaxPref = new CheckBoxPreference(context);
+        ajaxPref.setTitle(R.string.inach_prefs_ajax_update);
+        ajaxPref.setSummary(R.string.inach_prefs_ajax_update_summary);
+        ajaxPref.setKey(getSharedKey(PREF_AJAX_UPDATE));
+        ajaxPref.setDefaultValue(true);
+        preferenceGroup.addPreference(ajaxPref);
+        super.addPreferencesOnScreen(preferenceGroup);
+    }
+    
+    private boolean useAjax() {
+        return preferences.getBoolean(getSharedKey(PREF_AJAX_UPDATE), true);
+    }
+    
+    private JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
+        JSONObject object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, false);
+        if (task != null && task.isCancelled()) throw new Exception("interrupted");
+        if (listener != null) listener.setIndeterminate();
+        return object;
+    }
+    
+    @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
         return new InachReader(stream);
     }
@@ -121,6 +159,7 @@ public class InachModule extends AbstractWakabaModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel board = super.getBoard(shortName, listener, task);
+        board.defaultUserName = "Аноним";
         board.timeZoneId = "GMT+3";
         board.readonlyBoard = false;
         board.requiredFileForNewThread = true;
@@ -139,6 +178,134 @@ public class InachModule extends AbstractWakabaModule {
         board.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         board.markType = BoardModel.MARK_WAKABAMARK;
         return board;
+    }
+    
+    @Override
+    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
+            throws Exception {
+        if (useAjax() && oldList != null) {
+            int postsCount = 0;
+            for (PostModel post : oldList) if (!post.deleted) ++postsCount;
+            if (postsCount > 1) {
+                String ajaxUrl = getUsingUrl() + "cached.pl?task=updatethread&board=" + boardName + "&thread=" + threadNumber + "&posts=" +
+                        Integer.toString(postsCount - 2);
+                try {
+                    JSONObject json = downloadJSONObject(ajaxUrl, true, listener, task);
+                    if (json == null) return oldList;
+                    JSONArray array = json.getJSONArray("newposts");
+                    if (array.length() == 0) throw new Exception();
+                    PostModel[] newPosts = new PostModel[array.length()];
+                    for (int i=0, len=array.length(); i<len; ++i)
+                        newPosts[i] = mapAjaxModel(array.getJSONObject(i).getJSONObject("data"), boardName, threadNumber);
+                    Arrays.sort(newPosts, new Comparator<PostModel>() {
+                        @Override
+                        public int compare(PostModel lhs, PostModel rhs) {
+                            return Long.valueOf(Long.parseLong(lhs.number)).compareTo(Long.parseLong(rhs.number));
+                        }
+                    });
+                    long lastPostNum = Long.parseLong(oldList[oldList.length-1].number);
+                    ArrayList<PostModel> list = new ArrayList<PostModel>(Arrays.asList(oldList));
+                    for (int i=0; i<newPosts.length; ++i) {
+                        if (Long.parseLong(newPosts[i].number) > lastPostNum) {
+                            list.add(newPosts[i]);
+                        }
+                    }
+                    return list.toArray(new PostModel[list.size()]);
+                } catch (Exception e) {
+                    Logger.e(TAG, "no ajax", e);
+                } finally {
+                    buffer = null;
+                }
+            }
+        }
+        return super.getPostsList(boardName, threadNumber, listener, task, oldList);
+    }
+    
+    private PostModel mapAjaxModel(JSONObject json, String boardName, String threadNum) {
+        PostModel model = new PostModel();
+        model.number = Long.toString(json.getLong("num"));
+        model.name = json.optString("name", "");
+        model.subject = json.optString("subject", "");
+        model.comment = fixString(json.optString("comment", ""));
+        model.email = json.optString("email", "");
+        if (model.email.startsWith("mailto:")) model.email = model.email.substring(7);
+        model.trip = "";
+        model.sage = model.email.toLowerCase(Locale.US).contains("sage");
+        try {
+            model.timestamp = InachReader.DATE_FORMAT.parse(json.getString("date")).getTime();
+        } catch (Exception e) {
+            Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
+        }
+        model.parentThread = threadNum;
+        
+        String imagePath = json.optString("image", "");
+        if (imagePath.length() != 0) {
+            AttachmentModel attachment = new AttachmentModel();
+            attachment.path = "/" + boardName + "/" + imagePath;
+            attachment.thumbnail = json.optString("thumbnail", null);
+            if (attachment.thumbnail != null) attachment.thumbnail = "/" + boardName + "/" + attachment.thumbnail;
+            try {
+                String size = json.optString("size");
+                if (size.length() == 0) throw new Exception();
+                attachment.size = Math.round(Math.round(Integer.parseInt(size) * 100 / 1024.0f) / 100.0f);
+            } catch (Exception e) {
+                attachment.size = -1;
+            }
+            try {
+                String width = json.optString("width", "");
+                String height = json.optString("height", "");
+                if (width.length() == 0 || height.length() == 0) throw new Exception();
+                attachment.width = Integer.parseInt(width);
+                attachment.height = Integer.parseInt(height);
+            } catch (Exception e) {
+                attachment.width = -1;
+                attachment.height = -1;
+            }
+            String pathLower = attachment.path.toLowerCase(Locale.US);
+            if (pathLower.endsWith(".jpg") || pathLower.endsWith(".jpeg") || pathLower.endsWith(".png"))
+                attachment.type = AttachmentModel.TYPE_IMAGE_STATIC;
+            else if (pathLower.endsWith(".gif"))
+                attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
+            else if (pathLower.endsWith(".webm"))
+                attachment.type = AttachmentModel.TYPE_VIDEO;
+            else if (pathLower.endsWith(".mp3") || pathLower.endsWith(".ogg"))
+                attachment.type = AttachmentModel.TYPE_AUDIO;
+            else
+                attachment.type = AttachmentModel.TYPE_OTHER_FILE;
+            model.attachments = new AttachmentModel[] { attachment };
+        }
+        
+        String youtubeId = json.optString("youtube", "");
+        if (youtubeId.length() != 0) {
+            AttachmentModel attachment = new AttachmentModel();
+            attachment.size = -1;
+            attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+            attachment.path = "http://youtube.com/watch?v=" + youtubeId;
+            attachment.thumbnail = "http://img.youtube.com/vi/" + youtubeId + "/default.jpg";
+            if (model.attachments == null || model.attachments.length == 0) {
+                model.attachments = new AttachmentModel[] { attachment };
+            } else {
+                model.attachments = new AttachmentModel[] { model.attachments[0], attachment };
+            }
+        }
+        return model;
+    }
+    
+    private String fixString(String comment) {
+        boolean inTag = false;
+        if (buffer == null) buffer = new StringBuilder(); else buffer.setLength(0);
+        comment = comment.replace("' style='display: table-cell; vertical-align: middle;'", "'").
+                replace("<span style='display: table-cell; vertical-align: middle;' ", "<span ");
+        for (int i=0; i<comment.length(); ++i) {
+            char ch = comment.charAt(i);
+            switch (ch) {
+                case '<': inTag = true; break;
+                case '>': inTag = false; break;
+                case '\'': if (inTag) { buffer.append('\"'); continue; }
+            }
+            buffer.append(ch);
+        }
+        return buffer.toString();
     }
     
     @Override

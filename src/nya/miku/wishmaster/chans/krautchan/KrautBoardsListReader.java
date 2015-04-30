@@ -42,8 +42,8 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
  */
 public class KrautBoardsListReader implements Closeable {
     private static final List<String> SFW_BOARDS = Arrays.asList(new String[] {
-            "a", "c", "co", "d", "e", "f", "fb", "fe", "fit", "jp", "k", "l", "li", "m", "n", "ng", "p",
-            "ph", "prog", "rvss", "sp", "t", "trv", "tu", "tv", "v", "w", "we", "wk", "wp", "z", "zp" 
+            "a", "c", "co", "e", "f", "fe", "fit", "jp", "k", "l", "li", "m", "n", "ng",
+            "p", "ph", "prog", "sp", "t", "trv", "tv", "v", "w", "wk", "wp", "z", "zp" 
     });
     private static final String[] ATTACHMENT_FORMATS =
             new String[] { "gif", "jpg", "jpeg", "png", "psd", "webm", "mp3", "ogg", "rar", "zip", "torrent", "swf" };
