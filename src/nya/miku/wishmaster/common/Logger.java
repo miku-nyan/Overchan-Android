@@ -48,14 +48,20 @@ public class Logger {
     }
     
     public static void e(String tag, String msg) {
-        Log.e(tag, msg != null ? msg : "");
+        if (Debug.DEBUG) {
+            Log.e(tag, msg != null ? msg : "");
+        }
     }
 
     public static void e(String tag, Throwable e) {
-        Log.e(tag, e.toString(), e);
+        if (Debug.DEBUG) {
+            Log.e(tag, e.toString(), e);
+        }
     }
     
     public static void e(String tag, String msg, Throwable e) {
-        Log.e(tag, msg, e);
+        if (Debug.DEBUG) {
+            Log.e(tag, msg, e);
+        }
     }
 }
