@@ -33,6 +33,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.CryptoUtils;
@@ -337,6 +338,24 @@ public class ChanModels {
             result.add(post.number);
         }
         return result;
+    }
+    
+    /**
+     * Создать упрощённую модель доски ({@link SimpleBoardModel}
+     * @param chan название имиджборды
+     * @param boardName код доски (короткое название)
+     * @param description описание доски (полное название)
+     * @param category категория, к которой относится доска (в случае деления досок по категориям), может принимать null.
+     * @param nsfw должно принимать true, если на доске содержится контент 18+ или доска является немодерируемой
+     */
+    public static SimpleBoardModel obtainSimpleBoardModel(String chan, String boardName, String description, String category, boolean nsfw) {
+        SimpleBoardModel model = new SimpleBoardModel();
+        model.chan = chan;
+        model.boardName = boardName;
+        model.boardDescription = description;
+        model.boardCategory = category;
+        model.nsfw = nsfw;
+        return model;
     }
     
 }

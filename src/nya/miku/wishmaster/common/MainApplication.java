@@ -36,6 +36,7 @@ import nya.miku.wishmaster.chans.cirno.MikubaModule;
 import nya.miku.wishmaster.chans.cirno.NowereModule;
 import nya.miku.wishmaster.chans.dobrochan.DobroModule;
 import nya.miku.wishmaster.chans.fourchan.FourchanModule;
+import nya.miku.wishmaster.chans.incah.InachModule;
 import nya.miku.wishmaster.chans.infinity.InfinityModule;
 import nya.miku.wishmaster.chans.krautchan.KrautModule;
 import nya.miku.wishmaster.chans.makaba.MakabaModule;
@@ -97,15 +98,16 @@ public class MainApplication extends Application {
     public List<ChanModule> chanModulesList;
     
     private void registerChanModules() {
+        addChanModule(new FourchanModule(preferences, resources));
+        addChanModule(new KrautModule(preferences, resources));
+        addChanModule(new InfinityModule(preferences, resources));
         addChanModule(new CirnoModule(preferences, resources));
         addChanModule(new MikubaModule(preferences, resources));
         addChanModule(new DobroModule(preferences, resources));
         addChanModule(new NowereModule(preferences, resources));
         addChanModule(new Chan410Module(preferences, resources));
+        addChanModule(new InachModule(preferences, resources));
         addChanModule(new MakabaModule(preferences, resources));
-        addChanModule(new FourchanModule(preferences, resources));
-        addChanModule(new InfinityModule(preferences, resources));
-        addChanModule(new KrautModule(preferences, resources));
     }
     
     public ChanModule getChanModule(String chanName) {

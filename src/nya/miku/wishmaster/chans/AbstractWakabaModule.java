@@ -125,11 +125,11 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
         return new WakabaReader(stream);
     }
     
-    protected ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkIfModified, UrlPageModel urlModel)
+    protected ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkModified, UrlPageModel urlModel)
             throws Exception {
         HttpResponseModel responseModel = null;
         WakabaReader in = null;
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModified).build();
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkModified).build();
         try {
             responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
             if (responseModel.statusCode == 200) {
@@ -165,9 +165,9 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        Context context = preferenceGroup.getContext();
+        addPasswordPreference(preferenceGroup);
         if (canHttps()) {
-            Context context = preferenceGroup.getContext();
-            addPasswordPreference(preferenceGroup);
             CheckBoxPreference httpsPref = new CheckBoxPreference(context);
             httpsPref.setTitle(R.string.pref_use_https);
             httpsPref.setSummary(R.string.pref_use_https_summary);

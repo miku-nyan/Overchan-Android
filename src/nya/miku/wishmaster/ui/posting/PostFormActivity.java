@@ -132,10 +132,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 if (boardModel.markType == BoardModel.MARK_WAKABAMARK) {
                     switch (v.getId()) {
                         case R.id.postform_mark_bold:
-                            comment.replace(selectionStart, selectionEnd, "**" + text + "**");
+                            comment.replace(selectionStart, selectionEnd, "**" + text.replace("\n", "**\n**") + "**");
                             break;
                         case R.id.postform_mark_italic:
-                            comment.replace(selectionStart, selectionEnd, "*" + text + "*");
+                            comment.replace(selectionStart, selectionEnd, "*" + text.replace("\n", "*\n*") + "*");
                             break;
                         case R.id.postform_mark_strike:
                             StringBuilder strike = new StringBuilder();
@@ -143,7 +143,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                             comment.replace(selectionStart, selectionEnd, text + strike.toString());
                             break;
                         case R.id.postform_mark_spoiler:
-                            comment.replace(selectionStart, selectionEnd, "%%" + text + "%%");
+                            comment.replace(selectionStart, selectionEnd, "%%" + text.replace("\n", "%%\n%%") + "%%");
                             break;
                         case R.id.postform_mark_quote:
                             comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
