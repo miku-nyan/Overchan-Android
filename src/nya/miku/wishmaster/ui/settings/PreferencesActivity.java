@@ -21,6 +21,7 @@ package nya.miku.wishmaster.ui.settings;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
+import nya.miku.wishmaster.common.CurrentBuild;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
@@ -97,7 +98,7 @@ public class PreferencesActivity extends PreferenceActivity {
         aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                UrlHandler.launchExternalBrowser(PreferencesActivity.this, "http://miku-nyan.github.io/Overchan-Android");
+                AppUpdatesChecker.checkForUpdates(PreferencesActivity.this);
                 return true;
             }
         });
@@ -151,6 +152,8 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
             }
         });
+        
+        if (CurrentBuild.SFW_BUILD) getPreferenceManager().findPreference(getString(R.string.pref_key_show_nsfw_boards)).setEnabled(false);
         
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override

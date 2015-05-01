@@ -312,6 +312,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="autohide_error_empty_regex">Пустое регулярное выражение</string>
     <string name="autohide_error_incorrect_regex">Некорректное регулярное выражение</string>
     
+    <string name="app_update_checking">Проверка обновлений</string>
+    <string name="app_update_update_available">Доступно обновление</string>
+    <string name="app_update_update_dialog_text">Доступна новая версия: %s\n\nОткрыть сайт?</string>
+    <string name="app_update_update_not_required">Обновление не требуется</string>
+    <string name="app_update_update_error">Не удалось проверить обновления</string>
+    
     <string name="notification_url_copied">Адрес скопирован в буфер обмена\n%s</string>
     <string name="notification_post_not_found">Пост не найден</string>
     <string name="notification_comment_copied">Сообщение скопировано в буфер обмена</string>
