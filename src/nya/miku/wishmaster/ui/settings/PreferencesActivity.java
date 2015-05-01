@@ -94,7 +94,10 @@ public class PreferencesActivity extends PreferenceActivity {
         });
         
         Preference aboutPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_version));
-        try { aboutPreference.setSummary(getPackageManager().getPackageInfo(getPackageName(), 0).versionName); } catch (Exception e) {}
+        try {
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName + (CurrentBuild.SFW_BUILD ? " (SFW)" : "");
+            aboutPreference.setSummary(versionName);
+        } catch (Exception e) {}
         aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

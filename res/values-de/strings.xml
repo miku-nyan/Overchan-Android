@@ -305,6 +305,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="autohide_error_empty_regex">Leerer regulärer Ausdruck</string>
     <string name="autohide_error_incorrect_regex">Falscher regulärer Ausdruck</string>
     
+    <string name="app_update_checking">Suche nach Updates</string>
+    <string name="app_update_update_available">Update verfügbar</string>
+    <string name="app_update_update_dialog_text">Neue Version ist verfügbar: %s\n\nMöchten Sie die Website öffnen?</string>
+    <string name="app_update_update_not_required">Kein Update erforderlich</string>
+    <string name="app_update_update_error">Kann nicht nach Updates suchen</string>
+    
     <string name="notification_url_copied">Adresse ist in die Zwischenablage kopiert\n%s</string>
     <string name="notification_post_not_found">Post ist nicht gefunden</string>
     <string name="notification_comment_copied">Meldung ist in die Zwischenablage kopiert</string>
@@ -423,6 +429,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_gallery_nativegif_summary">Eine native Bibliothek libgif verwenden</string>
     <string name="pref_gallery_videoplayer_title">Built-in video-player</string> 
     <string name="pref_gallery_videoplayer_summary">Kann manchmal nicht in älteren Versionen von Android arbeiten</string>
+    <string name="pref_do_not_download_videos_title">Videos nicht herunterladen</string>
+    <string name="pref_do_not_download_videos_summary">Video-Dateien direkt öffnen, in den Cache nicht herunterladen</string>
     <string name="pref_gallery_audioplayer_title">Built-in audio-player</string>
     <string name="pref_gallery_audioplayer_summary">Kann manchmal nicht in älteren Versionen von Android arbeiten</string>
     <string name="pref_enable_autoupdate_title">Auto-Update aktivieren</string>

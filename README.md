@@ -32,7 +32,7 @@ Just import the project into your workspace (File → Import → Android → Exi
 
 ### Android Studio/IntelliJ IDEA
 
-You may use Android Studio/IntelliJ IDEA at your own risk. If you need to keep the directory structure (for further contributing) put this [build.gradle](https://yadi.sk/d/QxOq3anxg94NJ) file into the project directory before the import.
+You may use Android Studio/IntelliJ IDEA at your own risk. If you need to keep the directory structure (for further contributing) put this [build.gradle](http://miku-nyan.github.io/Overchan-Android/data/build.gradle) file into the project directory before the import.
 
 ## License
 
