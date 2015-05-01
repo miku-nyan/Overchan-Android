@@ -858,9 +858,9 @@ footer a:hover {
     background-image: none;
     border-top: solid 1px #ddd;
   }
-  aside#sidebar a.button {
+  /*aside#sidebar a.button {
     display: none;
-  }
+  }*/
   #main-content h1:before,
   #main-content h2:before,
   #main-content h3:before,
