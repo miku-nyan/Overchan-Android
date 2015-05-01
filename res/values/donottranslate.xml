@@ -42,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_gallery_scaleimageview">PREF_KEY_GALLERY_SCALEIMAGEVIEW</string>
     <string name="pref_key_gallery_nativegif">PREF_KEY_GALLERY_NATIVEGIF</string>
     <string name="pref_key_gallery_videoplayer">PREF_KEY_GALLERY_VIDEOPLAYER</string>
+    <string name="pref_key_do_not_download_videos">PREF_KEY_DO_NOT_DOWNLOAD_VIDEOS</string>
     <string name="pref_key_gallery_audioplayer">PREF_KEY_GALLERY_AUDIOPLAYER</string>
     <string name="pref_key_enable_autoupdate">PREF_KEY_ENABLE_AUTOUPDATE</string>
     <string name="pref_key_autoupdate_delay">PREF_KEY_AUTOUPDATE_DELAY</string>

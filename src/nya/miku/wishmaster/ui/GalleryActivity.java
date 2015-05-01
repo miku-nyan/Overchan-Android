@@ -647,7 +647,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         
         @Override
         public void run() {
-            if (tag.attachmentModel.type == AttachmentModel.TYPE_OTHER_NOTFILE) {
+            if (tag.attachmentModel.type == AttachmentModel.TYPE_OTHER_NOTFILE ||
+                    (settings.doNotDownloadVideos() && tag.attachmentModel.type == AttachmentModel.TYPE_VIDEO)) {
                 setExternalLink(tag);
                 return;
             } else if (tag.attachmentModel.path == null || tag.attachmentModel.path.length() == 0) {
@@ -1084,7 +1085,12 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                setOnClickView(tag, getString(R.string.gallery_tap_to_external_link), new View.OnClickListener() {
+                int stringResId = R.string.gallery_tap_to_external_link;
+                try {
+                    if (settings.doNotDownloadVideos() && tag.attachmentModel.type == AttachmentModel.TYPE_VIDEO)
+                        stringResId = R.string.gallery_tap_to_play;
+                } catch (Exception e) {}
+                setOnClickView(tag, getString(stringResId), new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         openBrowser();

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <resources>
-    <string name="app_name">Imageboards</string>
+    <string name="app_name">Overchan</string>
     
     <string name="drawer_open">Open drawer</string>
     <string name="drawer_close">Close drawer</string>
@@ -423,6 +423,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_gallery_nativegif_summary">Use a native library libgif</string>
     <string name="pref_gallery_videoplayer_title">Built-in video player</string>
     <string name="pref_gallery_videoplayer_summary">May not work on older versions of Android</string>
+    <string name="pref_do_not_download_videos_title">Do not download videos</string>
+    <string name="pref_do_not_download_videos_summary">Open video files directly not downloading into cache</string>
     <string name="pref_gallery_audioplayer_title">Built-in audio player</string>
     <string name="pref_gallery_audioplayer_summary">May not work on older versions of Android</string>
     <string name="pref_enable_autoupdate_title">Enable auto-update</string>

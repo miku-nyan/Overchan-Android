@@ -430,6 +430,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_gallery_nativegif_summary">Использовать нативную библиотеку libgif</string>
     <string name="pref_gallery_videoplayer_title">Встроенный видеоплеер</string>
     <string name="pref_gallery_videoplayer_summary">Может не работать на старых версиях Android</string>
+    <string name="pref_do_not_download_videos_title">Не скачивать видеофайлы</string>
+    <string name="pref_do_not_download_videos_summary">Открывать видеофайлы напрямую, не загружая в кэш</string>
     <string name="pref_gallery_audioplayer_title">Встроенный аудиоплеер</string>
     <string name="pref_gallery_audioplayer_summary">Может не работать на старых версиях Android</string>
     <string name="pref_enable_autoupdate_title">Включить автообновление</string>

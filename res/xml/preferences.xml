@@ -118,8 +118,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:defaultValue="true"
                 android:key="@string/pref_key_gallery_videoplayer"
                 android:title="@string/pref_gallery_videoplayer_title"
-                android:summary="@string/pref_gallery_videoplayer_summary" />
-        
+                android:summary="@string/pref_gallery_videoplayer_summary"
+                android:disableDependentsState="true" />
+            
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/pref_key_do_not_download_videos"
+                android:title="@string/pref_do_not_download_videos_title"
+                android:summary="@string/pref_do_not_download_videos_summary"
+                android:dependency="@string/pref_key_gallery_videoplayer" />
+            
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="@string/pref_key_gallery_audioplayer"
