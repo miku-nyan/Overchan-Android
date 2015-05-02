@@ -518,11 +518,9 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
             String lastCategory = "";
             
             LinkedHashMap<String, String> favBoards = new LinkedHashMap<>();
-            for (Database.FavoritesEntry entry : MainApplication.getInstance().database.getFavorites())
-                if (fragment.chan.getChanName().equals(entry.chan) && !Database.isNull(entry.board) && Database.isNull(entry.thread))
-                    favBoards.put(entry.board, "");
+            for (String board : fragment.database.getFavoriteBoards(fragment.chan)) favBoards.put(board, "");
             if (!favBoards.isEmpty()) {
-                lastCategory = resources.getString(R.string.boardslist_empty_list);
+                lastCategory = resources.getString(R.string.boardslist_favorite_boards);
                 add(new BoardsListEntry(lastCategory));
                 for (int i=0; i<fragment.boardsList.length; ++i)
                     if (favBoards.containsKey(fragment.boardsList[i].boardName))

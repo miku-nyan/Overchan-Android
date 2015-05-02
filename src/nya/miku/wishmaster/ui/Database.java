@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import nya.miku.wishmaster.api.ChanModule;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.Logger;
 import android.content.ContentValues;
 import android.content.Context;
@@ -268,6 +270,38 @@ public class Database {
         }
         if (c != null) c.close();
         return list;
+    }
+    
+    public List<String> getFavoriteBoards(ChanModule chan) {
+        List<String> list = new ArrayList<>();
+        Cursor c =
+                dbHelper.getReadableDatabase().query(TABLE_FAVORITES, null, COL_CHAN + " = ? AND " + COL_BOARD + " != ? AND " + COL_THREAD + " = ?",
+                new String[] { fixNull(chan.getChanName()), fixNull(null), fixNull(null) }, null, null, BaseColumns._ID + " desc", "200");
+        if (c != null && c.moveToFirst()) {
+            int boardIndex = c.getColumnIndex(COL_BOARD);
+            int boardpageIndex = c.getColumnIndex(COL_BOARDPAGE);
+            do {
+                String boardName = c.getString(boardIndex);
+                String boardPage = c.getString(boardpageIndex);
+                if (isFirstPage(chan, boardName, boardPage)) list.add(boardName);
+            } while (c.moveToNext());
+        }
+        if (c != null) c.close();
+        return list;
+    }
+    
+    private boolean isFirstPage(ChanModule chan, String boardName, String boardPage) {
+        try {
+            UrlPageModel urlModel = new UrlPageModel();
+            urlModel.chanName = chan.getChanName();
+            urlModel.type = UrlPageModel.TYPE_BOARDPAGE;
+            urlModel.boardName = boardName;
+            urlModel.boardPage = UrlPageModel.DEFAULT_FIRST_PAGE;
+            if (chan.parseUrl(chan.buildUrl(urlModel)).boardPage == Integer.parseInt(boardPage)) return true;
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+        return false;
     }
     
     public boolean isFavorite(String chan, String board, String boardPage, String thread) {
