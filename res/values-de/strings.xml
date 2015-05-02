@@ -120,6 +120,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="boardslist_format">/%1$s - %2$s</string>
     <string name="boardslist_hint">Board code</string>
     <string name="boardslist_btn_go">GO</string>
+    <string name="boardslist_favorite_boards">Favoriten</string>
+    <string name="boardslist_empty_list">Die Liste ist leer</string>
     
     <string name="search_bar_hint">Suche</string>
     <string name="search_bar_in_thread_hint">Suche in Thread</string>

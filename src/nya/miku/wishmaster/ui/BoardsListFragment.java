@@ -18,7 +18,9 @@
 
 package nya.miku.wishmaster.ui;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
@@ -28,6 +30,7 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.SerializableBoardsList;
 import nya.miku.wishmaster.common.CompatibilityImpl;
+import nya.miku.wishmaster.common.CurrentBuild;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
@@ -263,6 +266,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                         database.addFavorite(model.chanName, model.boardName, Integer.toString(model.boardPage), null,
                                 getString(R.string.tabs_title_boardpage_first, model.boardName), url);
                     }
+                    updateListSavePosition();
                     return true;
                 }
             } else if (item.getItemId() == R.id.context_menu_quickaccess_add) {
@@ -372,6 +376,19 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
      */
     public void updateList() {
         update(false);
+    }
+    
+    private void updateListSavePosition() {
+        try {
+            View v = listView.getChildAt(0);
+            int position = listView.getPositionForView(v);
+            BoardsListEntry model = adapter.getItem(position);
+            startItem = model.isSeparator ? model.category : model.model.boardName;
+            startItemTop = v == null ? 0 : v.getTop();
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+        updateList();
     }
     
     private void update(boolean forceUpdate) {
@@ -499,14 +516,39 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
             this.inflater = LayoutInflater.from(fragment.activity);
             this.resources = fragment.resources;
             String lastCategory = "";
-            for (int i=0; i<fragment.boardsList.length; ++i) {
-                if (!fragment.settings.showNSFWBoards() && fragment.boardsList[i].nsfw) continue;
-                String curCategory = fragment.boardsList[i].boardCategory != null ? fragment.boardsList[i].boardCategory : "";
-                if (!curCategory.equals(lastCategory)) {
-                    add(new BoardsListEntry(curCategory));
-                    lastCategory = curCategory;
+            
+            LinkedHashMap<String, String> favBoards = new LinkedHashMap<>();
+            for (Database.FavoritesEntry entry : MainApplication.getInstance().database.getFavorites())
+                if (fragment.chan.getChanName().equals(entry.chan) && !Database.isNull(entry.board) && Database.isNull(entry.thread))
+                    favBoards.put(entry.board, "");
+            if (!favBoards.isEmpty()) {
+                lastCategory = resources.getString(R.string.boardslist_empty_list);
+                add(new BoardsListEntry(lastCategory));
+                for (int i=0; i<fragment.boardsList.length; ++i)
+                    if (favBoards.containsKey(fragment.boardsList[i].boardName))
+                        favBoards.put(fragment.boardsList[i].boardName, fragment.boardsList[i].boardDescription);
+                for (Map.Entry<String, String> entry : favBoards.entrySet()) {
+                    SimpleBoardModel model = new SimpleBoardModel();
+                    model.chan = fragment.chan.getChanName();
+                    model.boardName = entry.getKey();
+                    model.boardDescription = entry.getValue();
+                    model.boardCategory = lastCategory;
+                    add(new BoardsListEntry(model));
                 }
-                add(new BoardsListEntry(fragment.boardsList[i]));
+            } else if (CurrentBuild.SFW_BUILD) {
+                add(new BoardsListEntry(resources.getString(R.string.boardslist_empty_list)));
+            }
+            
+            if (!CurrentBuild.SFW_BUILD) {
+                for (int i=0; i<fragment.boardsList.length; ++i) {
+                    if (!fragment.settings.showNSFWBoards() && fragment.boardsList[i].nsfw) continue;
+                    String curCategory = fragment.boardsList[i].boardCategory != null ? fragment.boardsList[i].boardCategory : "";
+                    if (!curCategory.equals(lastCategory)) {
+                        add(new BoardsListEntry(curCategory));
+                        lastCategory = curCategory;
+                    }
+                    add(new BoardsListEntry(fragment.boardsList[i]));
+                }
             }
         }
         

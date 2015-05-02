@@ -125,6 +125,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="boardslist_format">/%1$s - %2$s</string>
     <string name="boardslist_hint">Код доски</string>
     <string name="boardslist_btn_go">Перейти</string>
+    <string name="boardslist_favorite_boards">Избранные</string>
+    <string name="boardslist_empty_list">Список пуст</string>
     
     <string name="search_bar_hint">Поиск</string>
     <string name="search_bar_in_thread_hint">Поиск по треду</string>
