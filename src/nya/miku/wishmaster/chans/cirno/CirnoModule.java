@@ -118,6 +118,9 @@ public class CirnoModule extends AbstractChanModule {
                 if (responseModel.notModified()) return null;
                 throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
             }
+        } catch (Exception e) {
+            if (responseModel != null) HttpStreamer.getInstance().removeFromModifiedMap(url);
+            throw e;
         } finally {
             IOUtils.closeQuietly(in);
             if (responseModel != null) responseModel.release();

@@ -100,6 +100,8 @@ public class HttpStreamer {
     
     /**
      * HTTP запрос по адресу. После завершения работы с запросом, необходимо выполнить метод release() модели ответа!
+     * Если по данному адресу предполагаются запросы с заголовком If-Modified-Since, в случае ошибки при дальнейшем чтении из потока
+     * необходимо очистить соответствующию запись в таблице времён Modified ({@link #removeFromModifiedMap(String)})!
      * @param url адрес страницы
      * @param requestModel модель запроса (может принимать null, по умолчанию GET без проверки If-Modified)
      * @param httpClient HTTP клиент, исполняющий запрос
@@ -181,13 +183,10 @@ public class HttpStreamer {
             responseModel.statusCode = status.getStatusCode();
             responseModel.statusReason = status.getReasonPhrase();
             //обрабока полученных заголовков (headers)
+            String lastModifiedValue = null;
             if (responseModel.statusCode == 200) {
                 Header header = response.getFirstHeader(HttpHeaders.LAST_MODIFIED);
-                if (header != null) {
-                    synchronized (ifModifiedMap) {
-                        ifModifiedMap.put(request.getURI().toString(), header.getValue());
-                    }
-                }
+                if (header != null) lastModifiedValue = header.getValue();
             }
             Header header = response.getFirstHeader(HttpHeaders.LOCATION);
             if (header != null) responseModel.locationHeader = header.getValue();
@@ -202,6 +201,11 @@ public class HttpStreamer {
             }
             responseModel.request = request;
             responseModel.response = response;
+            if (lastModifiedValue != null) {
+                synchronized (ifModifiedMap) {
+                    ifModifiedMap.put(url, lastModifiedValue);
+                }
+            }
         } catch (Exception e) {
             Logger.e(TAG, e);
             HttpResponseModel.release(request, response);
@@ -255,6 +259,10 @@ public class HttpStreamer {
                 }
                 
             }
+        } catch (Exception e) {
+            if (responseModel != null) removeFromModifiedMap(url);
+            // (responseModel != null) <=> исключение именно во время чтения, а не во время самого запроса (т.е. запись уже устарела в любом случае)
+            throw e;
         } finally {
             if (responseModel != null) responseModel.release();
         }
@@ -348,6 +356,9 @@ public class HttpStreamer {
                 }
                 
             }
+        } catch (Exception e) {
+            if (responseModel != null) removeFromModifiedMap(url);
+            throw e;
         } finally {
             IOUtils.closeQuietly(in);
             if (responseModel != null) responseModel.release();
@@ -390,6 +401,9 @@ public class HttpStreamer {
                     throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode+" - "+responseModel.statusReason);
                 }
             }
+        } catch (Exception e) {
+            if (responseModel != null) removeFromModifiedMap(url);
+            throw e;
         } finally {
             if (responseModel != null) responseModel.release();
         }

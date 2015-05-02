@@ -239,6 +239,9 @@ public class InfinityModule extends AbstractChanModule {
         } catch (HttpWrongStatusCodeException e) {
             checkCloudflareError(e, url);
             throw e;
+        } catch (Exception e) {
+            if (responseModel != null) HttpStreamer.getInstance().removeFromModifiedMap(url);
+            throw e;
         } finally {
             IOUtils.closeQuietly(in);
             if (responseModel != null) responseModel.release();
