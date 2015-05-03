@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="favicon.ico"/>
     <script src="javascripts/jquery-1.11.2.min.js"></script>
-    <script src="javascripts/jquery.language.detection.whash.js"></script>
+    <script src="javascripts/jquery.language.detection.min.js"></script>
     
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -19,12 +19,12 @@
           languages : [
             {
               code : 'en',
-              path : 'en.html',
+              path : 'en.html#Download',
               defaultLanguage : true
             },
             {
               code : 'ru',
-              path : 'ru.html'
+              path : 'ru.html#Download'
             }
           ]
         });
@@ -35,6 +35,7 @@
   
   <body>
     Seems your browser doesn't support Javascript!<br>
+    <a class="language" href="https://github.com/miku-nyan/Overchan-Android/releases" data-language="en">Release Archive on GitHub</a><br>
     <a class="language" href="en.html" data-language="en">English</a><br>
     <a class="language" href="ru.html" data-language="ru">Russian</a>
   </body>

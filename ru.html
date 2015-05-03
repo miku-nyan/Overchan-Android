@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Architects+Daughter">
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    
+    <link rel="stylesheet" href="stylesheets/owl.carousel.css">
+    <link rel="stylesheet" href="stylesheets/owl.theme.default.css">
+    <script src="javascripts/jquery-1.11.2.min.js"></script>
+    <script src="javascripts/owl.carousel.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Overchan by miku-nyan</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Overchan</h1>
+        <h2>Meta Imageboard Client for Android</h2>
+        <a href="https://github.com/miku-nyan/Overchan-Android" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          
+          <p><b>Overchan</b> &#8211; мобильный браузер различных <a href="https://ru.wikipedia.org/wiki/%D0%98%D0%BC%D0%B8%D0%B4%D0%B6%D0%B1%D0%BE%D1%80%D0%B4">имиджбордов</a> для Android.</p>
+          <p>Проект является свободным ПО с открытым исходным кодом (лицензия <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>).</p>
+          
+          <h3><a id="Some-features" class="anchor" href="#Some-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Некоторые возможности</h3>
+          
+          <ul>
+            <li>Отдельные настройки для каждой имиджборды:<br>
+            пароль для удаления постов, HTTPS/SSL, прокси</li>
+            <li>Автоматическое скрытие по регулярным выражениям</li>
+            <li>Автоматическое обновление всех открытых вкладок в фоновом режиме</li>
+            <li>Отправка сообщений в фоновом режиме</li>
+            <li>Сохранение тредов со всеми вложениями в HTML с <a href="http://www.freedollchan.org/scripts">куклоскриптом</a></li>
+            <li>Отображение ответов к постам как в виде отдельных ссылок, так и в виде списка</li>
+            <li>Поддержка планшетного интерфейса</li>
+            <li>Различные темы оформления</li>
+            <li>Поддержка начиная с версии Android 1.6</li>
+          </ul>
+          
+          <p>
+            <a href="https://github.com/miku-nyan/Overchan-Android/releases">Архив версий</a><br>
+            <a href="https://github.com/miku-nyan/Overchan-Android/blob/master/Imageboards.md">Поддерживаемые имиджборды</a><br>
+            <a href="http://iichan.hk/b/res/3507246.html">Официальный тред с обсуждением</a><br>
+            <!-- <a href="yastore://details?id=nya.miku.wishmaster">Яндекс.Store</a> -->
+          </p>
+          
+          
+          <h3><a id="Screenshots" class="anchor" href="#Screenshots" aria-hidden="true"><span class="octicon octicon-link"></span></a>Скриншоты</h3>
+          
+          <div class="owl-carousel">
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/1.png"></div>
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/2.png"></div>
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/3.png"></div>
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/4.png"></div>
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/5.png"></div>
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/6.png"></div>
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/7.png"></div>
+            <div class="item" style="width:255px"><img class="owl-lazy" data-src="screenshots/8.png"></div>
+            <div class="item" style="width:680px"><img class="owl-lazy" data-src="screenshots/9.png"></div>
+          </div>
+          <script>
+            $(document).ready(function() {
+              $('.owl-carousel').owlCarousel({
+                items:4,
+                lazyLoad:true,
+                loop:true,
+                margin:10,
+                autoWidth:true
+              });
+            });
+          </script>
+          
+          <h3><a id="Donate" class="anchor" href="#Donate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Поддержать проект</h3>
+          <p><b>Bitcoin</b><br>
+          <tt>1LaumSD5Y9npHxsq9Cqo3esmWiytqv95QW</tt></p>
+          
+        </section>
+        
+        <aside id="sidebar">
+          <a id="Download" class="anchor" href="#Download" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+          <a id="DownloadButton" href="https://github.com/miku-nyan/Overchan-Android/releases" class="button">
+            <small>Release Archive</small>
+            GitHub
+          </a>
+          <script>
+            $.getJSON('data/version.json', function(data) {
+              var btn = document.getElementById('DownloadButton');
+              btn.href = data.url;
+              btn.innerHTML = '<small>Current Release</small>' + data.description + ' (.apk)';
+            });
+          </script>
+          
+          <p class="repo-owner"><a href="https://github.com/miku-nyan/Overchan-Android"></a> is maintained by <a href="https://github.com/miku-nyan">miku-nyan</a>.</p>
+          
+          <p>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.<br>
+          <a href="http://www.owlcarousel.owlgraphic.com/">Owl Carousel 2</a></p>
+          <p><a class="language" href="ru.html" data-language="ru">RU</a> <a class="language" href="en.html" data-language="en">EN</a></p>
+        </aside>
+      </div>
+    </div>
+    
+  </body>
+</html>
