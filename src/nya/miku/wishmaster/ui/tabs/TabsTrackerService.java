@@ -272,12 +272,7 @@ public class TabsTrackerService extends Service {
                    }
                 }
                 
-                long tBefore = System.currentTimeMillis();
                 LockSupport.parkNanos(1000000000);
-                long slept = System.currentTimeMillis() - tBefore;
-                if (slept < 900) {
-                    try { Thread.sleep(1000 - slept); } catch (Exception e) {}
-                }
             }
         }
         
