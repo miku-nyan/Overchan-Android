@@ -37,6 +37,7 @@ import org.apache.http.message.BasicNameValuePair;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -221,7 +222,12 @@ public class FourchanModule extends AbstractChanModule {
                             } else if (response.contains("Incorrect Token or PIN")) {
                                 showToast("Incorrect Token or PIN");
                             } else {
-                                showToast(resources.getString(R.string.error_unknown));
+                                Matcher m = Pattern.compile("<strong style=\"color: red; font-size: larger;\">(.*?)</strong>").matcher(response);
+                                if (m.find()) {
+                                    showToast(m.group(1));
+                                } else {
+                                    showWebView(response);
+                                }
                             }
                         } catch (Exception e) {
                             showToast(e.getMessage() == null ? resources.getString(R.string.error_unknown) : e.getMessage());
@@ -235,6 +241,19 @@ public class FourchanModule extends AbstractChanModule {
                                 @Override
                                 public void run() {
                                     Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    }
+                    private void showWebView(final String html) {
+                        if (context instanceof Activity) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    WebView webView = new WebView(context);
+                                    webView.getSettings().setSupportZoom(true);
+                                    webView.loadData(html, "text/html", null);
+                                    new AlertDialog.Builder(context).setView(webView).setNeutralButton(android.R.string.ok, null).show();
                                 }
                             });
                         }
