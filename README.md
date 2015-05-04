@@ -2,9 +2,8 @@
 
 Overchan Android (Meta Imageboard Client) is an application for browsing imageboards.
 
-## Download APK
-
-You can download the application [here](https://github.com/miku-nyan/Overchan-Android/releases).
+[Website](http://miku-nyan.github.io/Overchan-Android/)
+[Releases](https://github.com/miku-nyan/Overchan-Android/releases)
 
 ## Building Source Code
 

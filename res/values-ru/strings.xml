@@ -126,7 +126,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="boardslist_hint">Код доски</string>
     <string name="boardslist_btn_go">Перейти</string>
     <string name="boardslist_favorite_boards">Избранные</string>
-    <string name="boardslist_empty_list">Список пуст</string>
+    <string name="boardslist_empty_list">Список избранных досок пуст</string>
     
     <string name="search_bar_hint">Поиск</string>
     <string name="search_bar_in_thread_hint">Поиск по треду</string>
@@ -316,7 +316,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="app_update_checking">Проверка обновлений</string>
     <string name="app_update_update_available">Доступно обновление</string>
-    <string name="app_update_update_dialog_text">Доступна новая версия: %s\n\nОткрыть сайт?</string>
+    <string name="app_update_update_dialog_text">Доступна новая версия:\n%s\n\nОткрыть сайт?</string>
     <string name="app_update_update_not_required">Обновление не требуется</string>
     <string name="app_update_update_error">Не удалось проверить обновления</string>
     
@@ -476,6 +476,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Photon</item>
         <item>Neutron</item>
         <item>Gurochan</item>
+        <item>Tomorrow</item>
+        <item>Mikuba</item>
     </string-array>
     <string name="pref_font_size_title">Размер текста</string>
     <string-array name="pref_font_size_choices">

@@ -135,6 +135,18 @@ public class ApplicationSettings {
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Gurochan_Large;
             else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Gurochan_Huge;
             else return R.style.Gurochan_Small;
+        } else if (theme.equals(resources.getString(R.string.pref_theme_value_tomorrow))) {
+            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Tomorrow_Small;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Tomorrow_Medium;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Tomorrow_Large;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Tomorrow_Huge;
+            else return R.style.Tomorrow_Small;
+        } else if (theme.equals(resources.getString(R.string.pref_theme_value_mikuba))) {
+            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Mikuba_Small;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Mikuba_Medium;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Mikuba_Large;
+            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Mikuba_Huge;
+            else return R.style.Mikuba_Small;
         } else {
             return R.style.Futaba_Small;
         }

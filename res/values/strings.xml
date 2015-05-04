@@ -121,7 +121,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="boardslist_hint">Board code</string>
     <string name="boardslist_btn_go">GO</string>
     <string name="boardslist_favorite_boards">Favorites</string>
-    <string name="boardslist_empty_list">The list is empty</string>
+    <string name="boardslist_empty_list">The list of favorite boards is empty</string>
     
     <string name="search_bar_hint">Search</string>
     <string name="search_bar_in_thread_hint">Search in thread</string>
@@ -309,7 +309,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="app_update_checking">Checking for updates</string>
     <string name="app_update_update_available">Update available</string>
-    <string name="app_update_update_dialog_text">New version is available: %s\n\nDo you want to open the site?</string>
+    <string name="app_update_update_dialog_text">New version is available:\n%s\n\nDo you want to open the site?</string>
     <string name="app_update_update_not_required">No update required</string>
     <string name="app_update_update_error">Cannot check for updates</string>
     
@@ -469,6 +469,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Photon</item>
         <item>Neutron</item>
         <item>Gurochan</item>
+        <item>Tomorrow</item>
+        <item>Mikuba</item>
     </string-array>
     <string name="pref_font_size_title">Text size</string>
     <string-array name="pref_font_size_choices">
