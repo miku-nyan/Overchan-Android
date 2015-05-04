@@ -72,7 +72,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -81,7 +80,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputType;
-import android.widget.Toast;
 
 /**
  * Класс, осуществляющий взаимодействия с АИБ 2ch.hk (движок makaba)
@@ -118,10 +116,6 @@ public class MakabaModule extends AbstractChanModule {
     private Map<String, BoardModel> boardsMap = null;
     /** дополнительная карта досок (для досок, которые отсутствуют в карте из mobile.fcgi) */
     private Map<String, BoardModel> customBoardsMap = new HashMap<String, BoardModel>();
-    
-    //Активация настройки выбора HTTP клиента (okhttp/apache-hc)
-    private Runnable addOkHttpPending = null;
-    private int clickCounter;
     
     public MakabaModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -242,13 +236,6 @@ public class MakabaModule extends AbstractChanModule {
         mobileAPIPref.setSummary(R.string.makaba_prefs_mobile_api_summary);
         mobileAPIPref.setKey(getSharedKey(PREF_KEY_MOBILE_API));
         mobileAPIPref.setDefaultValue(true);
-        mobileAPIPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if (++clickCounter == 10 && addOkHttpPending != null) addOkHttpPending.run();
-                return true;
-            }
-        });
         group.addPreference(mobileAPIPref);
     }
     
@@ -260,38 +247,6 @@ public class MakabaModule extends AbstractChanModule {
         recaptchaPreference.setKey(getSharedKey(PREF_KEY_FORCE_GOOGLE));
         recaptchaPreference.setDefaultValue(false);
         group.addPreference(recaptchaPreference);
-    }
-    
-    /** Добавить категорию настроек пасскода */
-    private void addPasscodePreferences(PreferenceGroup group) {
-        // XXX поддержки пасскодов пока не будет
-        /*final Context context = group.getContext();
-        OnPreferenceClickListener loginPasscodeListener = new OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                AlertDialog a = new AlertDialog(context) {};
-                a.setTitle("Sorry");
-                a.setMessage("This feature is not yet implemented");
-                a.setButton(DialogInterface.BUTTON_NEUTRAL, "OK", (OnClickListener)null);
-                a.show();
-                return false;
-            }            
-        };
-        PreferenceCategory passcodeCat = new PreferenceCategory(context);
-        passcodeCat.setTitle("Настройки пасскода");
-        group.addPreference(passcodeCat);
-        EditTextPreference passcodePref = new EditTextPreference(context); //поле ввода пасскода
-        passcodePref.setTitle("Пасскод");
-        passcodePref.setDialogTitle("Пасскод");
-        passcodePref.setSummary("Код для пропуска капчи");
-        passcodePref.setKey(getSharedKey(PREF_KEY_PASSCODE));
-        passcodePref.getEditText().setSingleLine();
-        passcodePref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        passcodeCat.addPreference(passcodePref);
-        Preference passcodeLogin = new Preference(context); //кнопка авторизации
-        passcodeLogin.setTitle("Авторизовать пасскод");
-        passcodeLogin.setOnPreferenceClickListener(loginPasscodeListener);
-        passcodeCat.addPreference(passcodeLogin);*/
     }
     
     /** Добавить категорию настроек домена (в т.ч. https) */
@@ -337,22 +292,8 @@ public class MakabaModule extends AbstractChanModule {
     public void addPreferencesOnScreen(final PreferenceGroup preferenceScreen) {
         addMobileAPIPreference(preferenceScreen);
         addRecaptchaPreference(preferenceScreen);
-        addPasscodePreferences(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
-        if (preferences.getBoolean(getSharedKey(PREF_KEY_OKHTTP), false)) {
-            addOkHttpPreference(preferenceScreen);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD){
-            clickCounter = 0;
-            addOkHttpPending = new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(preferenceScreen.getContext(), R.string.pref_okhttp_unlocked, Toast.LENGTH_LONG).show();
-                    addOkHttpPreference(preferenceScreen);
-                    addOkHttpPending = null;
-                }
-            };
-        }
     }
     
     @Override

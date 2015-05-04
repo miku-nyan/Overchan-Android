@@ -68,7 +68,6 @@ public abstract class AbstractChanModule implements ChanModule {
     protected static final String PREF_KEY_USE_PROXY = "PREF_KEY_USE_PROXY";
     protected static final String PREF_KEY_PROXY_HOST = "PREF_KEY_PROXY_HOST";
     protected static final String PREF_KEY_PROXY_PORT = "PREF_KEY_PROXY_PORT";
-    protected static final String PREF_KEY_OKHTTP = "PREF_KEY_OKHTTP";
     protected static final String PREF_KEY_PASSWORD = "PREF_KEY_PASSWORD";
     
     /**
@@ -94,7 +93,6 @@ public abstract class AbstractChanModule implements ChanModule {
     private OnPreferenceChangeListener updateHttpListener = new OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            boolean okHttp = preferences.getBoolean(getSharedKey(PREF_KEY_OKHTTP), false);
             boolean unsafeSsl = preferences.getBoolean(getSharedKey(PREF_KEY_UNSAFE_SSL), false);
             boolean useProxy = preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false);
             String proxyHost = preferences.getString(getSharedKey(PREF_KEY_PROXY_HOST), DEFAULT_PROXY_HOST);
@@ -102,27 +100,23 @@ public abstract class AbstractChanModule implements ChanModule {
             
             if (preference.getKey().equals(getSharedKey(PREF_KEY_UNSAFE_SSL))) {
                 unsafeSsl = (boolean)newValue;
-                updateHttpClient(okHttp, unsafeSsl, useProxy, proxyHost, proxyPort);
+                updateHttpClient(unsafeSsl, useProxy, proxyHost, proxyPort);
                 return true;
             } else if (preference.getKey().equals(getSharedKey(PREF_KEY_USE_PROXY))) {
                 useProxy = (boolean)newValue;
-                updateHttpClient(okHttp, unsafeSsl, useProxy, proxyHost, proxyPort);
+                updateHttpClient(unsafeSsl, useProxy, proxyHost, proxyPort);
                 return true;
             } else if (preference.getKey().equals(getSharedKey(PREF_KEY_PROXY_HOST))) {
                 if (!proxyHost.equals((String)newValue)) {
                     proxyHost = (String)newValue;
-                    updateHttpClient(okHttp, unsafeSsl, useProxy, proxyHost, proxyPort);
+                    updateHttpClient(unsafeSsl, useProxy, proxyHost, proxyPort);
                 }
                 return true;
             } else if (preference.getKey().equals(getSharedKey(PREF_KEY_PROXY_PORT))) {
                 if (!proxyPort.equals((String)newValue)) {
                     proxyPort = (String)newValue;
-                    updateHttpClient(okHttp, unsafeSsl, useProxy, proxyHost, proxyPort);
+                    updateHttpClient(unsafeSsl, useProxy, proxyHost, proxyPort);
                 }
-                return true;
-            } else if (preference.getKey().equals(getSharedKey(PREF_KEY_OKHTTP))) {
-                okHttp = (boolean)newValue;
-                updateHttpClient(okHttp, unsafeSsl, useProxy, proxyHost, proxyPort);
                 return true;
             }
             
@@ -137,7 +131,6 @@ public abstract class AbstractChanModule implements ChanModule {
         this.preferences = preferences;
         this.resources = resources;
         updateHttpClient(
-                preferences.getBoolean(getSharedKey(PREF_KEY_OKHTTP), false),
                 preferences.getBoolean(getSharedKey(PREF_KEY_UNSAFE_SSL), false),
                 preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false),
                 preferences.getString(getSharedKey(PREF_KEY_PROXY_HOST), DEFAULT_PROXY_HOST),
@@ -155,13 +148,12 @@ public abstract class AbstractChanModule implements ChanModule {
     
     /**
      * Обновить (создать новый) HTTP-клиент
-     * @param okHttp если true, использовать клиент OkHttp вместо apache-hc
      * @param unsafeSsl если true, будут игнорироваться ошибки SSL (небезопасное подключение)
      * @param useProxy использовать прокси
      * @param proxyHost адрес прокси-сервера, если useProxy true
      * @param proxyPort порт прокси-сервера, если useProxy true
      */
-    private void updateHttpClient(boolean okHttp, boolean unsafeSsl, boolean useProxy, String proxyHost, String proxyPort) {
+    private void updateHttpClient(boolean unsafeSsl, boolean useProxy, String proxyHost, String proxyPort) {
         HttpHost proxy = null;
         if (useProxy) {
             try {
@@ -178,7 +170,7 @@ public abstract class AbstractChanModule implements ChanModule {
                 Logger.e(TAG, e);
             }
         }
-        httpClient = new ExtendedHttpClient(okHttp, !unsafeSsl, proxy);
+        httpClient = new ExtendedHttpClient(!unsafeSsl, proxy);
         initHttpClient();
     }
     
@@ -243,24 +235,6 @@ public abstract class AbstractChanModule implements ChanModule {
         proxyHostPort.setOnPreferenceChangeListener(updateHttpListener);
         proxyCat.addPreference(proxyHostPort);
         proxyHostPort.setDependency(getSharedKey(PREF_KEY_USE_PROXY));
-    }
-    
-    /**
-     * Добавить в группу параметров (на экран/в категорию) категорию расширенных настроек соединения (опция выбора OkHttp)
-     * @param group группа, на которую добавляются параметры
-     */
-    protected void addOkHttpPreference(PreferenceGroup group) {
-        final Context context = group.getContext();
-        PreferenceCategory extendedCat = new PreferenceCategory(context);
-        extendedCat.setTitle(R.string.pref_cat_connection_extended);
-        group.addPreference(extendedCat);
-        CheckBoxPreference okHttp = new CheckBoxPreference(context); //чекбокс "использовать okhttp"
-        okHttp.setTitle(R.string.pref_okhttp);
-        okHttp.setSummary(R.string.pref_okhttp_summary);
-        okHttp.setKey(getSharedKey(PREF_KEY_OKHTTP));
-        okHttp.setDefaultValue(false);
-        okHttp.setOnPreferenceChangeListener(updateHttpListener);
-        extendedCat.addPreference(okHttp);
     }
     
     /**

@@ -77,19 +77,14 @@ public class ExtendedHttpClient extends HttpClientWrapper {
     
     /**
      * Конструктор
-     * @param okHttp использовать клиент OkHttp вместо apache-hc
      * @param safe включить проверку сертификата и имени хоста для SSL
      * @param proxy адрес HTTP прокси (возможно null)
      */
-    public ExtendedHttpClient(boolean okHttp, boolean safe, HttpHost proxy) {
+    public ExtendedHttpClient(boolean safe, HttpHost proxy) {
         super();
         this.cookieStore = new BasicCookieStoreHC4();
         this.proxy = proxy;
-        if (okHttp) {
-            setClient(new OkWrapper(safe, proxy, cookieStore));
-        } else {
-            setClient(build(safe, proxy, cookieStore));
-        }
+        setClient(build(safe, proxy, cookieStore));
     }
     
     /**
