@@ -118,6 +118,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             case R.id.postform_send_button:
                 send();
                 break;
+            //TODO выделить операции с разметкой в отдельный класс
             case R.id.postform_mark_bold:
             case R.id.postform_mark_italic:
             case R.id.postform_mark_strike:
@@ -129,44 +130,56 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 int selectionEnd = Math.min(text.length(), commentField.getSelectionEnd());
                 text = text.substring(selectionStart, selectionEnd);
                 
-                if (boardModel.markType == BoardModel.MARK_WAKABAMARK) {
-                    switch (v.getId()) {
-                        case R.id.postform_mark_bold:
-                            comment.replace(selectionStart, selectionEnd, "**" + text.replace("\n", "**\n**") + "**");
-                            break;
-                        case R.id.postform_mark_italic:
-                            comment.replace(selectionStart, selectionEnd, "*" + text.replace("\n", "*\n*") + "*");
-                            break;
-                        case R.id.postform_mark_strike:
-                            StringBuilder strike = new StringBuilder();
-                            for (int i=0, len=selectionEnd-selectionStart; i<len; ++i) strike.append("^H");
-                            comment.replace(selectionStart, selectionEnd, text + strike.toString());
-                            break;
-                        case R.id.postform_mark_spoiler:
-                            comment.replace(selectionStart, selectionEnd, "%%" + text.replace("\n", "%%\n%%") + "%%");
-                            break;
-                        case R.id.postform_mark_quote:
-                            comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
-                            break;
+                try {
+                    if (boardModel.markType == BoardModel.MARK_WAKABAMARK) {
+                        switch (v.getId()) {
+                            case R.id.postform_mark_bold:
+                                comment.replace(selectionStart, selectionEnd, "**" + text.replace("\n", "**\n**") + "**");
+                                commentField.setSelection(selectionStart + 2);
+                                break;
+                            case R.id.postform_mark_italic:
+                                comment.replace(selectionStart, selectionEnd, "*" + text.replace("\n", "*\n*") + "*");
+                                commentField.setSelection(selectionStart + 1);
+                                break;
+                            case R.id.postform_mark_strike:
+                                StringBuilder strike = new StringBuilder();
+                                for (int i=0, len=selectionEnd-selectionStart; i<len; ++i) strike.append("^H");
+                                comment.replace(selectionStart, selectionEnd, text + strike.toString());
+                                commentField.setSelection(selectionStart);
+                                break;
+                            case R.id.postform_mark_spoiler:
+                                comment.replace(selectionStart, selectionEnd, "%%" + text.replace("\n", "%%\n%%") + "%%");
+                                commentField.setSelection(selectionStart + 2);
+                                break;
+                            case R.id.postform_mark_quote:
+                                comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
+                                break;
+                        }
+                    } else if (boardModel.markType == BoardModel.MARK_BBCODE) {
+                        switch (v.getId()) {
+                            case R.id.postform_mark_bold:
+                                comment.replace(selectionStart, selectionEnd, "[b]" + text + "[/b]");
+                                commentField.setSelection(selectionStart + 3);
+                                break;
+                            case R.id.postform_mark_italic:
+                                comment.replace(selectionStart, selectionEnd, "[i]" + text + "[/i]");
+                                commentField.setSelection(selectionStart + 3);
+                                break;
+                            case R.id.postform_mark_strike:
+                                comment.replace(selectionStart, selectionEnd, "[s]" + text + "[/s]");
+                                commentField.setSelection(selectionStart + 3);
+                                break;
+                            case R.id.postform_mark_spoiler:
+                                comment.replace(selectionStart, selectionEnd, "[spoiler]" + text + "[/spoiler]");
+                                commentField.setSelection(selectionStart + 9);
+                                break;
+                            case R.id.postform_mark_quote:
+                                comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
+                                break;
+                        }
                     }
-                } else if (boardModel.markType == BoardModel.MARK_BBCODE) {
-                    switch (v.getId()) {
-                        case R.id.postform_mark_bold:
-                            comment.replace(selectionStart, selectionEnd, "[b]" + text + "[/b]");
-                            break;
-                        case R.id.postform_mark_italic:
-                            comment.replace(selectionStart, selectionEnd, "[i]" + text + "[/i]");
-                            break;
-                        case R.id.postform_mark_strike:
-                            comment.replace(selectionStart, selectionEnd, "[s]" + text + "[/s]");
-                            break;
-                        case R.id.postform_mark_spoiler:
-                            comment.replace(selectionStart, selectionEnd, "[spoiler]" + text + "[/spoiler]");
-                            break;
-                        case R.id.postform_mark_quote:
-                            comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
-                            break;
-                    }
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
                 }
                 break;
         }
