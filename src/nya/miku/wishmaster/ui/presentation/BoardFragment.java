@@ -320,6 +320,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             return new View(activity);
         }
         rootView = inflater.inflate(R.layout.board_fragment, container, false);
+        /*{
+            ImageView mikuView = new ImageView(activity);
+            mikuView.setImageResource(R.drawable.miku);
+            ((FrameLayout) rootView.findViewById(R.id.board_main_frame)).addView(mikuView, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        }*/
         loadingView = rootView.findViewById(R.id.board_loading);
         errorView = rootView.findViewById(R.id.board_error);
         errorTextView = (TextView)errorView.findViewById(R.id.frame_error_text);
@@ -1123,6 +1129,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                         notification = resources.getQuantityString(
                                                 R.plurals.postslist_new_posts_quantity, newPostsCount, newPostsCount);
                                         toastToNewPosts = true;
+                                        if (silent && activity.isPaused()) TabsTrackerService.unread = true;
                                     }
                                 } else {
                                     notification = resources.getString(R.string.postslist_list_updated);

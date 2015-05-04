@@ -34,7 +34,7 @@ import android.widget.Toast;
 
 public class AppUpdatesChecker {
     private static final String URL = "http://miku-nyan.github.io/Overchan-Android/data/version.json";
-    private static final String SITE_URL = "http://miku-nyan.github.io/Overchan-Android/#Download";
+    private static final String SITE_URL = "http://miku-nyan.github.io/Overchan-Android/dl.html";
     
     public static void checkForUpdates(final Activity activity) {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();

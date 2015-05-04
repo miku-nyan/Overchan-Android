@@ -18,6 +18,8 @@
 
 package nya.miku.wishmaster.ui.tabs;
 
+import java.util.concurrent.locks.LockSupport;
+
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -270,9 +272,12 @@ public class TabsTrackerService extends Service {
                    }
                 }
                 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {}
+                long tBefore = System.currentTimeMillis();
+                LockSupport.parkNanos(1000000000);
+                long slept = System.currentTimeMillis() - tBefore;
+                if (slept < 900) {
+                    try { Thread.sleep(1000 - slept); } catch (Exception e) {}
+                }
             }
         }
         
