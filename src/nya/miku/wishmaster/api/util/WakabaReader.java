@@ -62,7 +62,7 @@ public class WakabaReader implements Closeable {
     private static final Pattern ATTACHMENT_SIZE_PATTERN =
             Pattern.compile("([,\\.\\d]+) ?([кkмm])?i?[бb]", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern ATTACHMENT_PX_SIZE_PATTERN = Pattern.compile("(\\d+)[x×х](\\d+)"); // \u0078 \u00D7 \u0445
-    private static final Pattern ATTACHMENT_ORIGINAL_NAME_PATTERN = Pattern.compile(",?([^<\\)]*)");
+    private static final Pattern ATTACHMENT_ORIGINAL_NAME_PATTERN = Pattern.compile("\\s*,?([^<\\)]*)");
     
     private static final char[] DATA_START = "<form id=\"delform\"".toCharArray();
     
@@ -287,13 +287,7 @@ public class WakabaReader implements Closeable {
             case FILTER_ENDDATE:
                 if (dateBuffer.length() > FILTERS_OPEN[FILTER_ENDDATE].length) {
                     String date = dateBuffer.substring(0, dateBuffer.length() - FILTERS_OPEN[FILTER_ENDDATE].length).trim();
-                    if (date.length() > 0) {
-                        try {
-                            currentPost.timestamp = dateFormat.parse(date).getTime();
-                        } catch (Exception e) {
-                            Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
-                        }
-                    }
+                    parseDate(date);
                 }
                 inDate = false;
                 dateBuffer.setLength(0);
@@ -492,6 +486,25 @@ public class WakabaReader implements Closeable {
             currentPost.name = StringEscapeUtils.unescapeHtml4(raw).trim();
         }
         if (currentPost.name.startsWith("<")) currentPost.name = currentPost.name.replaceAll("<[^>]*>", "");
+    }
+    
+    /**
+     * Метод для парсинга даты, принимает строку - то (в стандартной вакабе), что идёт после тэгов
+     * &lt;span class="postername"&gt;, &lt;span class="commentpostername"&gt; или &lt;span class="postertrip"&gt;
+     * и до закрывающегося тэга &lt;/label&gt;.<br>
+     * Сохраняется в {@link #currentPost}, поле {@link PostModel#timestamp}.<br>
+     * Эта реализация пытается распарсить дату имеющимся объектом {@link DateFormat}
+     * (переданным конструктору класса или по умолчанию, если был передан null), в случае исключения выводится сообщение в лог.
+     * @param date строка с датой
+     */
+    protected void parseDate(String date) {
+        if (date.length() > 0) {
+            try {
+                currentPost.timestamp = dateFormat.parse(date).getTime();
+            } catch (Exception e) {
+                Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
+            }
+        }
     }
     
     /**

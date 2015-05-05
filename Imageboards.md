@@ -9,4 +9,6 @@
 * [nowere.net](http://nowere.net/)
 * [410chan.org](http://410chan.org/)
 * [Inach.org](http://inach.org/)
+* [Owlchan.ru](http://owlchan.ru/)
+* [chuck.dfwk.ru](http://chuck.dfwk.ru/)
 * [2ch.hk](https://2ch.hk/)
