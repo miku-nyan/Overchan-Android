@@ -107,6 +107,13 @@ public class CompatibilityImpl {
         }
     }
     
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void setActionBarNoBackground(Activity activity) {
+        try {
+            activity.getActionBar().setBackgroundDrawable(null);
+        } catch (Exception e) {}
+    }
+    
     @TargetApi(Build.VERSION_CODES.FROYO)
     public static File getExternalCacheDir(ContextWrapper context) {
         return context.getExternalCacheDir();

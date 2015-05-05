@@ -295,7 +295,7 @@ public class PresentationModel {
                     source.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE)) {
                 for (AutohideActivity.CompiledAutohideRule rule : autohideRules) {
                     if (
-                            (rule.inComment && posts[i].comment != null && rule.pattern.matcher(posts[i].comment).find()) ||
+                            (rule.inComment && model.spannedComment != null && rule.pattern.matcher(model.spannedComment).find()) ||
                             (rule.inSubject && posts[i].subject != null && rule.pattern.matcher(posts[i].subject).find()) ||
                             (rule.inName &&
                                     (posts[i].name != null && rule.pattern.matcher(posts[i].name).find()) ||

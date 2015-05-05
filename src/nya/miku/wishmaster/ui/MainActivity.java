@@ -287,6 +287,11 @@ public class MainActivity extends FragmentActivity {
         openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         setTheme(settings.theme);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP &&
+                MainApplication.getInstance().preferences.getString(
+                        getString(R.string.pref_key_theme), getString(R.string.pref_theme_value_default)).
+                                equals(getString(R.string.pref_theme_value_tomorrow)))
+                                        CompatibilityImpl.setActionBarNoBackground(this);
         super.onCreate(savedInstanceState);
         if (MainApplication.getInstance().settings.showSidePanel()) {
             setContentView(R.layout.main_activity_tablet);
