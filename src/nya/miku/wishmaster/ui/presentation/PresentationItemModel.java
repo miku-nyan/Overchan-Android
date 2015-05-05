@@ -145,7 +145,7 @@ public class PresentationItemModel {
         this.floatingModels = floatingModels;
         
         this.spannedComment = HtmlParser.createSpanned(source.subject, source.comment, spanClickListener, imageGetter, themeColors, openSpoilers);
-        this.dateString = dateFormat.format(source.timestamp);
+        this.dateString = source.timestamp != 0 ? dateFormat.format(source.timestamp) : "";
         parseReferences();
         parseBadge();
         computeThumbnailsHash();
