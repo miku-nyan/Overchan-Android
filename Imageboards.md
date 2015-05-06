@@ -6,6 +6,7 @@
 * [iichan.hk](http://iichan.hk/)
 * [hatsune.ru](http://hatsune.ru/)
 * [Dobrochan](http://dobrochan.com)
+* [2-chru.net](https://2-chru.net/)
 * [nowere.net](http://nowere.net/)
 * [410chan.org](http://410chan.org/)
 * [Inach.org](http://inach.org/)
