@@ -57,12 +57,12 @@ import android.preference.PreferenceGroup;
 
 public abstract class AbstractWakabaModule extends AbstractChanModule {
     
-    private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
+    protected static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
+    protected static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
     
-    private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
-    private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
+    protected static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
+    protected static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
+    protected static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
     
     private Map<String, SimpleBoardModel> boardsMap = null;
     
