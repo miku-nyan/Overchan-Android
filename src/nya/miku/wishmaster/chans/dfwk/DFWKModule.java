@@ -175,7 +175,6 @@ public class DFWKModule extends AbstractWakabaModule {
             }
             @Override
             protected void postprocessPost(PostModel post) {
-                System.out.println("["+post.comment+"]");
                 Matcher embedMatcher = EMBED_PATTERN.matcher(post.comment);
                 if (embedMatcher.find()) {
                     AttachmentModel embedAttachment = new AttachmentModel();

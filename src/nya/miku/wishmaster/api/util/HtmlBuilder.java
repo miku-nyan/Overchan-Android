@@ -127,7 +127,7 @@ public class HtmlBuilder implements Closeable {
     private static final String HTML_FOOTER =
                             "</form>" +
                             "<p class=\"footer\"> - " +
-                                "<a href=\"https://github.com/miku-nyan/Overchan-Android\">overchan-android</a> + " +
+                                "<a href=\"http://miku-nyan.github.io/Overchan-Android/\">overchan-android</a> + " +
                                 "<a href=\"http://wakaba.c3.cx/\">wakaba 3.0.9</a> + " +
                                 "<a href=\"http://www.2chan.net/\">futaba</a> + " +
                                 "<a href=\"http://www.1chan.net/futallaby/\">futallaby</a> -</p>" +

@@ -108,7 +108,7 @@ public class HttpRequestModel {
         
         /**
          * Отключить любой редирект: страница по редиректу не будет загружаться автоматически.
-         * (адрес редиректа можно будет посмотреть в locationHeader)
+         * (адрес редиректа можно будет посмотреть в locationHeader)<br>
          * По умолчанию false
          */
         public Builder setNoRedirect(boolean noRedirect) {
@@ -118,7 +118,7 @@ public class HttpRequestModel {
         
         /** 
          * checkIfModified - не загружать контент, если данные не изменились с момента прошлого запроса.
-         * Только для метода GET.
+         * Только для метода GET.<br>
          * По умолчанию false
          */
         public Builder setCheckIfModified(boolean checkIfModified) {

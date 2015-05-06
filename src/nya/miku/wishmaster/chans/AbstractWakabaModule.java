@@ -97,6 +97,10 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
         return false;
     }
     
+    protected boolean wakabaNoRedirect() {
+        return false;
+    }
+    
     @Override
     protected void initHttpClient() {
         if (canCloudflare()) {
@@ -129,7 +133,7 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
             throws Exception {
         HttpResponseModel responseModel = null;
         WakabaReader in = null;
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkModified).build();
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkModified).setNoRedirect(wakabaNoRedirect()).build();
         try {
             responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
             if (responseModel.statusCode == 200) {
@@ -187,13 +191,15 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
         return getBoardsList();
     }
     
-    protected abstract SimpleBoardModel[] getBoardsList();
+    protected SimpleBoardModel[] getBoardsList() {
+        return new SimpleBoardModel[0];
+    }
     
     
-    protected Map<String, SimpleBoardModel> getBoardsMap() {
+    protected Map<String, SimpleBoardModel> getBoardsMap(ProgressListener listener, CancellableTask task) throws Exception {
         if (boardsMap == null) {
             Map<String, SimpleBoardModel> map = new HashMap<>();
-            for (SimpleBoardModel board : getBoardsList()) map.put(board.boardName, board);
+            for (SimpleBoardModel board : getBoardsList(listener, task, null)) map.put(board.boardName, board);
             boardsMap = map;
         }
         return boardsMap;
@@ -201,7 +207,7 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
     
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
-        Map<String, SimpleBoardModel> map = getBoardsMap();
+        Map<String, SimpleBoardModel> map = getBoardsMap(listener, task);
         SimpleBoardModel simpleModel = map.get(shortName);
         BoardModel model = new BoardModel();
         model.chan = getChanName();

@@ -18,6 +18,7 @@
 
 package nya.miku.wishmaster.chans.fourchan;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -504,7 +505,6 @@ public class FourchanModule extends AbstractChanModule {
                         }
                         @Override
                         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                            System.out.println(url);
                             if (url.contains(INTERCEPT)) {
                                 String hash = url.substring(url.indexOf(INTERCEPT) + INTERCEPT.length());
                                 ((FourchanModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).recaptcha2 = hash;
@@ -672,6 +672,9 @@ public class FourchanModule extends AbstractChanModule {
             if (search != null) {
                 model.type = UrlPageModel.TYPE_SEARCHPAGE;
                 model.searchRequest = search;
+                try {
+                    model.searchRequest = URLDecoder.decode(model.searchRequest, "UTF-8");
+                } catch (Exception e) {}
             } else {
                 model.type = UrlPageModel.TYPE_CATALOGPAGE;
                 model.catalogType = 0;

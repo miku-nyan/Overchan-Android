@@ -399,7 +399,7 @@ public class WakabaReader implements Closeable {
                 attachment.type = AttachmentModel.TYPE_IMAGE_STATIC;
             else if (pathLower.endsWith(".gif"))
                 attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
-            else if (pathLower.endsWith(".webm"))
+            else if (pathLower.endsWith(".webm") || pathLower.endsWith(".mp4") || pathLower.endsWith(".ogv"))
                 attachment.type = AttachmentModel.TYPE_VIDEO;
             else if (pathLower.endsWith(".mp3") || pathLower.endsWith(".ogg"))
                 attachment.type = AttachmentModel.TYPE_AUDIO;

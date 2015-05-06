@@ -46,6 +46,7 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
@@ -55,9 +56,10 @@ import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 
 @SuppressWarnings("deprecation") //https://issues.apache.org/jira/browse/HTTPCLIENT-1632
-public class OwlchanModule extends AbstractWakabaModule { //TODO detect HTTP 404
+public class OwlchanModule extends AbstractWakabaModule {
     
     private static final String CHAN_NAME = "owlchan.ru";
     private static final String DOMAIN = "owlchan.ru";
@@ -115,6 +117,22 @@ public class OwlchanModule extends AbstractWakabaModule { //TODO detect HTTP 404
     @Override
     protected boolean useHttpsDefaultValue() {
         return false;
+    }
+    
+    @Override
+    protected boolean wakabaNoRedirect() {
+        return true;
+    }
+    
+    @Override
+    protected ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkModified, UrlPageModel urlModel)
+            throws Exception {
+        try {
+            return super.readWakabaPage(url, listener, task, checkModified, urlModel);
+        } catch (HttpWrongStatusCodeException e) {
+            if (e.getStatusCode() == 302) throw new HttpWrongStatusCodeException(404, "404 - Not found");
+            throw e;
+        }
     }
     
     @Override

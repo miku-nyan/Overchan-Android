@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
@@ -49,12 +50,14 @@ public class DvachReader extends WakabaReader {
         DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy HH:mm:ss", dvachSymbols);
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
     }
+    private static final char[] TRIP_FILTER = "<span class=\"postertrip \">".toCharArray();
     private static final char[] TINATRIP_FILTER = "<span class=\"postertrip vip\">".toCharArray();
     private static final char[] NUM_FILTER = "<a id=\"".toCharArray();
     private static final char[] LABELOPEN_FILTER = "<label>".toCharArray();
     private static final char[] LABELCLOSE_FILTER = "</label>".toCharArray();
     private static final char[] COUNTRYBALL_FILTER = "<div class=\"countryball\"".toCharArray();
     private int curTripPos = 0;
+    private int curTinaTripPos = 0;
     private int curNumPos = 0;
     private int curLabelOpenPos = 0;
     private int curLabelClosePos = 0;
@@ -70,14 +73,25 @@ public class DvachReader extends WakabaReader {
     protected void customFilters(int ch) throws IOException {
         if (inDate) dateBuf.append((char) ch);
         
-        if (ch == TINATRIP_FILTER[curTripPos]) {
+        if (ch == TRIP_FILTER[curTripPos]) {
             ++curTripPos;
-            if (curTripPos == TINATRIP_FILTER.length) {
+            if (curTripPos == TRIP_FILTER.length) {
                 currentPost.trip = StringEscapeUtils.unescapeHtml4(readUntilSequence("</span>".toCharArray()).replaceAll("<[^>]*>", "")).trim();
                 curTripPos = 0;
             }
         } else {
-            if (curTripPos != 0) curTripPos = ch == TINATRIP_FILTER[0] ? 1 : 0;
+            if (curTripPos != 0) curTripPos = ch == TRIP_FILTER[0] ? 1 : 0;
+        }
+        
+        if (ch == TINATRIP_FILTER[curTinaTripPos]) {
+            ++curTinaTripPos;
+            if (curTinaTripPos == TINATRIP_FILTER.length) {
+                currentPost.trip =
+                        StringEscapeUtils.unescapeHtml4(readUntilSequence("</span>".toCharArray()).replaceAll("<[^>]*>", "")).trim() + '\u2655';
+                curTinaTripPos = 0;
+            }
+        } else {
+            if (curTinaTripPos != 0) curTinaTripPos = ch == TINATRIP_FILTER[0] ? 1 : 0;
         }
         
         if (ch == NUM_FILTER[curNumPos]) {
@@ -150,6 +164,14 @@ public class DvachReader extends WakabaReader {
     @Override
     protected void postprocessPost(PostModel post) {
         post.comment = post.comment.replaceAll("<span class=\"red italic\">(.*?)</span>", "<font color=\"red\"><em>$1</em></font>");
+        if (post.attachments != null)
+            for (AttachmentModel attachment : post.attachments)
+                attachment.originalName = null;
+    }
+    
+    @Override
+    protected void parseAttachment(String html) {
+        super.parseAttachment(html.replace("kbps", ""));
     }
     
     @Override
