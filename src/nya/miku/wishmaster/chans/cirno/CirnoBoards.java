@@ -78,7 +78,7 @@ public class CirnoBoards {
         addBoard("vn", "Визуальные новеллы", "Японская культура", "Сэйбер", false);
         addBoard("vo", "Vocaloid", "Японская культура", "", false); //hatsune
         addBoard("gnx", "Gainax", "Японская культура", "Ноно", false);
-        //addBoard("abe", "ёситоси абэ", "Японская культура", "Chada", false); boards.haruhiism.net
+        addBoard("abe", "ёситоси абэ", "Японская культура", "Chada", false);
         addBoard("c", "Косплей", "Японская культура", "Аноним", false);
         addBoard("ls", "Lucky☆Star", "Японская культура", "Цукаса", false);
         addBoard("ma", "Манга", "Японская культура", "Иноуэ Орихимэ", false);
@@ -128,7 +128,7 @@ public class CirnoBoards {
         model.defaultUserName = defaultPosterName;
         model.bumpLimit = 500;
         
-        model.readonlyBoard = name.equals("o") || name.equals("w");
+        model.readonlyBoard = name.equals("o") || name.equals("w") || name.equals("abe");
         model.requiredFileForNewThread = !name.equals("d");
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;

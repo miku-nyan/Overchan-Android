@@ -42,8 +42,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -78,10 +80,11 @@ public class DvachModule extends AbstractWakabaModule {
     static final String CHAN_NAME = "2-chru.net";
     private static final String DEFAULT_DOMAIN = "2-chru.net";
     private static final String ONION_DOMAIN = "dmirrgetyojz735v.onion";
-    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "2chru.net" };
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "mirror.2-chru.net", "bypass.2-chru.net", "2chru.net" };
     private static final String[] FORMATS = new String[] { "jpg", "jpeg", "png", "gif", "webm", "mp4", "ogv", "mp3", "ogg" };
     
     private static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
+    private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2>(.*?)</h2>", Pattern.DOTALL);
     private static final Pattern REDIRECT_PATTERN = Pattern.compile("url=res/\\d+\\.html");
@@ -110,12 +113,19 @@ public class DvachModule extends AbstractWakabaModule {
     
     @Override
     protected String getUsingDomain() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) ? ONION_DOMAIN : DEFAULT_DOMAIN;
+        if (preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false)) return ONION_DOMAIN;
+        String domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN);
+        return TextUtils.isEmpty(domain) ? DEFAULT_DOMAIN : domain;
     }
     
     @Override
     protected String[] getAllDomains() {
-        return DOMAINS;
+        String domain = getUsingDomain();
+        for (String d : DOMAINS) if (domain.equals(d)) return DOMAINS;
+        String[] domains = new String[DOMAINS.length + 1];
+        for (int i=0; i<DOMAINS.length; ++i) domains[i] = DOMAINS[i];
+        domains[DOMAINS.length] = domain;
+        return domains;
     }
     
     @Override
@@ -138,7 +148,18 @@ public class DvachModule extends AbstractWakabaModule {
         onionPref.setSummary(R.string.pref_use_onion_summary);
         onionPref.setKey(getSharedKey(PREF_KEY_USE_ONION));
         onionPref.setDefaultValue(false);
+        onionPref.setDisableDependentsState(true);
         preferenceGroup.addPreference(onionPref);
+        EditTextPreference domainPref = new EditTextPreference(context);
+        domainPref.setTitle(R.string.dvach_prefs_domain);
+        domainPref.setDialogTitle(R.string.dvach_prefs_domain);
+        domainPref.setSummary(R.string.dvach_prefs_domain_summary);
+        domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
+        domainPref.getEditText().setHint(DEFAULT_DOMAIN);
+        domainPref.getEditText().setSingleLine();
+        domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        preferenceGroup.addPreference(domainPref);
+        domainPref.setDependency(getSharedKey(PREF_KEY_USE_ONION));
         addProxyPreferences(preferenceGroup);
     }
     
@@ -213,7 +234,7 @@ public class DvachModule extends AbstractWakabaModule {
                 e instanceof HttpRequestException &&
                 ((HttpRequestException) e).isSslException() &&
                 preferences.getBoolean(getSharedKey(PREF_KEY_UNSAFE_SSL), false))
-            return new Exception("SSL Internal Error\nUse proxy/tor");
+            return new Exception("SSL Internal Error\nTry to use Tor/.onion domain");
         return e;
     }
     
@@ -284,7 +305,7 @@ public class DvachModule extends AbstractWakabaModule {
         try {
             cssTest(model.boardName, task);
         } catch (Exception e) {
-            Logger.e(TAG, "ccstest failed", e);
+            Logger.e(TAG, "csstest failed", e);
         }
         
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
@@ -382,8 +403,8 @@ public class DvachModule extends AbstractWakabaModule {
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
         String cssCode = holder.getCode();
         if (cssCode != null) {
-        HttpStreamer.getInstance().getBytesFromUrl(getUsingUrl() + boardName + "/csstest.foo?code=" + cssCode,
-                HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+            HttpStreamer.getInstance().getBytesFromUrl(getUsingUrl() + boardName + "/csstest.foo?code=" + cssCode,
+                    HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
         }
     }
     

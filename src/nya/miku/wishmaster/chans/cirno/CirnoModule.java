@@ -74,6 +74,8 @@ public class CirnoModule extends AbstractChanModule {
     static final String IICHAN_NAME = "iichan.hk";
     static final String IICHAN_DOMAIN = "iichan.hk";
     static final String IICHAN_URL = "http://" + IICHAN_DOMAIN + "/";
+    private static final String HARUHIISM_DOMAIN = "boards.haruhiism.net";
+    private static final String HARUHIISM_URL = "http://" + HARUHIISM_DOMAIN + "/";
     
     public CirnoModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -111,7 +113,8 @@ public class CirnoModule extends AbstractChanModule {
         try {
             responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
             if (responseModel.statusCode == 200) {
-                in = new WakabaReader(responseModel.stream, DateFormats.IICHAN_DATE_FORMAT);
+                in = new WakabaReader(responseModel.stream,
+                        url.startsWith(HARUHIISM_URL) ? DateFormats.HARUHIISM_DATE_FORMAT : DateFormats.IICHAN_DATE_FORMAT);
                 if (task != null && task.isCancelled()) throw new Exception("interrupted");
                 return in.readWakabaPage();
             } else {
@@ -292,11 +295,12 @@ public class CirnoModule extends AbstractChanModule {
                 return WakabaUtils.buildUrl(model, Chan410Module.CHAN410_URL);
             }
         }
-        return WakabaUtils.buildUrl(model, IICHAN_URL);
+        boolean haruhiism = "abe".equals(model.boardName) || (model.otherPath != null && model.otherPath.startsWith("/abe"));
+        return WakabaUtils.buildUrl(model, haruhiism ? HARUHIISM_URL : IICHAN_URL);
     }
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return WakabaUtils.parseUrl(url, IICHAN_NAME, IICHAN_DOMAIN);
+        return WakabaUtils.parseUrl(url, IICHAN_NAME, IICHAN_DOMAIN, HARUHIISM_DOMAIN);
     }
 }

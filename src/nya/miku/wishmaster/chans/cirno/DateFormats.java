@@ -32,6 +32,7 @@ import java.util.TimeZone;
 @SuppressLint("SimpleDateFormat")
 public class DateFormats {
     static final DateFormat IICHAN_DATE_FORMAT;
+    static final DateFormat HARUHIISM_DATE_FORMAT;
     static final DateFormat CHAN_410_DATE_FORMAT;
     static final DateFormat MIKUBA_DATE_FORMAT;
     static final DateFormat NOWERE_DATE_FORMAT;
@@ -43,6 +44,9 @@ public class DateFormats {
                     "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря" });
         IICHAN_DATE_FORMAT = new SimpleDateFormat("EEE dd MMMM yyyy HH:mm:ss", iichanSymbols);
         IICHAN_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        
+        HARUHIISM_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        HARUHIISM_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
         
         CHAN_410_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US) {
             public Date parse(String string) throws ParseException {

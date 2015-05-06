@@ -120,6 +120,7 @@ public class DobroModule extends AbstractChanModule {
     @Override
     protected void initHttpClient() {
         domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN);
+        if (domain.length() == 0) domain = DEFAULT_DOMAIN;
         loadHanabiraCookie();
     }
     
