@@ -143,8 +143,12 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                                 break;
                             case R.id.postform_mark_strike:
                                 StringBuilder strike = new StringBuilder();
-                                for (int i=0, len=selectionEnd-selectionStart; i<len; ++i) strike.append("^H");
-                                comment.replace(selectionStart, selectionEnd, text + strike.toString());
+                                for (String s : text.split("\n")) {
+                                    strike.append(s);
+                                    for (int i=0; i<s.length(); ++i) strike.append("^H");
+                                    strike.append('\n');
+                                }
+                                comment.replace(selectionStart, selectionEnd, strike.substring(0, strike.length() - 1));
                                 commentField.setSelection(selectionStart);
                                 break;
                             case R.id.postform_mark_spoiler:
