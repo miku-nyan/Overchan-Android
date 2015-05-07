@@ -403,7 +403,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             @Override
             public void run() {
                 e.handle(PostFormActivity.this, currentTask, new InteractiveException.Callback() {
-                    @Override public void onSuccess() { cfDialog.dismiss(); updateCaptcha(); }
+                    @Override public void onSuccess() { cfDialog.dismiss(); send(); }
                     @Override public void onError(String message) { cfDialog.dismiss(); switchToErrorCaptcha(message); }
                 });
             }

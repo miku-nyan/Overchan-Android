@@ -175,7 +175,13 @@ public class OwlchanModule extends AbstractWakabaModule {
     
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DATEFORMAT);
+        return new WakabaReader(stream, DATEFORMAT) {
+            @Override
+            protected void parseThumbnail(String imgTag) {
+                if (imgTag.contains("/css/locked.gif")) currentThread.isClosed = true;
+                super.parseThumbnail(imgTag);
+            }
+        };
     }
     
     @Override

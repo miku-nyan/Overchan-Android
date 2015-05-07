@@ -35,19 +35,14 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookieHC4;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.net.http.SslError;
-import android.os.Build;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -56,11 +51,7 @@ import android.preference.PreferenceScreen;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.Html;
 import android.text.InputType;
-import android.view.ViewGroup;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -75,10 +66,8 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.chans.AbstractChanModule;
-import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -97,14 +86,14 @@ public class FourchanModule extends AbstractChanModule {
     private static final String PREF_KEY_PASS_PIN = "PREF_KEY_PASS_PIN";
     private static final String PREF_KEY_PASS_COOKIE = "PREF_KEY_PASS_COOKIE";
     
-    private static final String RECAPTCHA_KEY = "6Ldp2bsSAAAAAAJ5uyx_lx34lJeEpTLVkP5k04qc";
+    static final String RECAPTCHA_KEY = "6Ldp2bsSAAAAAAJ5uyx_lx34lJeEpTLVkP5k04qc";
     
     private boolean usingPasscode = false;
     
     private Map<String, BoardModel> boardsMap = null;
     
     private Recaptcha2 recaptcha = null;
-    private String recaptcha2 = null;
+    String recaptcha2 = null;
     
     private static final Pattern ERROR_POSTING = Pattern.compile("<span id=\"errmsg\"(?:[^>]*)>(.*?)(?:</span>|<br)");
     private static final Pattern SUCCESS_POSTING = Pattern.compile("<!-- thread:(\\d+),no:(?:\\d+) -->");
@@ -309,14 +298,14 @@ public class FourchanModule extends AbstractChanModule {
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
         addPasscodePreference(preferenceGroup);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final CheckBoxPreference newRecaptchaPref = new CheckBoxPreference(context);
-            newRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha);
-            newRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_summary);
-            newRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
-            newRecaptchaPref.setDefaultValue(false);
-            preferenceGroup.addPreference(newRecaptchaPref);
-        }
+        
+        final CheckBoxPreference newRecaptchaPref = new CheckBoxPreference(context);
+        newRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha);
+        newRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_summary);
+        newRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
+        newRecaptchaPref.setDefaultValue(false);
+        preferenceGroup.addPreference(newRecaptchaPref);
+        
         addPasswordPreference(preferenceGroup);
         CheckBoxPreference httpsPref = new CheckBoxPreference(context);
         httpsPref.setTitle(R.string.pref_use_https);
@@ -326,18 +315,16 @@ public class FourchanModule extends AbstractChanModule {
         preferenceGroup.addPreference(httpsPref);
         addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         addProxyPreferences(preferenceGroup);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
-            final Preference newRecaptchaPref = preferenceGroup.findPreference(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
-            newRecaptchaPref.setEnabled(!proxyPreference.isChecked());
-            proxyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {            
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    newRecaptchaPref.setEnabled(!proxyPreference.isChecked());
-                    return false;
-                }
-            });
-        }
+        
+        final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
+        newRecaptchaPref.setEnabled(!proxyPreference.isChecked());
+        proxyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {            
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                newRecaptchaPref.setEnabled(!proxyPreference.isChecked());
+                return false;
+            }
+        });
     }
     
     private boolean useHttps() {
@@ -345,8 +332,7 @@ public class FourchanModule extends AbstractChanModule {
     }
     
     private boolean useNewRecaptcha() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB &&
-                !preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) &&
+        return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) &&
                 preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), false);
     }
     
@@ -468,82 +454,11 @@ public class FourchanModule extends AbstractChanModule {
         }
     }
     
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private static class Recaptcha2Exception extends InteractiveException {
-        private static final long serialVersionUID = 1L;
-        
-        private static final String INTERCEPT = "_intercept?";
-        
-        private static final String RECAPTCHA_HTML =
-                "<script type=\"text/javascript\">" +
-                    "window.globalOnCaptchaEntered = function(res) { " +
-                        "location.href = \"" + INTERCEPT + "\" + res; " +
-                    "}" +
-                "</script>" +
-                "<script src=\"https://www.google.com/recaptcha/api.js\" async defer></script>" +
-                "<div class=\"g-recaptcha\" data-sitekey=\"" + RECAPTCHA_KEY + "\" data-callback=\"globalOnCaptchaEntered\"></div>";
-        
-        @Override
-        public String getServiceName() {
-            return "Recaptcha";
-        }
-        
-        @Override
-        public void handle(final Activity activity, final CancellableTask task, final Callback callback) {
-            if (task.isCancelled()) return;
-            activity.runOnUiThread(new Runnable() {
-                @SuppressLint("SetJavaScriptEnabled")
-                @Override
-                public void run() {
-                    final Dialog dialog = new Dialog(activity);
-                    WebView webView = new WebView(activity);
-                    webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                    webView.setWebViewClient(new WebViewClient() {
-                        @Override
-                        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                            handler.proceed();
-                        }
-                        @Override
-                        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                            if (url.contains(INTERCEPT)) {
-                                String hash = url.substring(url.indexOf(INTERCEPT) + INTERCEPT.length());
-                                ((FourchanModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).recaptcha2 = hash;
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.onSuccess();
-                                        dialog.dismiss();
-                                    }
-                                });
-                            }
-                            return super.shouldInterceptRequest(view, url);
-                        }
-                    });
-                    //webView.getSettings().setUserAgentString(HttpConstants.USER_AGENT_STRING);
-                    webView.getSettings().setUserAgentString("Mozilla/5.0"); //should get easier captcha
-                    webView.getSettings().setJavaScriptEnabled(true);
-                    dialog.setTitle("Recaptcha");
-                    dialog.setContentView(webView);
-                    dialog.setCanceledOnTouchOutside(false);
-                    dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            callback.onError("Cancelled");
-                        }
-                    });
-                    dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    dialog.show();
-                    webView.loadDataWithBaseURL("https://127.0.0.1/", RECAPTCHA_HTML, "text/html", "UTF-8", null);
-                }
-            });
-        }
-    }
-    
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         if (!usingPasscode) {
             if (useNewRecaptcha()) {
-                if (recaptcha2 == null) throw new Recaptcha2Exception();
+                if (recaptcha2 == null) throw new Recaptcha2Interactive();
             } else if (recaptcha == null) throw new Exception("Invalid captcha");
         }
         String url = (useHttps() ? "https://" : "http://") + "sys.4chan.org/" + model.boardName + "/post";
