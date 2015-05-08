@@ -131,7 +131,7 @@ public class MakabaModule extends AbstractChanModule {
     
     @Override
     public String getDisplayingName() {
-        return "Два.ч (.hk)";
+        return "Два.ч (2ch.hk)";
     }
     
     @Override
@@ -617,7 +617,7 @@ public class MakabaModule extends AbstractChanModule {
         if (model.opmark) postEntityBuilder.addString("water_mark", "on");
         if (model.watermark) postEntityBuilder.addString("op_mark", "1");
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setTimeout(0).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
         String response = null;
         try {
             response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, null, task, true);

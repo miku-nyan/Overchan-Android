@@ -47,7 +47,10 @@ public class WriteableDirContainer extends WriteableContainer {
     @Override
     public void transfer(String[] doNotCopy, CancellableTask task) throws IOException {
         try {
-            if (doNotCopy == null) return;
+            if (doNotCopy == null) {
+                transfered = true;
+                return;
+            }
             for (String file : doNotCopy) {
                 if (task.isCancelled()) throw new IOException();
                 if (!files.contains(file)) {
@@ -83,6 +86,7 @@ public class WriteableDirContainer extends WriteableContainer {
         if (files.contains(filename)) return true;
         if (transfered) {
             File file = new File(directory, filename);
+            System.out.println(file.getAbsolutePath() + " " + file.exists());
             return !file.isDirectory() && file.exists();
         }
         return false;

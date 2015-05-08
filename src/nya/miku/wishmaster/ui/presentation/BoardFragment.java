@@ -1164,7 +1164,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 public void onInteractiveException(final InteractiveException e) {
                     if (isCancelled()) return;
                     if (silent && activity.isPaused()) {
-                        setPullableNoRefreshing();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                setPullableNoRefreshing();
+                            }
+                        });
                         return;
                     }
                     e.handle(activity, PageGetter.this, new InteractiveException.Callback() {
@@ -1215,10 +1220,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         private void toListView(final boolean needUpdateAfter) {
             if (presentationModel == null || presentationModel.presentationList == null) return;
             adapter = new PostsListAdapter(BoardFragment.this);
+            if (presentationModel == null) return;
             if (pageType == TYPE_POSTSLIST && tabModel.firstUnreadPosition == 0) {
                 resetFirstUnreadPosition();
             }
             String oldTabTitle = tabModel.title != null ? tabModel.title : "";
+            if (presentationModel == null) return;
             if (isThreadPage && presentationModel.presentationList.size() > 0) {
                 String tabTitle;
                 String subject = presentationModel.presentationList.get(0).sourceModel.subject;
@@ -1379,7 +1386,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             fragmentRef = new WeakReference<BoardFragment>(fragment);
             onUnreadFrameListener = new OnUnreadFrameListener(fragmentRef);
             onAttachmentClickListener = new OnAttachmentClickListener(fragmentRef);
-            this.currentCount = fragment.presentationModel.presentationList.size();
+            if (fragment.presentationModel != null) // может обнулиться в BoardFragment.onDestroy() (т.к. метод работает асинхронно)
+                this.currentCount = fragment.presentationModel.presentationList.size();
             this.inflater = LayoutInflater.from(fragment.activity);
             this.thumbnailsInRowCount = Math.max(1, fragment.postItemWidth / fragment.thumbnailWidth);
         }
@@ -2098,6 +2106,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     private void setNavigationCatalogBar() {
+        if (presentationModel == null) return;
         if (tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE) {
             View.OnClickListener navigationBarOnClickListener = new NavigationBarOnClickListener(this);
             for (int id : new int[] {R.id.board_navigation_previous, R.id.board_navigation_next, R.id.board_navigation_page }) {
@@ -2701,6 +2710,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         if (position != -1) {
             Spanned referencesString = presentationModel.presentationList.get(position).referencesString;
+            if (referencesString == null) {
+                Logger.e(TAG, "null referencesString");
+                return;
+            }
             ClickableURLSpan[] spans = referencesString.getSpans(0, referencesString.length(), ClickableURLSpan.class);
             for (ClickableURLSpan span : spans) {
                 String url = span.getURL();

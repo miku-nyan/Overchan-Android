@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.ui.tabs;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.MainApplication;
 import android.content.Context;
 import android.graphics.Color;
@@ -133,6 +134,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
      */
     public void closeTab(int position) {
         setDraggingItem(-1);
+        if (position >= getCount()) return;
         tabsIdStack.removeTab(getItem(position).id);
         remove(getItem(position));
         if (position == selectedItem) {
@@ -215,7 +217,9 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
                     titleText = titleStringBuilder.append(titleText).toString();
                 }
                 title.setText(titleText);
-                Drawable icon = MainApplication.getInstance().getChanModule(model.pageModel.chanName).getChanFavicon();
+                ChanModule chan = MainApplication.getInstance().getChanModule(model.pageModel.chanName);
+                Drawable icon = chan != null ? chan.getChanFavicon() :
+                    ResourcesCompat.getDrawable(context.getResources(), android.R.drawable.ic_delete, null);
                 if (icon != null) {
                     if (model.type == TabModel.TYPE_LOCAL) {
                         Drawable[] layers = new Drawable[] {

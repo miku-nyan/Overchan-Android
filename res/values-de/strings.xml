@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="mark_quote">Zitat</string>
     <string name="mark_bold">Fett</string>
     <string name="mark_italic">Kursiv</string>
+    <string name="mark_underline">Unterstrichen</string>
     <string name="mark_strike">Durchgestrichen</string>
     <string name="mark_spoiler">Spoiler</string>
     
@@ -330,12 +331,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_ssl_help">\n\nWenn Sie verstehen, was los ist, können Sie in den Einstellungen dieser Imageboard wählen:
         \n\"SSL-Fehler ignorieren\".\n\nIn diesem Fall wird die Sicherheit der Verbindung nicht gewährleistet.</string>
     <string name="error_connection">Keine Verbindung zum Server</string>
+    <string name="error_connection_timeout">Verbindungszeit überschritten</string>
     <string name="error_parse">Nicht möglich, die Seite zu parsen</string>
     <string name="error_open_local">Nicht möglich, die Datei als gespeicherter Thread zu eröffnen</string>
     <string name="error_no_space">Nicht genügend Speicherplatz</string>
     <string name="error_interactive_dialog_format">%s Überprüfung läuft</string>
     <string name="error_interactive_cancelled_format">%s Überprüfung nicht bestanden</string>
     <string name="error_out_of_memory">Out of Memory</string>
+    
+    <string name="crash_dialog_title">Overchan ist abgestürzt</string>
+    <string name="crash_dialog_text">Ein unerwarteter Fehler ist aufgetreten, der
+        zum Beenden der Anwendung führte. Helfen Sie diesen Fehler
+        zu beheben, indem Sie per Tipp auf OK einen Fehlerbericht senden.</string>
+    <string name="crash_dialog_comment_prompt">Nachfolgend einen Kommentar zu dem Problem abgeben:</string>
+    <string name="crash_dialog_ok_toast">Vielen Dank!</string>
     
     <string name="makaba_catalog_standart">Nach Bump sortieren</string>
     <string name="makaba_catalog_last_reply">Nach Letzten Antworten sortieren</string>
@@ -466,7 +475,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>ZIP-Archiv</item>
         <item>MHTML</item>
     </string-array>
-    <string name="pref_theme_title">Thema</string> <!-- appearance -->
+    <string name="pref_theme_title">Thema</string>
     <string-array name="pref_theme_choices">
         <item>Futaba</item>
         <item>Photon</item>

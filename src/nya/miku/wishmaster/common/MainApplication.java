@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.DraftsCache;
@@ -73,7 +74,13 @@ import android.preference.PreferenceManager;
         reportType = org.acra.sender.HttpSender.Type.JSON,
         httpMethod = org.acra.sender.HttpSender.Method.PUT,
         formUriBasicAuthLogin = ACRAConstants.ACRA_LOGIN,
-        formUriBasicAuthPassword = ACRAConstants.ACRA_PASSWORD )
+        formUriBasicAuthPassword = ACRAConstants.ACRA_PASSWORD,
+        mode = org.acra.ReportingInteractionMode.DIALOG,
+        resDialogText = R.string.crash_dialog_text,
+        resDialogIcon = android.R.drawable.ic_dialog_info,
+        resDialogTitle = R.string.crash_dialog_title,
+        resDialogCommentPrompt = R.string.crash_dialog_comment_prompt,
+        resDialogOkToast = R.string.crash_dialog_ok_toast )
 
 public class MainApplication extends Application {
     

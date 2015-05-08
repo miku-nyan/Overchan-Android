@@ -19,6 +19,8 @@
 package nya.miku.wishmaster.ui.tabs;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.FavoritesFragment;
 import nya.miku.wishmaster.ui.HistoryFragment;
 import nya.miku.wishmaster.ui.NewTabFragment;
@@ -32,6 +34,7 @@ import android.support.v4.app.FragmentManager;
  *
  */
 public class TabsSwitcher {
+    private static final String TAG = "TabsSwitcher";
     /** текущий ID или виртуальная позиция скрытой вкладки */
     public Long currentId = null;
     public Fragment currentFragment;
@@ -42,15 +45,23 @@ public class TabsSwitcher {
      * @param fragmentManager менеджер фрагментов
      */
     public void switchTo(TabModel tabModel, FragmentManager fragmentManager) {
-        if (currentId != null && currentId.equals(Long.valueOf(tabModel.id))) {
-            if (tabModel.forceUpdate && currentFragment != null && currentFragment instanceof BoardFragment) {
-                ((BoardFragment) currentFragment).update();
+        try {
+            if (currentId != null && currentId.equals(Long.valueOf(tabModel.id))) {
+                if (tabModel.forceUpdate && currentFragment != null && currentFragment instanceof BoardFragment) {
+                    ((BoardFragment) currentFragment).update();
+                }
+                return;
             }
-            return;
+            if (MainApplication.getInstance().getChanModule(tabModel.pageModel.chanName) == null) {
+                Logger.e(TAG, "chan module " + tabModel.pageModel.chanName + " not registered");
+                return;
+            }
+            currentFragment = BoardFragment.newInstance(tabModel.id);
+            currentId = tabModel.id;
+            replace(fragmentManager, currentFragment);
+        } catch (Exception e) {
+            Logger.e(TAG, e);
         }
-        currentFragment = BoardFragment.newInstance(tabModel.id);
-        currentId = tabModel.id;
-        replace(fragmentManager, currentFragment);
     }
     
     /**

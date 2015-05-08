@@ -18,13 +18,15 @@
 
 package nya.miku.wishmaster.http.streamer;
 
+import nya.miku.wishmaster.R;
+
 /**
  * Исключение возбуждается в случае ошибки в HTTP запросе.
  * @author miku-nyan
  *
  */
 public class HttpRequestException extends Exception {
-    private static final long serialVersionUID = 5427240220027259552L;
+    private static final long serialVersionUID = 1L;
     private boolean sslException = false;
     
     public HttpRequestException(Exception e) {
@@ -36,6 +38,20 @@ public class HttpRequestException extends Exception {
     }
     public boolean isSslException() {
         return sslException;
+    }
+    @Override
+    public String getMessage() {
+        String message = super.getMessage();
+        if (message.startsWith("org.apache.http.conn.HttpHostConnectException: ")) {
+            return message.substring(47);
+        } else if (message.equals("java.net.SocketTimeoutException")) {
+            try {
+                return nya.miku.wishmaster.common.MainApplication.getInstance().getString(R.string.error_connection_timeout);
+            } catch (Exception e) {
+                return "Connection timed out";
+            }
+        }
+        return message;
     }
 
 }

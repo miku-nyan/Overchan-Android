@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="mark_quote">Цитата</string>
     <string name="mark_bold">Жирный</string>
     <string name="mark_italic">Курсив</string>
+    <string name="mark_underline">Подчёркнутый</string>
     <string name="mark_strike">Зачёркнутый</string>
     <string name="mark_spoiler">Спойлер</string>
     
@@ -337,12 +338,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_ssl_help">\n\nЕсли вы понимаете, что происходит, вы можете установить в настройках данной имиджборды:
         \n\"Игнорировать ошибки SSL\".\n\nПри этом безопасность соединения не гарантирована.</string>
     <string name="error_connection">Ошибка при загрузке</string>
+    <string name="error_connection_timeout">Время ожидания соединения истекло</string>
     <string name="error_parse">Невозможно распарсить страницу</string>
     <string name="error_open_local">Невозможно открыть файл как сохранённый тред</string>
     <string name="error_no_space">Недостаточно места на диске</string>
     <string name="error_interactive_dialog_format">Выполняется проверка %s</string>
     <string name="error_interactive_cancelled_format">Проверка %s не пройдена</string>
     <string name="error_out_of_memory">Недостаточно памяти</string>
+    
+    <string name="crash_dialog_title">Overchan - сбой</string>
+    <string name="crash_dialog_text">Непредвиденная ошибка привела к вынужденной остановке приложения.
+        Пожалуйста, помогите исправить её, пришлите отчет об ошибке - для этого нажмите OK.</string>
+    <string name="crash_dialog_comment_prompt">Здесь можно добавить ваши замечания о проблеме:</string>
+    <string name="crash_dialog_ok_toast">Спасибо!</string>
     
     <string name="makaba_catalog_standart">Сортировка по бампам</string>
     <string name="makaba_catalog_last_reply">Сортировка по последнему ответу</string>

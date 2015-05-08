@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="mark_quote">Quote</string>
     <string name="mark_bold">Bold</string>
     <string name="mark_italic">Italic</string>
+    <string name="mark_underline">Underline</string>
     <string name="mark_strike">Strikethrough</string>
     <string name="mark_spoiler">Spoiler</string>
     
@@ -330,12 +331,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_ssl_help">\n\nIf you understand what\'s going on, you can set in preferences of this imageboard:
         \n\"Ignore SSL Errors\".\n\nIn this case, the security of the connection is not guaranteed.</string>
     <string name="error_connection">Unable to connect to server</string>
+    <string name="error_connection_timeout">Connection timed out</string>
     <string name="error_parse">Unable to parse the page</string>
     <string name="error_open_local">Unable to open the file as the saved thread</string>
     <string name="error_no_space">Not enough disk space</string>
     <string name="error_interactive_dialog_format">%s checking</string>
     <string name="error_interactive_cancelled_format">%s checking has not been passed</string>
     <string name="error_out_of_memory">Out of memory</string>
+    
+    <string name="crash_dialog_title">Overchan has crashed</string>
+    <string name="crash_dialog_text">An unexpected error occurred forcing the application to stop.
+        Please help fix this by sending the error report, all you have to do is click OK.</string>
+    <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
+    <string name="crash_dialog_ok_toast">Thank you!</string>
     
     <string name="makaba_catalog_standart">Sort by Bump order</string>
     <string name="makaba_catalog_last_reply">Sort by Last Reply</string>

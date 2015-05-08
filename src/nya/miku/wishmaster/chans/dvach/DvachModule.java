@@ -103,7 +103,7 @@ public class DvachModule extends AbstractWakabaModule {
     
     @Override
     public String getDisplayingName() {
-        return "Два.ч";
+        return "Два.ч (2-chru.net)";
     }
     
     @Override

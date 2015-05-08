@@ -121,6 +121,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             //TODO выделить операции с разметкой в отдельный класс
             case R.id.postform_mark_bold:
             case R.id.postform_mark_italic:
+            case R.id.postform_mark_underline:
             case R.id.postform_mark_strike:
             case R.id.postform_mark_spoiler:
             case R.id.postform_mark_quote:
@@ -167,6 +168,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                                 break;
                             case R.id.postform_mark_italic:
                                 comment.replace(selectionStart, selectionEnd, "[i]" + text + "[/i]");
+                                commentField.setSelection(selectionStart + 3);
+                                break;
+                            case R.id.postform_mark_underline:
+                                comment.replace(selectionStart, selectionEnd, "[u]" + text + "[/u]");
                                 commentField.setSelection(selectionStart + 3);
                                 break;
                             case R.id.postform_mark_strike:
@@ -460,6 +465,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         }
         
         markLayout.setVisibility(boardModel.markType != BoardModel.MARK_NOMARK ? View.VISIBLE : View.GONE);
+        if (boardModel.markType == BoardModel.MARK_WAKABAMARK) markLayout.findViewById(R.id.postform_mark_underline).setVisibility(View.GONE);
         subjectField.setVisibility(boardModel.allowSubjects ? View.VISIBLE : View.GONE);
         chkboxLayout.setVisibility(boardModel.allowSage || boardModel.allowWatermark || boardModel.allowOpMark ? View.VISIBLE : View.GONE);
         sageChkbox.setVisibility(boardModel.allowSage ? View.VISIBLE : View.GONE);

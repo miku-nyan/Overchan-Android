@@ -186,6 +186,7 @@ public class DobroModule extends AbstractChanModule {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if (preference.getKey().equals(getSharedKey(PREF_KEY_DOMAIN))) {
                     domain = (String) newValue;
+                    if (domain.length() == 0) domain = DEFAULT_DOMAIN;
                     loadHanabiraCookie();
                     return true;
                 }
