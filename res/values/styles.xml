@@ -230,7 +230,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <style name="Mikuba_Base" parent="@style/Theme_Light_Switch">
         <item name="materialPrimary">#66EEFF</item>
         <item name="materialPrimaryDark">#408090</item>
-        <item name="materialNavigationBar">#112535</item>
         <item name="android:textColorPrimary">#000000</item>
         <item name="activityRootBackground">#FAFAFA</item>
         <item name="sidebarBackground">#CCFAFAFA</item>
