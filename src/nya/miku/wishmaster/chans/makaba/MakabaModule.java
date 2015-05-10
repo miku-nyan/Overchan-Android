@@ -396,28 +396,38 @@ public class MakabaModule extends AbstractChanModule {
     @Override
     public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
             throws Exception {
-        String url = domainUrl + "makaba/makaba.fcgi?task=catalog&board=" + boardName + "&filter=" + CATALOG_TYPES[catalogType] + "&json=1";
-        JSONObject json = downloadJSONObject(url, (oldList != null), listener, task);
-        if (json == null) return oldList;
-        JSONArray threads = json.getJSONArray("threads");
-        ThreadModel[] result = new ThreadModel[threads.length()];
-        for (int i=0; i<threads.length(); ++i) {
-            JSONObject curThread = threads.getJSONObject(i);
-            ThreadModel model = new ThreadModel();
-            model.threadNumber = curThread.getString("num");
+        Exception last = null;
+        for (String url : new String[] {
+                domainUrl + "makaba/makaba.fcgi?task=catalog&board=" + boardName + "&filter=" + CATALOG_TYPES[catalogType] + "&json=1",
+                domainUrl + boardName + "/catalog.json"
+        }) {
             try {
-                model.postsCount = curThread.getInt("posts_count") + 1;
-                model.attachmentsCount = curThread.getInt("files_count");
-                model.attachmentsCount += curThread.getJSONArray("files").length();
-                model.isSticky = curThread.getInt("sticky") != 0;
-                model.isClosed = curThread.getInt("closed") != 0;
+                JSONObject json = downloadJSONObject(url, (oldList != null), listener, task);
+                if (json == null) return oldList;
+                JSONArray threads = json.getJSONArray("threads");
+                ThreadModel[] result = new ThreadModel[threads.length()];
+                for (int i=0; i<threads.length(); ++i) {
+                    JSONObject curThread = threads.getJSONObject(i);
+                    ThreadModel model = new ThreadModel();
+                    model.threadNumber = curThread.getString("num");
+                    try {
+                        model.postsCount = curThread.getInt("posts_count") + 1;
+                        model.attachmentsCount = curThread.getInt("files_count");
+                        model.attachmentsCount += curThread.getJSONArray("files").length();
+                        model.isSticky = curThread.getInt("sticky") != 0;
+                        model.isClosed = curThread.getInt("closed") != 0;
+                    } catch (Exception e) {
+                        Logger.e(TAG, e);
+                    } 
+                    model.posts = new PostModel[] { mapPostModel(curThread, boardName) };
+                    result[i] = model;
+                }
+                return result;
             } catch (Exception e) {
-                Logger.e(TAG, e);
-            } 
-            model.posts = new PostModel[] { mapPostModel(curThread, boardName) };
-            result[i] = model;
+                last = e;
+            }
         }
-        return result;
+        throw last == null ? new Exception() : last;
     }
 
     @Override
