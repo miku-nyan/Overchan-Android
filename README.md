@@ -23,16 +23,16 @@ Open the source code directory and run (in the command line):
 
 The .apk file (`bin/Overchan-debug.apk`) will be signed with the debug key.
 
-*Note for Windows platforms:*
+*Note for Windows platforms:*  
 NDK path cannot contain any spaces but you can use the short name of the path (example: `C:\Program Files` → `C:\PROGRA~1`). The short directory name can be found using `dir /x` (example: `dir /x c:\`)
 
 ### Using Eclipse with ADT
 
 Just import the project into your workspace (File → Import → Android → Existing Android code into workspace → select the folder).
 
-### Android Studio/IntelliJ IDEA
+### Android Studio/IntelliJ IDEA/Gradle
 
-You may use Android Studio/IntelliJ IDEA at your own risk. If you need to keep the directory structure (for further contributing) put this [build.gradle](http://miku-nyan.github.io/Overchan-Android/data/build.gradle) file into the project directory before the import.
+You may use Android Studio/IntelliJ IDEA at your own risk. The gradle build script is included.
 
 ## License
 
