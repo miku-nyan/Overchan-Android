@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.chans.infinity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -715,6 +716,19 @@ public class InfinityModule extends AbstractChanModule {
         model.type = UrlPageModel.TYPE_OTHERPAGE;
         model.otherPath = path;
         return model;
+    }
+    
+    @Override
+    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
+        try {
+            super.downloadFile(url, out, listener, task);
+        } catch (HttpWrongStatusCodeException e) {
+            if (url.contains("/thumb/") && url.endsWith(".jpg") && e.getStatusCode() == 404) {
+                super.downloadFile(url.substring(0, url.length() - 3) + "png", out, listener, task);
+            } else {
+                throw e;
+            }
+        }
     }
     
 }
