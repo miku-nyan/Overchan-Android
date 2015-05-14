@@ -690,15 +690,27 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 return true;
             case R.id.context_menu_reply:
                 SendPostModel sendReplyModel = getSendPostModel();
-                sendReplyModel.comment = sendReplyModel.comment + ">>" + adapter.getItem(position).sourceModel.number + "\n";
+                int sendReplyModelPos = sendReplyModel.commentPosition;
+                if (sendReplyModelPos > sendReplyModel.comment.length()) sendReplyModelPos = -1;
+                if (sendReplyModelPos < 0) sendReplyModelPos = sendReplyModel.comment.length();
+                String insertion = ">>" + adapter.getItem(position).sourceModel.number + "\n";
+                sendReplyModel.comment = sendReplyModel.comment.substring(0, sendReplyModelPos) +
+                        insertion + sendReplyModel.comment.substring(sendReplyModelPos);
+                sendReplyModel.commentPosition = sendReplyModelPos + insertion.length();
                 openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyModel);
                 return true;
             case R.id.context_menu_reply_with_quote:
                 SendPostModel sendReplyWithQuoteModel = getSendPostModel();
+                int sendReplyWithQuoteModelPos = sendReplyWithQuoteModel.commentPosition;
+                if (sendReplyWithQuoteModelPos > sendReplyWithQuoteModel.comment.length()) sendReplyWithQuoteModelPos = -1;
+                if (sendReplyWithQuoteModelPos < 0) sendReplyWithQuoteModelPos = sendReplyWithQuoteModel.comment.length();
                 String quotedComment = adapter.getItem(position).spannedComment.toString().
                         replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1").replaceAll("(\n+)", "$1>");
-                sendReplyWithQuoteModel.comment = sendReplyWithQuoteModel.comment + ">>" + adapter.getItem(position).sourceModel.number + "\n"
-                        + (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
+                String insertionWithQuote = ">>" + adapter.getItem(position).sourceModel.number + "\n" +
+                        (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
+                sendReplyWithQuoteModel.comment = sendReplyWithQuoteModel.comment.substring(0, sendReplyWithQuoteModelPos) +
+                        insertionWithQuote + sendReplyWithQuoteModel.comment.substring(sendReplyWithQuoteModelPos);
+                sendReplyWithQuoteModel.commentPosition = sendReplyWithQuoteModelPos + insertionWithQuote.length();
                 openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyWithQuoteModel);
                 return true;
             case R.id.context_menu_select_text:

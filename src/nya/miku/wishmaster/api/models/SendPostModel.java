@@ -49,6 +49,8 @@ public class SendPostModel implements Serializable {
     @Tag(5) public String email;
     /** Комментарий (текст сообщения) */
     @Tag(6) public String comment;
+    /** Позиция курсора в комментарии (тексте сообщения) */
+    @Tag(15) public int commentPosition = -1;
     /** Пароль для удаления поста или прикреплённых файлов */
     @Tag(7) public String password;
     /** Индекс значка в массиве {@link BoardModel#iconDescriptions}.
