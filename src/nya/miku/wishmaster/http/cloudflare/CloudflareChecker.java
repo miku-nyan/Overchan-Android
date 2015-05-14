@@ -72,7 +72,7 @@ public class CloudflareChecker {
     private static final String TAG = "CloudflareChecker";
     
     /** таймаут при анти-ддос проверке в милисекундах */
-    public static final long TIMEOUT = 20 * 1000;
+    public static final long TIMEOUT = 35 * 1000;
     
     private CloudflareChecker() {}
     private static CloudflareChecker instance;

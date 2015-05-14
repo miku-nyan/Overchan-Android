@@ -44,6 +44,7 @@ import nya.miku.wishmaster.chans.infinity.InfinityModule;
 import nya.miku.wishmaster.chans.krautchan.KrautModule;
 import nya.miku.wishmaster.chans.makaba.MakabaModule;
 import nya.miku.wishmaster.chans.owlchan.OwlchanModule;
+import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
@@ -154,6 +155,8 @@ public class MainApplication extends Application {
         chanModulesIndex = new HashMap<String, Integer>();
         chanModulesList = new ArrayList<ChanModule>();
         registerChanModules();
+        
+        RecaptchaAjax.init();
     }
     
     private File getAvailableCacheDir() {
