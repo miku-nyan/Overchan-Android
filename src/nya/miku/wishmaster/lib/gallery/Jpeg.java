@@ -47,23 +47,27 @@ public class Jpeg {
     }
     
     public static boolean isNonStandardGrayscaleImage(File file) {
-        byte[] bytes = getJpegInfoBytes(file);
-        if (bytes == null) {
-            return false;
-        }
-        
-        // read subsampling information
-        byte numberF = bytes[5]; // byte #6
-        String[] samplings = new String[numberF];
-        
-        for (int i = 0; i < numberF; i++) {
-            int hv = bytes[7 + i * numberF]; // byte #8, #10...
+        try {
+            byte[] bytes = getJpegInfoBytes(file);
+            if (bytes == null) {
+                return false;
+            }
             
-            int h = hv >> 4;
-            int v = hv & 0x0F;
-            samplings[i] = h + "x" + v;
+            // read subsampling information
+            byte numberF = bytes[5]; // byte #6
+            String[] samplings = new String[numberF];
+            
+            for (int i = 0; i < numberF; i++) {
+                int hv = bytes[7 + i * numberF]; // byte #8, #10...
+                
+                int h = hv >> 4;
+                int v = hv & 0x0F;
+                samplings[i] = h + "x" + v;
+            }
+            
+            return samplings.length == 1 && !samplings[0].equals("1x1");
+        } catch (Exception e) {
+            return true;
         }
-        
-        return samplings.length == 1 && !samplings[0].equals("1x1");
     }
 }
