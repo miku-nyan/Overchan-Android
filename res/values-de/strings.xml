@@ -369,6 +369,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dvach_prefs_domain">Domain</string>
     <string name="dvach_prefs_domain_summary">Reserved domains: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
     
+    <string name="synch_prefs_domain">Domain</string>
+    <string name="synch_prefs_domain_summary">Reserved domains: syn-ch.com, syn-ch.org, syn-ch.ru, syn-ch.com.ua</string>
+    
     <string name="infinity_tor_message">Um 8chan über Tor zu senden, müssen Sie den .onion Domain verwenden.</string>
     
     <string name="inach_prefs_ajax_update">JSON-Update</string>

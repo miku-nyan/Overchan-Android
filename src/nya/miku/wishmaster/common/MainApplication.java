@@ -44,6 +44,7 @@ import nya.miku.wishmaster.chans.infinity.InfinityModule;
 import nya.miku.wishmaster.chans.krautchan.KrautModule;
 import nya.miku.wishmaster.chans.makaba.MakabaModule;
 import nya.miku.wishmaster.chans.owlchan.OwlchanModule;
+import nya.miku.wishmaster.chans.synch.SynchModule;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.ui.Database;
@@ -118,6 +119,7 @@ public class MainApplication extends Application {
         addChanModule(new DvachModule(preferences, resources));
         addChanModule(new NowereModule(preferences, resources));
         addChanModule(new Chan410Module(preferences, resources));
+        addChanModule(new SynchModule(preferences, resources));
         addChanModule(new InachModule(preferences, resources));
         addChanModule(new OwlchanModule(preferences, resources));
         addChanModule(new DFWKModule(preferences, resources));
