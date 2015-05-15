@@ -209,6 +209,7 @@ public class PostingService extends Service {
                 }, this);
                 success = true;
             } catch (Exception e) {
+                Logger.e(TAG, "exception while posting", e);
                 if (!isCancelled()) {
                     Intent broadcastIntent = new Intent(BROADCAST_ACTION_STATUS);
                     broadcastIntent.putExtra(EXTRA_BROADCAST_PROGRESS_STATUS, BROADCAST_STATUS_ERROR);

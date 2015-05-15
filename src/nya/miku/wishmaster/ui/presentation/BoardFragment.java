@@ -225,7 +225,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     /** позиция (в адаптере) последнего выбранного элемента при создании контекстного меню из всплывающего окна
      *  или -1, если контекстное меню создано из listView */
-    private int lastContextMenuPostion;
+    private int lastContextMenuPosition;
     
     /** выбранное вложение (аттачмент) при создании контекстного меню из превью-картинки */
     private View lastContextMenuAttachment;
@@ -447,7 +447,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             boolean searchMenuVisible = false;
             boolean savePageMenuVisible = false;
             boolean boardGallryMenuVisible = false;
-            if (tabModel.type != TabModel.TYPE_LOCAL && pageType != TYPE_SEARCHLIST && listLoaded && !presentationModel.source.boardModel.readonlyBoard) {
+            if (tabModel.type != TabModel.TYPE_LOCAL && pageType != TYPE_SEARCHLIST && listLoaded &&
+                    !presentationModel.source.boardModel.readonlyBoard) {
                 addPostMenuVisible = true;
             }
             if (tabModel.type != TabModel.TYPE_LOCAL || listLoaded) {
@@ -558,7 +559,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         //контекстное меню для обычных элементов
         boolean isList = true;
-        lastContextMenuPostion = -1;
+        lastContextMenuPosition = -1;
         
         final PresentationItemModel model;
         if (v.getId() == android.R.id.list) {
@@ -572,8 +573,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 PostsListAdapter.PostViewTag tag = (PostsListAdapter.PostViewTag) v.getTag();
                 if (!tag.isPopupDialog) return;
                 isList = false;
-                lastContextMenuPostion = tag.position;
-                model = adapter.getItem(lastContextMenuPostion);
+                lastContextMenuPosition = tag.position;
+                model = adapter.getItem(lastContextMenuPosition);
             } else {
                 return;
             }
@@ -662,7 +663,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         //контекстное меню для обычных постов
-        int position = lastContextMenuPostion;
+        int position = lastContextMenuPosition;
         if (item.getMenuInfo() != null && item.getMenuInfo() instanceof AdapterView.AdapterContextMenuInfo) {
             position = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
         }
@@ -714,7 +715,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyWithQuoteModel);
                 return true;
             case R.id.context_menu_select_text:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && lastContextMenuPostion == -1) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && lastContextMenuPosition == -1) {
                     int firstPosition = listView.getFirstVisiblePosition() - listView.getHeaderViewsCount();
                     int wantedChild = position - firstPosition;
                     if (wantedChild >= 0 && wantedChild < listView.getChildCount()) {
