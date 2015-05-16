@@ -102,7 +102,7 @@ public class SynchModule extends AbstractVichanModule {
     
     @Override
     public Drawable getChanFavicon() {
-        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_cirno, null);
+        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_synch, null);
     }
     
     @Override
@@ -151,7 +151,7 @@ public class SynchModule extends AbstractVichanModule {
         model.timeZoneId = "GMT+3";
         model.defaultUserName = "Аноним";
         model.readonlyBoard = false;
-        model.requiredFileForNewThread = false;
+        model.requiredFileForNewThread = true;
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
         model.allowNames = true;

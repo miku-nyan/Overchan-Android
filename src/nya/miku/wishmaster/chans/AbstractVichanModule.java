@@ -338,13 +338,13 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     
     protected static class VichanAntiBot {
         public static List<Pair<String, String>> getFormValues(String url, CancellableTask task, HttpClient httpClient) throws Exception {
-            return getFormValues(url, task, httpClient, "<form name=\"post\"", "</form>");
+            return getFormValues(url, HttpRequestModel.builder().setGET().build(), task, httpClient, "<form name=\"post\"", "</form>");
         }
         
-        public static List<Pair<String, String>> getFormValues(String url, CancellableTask task, HttpClient client, String startForm, String endForm)
-                throws Exception {
+        public static List<Pair<String, String>> getFormValues(String url, HttpRequestModel requestModel, CancellableTask task, HttpClient client,
+                String startForm, String endForm) throws Exception {
             VichanAntiBot reader = null;
-            HttpRequestModel request = HttpRequestModel.builder().setGET().build();
+            HttpRequestModel request = requestModel;
             HttpResponseModel response = null;
             try {
                 response = HttpStreamer.getInstance().getFromUrl(url, request, client, null, task);

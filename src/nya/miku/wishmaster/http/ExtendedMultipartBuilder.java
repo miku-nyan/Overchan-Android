@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Random;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -64,7 +65,8 @@ public class ExtendedMultipartBuilder {
     private CancellableTask task = null;
     
     public ExtendedMultipartBuilder() {
-        builder = MultipartEntityBuilder.create().setMode(HttpMultipartMode.BROWSER_COMPATIBLE).setBoundary(generateBoundary());
+        builder = MultipartEntityBuilder.create().setMode(HttpMultipartMode.BROWSER_COMPATIBLE).setBoundary(generateBoundary()).
+                setCharset(Charset.forName("UTF-8"));
     }
     
     public static ExtendedMultipartBuilder create() {
