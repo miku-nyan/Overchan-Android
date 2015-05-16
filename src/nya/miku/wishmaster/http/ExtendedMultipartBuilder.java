@@ -65,12 +65,16 @@ public class ExtendedMultipartBuilder {
     private CancellableTask task = null;
     
     public ExtendedMultipartBuilder() {
-        builder = MultipartEntityBuilder.create().setMode(HttpMultipartMode.BROWSER_COMPATIBLE).setBoundary(generateBoundary()).
-                setCharset(Charset.forName("UTF-8"));
+        builder = MultipartEntityBuilder.create().setMode(HttpMultipartMode.BROWSER_COMPATIBLE).setBoundary(generateBoundary());
     }
     
     public static ExtendedMultipartBuilder create() {
         return new ExtendedMultipartBuilder();
+    }
+    
+    public ExtendedMultipartBuilder setCharset(Charset charset) {
+        builder.setCharset(charset);
+        return this;
     }
     
     public ExtendedMultipartBuilder addPart(String key, ContentBody body) {

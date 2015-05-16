@@ -131,12 +131,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         for (int i=0, len=threads.length(); i<len; ++i) {
             JSONArray posts = threads.getJSONObject(i).getJSONArray("posts");
             JSONObject op = posts.getJSONObject(0);
-            ThreadModel curThread = new ThreadModel();
-            curThread.threadNumber = Long.toString(op.getLong("no"));
-            curThread.postsCount = op.optInt("replies", -2) + 1;
-            curThread.attachmentsCount = op.optInt("images", -2) + 1;
-            curThread.isSticky = op.optInt("sticky") == 1;
-            curThread.isClosed = op.optInt("closed") == 1;
+            ThreadModel curThread = mapThreadModel(op, boardName);
             curThread.posts = new PostModel[posts.length()];
             for (int j=0, plen=posts.length(); j<plen; ++j) {
                 curThread.posts[j] = mapPostModel(posts.getJSONObject(j), boardName);
@@ -184,6 +179,16 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             }
         }
         return threads.toArray(new ThreadModel[threads.size()]);
+    }
+    
+    protected ThreadModel mapThreadModel(JSONObject opPost, String boardName) {
+        ThreadModel curThread = new ThreadModel();
+        curThread.threadNumber = Long.toString(opPost.getLong("no"));
+        curThread.postsCount = opPost.optInt("replies", -2) + 1;
+        curThread.attachmentsCount = opPost.optInt("images", -2) + 1;
+        curThread.isSticky = opPost.optInt("sticky") == 1;
+        curThread.isClosed = opPost.optInt("closed") == 1;
+        return curThread;
     }
     
     protected PostModel mapPostModel(JSONObject object, String boardName) {

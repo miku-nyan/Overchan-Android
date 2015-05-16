@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.chans.synch;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -47,6 +48,7 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.chans.AbstractVichanModule;
@@ -170,6 +172,13 @@ public class SynchModule extends AbstractVichanModule {
     }
     
     @Override
+    protected ThreadModel mapThreadModel(JSONObject opPost, String boardName) {
+        ThreadModel model = super.mapThreadModel(opPost, boardName);
+        if (model.attachmentsCount >= 0) model.attachmentsCount += opPost.optInt("omitted_images", 0);
+        return model;
+    }
+    
+    @Override
     protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         AttachmentModel model = super.mapAttachment(object, boardName, isSpoiler);
         if (model != null) {
@@ -196,7 +205,8 @@ public class SynchModule extends AbstractVichanModule {
         
         if (task != null && task.isCancelled()) throw new Exception("interrupted");
         
-        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().
+                setCharset(Charset.forName("UTF-8")).setDelegates(listener, task);
         for (Pair<String, String> pair : fields) {
             String val;
             switch (pair.getKey()) {
