@@ -57,7 +57,7 @@ import android.support.v4.content.res.ResourcesCompat;
 @SuppressWarnings("deprecation") // https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 
 public class SevenchanModule extends AbstractWakabaModule {
-    private static final String CHAN_NAME = "7chan";
+    private static final String CHAN_NAME = "7chan.org";
     private static final String RECAPTCHA_KEY = "6LdVg8YSAAAAAOhqx0eFT1Pi49fOavnYgy7e-lTO";
     static final String TIMEZONE = "GMT+4"; // ?
     private static final Pattern ERROR_POSTING = Pattern.compile("<h2(?:[^>]*)>(.*?)</h2>", Pattern.DOTALL);

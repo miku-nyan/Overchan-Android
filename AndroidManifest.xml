@@ -95,6 +95,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="7chan.org" />
                 
+                <data android:host="lainchan.org" />
+                <data android:host="www.lainchan.org" />
+                
                 <data android:host="dobrochan.ru" />
                 <data android:host="dobrochan.com" />
                 <data android:host="dobrochan.org" />
