@@ -209,6 +209,8 @@ public class SevenchanModule extends AbstractWakabaModule {
                     addString("recaptcha_challenge_field", lastCaptcha.challenge).
                     addString("recaptcha_response_field", model.captchaAnswer);
             lastCaptcha = null;
+            
+            postEntityBuilder.addString("embed", "");
         }
         
         if (model.attachments != null && model.attachments.length > 0)

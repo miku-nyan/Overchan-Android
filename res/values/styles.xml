@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <style name="Futaba_Base" parent="@style/Theme_Light_Switch">
         <item name="materialPrimary">#FFFFEE</item>
+        <item name="materialPrimaryDark">#7F7F75</item>
         <item name="android:textColorPrimary">#800000</item>
         <item name="activityRootBackground">#FFFFEE</item>
         <item name="sidebarBackground">#CCFFFFEE</item>
@@ -74,6 +75,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </style>
     
     <style name="Photon_Base" parent="@style/Theme_Light_Switch">
+        <item name="materialPrimary">#EEEEEE</item>
+        <item name="materialPrimaryDark">#757575</item>
         <item name="android:textColorPrimary">#333333</item>
         <item name="activityRootBackground">#EEEEEE</item>
         <item name="sidebarBackground">#CCEEEEEE</item>
@@ -151,6 +154,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <style name="Gurochan_Base" parent="@style/Theme_Light_Switch">
         <item name="materialPrimary">#EDDAD2</item>
+        <item name="materialPrimaryDark">#766D69</item>
         <item name="android:textColorPrimary">#000000</item>
         <item name="activityRootBackground">#EDDAD2</item>
         <item name="sidebarBackground">#CCEDDAD2</item>
@@ -190,6 +194,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <style name="Tomorrow_Base" parent="@style/Theme_Dark_Switch">
         <item name="materialPrimary">#1D1F21</item>
+        <item name="materialPrimaryDark">#141619</item>
         <item name="android:textColorPrimary">#C5C8C6</item>
         <item name="activityRootBackground">#1D1F21</item>
         <item name="sidebarBackground">#CC1D1F21</item>

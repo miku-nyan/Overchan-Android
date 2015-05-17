@@ -45,6 +45,7 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.chans.AbstractVichanModule;
@@ -56,23 +57,23 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation") // https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 
 public class LainModule extends AbstractVichanModule {
     private static final String CHAN_NAME = "lainchan.org";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cyb", "cyberpunk", "", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "λ", "programming", "", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tech", "consumer technology", "", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "zzz", "dream", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "drg", "drugs 2.0", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "literature", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "DIY & Electronics", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "w", "weeb", "  ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rpg", "gaymes", "  ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "random", "  ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "layer", "layer:03", "  ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "q", "questions and complaints", "   ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cyb", "cyberpunk", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "λ", "programming", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tech", "consumer technology", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "zzz", "dream", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "drg", "drugs 2.0", "", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "literature", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "DIY & Electronics", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "w", "weeb", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rpg", "gaymes", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "random", " ", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "layer", "layer:03", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "q", "questions and complaints", "", false),
     };
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
     
@@ -115,7 +116,7 @@ public class LainModule extends AbstractVichanModule {
         BoardModel model = super.getBoard(shortName, listener, task);
         model.timeZoneId = "GMT";
         model.readonlyBoard = false;
-        model.requiredFileForNewThread = false;//true;
+        model.requiredFileForNewThread = true;
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
         model.allowNames = true;
@@ -130,6 +131,13 @@ public class LainModule extends AbstractVichanModule {
         model.attachmentsMaxCount = 1;
         model.attachmentsFormatFilters = null;
         model.markType = BoardModel.MARK_BBCODE;
+        return model;
+    }
+    
+    @Override
+    protected ThreadModel mapThreadModel(JSONObject opPost, String boardName) {
+        ThreadModel model = super.mapThreadModel(opPost, boardName);
+        if (model.attachmentsCount >= 0) model.attachmentsCount += opPost.optInt("omitted_images", 0);
         return model;
     }
     
@@ -153,6 +161,7 @@ public class LainModule extends AbstractVichanModule {
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().
                 setCharset(Charset.forName("UTF-8")).setDelegates(listener, task);
         for (Pair<String, String> pair : fields) {
+            if (pair.getKey().equals("spoiler")) continue;
             String val;
             switch (pair.getKey()) {
                 case "name": val = model.name; break;
