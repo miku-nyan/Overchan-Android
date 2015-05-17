@@ -102,6 +102,7 @@ public class HtmlParser {
             URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors, boolean openSpoilers) {
         SpannableStringBuilder spanned = fromHtml(subject, source, themeColors, imageGetter, openSpoilers);
         replaceUrls(spanned, spanClickListener, themeColors);
+        if (!openSpoilers) fixSpoilerSpans(spanned, themeColors);
         return spanned;
     }
     
@@ -115,6 +116,25 @@ public class HtmlParser {
             for (URLSpan span : spans) {
                 ClickableURLSpan.replaceURLSpan(builder, span, themeColors.urlLinkForeground).setOnClickListener(listener);
             }
+        }
+    }
+    
+    /**
+     * Исправить расположение SpoilerSpan и ForegroundColorSpan цвета ссылок для корректной работы ссылок под спойлерами
+     */
+    private static void fixSpoilerSpans(SpannableStringBuilder builder, ThemeColors themeColors) {
+        SpoilerSpan[] spoilers = builder.getSpans(0, builder.length(), SpoilerSpan.class);
+        for (SpoilerSpan span : spoilers) {
+            int start = builder.getSpanStart(span);
+            int end = builder.getSpanEnd(span);
+            builder.removeSpan(span);
+            builder.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        ClickableURLSpan[] urls = builder.getSpans(0, builder.length(), ClickableURLSpan.class);
+        for (ClickableURLSpan span : urls) {
+            int start = builder.getSpanStart(span);
+            int end = builder.getSpanEnd(span);
+            builder.setSpan(new ForegroundColorSpan(themeColors.urlLinkForeground), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
     

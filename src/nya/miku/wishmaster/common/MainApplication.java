@@ -107,7 +107,7 @@ public class MainApplication extends Application {
     
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
-        
+    
     public Map<String, Integer> chanModulesIndex;
     public List<ChanModule> chanModulesList;
     
