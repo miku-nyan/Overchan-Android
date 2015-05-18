@@ -78,6 +78,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item quantity="other">%d новых сообщения</item>
     </plurals>
     
+    <string name="attachment_info_size_format">Размер: %s</string>
+    <string name="attachment_info_resolution_format">Разрешение: %1$dx%2$d</string>
+    <string name="attachment_info_original_name_format">Оригинальное имя: %s</string>
+    
     <string name="tabs_newtab">Новая вкладка</string>
     <string name="tabs_favorites">Избранное</string>
     <string name="tabs_history">История</string>
@@ -169,6 +173,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_reply_with_quote">Ответить с цитатой</string>
     <string name="context_menu_reply_no_reading">Ответить не читая</string>
     <string name="context_menu_show_thumbnail">Показать миниатюру</string>
+    <string name="context_menu_attachment_info">Показать информацию</string>
     <string name="context_menu_download_file">Скачать файл</string>
     <string name="context_menu_download_attachment">Скачать вложение</string>
     <string name="context_menu_download_attachments">Скачать вложения</string>

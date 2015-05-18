@@ -29,6 +29,7 @@ import java.util.Set;
 
 import android.content.res.Resources;
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -182,6 +183,23 @@ public class ChanModels {
         } else {
             return resources.getString(R.string.postitem_attachment_size_kb_format, kb);
         }
+    }
+    
+    /**
+     * Получить строку с информацией о вложении (размер, разрешение, имя)
+     * @param chan модуль имиджборды
+     * @param attachment модель вложения
+     * @param resources объект ресурсов
+     */
+    public static String getAttachmentInfoString(ChanModule chan, AttachmentModel attachment, Resources resources) {
+        StringBuilder info = new StringBuilder(chan.fixRelativeUrl(attachment.path)).append('\n');
+        if (attachment.size != -1)
+            info.append(resources.getString(R.string.attachment_info_size_format, getAttachmentSizeString(attachment, resources))).append('\n');
+        if (attachment.width > 0 && attachment.height > 0)
+            info.append(resources.getString(R.string.attachment_info_resolution_format, attachment.width, attachment.height)).append('\n');
+        if (attachment.originalName != null)
+            info.append(resources.getString(R.string.attachment_info_original_name_format, attachment.originalName)).append('\n');
+        return info.substring(0, info.length() - 1);
     }
     
     /**

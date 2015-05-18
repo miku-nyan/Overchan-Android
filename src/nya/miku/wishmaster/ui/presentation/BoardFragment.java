@@ -532,10 +532,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             menu.add(Menu.NONE, R.id.context_menu_thumb_download, 2, R.string.context_menu_download_file);
             menu.add(Menu.NONE, R.id.context_menu_thumb_copy_url, 3, R.string.context_menu_copy_url);
-            menu.add(Menu.NONE, R.id.context_menu_thumb_search_google, 4, R.string.context_menu_search_google);
+            menu.add(Menu.NONE, R.id.context_menu_thumb_attachment_info, 4, R.string.context_menu_attachment_info);
+            menu.add(Menu.NONE, R.id.context_menu_thumb_search_google, 5, R.string.context_menu_search_google);
             for (int id : new int[] {
                     R.id.context_menu_thumb_download,
                     R.id.context_menu_thumb_copy_url,
+                    R.id.context_menu_thumb_attachment_info,
                     R.id.context_menu_thumb_search_google } ) {
                 menu.findItem(id).setOnMenuItemClickListener(contextMenuListener);
             }
@@ -654,6 +656,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 String url = chan.fixRelativeUrl(((AttachmentModel) lastContextMenuAttachment.getTag()).path);
                 Clipboard.copyText(activity, url);
                 Toast.makeText(activity, resources.getString(R.string.notification_url_copied, url), Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.context_menu_thumb_attachment_info:
+                String info = ChanModels.getAttachmentInfoString(chan, ((AttachmentModel) lastContextMenuAttachment.getTag()), resources);
+                Toast.makeText(activity, info, Toast.LENGTH_LONG).show();
                 return true;
             case R.id.context_menu_thumb_search_google:
                 String googleUrl = "http://www.google.com/searchbyimage?image_url=" +
@@ -1300,7 +1306,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     if (isThreadPage) {
                         activity.setTitle(tabModel.title);
                     } else if (pageType == TYPE_THREADSLIST) {
-                        activity.setTitle(presentationModel.source.boardModel.boardDescription);
+                        if (presentationModel != null) activity.setTitle(presentationModel.source.boardModel.boardDescription);
                     }
                     if (activity.tabsAdapter != null && tabTitleChanged) {
                         activity.tabsAdapter.notifyDataSetChanged();
