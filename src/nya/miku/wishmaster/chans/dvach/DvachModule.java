@@ -372,8 +372,12 @@ public class DvachModule extends AbstractWakabaModule {
                 return cssCode;
             }
         }
+        class WebViewHolder {
+            private WebView webView = null;
+        }
         
         final CSSCodeHolder holder = new CSSCodeHolder();
+        final WebViewHolder wv = new WebViewHolder();
         final String cssTest = HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + boardName + "/csstest.foo",
                 HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
         long startTime = System.currentTimeMillis();
@@ -381,8 +385,8 @@ public class DvachModule extends AbstractWakabaModule {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                WebView wv = new WebView(MainApplication.getInstance());
-                wv.setWebViewClient(new WebViewClient(){
+                wv.webView = new WebView(MainApplication.getInstance());
+                wv.webView.setWebViewClient(new WebViewClient(){
                     @Override
                     public void onLoadResource(WebView view, String url) {
                         if (url.contains("?code=") && !task.isCancelled()) {
@@ -390,7 +394,7 @@ public class DvachModule extends AbstractWakabaModule {
                         }
                     }
                 });
-                wv.loadDataWithBaseURL("http://127.0.0.1/csstest.foo", cssTest, "text/html", "UTF-8", "");
+                wv.webView.loadDataWithBaseURL("http://127.0.0.1/csstest.foo", cssTest, "text/html", "UTF-8", "");
             }
         });
         
@@ -398,6 +402,14 @@ public class DvachModule extends AbstractWakabaModule {
             long time = System.currentTimeMillis() - startTime;
             if ((task != null && task.isCancelled()) || time > 5000) break;
             Thread.yield();
+        }
+        
+        try {
+            wv.webView.stopLoading();
+            wv.webView.clearCache(true);
+            wv.webView.destroy();
+        } catch (Exception e) {
+            Logger.e(TAG, e);
         }
         
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");

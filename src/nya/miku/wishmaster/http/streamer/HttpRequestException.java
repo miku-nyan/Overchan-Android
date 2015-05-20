@@ -18,6 +18,8 @@
 
 package nya.miku.wishmaster.http.streamer;
 
+import javax.net.ssl.SSLException;
+
 import nya.miku.wishmaster.R;
 
 /**
@@ -27,31 +29,31 @@ import nya.miku.wishmaster.R;
  */
 public class HttpRequestException extends Exception {
     private static final long serialVersionUID = 1L;
-    private boolean sslException = false;
+    private final boolean sslException;
     
     public HttpRequestException(Exception e) {
-        super(e);
+        super((e != null ? (e.getMessage() != null ? e.getMessage() : e.toString()) : null), e);
+        sslException = e instanceof SSLException;
     }
-    public HttpRequestException(Exception e, boolean sslException) {
-        this(e);
-        this.sslException = sslException;
-    }
+    
     public boolean isSslException() {
         return sslException;
     }
+    
     @Override
     public String getMessage() {
+        if (sslException) return getString(R.string.error_ssl, "SSL/HTTPS Error (Connection is Untrusted)");
         String message = super.getMessage();
-        if (message.startsWith("org.apache.http.conn.HttpHostConnectException: ")) {
-            return message.substring(47);
-        } else if (message.equals("java.net.SocketTimeoutException")) {
-            try {
-                return nya.miku.wishmaster.common.MainApplication.getInstance().getString(R.string.error_connection_timeout);
-            } catch (Exception e) {
-                return "Connection timed out";
-            }
-        }
+        if (message.equals("java.net.SocketTimeoutException")) return getString(R.string.error_connection_timeout, "Connection timed out");
         return message;
+    }
+    
+    private String getString(int resId, String defaultValue) {
+        try {
+            return nya.miku.wishmaster.common.MainApplication.getInstance().getString(resId);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
 }

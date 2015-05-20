@@ -488,7 +488,12 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         if (boardModel.allowSubjects) subjectField.setText(sendPostModel.subject != null ? sendPostModel.subject : "");
         if (boardModel.allowEmails) emailField.setText(sendPostModel.email != null ? sendPostModel.email : "");
         commentField.setText(sendPostModel.comment != null ? sendPostModel.comment : "");
-        if (commentField.getText() != null) commentField.setSelection(commentField.getText().length());
+        if (commentField.getText() != null) {
+            int commentPosition = sendPostModel.commentPosition;
+            if (commentPosition > commentField.getText().length()) commentPosition = -1;
+            if (commentPosition < 0) commentPosition = commentField.getText().length();
+            commentField.setSelection(commentPosition);
+        }
         if (boardModel.allowDeletePosts || boardModel.allowDeleteFiles)
             passwordField.setText(sendPostModel.password != null ? sendPostModel.password : "");
         if (boardModel.allowIcons) spinner.setSelection(sendPostModel.icon != -1 ? sendPostModel.icon : 0);
@@ -510,6 +515,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         sendPostModel.subject = subjectField.getText().toString();
         sendPostModel.email = hidePersonalData && boardModel.allowEmails ? settings.getDefaultEmail() : emailField.getText().toString();
         sendPostModel.comment = commentField.getText().toString();
+        sendPostModel.commentPosition = commentField.getSelectionStart();
         sendPostModel.password = hidePersonalData && (boardModel.allowDeletePosts || boardModel.allowDeleteFiles) ?
                 chan.getDefaultPassword() : passwordField.getText().toString();
         sendPostModel.icon = boardModel.allowIcons ? spinner.getSelectedItemPosition() : -1;

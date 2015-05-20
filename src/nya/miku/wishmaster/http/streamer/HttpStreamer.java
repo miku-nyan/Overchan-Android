@@ -26,8 +26,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
 
-import javax.net.ssl.SSLException;
-
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.common.IOUtils;
@@ -209,9 +207,7 @@ public class HttpStreamer {
         } catch (Exception e) {
             Logger.e(TAG, e);
             HttpResponseModel.release(request, response);
-            boolean sslException = false;
-            if (e instanceof SSLException) sslException = true;
-            throw new HttpRequestException(e, sslException);
+            throw new HttpRequestException(e);
         }
         
         return responseModel;

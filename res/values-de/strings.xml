@@ -74,6 +74,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item quantity="other">%d neue Posts</item>
     </plurals>
     
+    <string name="attachment_info_size_format">Größe: %s</string>
+    <string name="attachment_info_resolution_format">Auflösung: %1$dx%2$d</string>
+    <string name="attachment_info_original_name_format">Originalnamen: %s</string>
+    
     <string name="tabs_newtab">Neuer Tab</string>
     <string name="tabs_favorites">Favoriten</string>
     <string name="tabs_history">Browserverlauf</string>
@@ -164,6 +168,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_reply_with_quote">Mit Zitat antworten</string>
     <string name="context_menu_reply_no_reading">Ohne zu lesen Antworten</string>
     <string name="context_menu_show_thumbnail">Miniaturansicht anzeigen</string>
+    <string name="context_menu_attachment_info">Informationen anzeigen</string>
     <string name="context_menu_download_file">Datei herunterladen</string>
     <string name="context_menu_download_attachment">Anhang herunterladen</string>
     <string name="context_menu_download_attachments">Anhänge herunterladen</string>
@@ -368,6 +373,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="dvach_prefs_domain">Domain</string>
     <string name="dvach_prefs_domain_summary">Reserved domains: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
+    
+    <string name="synch_prefs_domain">Domain</string>
+    <string name="synch_prefs_domain_summary">Reserved domains: syn-ch.com, syn-ch.org, syn-ch.ru, syn-ch.com.ua</string>
     
     <string name="infinity_tor_message">Um 8chan über Tor zu senden, müssen Sie den .onion Domain verwenden.</string>
     

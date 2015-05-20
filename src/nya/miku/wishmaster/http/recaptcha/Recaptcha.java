@@ -49,6 +49,22 @@ public class Recaptcha {
     // сюда передавать значение Challenge
     private static final String RECAPTCHA_IMAGE_URL = "://www.google.com/recaptcha/api/image?c=";
     
+    private static interface ChallengeGetter { String get(String key, CancellableTask task, HttpClient httpClient, String scheme) throws Exception; }
+    private static final ChallengeGetter[] GETTERS = new ChallengeGetter[] {
+        new ChallengeGetter() {
+            @Override
+            public String get(String publicKey, CancellableTask task, HttpClient httpClient, String scheme) throws Exception {
+                return RecaptchaAjax.getChallenge(publicKey, task, httpClient, scheme);
+            }
+        },
+        new ChallengeGetter() {
+            @Override
+            public String get(String publicKey, CancellableTask task, HttpClient httpClient, String scheme) throws Exception {
+                return getNoscriptChallenge(publicKey, task, httpClient, scheme);
+            }
+        },
+    };
+    
     /** картинка с капчей */
     public Bitmap bitmap;
     /** значение challenge */
@@ -63,31 +79,44 @@ public class Recaptcha {
      * @return модель рекапчи
      */
     public static Recaptcha obtain(String publicKey, CancellableTask task, HttpClient httpClient, String scheme) throws RecaptchaException {
-        try {
-            if (scheme == null) scheme = "http";
-            Recaptcha recaptcha = new Recaptcha();
-            String response = HttpStreamer.getInstance().getStringFromUrl(scheme + RECAPTCHA_CHALLENGE_URL + publicKey,
-                    HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
-            Matcher matcher = Pattern.compile("challenge.?:.?'([\\w-]+)'").matcher(response);
-            if (matcher.find()) {
-                recaptcha.challenge = matcher.group(1);
-                HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(scheme + RECAPTCHA_IMAGE_URL + recaptcha.challenge,
-                        HttpRequestModel.builder().setGET().build(), httpClient, null, task);
+        Exception lastException = null;
+        if (scheme == null) scheme = "http";
+        Recaptcha recaptcha = new Recaptcha();
+        for (ChallengeGetter getter : GETTERS) {
+            try {
+                recaptcha.challenge = getter.get(publicKey, task, httpClient, scheme);
+                HttpResponseModel responseModel = null;
                 try {
+                    responseModel = HttpStreamer.getInstance().getFromUrl(scheme + RECAPTCHA_IMAGE_URL + recaptcha.challenge,
+                            HttpRequestModel.builder().setGET().build(), httpClient, null, task);
                     InputStream imageStream = responseModel.stream;
                     recaptcha.bitmap = BitmapFactory.decodeStream(imageStream);
                 } finally {
-                    responseModel.release();
+                    if (responseModel != null) responseModel.release();
                 }
-                return recaptcha;
-            } else throw new RecaptchaException("can't parse recaptcha challenge answer");
-        } catch (Exception e) {
-            if (e instanceof RecaptchaException) {
-                throw (RecaptchaException)e;
-            } else {
-                throw new RecaptchaException(e);
+                if (recaptcha.bitmap != null) return recaptcha;
+            } catch (Exception e) {
+                lastException = e;
             }
         }
+        if (lastException != null) {
+            if (lastException instanceof RecaptchaException) {
+                throw (RecaptchaException)lastException;
+            } else {
+                throw new RecaptchaException(lastException);
+            }
+        } else {
+            throw new RecaptchaException("Can't get recaptcha");
+        }
+    }
+    
+    private static String getNoscriptChallenge(String publicKey, CancellableTask task, HttpClient httpClient, String scheme) throws Exception {
+        if (scheme == null) scheme = "http";
+        String response = HttpStreamer.getInstance().getStringFromUrl(scheme + RECAPTCHA_CHALLENGE_URL + publicKey,
+                HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+        Matcher matcher = Pattern.compile("challenge.?:.?'([\\w-]+)'").matcher(response);
+        if (matcher.find()) return matcher.group(1);
+        throw new RecaptchaException("can't parse recaptcha challenge answer");
     }
     
     private Recaptcha() {}

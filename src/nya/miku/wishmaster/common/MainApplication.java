@@ -42,8 +42,12 @@ import nya.miku.wishmaster.chans.fourchan.FourchanModule;
 import nya.miku.wishmaster.chans.incah.InachModule;
 import nya.miku.wishmaster.chans.infinity.InfinityModule;
 import nya.miku.wishmaster.chans.krautchan.KrautModule;
+import nya.miku.wishmaster.chans.lainchan.LainModule;
 import nya.miku.wishmaster.chans.makaba.MakabaModule;
 import nya.miku.wishmaster.chans.owlchan.OwlchanModule;
+import nya.miku.wishmaster.chans.sevenchan.SevenchanModule;
+import nya.miku.wishmaster.chans.synch.SynchModule;
+import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
@@ -103,7 +107,7 @@ public class MainApplication extends Application {
     
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
-        
+    
     public Map<String, Integer> chanModulesIndex;
     public List<ChanModule> chanModulesList;
     
@@ -115,9 +119,12 @@ public class MainApplication extends Application {
         addChanModule(new MikubaModule(preferences, resources));
         addChanModule(new DobroModule(preferences, resources));
         addChanModule(new DvachModule(preferences, resources));
+        addChanModule(new SevenchanModule(preferences, resources));
         addChanModule(new NowereModule(preferences, resources));
         addChanModule(new Chan410Module(preferences, resources));
+        addChanModule(new SynchModule(preferences, resources));
         addChanModule(new InachModule(preferences, resources));
+        addChanModule(new LainModule(preferences, resources));
         addChanModule(new OwlchanModule(preferences, resources));
         addChanModule(new DFWKModule(preferences, resources));
         addChanModule(new MakabaModule(preferences, resources));
@@ -154,6 +161,8 @@ public class MainApplication extends Application {
         chanModulesIndex = new HashMap<String, Integer>();
         chanModulesList = new ArrayList<ChanModule>();
         registerChanModules();
+        
+        RecaptchaAjax.init();
     }
     
     private File getAvailableCacheDir() {

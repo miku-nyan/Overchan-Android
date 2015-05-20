@@ -220,7 +220,7 @@ public class TabsTrackerService extends Service {
         if (task.isCancelled()) return;
         if (tabsSwitcher.currentFragment instanceof BoardFragment) {
             TabModel tab = tabsState.findTabById(tabsSwitcher.currentId);
-            if (tab.type == TabModel.TYPE_NORMAL && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
+            if (tab != null && tab.pageModel != null && tab.type == TabModel.TYPE_NORMAL && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {

@@ -86,7 +86,6 @@ public class WriteableDirContainer extends WriteableContainer {
         if (files.contains(filename)) return true;
         if (transfered) {
             File file = new File(directory, filename);
-            System.out.println(file.getAbsolutePath() + " " + file.exists());
             return !file.isDirectory() && file.exists();
         }
         return false;

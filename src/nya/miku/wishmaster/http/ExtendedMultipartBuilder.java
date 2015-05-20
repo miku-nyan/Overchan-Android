@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Random;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -69,6 +70,11 @@ public class ExtendedMultipartBuilder {
     
     public static ExtendedMultipartBuilder create() {
         return new ExtendedMultipartBuilder();
+    }
+    
+    public ExtendedMultipartBuilder setCharset(Charset charset) {
+        builder.setCharset(charset);
+        return this;
     }
     
     public ExtendedMultipartBuilder addPart(String key, ContentBody body) {

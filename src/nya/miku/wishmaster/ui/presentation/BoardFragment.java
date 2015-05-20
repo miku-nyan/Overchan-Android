@@ -225,7 +225,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     /** позиция (в адаптере) последнего выбранного элемента при создании контекстного меню из всплывающего окна
      *  или -1, если контекстное меню создано из listView */
-    private int lastContextMenuPostion;
+    private int lastContextMenuPosition;
     
     /** выбранное вложение (аттачмент) при создании контекстного меню из превью-картинки */
     private View lastContextMenuAttachment;
@@ -447,7 +447,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             boolean searchMenuVisible = false;
             boolean savePageMenuVisible = false;
             boolean boardGallryMenuVisible = false;
-            if (tabModel.type != TabModel.TYPE_LOCAL && pageType != TYPE_SEARCHLIST && listLoaded && !presentationModel.source.boardModel.readonlyBoard) {
+            if (tabModel.type != TabModel.TYPE_LOCAL && pageType != TYPE_SEARCHLIST && listLoaded &&
+                    !presentationModel.source.boardModel.readonlyBoard) {
                 addPostMenuVisible = true;
             }
             if (tabModel.type != TabModel.TYPE_LOCAL || listLoaded) {
@@ -531,10 +532,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             menu.add(Menu.NONE, R.id.context_menu_thumb_download, 2, R.string.context_menu_download_file);
             menu.add(Menu.NONE, R.id.context_menu_thumb_copy_url, 3, R.string.context_menu_copy_url);
-            menu.add(Menu.NONE, R.id.context_menu_thumb_search_google, 4, R.string.context_menu_search_google);
+            menu.add(Menu.NONE, R.id.context_menu_thumb_attachment_info, 4, R.string.context_menu_attachment_info);
+            menu.add(Menu.NONE, R.id.context_menu_thumb_search_google, 5, R.string.context_menu_search_google);
             for (int id : new int[] {
                     R.id.context_menu_thumb_download,
                     R.id.context_menu_thumb_copy_url,
+                    R.id.context_menu_thumb_attachment_info,
                     R.id.context_menu_thumb_search_google } ) {
                 menu.findItem(id).setOnMenuItemClickListener(contextMenuListener);
             }
@@ -558,7 +561,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         //контекстное меню для обычных элементов
         boolean isList = true;
-        lastContextMenuPostion = -1;
+        lastContextMenuPosition = -1;
         
         final PresentationItemModel model;
         if (v.getId() == android.R.id.list) {
@@ -572,8 +575,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 PostsListAdapter.PostViewTag tag = (PostsListAdapter.PostViewTag) v.getTag();
                 if (!tag.isPopupDialog) return;
                 isList = false;
-                lastContextMenuPostion = tag.position;
-                model = adapter.getItem(lastContextMenuPostion);
+                lastContextMenuPosition = tag.position;
+                model = adapter.getItem(lastContextMenuPosition);
             } else {
                 return;
             }
@@ -654,6 +657,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 Clipboard.copyText(activity, url);
                 Toast.makeText(activity, resources.getString(R.string.notification_url_copied, url), Toast.LENGTH_LONG).show();
                 return true;
+            case R.id.context_menu_thumb_attachment_info:
+                String info = ChanModels.getAttachmentInfoString(chan, ((AttachmentModel) lastContextMenuAttachment.getTag()), resources);
+                Toast.makeText(activity, info, Toast.LENGTH_LONG).show();
+                return true;
             case R.id.context_menu_thumb_search_google:
                 String googleUrl = "http://www.google.com/searchbyimage?image_url=" +
                         chan.fixRelativeUrl(((AttachmentModel) lastContextMenuAttachment.getTag()).path);
@@ -662,7 +669,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         //контекстное меню для обычных постов
-        int position = lastContextMenuPostion;
+        int position = lastContextMenuPosition;
         if (item.getMenuInfo() != null && item.getMenuInfo() instanceof AdapterView.AdapterContextMenuInfo) {
             position = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
         }
@@ -690,19 +697,31 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 return true;
             case R.id.context_menu_reply:
                 SendPostModel sendReplyModel = getSendPostModel();
-                sendReplyModel.comment = sendReplyModel.comment + ">>" + adapter.getItem(position).sourceModel.number + "\n";
+                int sendReplyModelPos = sendReplyModel.commentPosition;
+                if (sendReplyModelPos > sendReplyModel.comment.length()) sendReplyModelPos = -1;
+                if (sendReplyModelPos < 0) sendReplyModelPos = sendReplyModel.comment.length();
+                String insertion = ">>" + adapter.getItem(position).sourceModel.number + "\n";
+                sendReplyModel.comment = sendReplyModel.comment.substring(0, sendReplyModelPos) +
+                        insertion + sendReplyModel.comment.substring(sendReplyModelPos);
+                sendReplyModel.commentPosition = sendReplyModelPos + insertion.length();
                 openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyModel);
                 return true;
             case R.id.context_menu_reply_with_quote:
                 SendPostModel sendReplyWithQuoteModel = getSendPostModel();
+                int sendReplyWithQuoteModelPos = sendReplyWithQuoteModel.commentPosition;
+                if (sendReplyWithQuoteModelPos > sendReplyWithQuoteModel.comment.length()) sendReplyWithQuoteModelPos = -1;
+                if (sendReplyWithQuoteModelPos < 0) sendReplyWithQuoteModelPos = sendReplyWithQuoteModel.comment.length();
                 String quotedComment = adapter.getItem(position).spannedComment.toString().
                         replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1").replaceAll("(\n+)", "$1>");
-                sendReplyWithQuoteModel.comment = sendReplyWithQuoteModel.comment + ">>" + adapter.getItem(position).sourceModel.number + "\n"
-                        + (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
+                String insertionWithQuote = ">>" + adapter.getItem(position).sourceModel.number + "\n" +
+                        (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
+                sendReplyWithQuoteModel.comment = sendReplyWithQuoteModel.comment.substring(0, sendReplyWithQuoteModelPos) +
+                        insertionWithQuote + sendReplyWithQuoteModel.comment.substring(sendReplyWithQuoteModelPos);
+                sendReplyWithQuoteModel.commentPosition = sendReplyWithQuoteModelPos + insertionWithQuote.length();
                 openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyWithQuoteModel);
                 return true;
             case R.id.context_menu_select_text:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && lastContextMenuPostion == -1) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && lastContextMenuPosition == -1) {
                     int firstPosition = listView.getFirstVisiblePosition() - listView.getHeaderViewsCount();
                     int wantedChild = position - firstPosition;
                     if (wantedChild >= 0 && wantedChild < listView.getChildCount()) {
@@ -1287,7 +1306,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     if (isThreadPage) {
                         activity.setTitle(tabModel.title);
                     } else if (pageType == TYPE_THREADSLIST) {
-                        activity.setTitle(presentationModel.source.boardModel.boardDescription);
+                        if (presentationModel != null) activity.setTitle(presentationModel.source.boardModel.boardDescription);
                     }
                     if (activity.tabsAdapter != null && tabTitleChanged) {
                         activity.tabsAdapter.notifyDataSetChanged();
