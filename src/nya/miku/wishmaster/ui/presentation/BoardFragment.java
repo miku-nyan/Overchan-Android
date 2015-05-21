@@ -71,6 +71,7 @@ import nya.miku.wishmaster.ui.presentation.ClickableURLSpan.URLSpanClickListener
 import nya.miku.wishmaster.ui.presentation.FlowTextHelper.FloatingModel;
 import nya.miku.wishmaster.ui.presentation.HtmlParser.ImageGetter;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.settings.Wifi;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
 import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsState;
@@ -265,6 +266,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         resources = MainApplication.getInstance().resources;
         database = MainApplication.getInstance().database;
         handler = new Handler();
+        Wifi.updateState(activity);
         
         TabsState tabsState = MainApplication.getInstance().tabsState;
         if (tabsState == null) throw new IllegalStateException("tabsState was not initialized in the MainApplication singleton");
@@ -526,7 +528,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             AttachmentModel model = (AttachmentModel) v.getTag();
             
             View tnView = v.findViewById(R.id.post_thumbnail_image);
-            if (tnView != null && tnView.getTag() == Boolean.FALSE && !staticSettings.downloadThumbnails) {
+            if (tnView != null && tnView.getTag() == Boolean.FALSE && !downloadThumbnails()) {
                 menu.add(Menu.NONE, R.id.context_menu_thumb_load_thumb, 1, R.string.context_menu_show_thumbnail).
                         setOnMenuItemClickListener(contextMenuListener);
             }
@@ -1913,7 +1915,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         private void setNonBusy() {
-            if (!fragment().staticSettings.downloadThumbnails) return;
+            if (!fragment().downloadThumbnails()) return;
             int count = fragment().listView.getChildCount();
             for (int i=0; i<count; ++i) {
                 View v = fragment().listView.getChildAt(i);
@@ -2006,8 +2008,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         thumbnailPic,
                         fragment().imagesDownloadExecutor,
                         fragment().handler,
-                        fragment().staticSettings.downloadThumbnails && !curBusy,
-                        fragment().staticSettings.downloadThumbnails ? (curBusy ? 0 : R.drawable.thumbnail_error) :
+                        fragment().downloadThumbnails() && !curBusy,
+                        fragment().downloadThumbnails() ? (curBusy ? 0 : R.drawable.thumbnail_error) :
                             ChanModels.getDefaultThumbnailResId(attachment.type));
             } else {
                 thumbnailPic.setTag(Boolean.TRUE);
@@ -2035,7 +2037,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     badgeIcon,
                     fragment().imagesDownloadExecutor,
                     fragment().handler,
-                    fragment().staticSettings.downloadThumbnails && !curBusy,
+                    fragment().downloadThumbnails() && !curBusy,
                     0);
         }
     }
@@ -2047,6 +2049,17 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         int res = a/b;
         if (a%b != 0) ++res;
         return res;
+    }
+    
+    /**
+     * Загружать миниатюры автоматически
+     */
+    private boolean downloadThumbnails() {
+        switch (staticSettings.downloadThumbnails) {
+            case ALWAYS: return true;
+            case WIFI_ONLY: return Wifi.isConnected();
+            default: return false;
+        }
     }
     
     /**
@@ -2908,7 +2921,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 } else isBusy = true;
             }
             private void setNonBusy() {
-                if (!staticSettings.downloadThumbnails) return;
+                if (!downloadThumbnails()) return;
                 for (int i=0; i<view.getChildCount(); ++i) {
                     View v = view.getChildAt(i);
                     Object tnTag = v.findViewById(R.id.post_thumbnail_image).getTag();
@@ -2956,8 +2969,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         tnImage,
                         imagesDownloadExecutor,
                         handler,
-                        staticSettings.downloadThumbnails && !isBusy,
-                        staticSettings.downloadThumbnails ? (isBusy ? 0 : R.drawable.thumbnail_error) :
+                        downloadThumbnails() && !isBusy,
+                        downloadThumbnails() ? (isBusy ? 0 : R.drawable.thumbnail_error) :
                             ChanModels.getDefaultThumbnailResId(attachment.type));
             }
         }

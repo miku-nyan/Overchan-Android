@@ -76,8 +76,24 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_date), true);
     }
     
-    public boolean isDownloadThumbnails() {
-        return preferences.getBoolean(resources.getString(R.string.pref_key_download_thumbs), true);
+    public enum DownloadThumbnailsMode {
+        ALWAYS,
+        WIFI_ONLY,
+        NEVER
+    }
+    
+    public DownloadThumbnailsMode isDownloadThumbnails() {
+        String defaultMode = resources.getString(R.string.pref_download_thumbs_value_default);
+        String format = preferences.getString(resources.getString(R.string.pref_key_download_thumbs), defaultMode);
+        if (format.equals(resources.getString(R.string.pref_download_thumbs_value_always))) {
+            return DownloadThumbnailsMode.ALWAYS;
+        } else if (format.equals(resources.getString(R.string.pref_download_thumbs_value_wifi_only))) {
+            return DownloadThumbnailsMode.WIFI_ONLY;
+        } else if (format.equals(resources.getString(R.string.pref_download_thumbs_value_never))) {
+            return DownloadThumbnailsMode.NEVER;
+        } else {
+            return DownloadThumbnailsMode.ALWAYS;
+        }
     }
     
     public boolean isPopupLinks() {
@@ -315,7 +331,7 @@ public class ApplicationSettings {
     public class StaticSettingsContainer {
         public int theme;
         public int itemHeight;
-        public boolean downloadThumbnails;
+        public DownloadThumbnailsMode downloadThumbnails;
         public boolean isDisplayDate;
         public boolean isLocalTime;
         public boolean repliesOnlyQuantity;

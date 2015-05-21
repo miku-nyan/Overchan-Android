@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
     <uses-sdk
         android:minSdkVersion="4"
@@ -172,6 +173,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <service android:name="nya.miku.wishmaster.ui.posting.PostingService" />
         <service android:name="nya.miku.wishmaster.ui.downloading.DownloadingService" />
         <service android:name="nya.miku.wishmaster.ui.tabs.TabsTrackerService" />
+        
+        <receiver android:name="nya.miku.wishmaster.ui.settings.Wifi" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+        
     </application>
 
 </manifest>

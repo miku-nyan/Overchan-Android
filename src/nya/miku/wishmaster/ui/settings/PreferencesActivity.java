@@ -79,6 +79,7 @@ public class PreferencesActivity extends PreferenceActivity {
         
         updateListSummary(R.string.pref_key_theme);
         updateListSummary(R.string.pref_key_font_size);
+        updateListSummary(R.string.pref_key_download_thumbs);
         updateListSummary(R.string.pref_key_download_format);
         
         final Preference clearCachePreference = getPreferenceManager().findPreference(getString(R.string.pref_key_clear_cache));

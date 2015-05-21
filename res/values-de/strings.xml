@@ -461,7 +461,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_autoupdate_delay_summary">Auto-Aktualisierungsintervall nicht weniger als 30 Sekunden</string>
     <string name="pref_autoupdate_delay_hint">60 Sekunden standardmäßig</string>
     <string name="pref_autoupdate_delay_incorrect">Falscher Wert</string>
-    <string name="pref_autoupdate_background_title">Update im Hintergrund</string>
+    <string name="pref_autoupdate_background_title">Update Hintergrundtabs</string>
     <string name="pref_autoupdate_background_summary">Markierte Tabs für Auto-Update im Hintergrund aktualisieren</string>
     <string name="pref_autoupdate_notification_title">Im Infobereich</string>
     <string name="pref_autoupdate_notification_summary">Das System darf den Prozess nicht schließen, wenn die Anwendung minimiert wird</string>
@@ -475,8 +475,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Verzeichnis für Herunterladen</string>
     <string name="pref_download_dir_summary">Das Verzeichnis, in dem Dateien gespeichert werden sollen</string>
-    <string name="pref_download_thumbs_title">Thumbnails herunterladen</string>
-    <string name="pref_download_thumbs_summary">Laden Sie die Thumbnails automatisch, kann deaktiviert werden, um Web-Traffic zu reduzieren</string>
+    <string name="pref_download_thumbs_title">Thumbnails automatisch herunterladen</string>
+    <string-array name="pref_download_thumbs_choices">
+        <item>Immer</item>
+        <item>Nur Wi-Fi</item>
+        <item>Nie</item>
+    </string-array>
     <string name="pref_download_format_title">Threads Speicherformat</string>
     <string-array name="pref_download_format_choices">
         <item>Dateiordner</item>

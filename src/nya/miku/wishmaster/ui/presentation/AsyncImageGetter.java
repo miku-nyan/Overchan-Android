@@ -28,6 +28,7 @@ import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.presentation.HtmlParser.ImageGetter;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
+import nya.miku.wishmaster.ui.settings.Wifi;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -106,7 +107,13 @@ public class AsyncImageGetter implements ImageGetter {
         
         MutableBmpDrawable drawable = new MutableBmpDrawable(MainApplication.getInstance().resources, EMPTY_BMP);
         drawable.setBounds(0, 0, maxSize, maxSize);
-        if (staticSettings.downloadThumbnails) {
+        final boolean canDownload;
+        switch (staticSettings.downloadThumbnails) {
+            case ALWAYS: canDownload = true; break;
+            case WIFI_ONLY: canDownload = Wifi.isConnected(); break;
+            default: canDownload = false; break;
+        }
+        if (canDownload) {
             executor.execute(new Downloader(hash, source, drawable, task));
         }
         return drawable;

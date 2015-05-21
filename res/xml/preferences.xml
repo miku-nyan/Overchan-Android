@@ -184,11 +184,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:entryValues="@array/pref_download_format_values"
             android:defaultValue="@string/pref_download_format_value_default" />
         
-        <CheckBoxPreference
-            android:defaultValue="true"
+        <ListPreference
             android:key="@string/pref_key_download_thumbs"
             android:title="@string/pref_download_thumbs_title"
-            android:summary="@string/pref_download_thumbs_summary" />
+            android:dialogTitle="@string/pref_download_thumbs_title"
+            android:entries="@array/pref_download_thumbs_choices"
+            android:entryValues="@array/pref_download_thumbs_values"
+            android:defaultValue="@string/pref_download_thumbs_value_default" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_date_time" >

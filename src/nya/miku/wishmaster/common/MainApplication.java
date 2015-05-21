@@ -52,6 +52,7 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.settings.Wifi;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 
@@ -168,6 +169,7 @@ public class MainApplication extends Application {
         try {
             sfw = getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("(SFW)");
         } catch (Exception e) {}
+        Wifi.updateState(this);
     }
     
     private File getAvailableCacheDir() {
