@@ -22,7 +22,6 @@ import java.io.File;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.common.CompatibilityImpl;
-import nya.miku.wishmaster.common.CurrentBuild;
 import nya.miku.wishmaster.ui.FavoritesFragment;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import android.content.SharedPreferences;
@@ -271,7 +270,6 @@ public class ApplicationSettings {
     }
     
     public boolean showNSFWBoards() {
-        if (CurrentBuild.SFW_BUILD) return false;
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_nsfw_boards), false);
     }
     

@@ -30,7 +30,6 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.SerializableBoardsList;
 import nya.miku.wishmaster.common.CompatibilityImpl;
-import nya.miku.wishmaster.common.CurrentBuild;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
@@ -517,6 +516,8 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
             this.resources = fragment.resources;
             String lastCategory = "";
             
+            boolean sfw = MainApplication.getInstance().isSFW();
+            
             LinkedHashMap<String, String> favBoards = new LinkedHashMap<>();
             for (String board : fragment.database.getFavoriteBoards(fragment.chan)) favBoards.put(board, "");
             if (!favBoards.isEmpty()) {
@@ -533,11 +534,11 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                     model.boardCategory = lastCategory;
                     add(new BoardsListEntry(model));
                 }
-            } else if (CurrentBuild.SFW_BUILD) {
+            } else if (sfw) {
                 add(new BoardsListEntry(resources.getString(R.string.boardslist_empty_list)));
             }
             
-            if (!CurrentBuild.SFW_BUILD) {
+            if (!sfw) {
                 for (int i=0; i<fragment.boardsList.length; ++i) {
                     if (!fragment.settings.showNSFWBoards() && fragment.boardsList[i].nsfw) continue;
                     String curCategory = fragment.boardsList[i].boardCategory != null ? fragment.boardsList[i].boardCategory : "";

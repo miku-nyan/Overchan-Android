@@ -111,6 +111,8 @@ public class MainApplication extends Application {
     public Map<String, Integer> chanModulesIndex;
     public List<ChanModule> chanModulesList;
     
+    private boolean sfw;
+    
     private void registerChanModules() {
         addChanModule(new FourchanModule(preferences, resources));
         addChanModule(new KrautModule(preferences, resources));
@@ -163,6 +165,9 @@ public class MainApplication extends Application {
         registerChanModules();
         
         RecaptchaAjax.init();
+        try {
+            sfw = getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("(SFW)");
+        } catch (Exception e) {}
     }
     
     private File getAvailableCacheDir() {
@@ -181,6 +186,10 @@ public class MainApplication extends Application {
         if (ACRAConstants.ACRA_ENABLED) ACRA.init(this);
         initObjects();
         instance = this;
+    }
+    
+    public boolean isSFW() {
+        return sfw;
     }
     
     @Override
