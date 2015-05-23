@@ -427,7 +427,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_show_nsfw_boards_title">Alle Boards</string>
     <string name="pref_show_nsfw_boards_summary">Unmoderated Boards anzeigen</string>
     <string name="pref_autohide_title">Autohide</string>
-    <string name="pref_autohide_summary">Automatisches Verstecken von regulären Ausdrücken</string>
+    <string name="pref_autohide_summary">Automatisches Verstecken durch reguläre Ausdrücke</string>
     <string name="pref_external_links_confirmation_title">Links Bestätigung</string>
     <string name="pref_external_links_confirmation_summary">Bestätigen Sie, bevor Sie externe Links öffnen</string>
     <string name="pref_do_not_close_tabs_title">Tabs nicht schließen</string>
