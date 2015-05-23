@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Architects Daughter';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    url(architectsdaughter.woff2) format('woff2'),
+    url(architectsdaughter.woff) format('woff'),
+    url(architectsdaughter.ttf) format('truetype');
+}

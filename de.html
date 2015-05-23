@@ -26,8 +26,8 @@
     <header>
       <div class="inner">
         <h1>Overchan</h1>
-        <h2>Meta Imageboard Client for Android</h2>
-        <a href="https://github.com/miku-nyan/Overchan-Android" class="button"><small>View project on</small> GitHub</a>
+        <h2>Meta Imageboard Client für Android</h2>
+        <a href="https://github.com/miku-nyan/Overchan-Android" class="button"><small>Zum Projekt auf</small> GitHub</a>
       </div>
     </header>
 
@@ -35,29 +35,29 @@
       <div class="inner clearfix">
         <section id="main-content">
           
-          <p><b>Overchan</b> is a mobile application for browsing <a href="https://en.wikipedia.org/wiki/Imageboard">imageboards</a> for Android.</p>
-          <p>The project is free and open-source software (licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>).</p>
+          <p><b>Overchan</b> ist eine mobile Anwendung für das Surfen <a href="https://de.wikipedia.org/wiki/Imageboard">Imageboards</a> für Android.</p>
+          <p>Das Projekt ist eine freie und Open-Source-Software (unter der <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>-Lizenz).</p>
           
-          <h3><a id="Some-features" class="anchor" href="#Some-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Some features</h3>
+          <h3><a id="Some-features" class="anchor" href="#Some-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Einige Funktionen</h3>
           
           <ul>
-            <li>Separate preferences for each imageboard:<br>
-            password for post deletion, HTTP/SSL, proxy</li>
-            <li>Automatic hide posts and threads using regular expressions</li>
-            <li>Automatic update all open tabs in background</li>
-            <li>Sending posts in background</li>
-            <li>Saving threads with all attachments in HTML with <a href="https://github.com/SthephanShinkufag/Dollchan-Extension-Tools">Dollchan Script</a></li>
-            <li>Two ways to display replies to posts: as separate references and as list</li>
-            <li>Supports the tablet interface</li>
-            <li>Themes</li>
-            <li>Supports Android 1.6 and newer</li>
+            <li>Individuelle Einstellungen für jede Imageboard:<br>
+            Passwort zum Löschen von Posts, HTTPS/SSL, Proxy</li>
+            <li>Automatisches Verstecken durch reguläre Ausdrücke</li>
+            <li>Automatische Aktualisierung aller offener Tabs im Hintergrund</li>
+            <li>Senden von Posts im Hintergrund</li>
+            <li>Bewahrung der Threads mit allen Anhängen in HTML mit Dollchan Script</li>
+            <li>Anzeige der Antworten sowohl in Einzelform als auch in einer Liste</li>
+            <li>Unterstützung von Tablet-Schnittstelle</li>
+            <li>Verschiedene Themen</li>
+            <li>Unterstützung ab Android 1.6</li>
           </ul>
           
           <p>
             <!-- <a href="yastore://details?id=nya.miku.wishmaster">Yandex.Store</a><br> -->
-            <a href="https://github.com/miku-nyan/Overchan-Android/releases">Release Archive</a><br>
-            <a href="https://github.com/miku-nyan/Overchan-Android/blob/master/Imageboards.md">Supported Imageboards</a><br>
-            <a href="http://iichan.hk/b/res/3507246.html">Official thread on iichan.hk (don't hesitate to ask in English)</a><br>
+            <a href="https://github.com/miku-nyan/Overchan-Android/releases">Release Archiv</a><br>
+            <a href="https://github.com/miku-nyan/Overchan-Android/blob/master/Imageboards.md">Unterstützte Imageboards</a><br>
+            <a href="http://iichan.hk/b/res/3507246.html">Offiziellen Thread auf iichan.hk</a><br>
           </p>
           
           
@@ -86,7 +86,7 @@
             });
           </script>
           
-          <h3><a id="Donate" class="anchor" href="#Donate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Donate</h3>
+          <h3><a id="Donate" class="anchor" href="#Donate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Spenden</h3>
           <p><b>Yandex.Money</b><br>
           <tt>410011591247652</tt></p>
           <p><b>Bitcoin</b><br>
@@ -97,14 +97,14 @@
         <aside id="sidebar">
           <a id="Download" class="anchor" href="#Download" aria-hidden="true"><span class="octicon octicon-link"></span></a>
           <a id="DownloadButton" href="https://github.com/miku-nyan/Overchan-Android/releases" class="button">
-            <small>Release Archive</small>
+            <small>Release Archiv</small>
             GitHub
           </a>
           <script>
             $.getJSON('data/version.json', function(data) {
               var btn = document.getElementById('DownloadButton');
               btn.href = data.url;
-              btn.innerHTML = '<small>Current Release</small>' + data.description + ' (.apk)';
+              btn.innerHTML = '<small><!--Current Release-->Aktuelle Release</small>' + data.description + ' (.apk)';
             });
           </script>
           
@@ -127,7 +127,7 @@
           <a href="http://www.owlcarousel.owlgraphic.com/">Owl Carousel 2</a></p>
           
           <p><a class="language" href="ru.html" data-language="ru">RU</a> <a class="language" href="en.html" data-language="en">EN</a> <a class="language" href="de.html" data-language="de">DE</a></p>
-          <script>document.cookie = 'languageDetection=en; path=/';</script>
+          <script>document.cookie = 'languageDetection=de; path=/';</script>
         </aside>
       </div>
     </div>
