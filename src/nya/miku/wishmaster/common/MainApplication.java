@@ -166,9 +166,7 @@ public class MainApplication extends Application {
         registerChanModules();
         
         RecaptchaAjax.init();
-        try {
-            sfw = getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("(SFW)");
-        } catch (Exception e) {}
+        sfw = getPackageName().endsWith(".sfw");
         Wifi.updateState(this);
     }
     

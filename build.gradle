@@ -44,7 +44,6 @@ android {
         res.srcDirs = ['res']
         assets.srcDirs = ['assets']
         jni.srcDirs = ['jni']
-        jniLibs.srcDir 'libs'
     }
     defaultConfig.ndk {
         moduleName "gif"
