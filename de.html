@@ -46,7 +46,7 @@
             <li>Automatisches Verstecken durch reguläre Ausdrücke</li>
             <li>Automatische Aktualisierung aller offener Tabs im Hintergrund</li>
             <li>Senden von Posts im Hintergrund</li>
-            <li>Bewahrung der Threads mit allen Anhängen in HTML mit Dollchan Script</li>
+            <li>Bewahrung der Threads mit allen Anhängen in HTML mit <a href="https://github.com/SthephanShinkufag/Dollchan-Extension-Tools">Dollchan Script</a></li>
             <li>Anzeige der Antworten sowohl in Einzelform als auch in einer Liste</li>
             <li>Unterstützung von Tablet-Schnittstelle</li>
             <li>Verschiedene Themen</li>
@@ -57,7 +57,7 @@
             <!-- <a href="yastore://details?id=nya.miku.wishmaster">Yandex.Store</a><br> -->
             <a href="https://github.com/miku-nyan/Overchan-Android/releases">Release Archiv</a><br>
             <a href="https://github.com/miku-nyan/Overchan-Android/blob/master/Imageboards.md">Unterstützte Imageboards</a><br>
-            <a href="http://iichan.hk/b/res/3507246.html">Offiziellen Thread auf iichan.hk</a><br>
+            <a href="http://iichan.hk/b/res/3531427.html">Offiziellen Thread auf iichan.hk</a><br>
           </p>
           
           
@@ -104,16 +104,14 @@
             $.getJSON('data/version.json', function(data) {
               var btn = document.getElementById('DownloadButton');
               btn.href = data.url;
-              btn.innerHTML = '<small><!--Current Release-->Aktuelle Release</small>' + data.description + ' (.apk)';
+              btn.innerHTML = '<small>Aktuelle Release</small>' + data.description + ' (.apk)';
             });
           </script>
           
-          <!--
-          <a href="https://play.google.com/store/apps/details?id=..." class="button" style="background: transparent url(images/download-button-google.png) 0 0 no-repeat;">
+          <a href="https://play.google.com/store/apps/details?id=nya.miku.wishmaster.sfw" class="button" style="background: transparent url(images/download-button-google.png) 0 0 no-repeat;">
             <small>GET IT ON</small>
             Google Play
           </a>
-          -->
           
           <a href="https://f-droid.org/repository/browse/?fdid=nya.miku.wishmaster" class="button" style="padding-left: 72px; background: transparent url(images/download-button-fdroid.png) 0 0 no-repeat;">
             <small>GET IT ON</small>
