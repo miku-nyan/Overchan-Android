@@ -2993,9 +2993,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             grid.setAdapter(gridAdapter);
             grid.setOnScrollListener(gridAdapter);
             Dialog gridDialog = new Dialog(activity);
-            gridDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             gridDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             gridDialog.setContentView(grid);
+            gridDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             gridDialog.show();
         } catch (OutOfMemoryError oom) {
             MainApplication.freeMemory();
