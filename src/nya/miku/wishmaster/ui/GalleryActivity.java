@@ -630,7 +630,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     
     private void updateItem() {
         AttachmentModel attachment = attachments.get(currentPosition).getLeft();
-        tryScrollParent(attachments.get(currentPosition).getRight()); //TODO make this optional before release!
+        if (settings.scrollThreadFromGallery()) tryScrollParent(attachments.get(currentPosition).getRight());
         String navText = attachment.size == -1 ? (currentPosition + 1) + "/" + attachments.size() :
                 (currentPosition + 1) + "/" + attachments.size() + " (" + ChanModels.getAttachmentSizeString(attachment, getResources()) + ")";
         navigationInfo.setText(navText);
