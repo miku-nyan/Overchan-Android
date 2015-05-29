@@ -43,6 +43,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -80,8 +81,10 @@ public class FourchanModule extends AbstractChanModule {
     
     static final String CHAN_NAME = "4chan.org";
     
+    private static final boolean NEW_RECAPTCHA_DEFAULT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1;
+    
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    private static final String PREF_KEY_NEW_RECAPTCHA = "PREF_KEY_NEW_RECAPTCHA";
+    private static final String PREF_KEY_NEW_RECAPTCHA = "PREF_KEY_NEW_RECAPTCHA1";
     private static final String PREF_KEY_PASS_TOKEN = "PREF_KEY_PASS_TOKEN";
     private static final String PREF_KEY_PASS_PIN = "PREF_KEY_PASS_PIN";
     private static final String PREF_KEY_PASS_COOKIE = "PREF_KEY_PASS_COOKIE";
@@ -303,7 +306,7 @@ public class FourchanModule extends AbstractChanModule {
         newRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha);
         newRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_summary);
         newRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
-        newRecaptchaPref.setDefaultValue(false);
+        newRecaptchaPref.setDefaultValue(NEW_RECAPTCHA_DEFAULT);
         preferenceGroup.addPreference(newRecaptchaPref);
         
         addPasswordPreference(preferenceGroup);
@@ -333,7 +336,7 @@ public class FourchanModule extends AbstractChanModule {
     
     private boolean useNewRecaptcha() {
         return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) &&
-                preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), false);
+                preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
     }
     
     @Override
