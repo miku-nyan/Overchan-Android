@@ -43,7 +43,7 @@ public class UrlHandler {
     public static void open(final String url, final MainActivity activity) {
         TabModel model = getTabModel(getPageModel(url), activity.getResources());
         if (model != null) {
-            open(model, activity);
+            open(model, activity, true);
             return;
         }
         boolean isEmail = url.toLowerCase(Locale.US).startsWith("mailto:");
@@ -68,11 +68,16 @@ public class UrlHandler {
     }
     
     public static void open(UrlPageModel urlPageModel, MainActivity activity) {
-        TabModel model = getTabModel(urlPageModel, activity.getResources());
-        open(model, activity);
+        open(urlPageModel, activity, true, null);
     }
     
-    private static void open(TabModel model, MainActivity activity) {
+    public static void open(UrlPageModel urlPageModel, MainActivity activity, boolean switchAfter, String tabTitle) {
+        TabModel model = getTabModel(urlPageModel, activity.getResources());
+        if (tabTitle != null) model.title = tabTitle;
+        open(model, activity, switchAfter);
+    }
+    
+    private static void open(TabModel model, MainActivity activity, boolean switchAfter) {
         TabsAdapter tabsAdapter = activity.tabsAdapter;
         for (int i=0; i<tabsAdapter.getCount(); ++i) {
             if (tabsAdapter.getItem(i).hash != null && tabsAdapter.getItem(i).hash.equals(model.hash)) {
@@ -90,7 +95,7 @@ public class UrlHandler {
         } else {
             tabsAdapter.add(model);
         }
-        tabsAdapter.setSelectedItemId(model.id);
+        if (switchAfter) tabsAdapter.setSelectedItemId(model.id);
     }
     
     public static TabModel getTabModel(UrlPageModel pageModel, Resources resources) {
