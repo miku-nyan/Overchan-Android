@@ -1125,9 +1125,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (presentationModel == null || presentationModel.isNotReady())
+                                if (presentationModel == null || presentationModel.isNotReady() || adapter == null)
                                     Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
                                 
+                                if (adapter == null) return;
                                 if (nullAdapterIsSet) {
                                     listView.setAdapter(adapter);
                                     listView.setSelectionFromTop(nullAdapterSavedPosition, nullAdapterSavedTop);

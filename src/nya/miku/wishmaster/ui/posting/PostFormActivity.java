@@ -125,13 +125,13 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             case R.id.postform_mark_strike:
             case R.id.postform_mark_spoiler:
             case R.id.postform_mark_quote:
-                Editable comment = commentField.getEditableText();
-                String text = comment.toString();
-                int selectionStart = Math.max(0, commentField.getSelectionStart());
-                int selectionEnd = Math.min(text.length(), commentField.getSelectionEnd());
-                text = text.substring(selectionStart, selectionEnd);
-                
                 try {
+                    Editable comment = commentField.getEditableText();
+                    String text = comment.toString();
+                    int selectionStart = Math.max(0, commentField.getSelectionStart());
+                    int selectionEnd = Math.min(text.length(), commentField.getSelectionEnd());
+                    text = text.substring(selectionStart, selectionEnd);
+                    
                     if (boardModel.markType == BoardModel.MARK_WAKABAMARK) {
                         switch (v.getId()) {
                             case R.id.postform_mark_bold:
