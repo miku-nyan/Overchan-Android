@@ -84,7 +84,7 @@ public class UrlHandler {
                 tabsAdapter.getItem(i).startItemNumber = model.startItemNumber;
                 tabsAdapter.getItem(i).startItemTop = 0;
                 tabsAdapter.getItem(i).forceUpdate = true;
-                tabsAdapter.setSelectedItem(i);
+                if (switchAfter) tabsAdapter.setSelectedItem(i);
                 return;
             }
         }

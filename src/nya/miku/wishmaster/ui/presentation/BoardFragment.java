@@ -624,7 +624,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 menu.findItem(R.id.context_menu_download).setTitle(R.string.context_menu_download_attachment);
             }
         } else if (pageType == TYPE_THREADSLIST && isList) {
-        	menu.add(Menu.NONE, R.id.context_menu_open_in_new_tab, 1, R.string.context_menu_open_in_new_tab);
+            menu.add(Menu.NONE, R.id.context_menu_open_in_new_tab, 1, R.string.context_menu_open_in_new_tab);
             menu.add(Menu.NONE, R.id.context_menu_thread_preview, 2, R.string.context_menu_thread_preview);
             menu.add(Menu.NONE, R.id.context_menu_reply_no_reading, 3, R.string.context_menu_reply_no_reading);
             menu.add(Menu.NONE, R.id.context_menu_hide, 4, R.string.context_menu_hide_thread);
@@ -679,13 +679,25 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (nullAdapterIsSet || position == -1 || adapter.getCount() <= position) return false;
         switch (item.getItemId()) {
             case R.id.context_menu_open_in_new_tab:
-            	UrlPageModel modelNewTab = new UrlPageModel();
-            	modelNewTab.chanName = chan.getChanName();
-            	modelNewTab.type = UrlPageModel.TYPE_THREADPAGE;
-            	modelNewTab.boardName = tabModel.pageModel.boardName;
-            	modelNewTab.threadNumber = adapter.getItem(position).sourceModel.parentThread;
-                UrlHandler.open(modelNewTab, activity, false, null);
-            	return true;
+                UrlPageModel modelNewTab = new UrlPageModel();
+                modelNewTab.chanName = chan.getChanName();
+                modelNewTab.type = UrlPageModel.TYPE_THREADPAGE;
+                modelNewTab.boardName = tabModel.pageModel.boardName;
+                modelNewTab.threadNumber = adapter.getItem(position).sourceModel.parentThread;
+                String tabTitle = null;
+                String subject = adapter.getItem(position).sourceModel.subject;
+                if (subject != null && subject.length() != 0) {
+                    tabTitle = subject;
+                } else {
+                    Spanned spannedComment = adapter.getItem(position).spannedComment;
+                    if (spannedComment != null) {
+                        tabTitle = spannedComment.toString().replace('\n', ' ');
+                        if (tabTitle.length() > MAX_TITLE_LENGHT) tabTitle = tabTitle.substring(0, MAX_TITLE_LENGHT);
+                    }
+                }
+                if (tabTitle != null) tabTitle = resources.getString(R.string.tabs_title_threadpage_loaded, modelNewTab.boardName, tabTitle);
+                UrlHandler.open(modelNewTab, activity, false, tabTitle);
+                return true;
             case R.id.context_menu_thread_preview:
                 showThreadPreviewDialog(position);
                 return true;
