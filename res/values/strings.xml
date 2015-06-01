@@ -163,6 +163,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_remove_history">Remove from history</string>
     <string name="context_menu_open_browser">Open browser</string>
     <string name="context_menu_autoupdate_background">Auto-update</string>
+    <string name="context_menu_open_in_new_tab">Open in new tab</string>
     <string name="context_menu_thread_preview">Thread preview</string>
     <string name="context_menu_reply">Reply to this post</string>
     <string name="context_menu_reply_with_quote">Reply with quote</string>

@@ -624,9 +624,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 menu.findItem(R.id.context_menu_download).setTitle(R.string.context_menu_download_attachment);
             }
         } else if (pageType == TYPE_THREADSLIST && isList) {
-            menu.add(Menu.NONE, R.id.context_menu_thread_preview, 1, R.string.context_menu_thread_preview);
-            menu.add(Menu.NONE, R.id.context_menu_reply_no_reading, 2, R.string.context_menu_reply_no_reading);
-            menu.add(Menu.NONE, R.id.context_menu_hide, 3, R.string.context_menu_hide_thread);
+        	menu.add(Menu.NONE, R.id.context_menu_open_in_new_tab, 1, R.string.context_menu_open_in_new_tab);
+            menu.add(Menu.NONE, R.id.context_menu_thread_preview, 2, R.string.context_menu_thread_preview);
+            menu.add(Menu.NONE, R.id.context_menu_reply_no_reading, 3, R.string.context_menu_reply_no_reading);
+            menu.add(Menu.NONE, R.id.context_menu_hide, 4, R.string.context_menu_hide_thread);
             if (presentationModel.source.boardModel.readonlyBoard || tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_reply_no_reading).setVisible(false);
             }
@@ -677,6 +678,14 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         if (nullAdapterIsSet || position == -1 || adapter.getCount() <= position) return false;
         switch (item.getItemId()) {
+            case R.id.context_menu_open_in_new_tab:
+            	UrlPageModel modelNewTab = new UrlPageModel();
+            	modelNewTab.chanName = chan.getChanName();
+            	modelNewTab.type = UrlPageModel.TYPE_THREADPAGE;
+            	modelNewTab.boardName = tabModel.pageModel.boardName;
+            	modelNewTab.threadNumber = adapter.getItem(position).sourceModel.parentThread;
+                UrlHandler.open(modelNewTab, activity, false, null);
+            	return true;
             case R.id.context_menu_thread_preview:
                 showThreadPreviewDialog(position);
                 return true;
