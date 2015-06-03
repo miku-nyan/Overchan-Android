@@ -305,6 +305,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_enable_autoupdate), false);
     }
     
+    public boolean isAutoupdateWifiOnly() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_autoupdate_only_wifi), false);
+    }
+    
     public boolean isAutoupdateBackground() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_autoupdate_background), false);
     }

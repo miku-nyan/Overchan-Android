@@ -221,6 +221,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:title="@string/pref_enable_autoupdate_title"
             android:summary="@string/pref_enable_autoupdate_summary" />
         
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_autoupdate_only_wifi"
+            android:title="@string/pref_autoupdate_only_wifi_title"
+            android:summary="@string/pref_autoupdate_only_wifi_summary"
+            android:dependency="@string/pref_key_enable_autoupdate" />
+        
         <EditTextPreference
             android:key="@string/pref_key_autoupdate_delay"
             android:title="@string/pref_autoupdate_delay_title"

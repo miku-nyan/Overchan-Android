@@ -36,6 +36,7 @@ import nya.miku.wishmaster.ui.MainActivity;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.presentation.PresentationModel;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.settings.Wifi;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -255,7 +256,7 @@ public class TabsTrackerService extends Service {
                     if (enableNotification) {
                         notifyForeground(TRACKER_NOTIFICATION_ID, notifBuilder.setContentText(getString(R.string.tabs_tracker_updating)).build());
                     }
-                    doUpdate(this);
+                    if (!MainApplication.getInstance().settings.isAutoupdateWifiOnly() || Wifi.isConnected()) doUpdate(this);
                     
                     if (isCancelled()) {
                         cancelForeground(TRACKER_NOTIFICATION_ID);
