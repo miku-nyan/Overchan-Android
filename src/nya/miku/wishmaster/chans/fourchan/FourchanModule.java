@@ -316,7 +316,7 @@ public class FourchanModule extends AbstractChanModule {
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
+        addUnsafeSslPreference(preferenceGroup, null/*getSharedKey(PREF_KEY_USE_HTTPS)*/);
         addProxyPreferences(preferenceGroup);
         
         final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
@@ -464,7 +464,7 @@ public class FourchanModule extends AbstractChanModule {
                 if (recaptcha2 == null) throw new Recaptcha2Interactive();
             } else if (recaptcha == null) throw new Exception("Invalid captcha");
         }
-        String url = (useHttps() ? "https://" : "http://") + "sys.4chan.org/" + model.boardName + "/post";
+        String url = "https://sys.4chan.org/" + model.boardName + "/post";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("name", model.name).
                 addString("email", model.sage ? "sage" : "").
@@ -499,7 +499,7 @@ public class FourchanModule extends AbstractChanModule {
     
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = (useHttps() ? "https://" : "http://") + "sys.4chan.org/" + model.boardName + "/imgboard.php";
+        String url = "https://sys.4chan.org/" + model.boardName + "/imgboard.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString(model.postNumber, "delete");
         if (model.onlyFiles) postEntityBuilder.addString("onlyimgdel", "on");
