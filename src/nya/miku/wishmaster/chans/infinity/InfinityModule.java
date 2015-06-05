@@ -92,6 +92,7 @@ public class InfinityModule extends AbstractVichanModule {
     
     private static final Pattern CAPTCHA_BASE64 = Pattern.compile("data:image/png;base64,([^\"]*)\"");
     private static final Pattern CAPTCHA_COOKIE = Pattern.compile("<input[^>]*name='captcha_cookie'[^>]*value='([^']*)'");
+    private static final Pattern CAPTCHA_ID = Pattern.compile("CAPTCHA ID: (.*?)<");
     
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
     private static final Pattern BAN_REASON_PATTERN = Pattern.compile("<p class=\"reason\">(.*?)</p>");
@@ -101,6 +102,8 @@ public class InfinityModule extends AbstractVichanModule {
     private Map<String, BoardModel> boardsMap = new HashMap<>();
     private boolean needTorCaptcha = false;
     private String torCaptchaCookie = null;
+    private boolean needNewthreadCaptcha = false;
+    private String newThreadCaptchaId = null;
     
     
     public InfinityModule(SharedPreferences preferences, Resources resources) {
@@ -281,6 +284,22 @@ public class InfinityModule extends AbstractVichanModule {
                 return captcha;
             }
         }
+        if (needNewthreadCaptcha) {
+            String url = getUsingUrl() + "8chan-captcha/entrypoint.php?mode=get&extra=abcdefghijklmnopqrstuvwxyz&nojs=true";
+            HttpRequestModel request = HttpRequestModel.builder().setGET().
+                    setCustomHeaders(new Header[] { new BasicHeader(HttpHeaders.CACHE_CONTROL, "max-age=0") }).build();
+            String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+            Matcher base64Matcher = CAPTCHA_BASE64.matcher(response);
+            Matcher captchaIdMatcher = CAPTCHA_ID.matcher(response);
+            if (base64Matcher.find() && captchaIdMatcher.find()) {
+                byte[] bitmap = Base64.decode(base64Matcher.group(1), Base64.DEFAULT);
+                newThreadCaptchaId = captchaIdMatcher.group(1);
+                CaptchaModel captcha = new CaptchaModel();
+                captcha.type = CaptchaModel.TYPE_NORMAL;
+                captcha.bitmap = BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length);
+                return captcha;
+            }
+        }
         return null;
     }
     
@@ -321,6 +340,10 @@ public class InfinityModule extends AbstractVichanModule {
             for (int i=0; i<model.attachments.length; ++i) {
                 postEntityBuilder.addFile(images[i], model.attachments[i]);
             }
+        }
+        if (needNewthreadCaptcha) {
+            postEntityBuilder.addString("captcha_text", model.captchaAnswer).addString("captcha_cookie", newThreadCaptchaId);
+            needNewthreadCaptcha = false;
         }
         
         UrlPageModel refererPage = new UrlPageModel();
@@ -365,7 +388,12 @@ public class InfinityModule extends AbstractVichanModule {
                 String htmlResponse = output.toString("UTF-8");
                 if (htmlResponse.contains("dnsbls_bypass.php")) {
                     needTorCaptcha = true;
-                    throw new Exception("Please complete your CAPTCHA.");
+                    throw new Exception("Please complete your CAPTCHA. (Bypass DNSBL)");
+                } else if (htmlResponse.contains("captcha_text") || htmlResponse.contains("entrypoint.php")) {
+                    needNewthreadCaptcha = true;
+                    throw new Exception(htmlResponse.contains("entrypoint.php") ?
+                            "You seem to have mistyped the verification, or your CAPTCHA expired. Please fill it out again." :
+                                "Please complete your CAPTCHA.");
                 } else if (htmlResponse.contains("<h1>Error</h1>")) {
                     Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
                     if (errorMatcher.find()) {
