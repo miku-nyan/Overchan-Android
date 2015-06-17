@@ -21,7 +21,6 @@ package nya.miku.wishmaster.ui.settings;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
-import nya.miku.wishmaster.common.CurrentBuild;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
@@ -57,6 +56,7 @@ public class PreferencesActivity extends PreferenceActivity {
         setTitle(R.string.preferences);
         
         super.onCreate(savedInstanceState);
+        boolean sfw = MainApplication.getInstance().isSFW();
         PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(this);
         setPreferenceScreen(rootScreen);
         
@@ -79,6 +79,7 @@ public class PreferencesActivity extends PreferenceActivity {
         
         updateListSummary(R.string.pref_key_theme);
         updateListSummary(R.string.pref_key_font_size);
+        updateListSummary(R.string.pref_key_download_thumbs);
         updateListSummary(R.string.pref_key_download_format);
         
         final Preference clearCachePreference = getPreferenceManager().findPreference(getString(R.string.pref_key_clear_cache));
@@ -95,16 +96,18 @@ public class PreferencesActivity extends PreferenceActivity {
         
         Preference aboutPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_version));
         try {
-            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName + (CurrentBuild.SFW_BUILD ? " (SFW)" : "");
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             aboutPreference.setSummary(versionName);
         } catch (Exception e) {}
-        aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                AppUpdatesChecker.checkForUpdates(PreferencesActivity.this);
-                return true;
-            }
-        });
+        if (!sfw) {
+            aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    AppUpdatesChecker.checkForUpdates(PreferencesActivity.this);
+                    return true;
+                }
+            });
+        }
         
         Preference licensePreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_license));
         licensePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -156,7 +159,7 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
         
-        if (CurrentBuild.SFW_BUILD) getPreferenceManager().findPreference(getString(R.string.pref_key_show_nsfw_boards)).setEnabled(false);
+        if (sfw) getPreferenceManager().findPreference(getString(R.string.pref_key_show_nsfw_boards)).setEnabled(false);
         
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override

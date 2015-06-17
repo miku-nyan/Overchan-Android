@@ -243,7 +243,7 @@ public class PostingService extends Service {
                             PendingIntent.getActivity(PostingService.this, 0, intentToPostingForm, PendingIntent.FLAG_CANCEL_CURRENT);
                     NotificationCompat.Builder errorNotifBuilder = new NotificationCompat.Builder(PostingService.this).
                             setSmallIcon(android.R.drawable.stat_notify_error).
-                            setTicker(getString(R.string.posting_error)).
+                            setTicker(e instanceof InteractiveException ? errorMessage : getString(R.string.posting_error)).
                             setContentTitle(getString(R.string.posting_error)).
                             setContentText(errorMessage).
                             setContentIntent(pIntentToPostingForm).

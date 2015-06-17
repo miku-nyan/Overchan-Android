@@ -163,6 +163,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_remove_history">Aus dem Verlauf entfernen</string>
     <string name="context_menu_open_browser">Browser öffnen</string>
     <string name="context_menu_autoupdate_background">Auto-update</string>
+    <string name="context_menu_open_in_new_tab">In neuem Tab öffnen</string>
     <string name="context_menu_thread_preview">Vorschau von Thread</string>
     <string name="context_menu_reply">Antworten</string>
     <string name="context_menu_reply_with_quote">Mit Zitat antworten</string>
@@ -427,7 +428,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_show_nsfw_boards_title">Alle Boards</string>
     <string name="pref_show_nsfw_boards_summary">Unmoderated Boards anzeigen</string>
     <string name="pref_autohide_title">Autohide</string>
-    <string name="pref_autohide_summary">Automatisches Verstecken von regulären Ausdrücken</string>
+    <string name="pref_autohide_summary">Automatisches Verstecken durch reguläre Ausdrücke</string>
     <string name="pref_external_links_confirmation_title">Links Bestätigung</string>
     <string name="pref_external_links_confirmation_summary">Bestätigen Sie, bevor Sie externe Links öffnen</string>
     <string name="pref_do_not_close_tabs_title">Tabs nicht schließen</string>
@@ -445,6 +446,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_replies_only_quantity_summary">Alternative Verweise auf Posts anzeigen</string>
     <string name="pref_gallery_screen_title">Galerie</string>
     <string name="pref_gallery_screen_summary">Erweiterte Einstellungen von Galerie</string>
+    <string name="pref_gallery_scroll_thread_title">Bis Anhänge blättern</string>
+    <string name="pref_gallery_scroll_thread_summary">Thread bis Posts mit Anhängen aus Galerie blättern</string>
     <string name="pref_gallery_scaleimageview_title">Image Viewer</string>
     <string name="pref_gallery_scaleimageview_summary">Bildbetrachter auf Basis integrierter Bibliothek skia</string>
     <string name="pref_gallery_nativegif_title">GIF-Viewer</string>
@@ -457,11 +460,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_gallery_audioplayer_summary">Kann manchmal nicht in älteren Versionen von Android arbeiten</string>
     <string name="pref_enable_autoupdate_title">Auto-Update aktivieren</string>
     <string name="pref_enable_autoupdate_summary">Die offenen Threads automatisch aktualisieren</string>
+    <string name="pref_autoupdate_only_wifi_title">Nur Wi-Fi</string>
+    <string name="pref_autoupdate_only_wifi_summary">Auto-Update nur über Wi-Fi</string>
     <string name="pref_autoupdate_delay_title">Intervall (in Sekunden)</string>
     <string name="pref_autoupdate_delay_summary">Auto-Aktualisierungsintervall nicht weniger als 30 Sekunden</string>
     <string name="pref_autoupdate_delay_hint">60 Sekunden standardmäßig</string>
     <string name="pref_autoupdate_delay_incorrect">Falscher Wert</string>
-    <string name="pref_autoupdate_background_title">Update im Hintergrund</string>
+    <string name="pref_autoupdate_background_title">Update Hintergrundtabs</string>
     <string name="pref_autoupdate_background_summary">Markierte Tabs für Auto-Update im Hintergrund aktualisieren</string>
     <string name="pref_autoupdate_notification_title">Im Infobereich</string>
     <string name="pref_autoupdate_notification_summary">Das System darf den Prozess nicht schließen, wenn die Anwendung minimiert wird</string>
@@ -475,8 +480,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Verzeichnis für Herunterladen</string>
     <string name="pref_download_dir_summary">Das Verzeichnis, in dem Dateien gespeichert werden sollen</string>
-    <string name="pref_download_thumbs_title">Thumbnails herunterladen</string>
-    <string name="pref_download_thumbs_summary">Laden Sie die Thumbnails automatisch, kann deaktiviert werden, um Web-Traffic zu reduzieren</string>
+    <string name="pref_download_thumbs_title">Thumbnails automatisch herunterladen</string>
+    <string-array name="pref_download_thumbs_choices">
+        <item>Immer</item>
+        <item>Nur Wi-Fi</item>
+        <item>Nie</item>
+    </string-array>
     <string name="pref_download_format_title">Threads Speicherformat</string>
     <string-array name="pref_download_format_choices">
         <item>Dateiordner</item>

@@ -22,7 +22,6 @@ import java.io.File;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.common.CompatibilityImpl;
-import nya.miku.wishmaster.common.CurrentBuild;
 import nya.miku.wishmaster.ui.FavoritesFragment;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import android.content.SharedPreferences;
@@ -77,8 +76,24 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_date), true);
     }
     
-    public boolean isDownloadThumbnails() {
-        return preferences.getBoolean(resources.getString(R.string.pref_key_download_thumbs), true);
+    public enum DownloadThumbnailsMode {
+        ALWAYS,
+        WIFI_ONLY,
+        NEVER
+    }
+    
+    public DownloadThumbnailsMode isDownloadThumbnails() {
+        String defaultMode = resources.getString(R.string.pref_download_thumbs_value_default);
+        String format = preferences.getString(resources.getString(R.string.pref_key_download_thumbs), defaultMode);
+        if (format.equals(resources.getString(R.string.pref_download_thumbs_value_always))) {
+            return DownloadThumbnailsMode.ALWAYS;
+        } else if (format.equals(resources.getString(R.string.pref_download_thumbs_value_wifi_only))) {
+            return DownloadThumbnailsMode.WIFI_ONLY;
+        } else if (format.equals(resources.getString(R.string.pref_download_thumbs_value_never))) {
+            return DownloadThumbnailsMode.NEVER;
+        } else {
+            return DownloadThumbnailsMode.ALWAYS;
+        }
     }
     
     public boolean isPopupLinks() {
@@ -250,6 +265,10 @@ public class ApplicationSettings {
         }
     }
     
+    public boolean scrollThreadFromGallery() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_scroll_thread), false);
+    }
+    
     public boolean useScaleImageView() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_scaleimageview), true);
     }
@@ -271,7 +290,6 @@ public class ApplicationSettings {
     }
     
     public boolean showNSFWBoards() {
-        if (CurrentBuild.SFW_BUILD) return false;
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_nsfw_boards), false);
     }
     
@@ -285,6 +303,10 @@ public class ApplicationSettings {
     
     public boolean isAutoupdateEnabled() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_enable_autoupdate), false);
+    }
+    
+    public boolean isAutoupdateWifiOnly() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_autoupdate_only_wifi), false);
     }
     
     public boolean isAutoupdateBackground() {
@@ -317,7 +339,7 @@ public class ApplicationSettings {
     public class StaticSettingsContainer {
         public int theme;
         public int itemHeight;
-        public boolean downloadThumbnails;
+        public DownloadThumbnailsMode downloadThumbnails;
         public boolean isDisplayDate;
         public boolean isLocalTime;
         public boolean repliesOnlyQuantity;

@@ -18,49 +18,50 @@
 
 package nya.miku.wishmaster.common;
 
+import nya.miku.wishmaster.BuildConfig;
 import android.util.Log;
 
 public class Logger {
     private Logger() {}
     
     public static void d(String tag, String msg) {
-        if (CurrentBuild.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(tag, msg != null ? msg : "");
         }
     }
 
     public static void i(String tag, String msg) {
-        if (CurrentBuild.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.i(tag, msg != null ? msg : "");
         }
     }
 
     public static void w(String tag, String msg) {
-        if (CurrentBuild.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.w(tag, msg != null ? msg : "");
         }
     }
     
     public static void v(String tag, String msg) {
-        if (CurrentBuild.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.v(tag, msg != null ? msg : "");
         }
     }
     
     public static void e(String tag, String msg) {
-        if (CurrentBuild.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.e(tag, msg != null ? msg : "");
         }
     }
 
     public static void e(String tag, Throwable e) {
-        if (CurrentBuild.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.e(tag, e.toString(), e);
         }
     }
     
     public static void e(String tag, String msg, Throwable e) {
-        if (CurrentBuild.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.e(tag, msg, e);
         }
     }

@@ -43,7 +43,7 @@ public class UrlHandler {
     public static void open(final String url, final MainActivity activity) {
         TabModel model = getTabModel(getPageModel(url), activity.getResources());
         if (model != null) {
-            open(model, activity);
+            open(model, activity, true);
             return;
         }
         boolean isEmail = url.toLowerCase(Locale.US).startsWith("mailto:");
@@ -68,24 +68,34 @@ public class UrlHandler {
     }
     
     public static void open(UrlPageModel urlPageModel, MainActivity activity) {
-        TabModel model = getTabModel(urlPageModel, activity.getResources());
-        open(model, activity);
+        open(urlPageModel, activity, true, null);
     }
     
-    private static void open(TabModel model, MainActivity activity) {
+    public static void open(UrlPageModel urlPageModel, MainActivity activity, boolean switchAfter, String tabTitle) {
+        TabModel model = getTabModel(urlPageModel, activity.getResources());
+        if (tabTitle != null) model.title = tabTitle;
+        open(model, activity, switchAfter);
+    }
+    
+    private static void open(TabModel model, MainActivity activity, boolean switchAfter) {
         TabsAdapter tabsAdapter = activity.tabsAdapter;
         for (int i=0; i<tabsAdapter.getCount(); ++i) {
             if (tabsAdapter.getItem(i).hash != null && tabsAdapter.getItem(i).hash.equals(model.hash)) {
                 tabsAdapter.getItem(i).startItemNumber = model.startItemNumber;
                 tabsAdapter.getItem(i).startItemTop = 0;
                 tabsAdapter.getItem(i).forceUpdate = true;
-                tabsAdapter.setSelectedItem(i);
+                if (switchAfter) tabsAdapter.setSelectedItem(i);
                 return;
             }
         }
         
-        tabsAdapter.add(model);
-        tabsAdapter.setSelectedItemId(model.id);
+        int selected = tabsAdapter.getSelectedItem();
+        if (selected >= 0 && selected < tabsAdapter.getCount()) {
+            tabsAdapter.insert(model, selected + 1);
+        } else {
+            tabsAdapter.add(model);
+        }
+        if (switchAfter) tabsAdapter.setSelectedItemId(model.id);
     }
     
     public static TabModel getTabModel(UrlPageModel pageModel, Resources resources) {

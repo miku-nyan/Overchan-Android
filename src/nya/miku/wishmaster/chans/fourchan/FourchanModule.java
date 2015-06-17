@@ -43,6 +43,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -80,8 +81,10 @@ public class FourchanModule extends AbstractChanModule {
     
     static final String CHAN_NAME = "4chan.org";
     
+    private static final boolean NEW_RECAPTCHA_DEFAULT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1;
+    
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    private static final String PREF_KEY_NEW_RECAPTCHA = "PREF_KEY_NEW_RECAPTCHA";
+    private static final String PREF_KEY_NEW_RECAPTCHA = "PREF_KEY_NEW_RECAPTCHA1";
     private static final String PREF_KEY_PASS_TOKEN = "PREF_KEY_PASS_TOKEN";
     private static final String PREF_KEY_PASS_PIN = "PREF_KEY_PASS_PIN";
     private static final String PREF_KEY_PASS_COOKIE = "PREF_KEY_PASS_COOKIE";
@@ -303,7 +306,7 @@ public class FourchanModule extends AbstractChanModule {
         newRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha);
         newRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_summary);
         newRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
-        newRecaptchaPref.setDefaultValue(false);
+        newRecaptchaPref.setDefaultValue(NEW_RECAPTCHA_DEFAULT);
         preferenceGroup.addPreference(newRecaptchaPref);
         
         addPasswordPreference(preferenceGroup);
@@ -313,7 +316,7 @@ public class FourchanModule extends AbstractChanModule {
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
+        addUnsafeSslPreference(preferenceGroup, null/*getSharedKey(PREF_KEY_USE_HTTPS)*/);
         addProxyPreferences(preferenceGroup);
         
         final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
@@ -333,7 +336,7 @@ public class FourchanModule extends AbstractChanModule {
     
     private boolean useNewRecaptcha() {
         return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) &&
-                preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), false);
+                preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
     }
     
     @Override
@@ -461,7 +464,7 @@ public class FourchanModule extends AbstractChanModule {
                 if (recaptcha2 == null) throw new Recaptcha2Interactive();
             } else if (recaptcha == null) throw new Exception("Invalid captcha");
         }
-        String url = (useHttps() ? "https://" : "http://") + "sys.4chan.org/" + model.boardName + "/post";
+        String url = "https://sys.4chan.org/" + model.boardName + "/post";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("name", model.name).
                 addString("email", model.sage ? "sage" : "").
@@ -496,7 +499,7 @@ public class FourchanModule extends AbstractChanModule {
     
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = (useHttps() ? "https://" : "http://") + "sys.4chan.org/" + model.boardName + "/imgboard.php";
+        String url = "https://sys.4chan.org/" + model.boardName + "/imgboard.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString(model.postNumber, "delete");
         if (model.onlyFiles) postEntityBuilder.addString("onlyimgdel", "on");

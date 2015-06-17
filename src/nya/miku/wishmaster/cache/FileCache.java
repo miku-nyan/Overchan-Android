@@ -48,6 +48,8 @@ public class FileCache { //TODO database
     /** имя файла для состояния вкладок (копия) */
     /*package*/ static final String TABS_FILENAME_2 = "tabsstate_2"; //не удаляется никогда
     
+    private static final String NOMEDIA = ".nomedia";
+    
     private static final float PAGES_QUOTE = 0.1f;
     
     private final File directory;
@@ -65,6 +67,7 @@ public class FileCache { //TODO database
     public FileCache(File directory, long maxSize) {
         this.directory = directory;
         makeDir();
+        makeNomedia();
         calculateSize();
         setMaxSize(maxSize);
     }
@@ -173,6 +176,14 @@ public class FileCache { //TODO database
         }
     }
     
+    private void makeNomedia() {
+        try {
+            pathToFile(NOMEDIA).createNewFile();
+        } catch (Exception e) {
+            Logger.e(TAG, "couldn't create .nomedia file", e);
+        }
+    }
+    
     private synchronized void trim() {
         if (maxSize == 0 || size <= maxSize) return;
         
@@ -223,7 +234,7 @@ public class FileCache { //TODO database
 
     private boolean isUndeletable(File file) {
         String filename = file.getName();
-        return filename.equals(TABS_FILENAME) || filename.equals(TABS_FILENAME_2) || filename.startsWith(PREFIX_BOARDS); 
+        return filename.equals(TABS_FILENAME) || filename.equals(TABS_FILENAME_2) || filename.startsWith(PREFIX_BOARDS) || filename.equals(NOMEDIA); 
     }
     
     private boolean isPageFile(File file) {

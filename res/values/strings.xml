@@ -163,6 +163,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_remove_history">Remove from history</string>
     <string name="context_menu_open_browser">Open browser</string>
     <string name="context_menu_autoupdate_background">Auto-update</string>
+    <string name="context_menu_open_in_new_tab">Open in new tab</string>
     <string name="context_menu_thread_preview">Thread preview</string>
     <string name="context_menu_reply">Reply to this post</string>
     <string name="context_menu_reply_with_quote">Reply with quote</string>
@@ -444,6 +445,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_replies_only_quantity_summary">Alternative way to display references to posts</string>
     <string name="pref_gallery_screen_title">Gallery</string>
     <string name="pref_gallery_screen_summary">Gallery advanced preferences</string>
+    <string name="pref_gallery_scroll_thread_title">Scroll to attachments</string>
+    <string name="pref_gallery_scroll_thread_summary">Scroll the thread to posts with attachments from gallery</string>
     <string name="pref_gallery_scaleimageview_title">Image Viewer</string>
     <string name="pref_gallery_scaleimageview_summary">Image viewer based on built-in library skia</string>
     <string name="pref_gallery_nativegif_title">GIF Viewer</string>
@@ -456,11 +459,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_gallery_audioplayer_summary">May not work on older versions of Android</string>
     <string name="pref_enable_autoupdate_title">Enable auto-update</string>
     <string name="pref_enable_autoupdate_summary">Update the open threads automatically</string>
+    <string name="pref_autoupdate_only_wifi_title">Wi-Fi only</string>
+    <string name="pref_autoupdate_only_wifi_summary">Auto-update over Wi-Fi only</string>
     <string name="pref_autoupdate_delay_title">Interval (in seconds)</string>
     <string name="pref_autoupdate_delay_summary">Auto-update interval, not less than 30 seconds</string>
     <string name="pref_autoupdate_delay_hint">60 seconds by default</string>
     <string name="pref_autoupdate_delay_incorrect">Incorrect value</string>
-    <string name="pref_autoupdate_background_title">Update in background</string>
+    <string name="pref_autoupdate_background_title">Update background tabs</string>
     <string name="pref_autoupdate_background_summary">Update tabs marked for auto-update in the background</string>
     <string name="pref_autoupdate_notification_title">In the notification area</string>
     <string name="pref_autoupdate_notification_summary">Does not allow the system to close the process when the application is minimized</string>
@@ -474,8 +479,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Downloads directory</string>
     <string name="pref_download_dir_summary">The directory where files should be saved</string>
-    <string name="pref_download_thumbs_title">Download thumbnails</string>
-    <string name="pref_download_thumbs_summary">Download thumbnails automatically, disable to reduce web traffic</string>
+    <string name="pref_download_thumbs_title">Download thumbnails automatically</string>
+    <string-array name="pref_download_thumbs_choices">
+        <item>Always</item>
+        <item>Wi-Fi only</item>
+        <item>Never</item>
+    </string-array>
     <string name="pref_download_format_title">Threads save format</string>
     <string-array name="pref_download_format_choices">
         <item>File folder</item>

@@ -52,6 +52,7 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.settings.Wifi;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 
@@ -111,6 +112,8 @@ public class MainApplication extends Application {
     public Map<String, Integer> chanModulesIndex;
     public List<ChanModule> chanModulesList;
     
+    private boolean sfw;
+    
     private void registerChanModules() {
         addChanModule(new FourchanModule(preferences, resources));
         addChanModule(new KrautModule(preferences, resources));
@@ -163,6 +166,8 @@ public class MainApplication extends Application {
         registerChanModules();
         
         RecaptchaAjax.init();
+        sfw = getPackageName().endsWith(".sfw");
+        Wifi.updateState(this);
     }
     
     private File getAvailableCacheDir() {
@@ -181,6 +186,10 @@ public class MainApplication extends Application {
         if (ACRAConstants.ACRA_ENABLED) ACRA.init(this);
         initObjects();
         instance = this;
+    }
+    
+    public boolean isSFW() {
+        return sfw;
     }
     
     @Override

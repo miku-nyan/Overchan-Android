@@ -71,6 +71,7 @@ import nya.miku.wishmaster.ui.presentation.ClickableURLSpan.URLSpanClickListener
 import nya.miku.wishmaster.ui.presentation.FlowTextHelper.FloatingModel;
 import nya.miku.wishmaster.ui.presentation.HtmlParser.ImageGetter;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.settings.Wifi;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
 import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsState;
@@ -265,6 +266,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         resources = MainApplication.getInstance().resources;
         database = MainApplication.getInstance().database;
         handler = new Handler();
+        Wifi.updateState(activity);
         
         TabsState tabsState = MainApplication.getInstance().tabsState;
         if (tabsState == null) throw new IllegalStateException("tabsState was not initialized in the MainApplication singleton");
@@ -526,7 +528,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             AttachmentModel model = (AttachmentModel) v.getTag();
             
             View tnView = v.findViewById(R.id.post_thumbnail_image);
-            if (tnView != null && tnView.getTag() == Boolean.FALSE && !staticSettings.downloadThumbnails) {
+            if (tnView != null && tnView.getTag() == Boolean.FALSE && !downloadThumbnails()) {
                 menu.add(Menu.NONE, R.id.context_menu_thumb_load_thumb, 1, R.string.context_menu_show_thumbnail).
                         setOnMenuItemClickListener(contextMenuListener);
             }
@@ -622,9 +624,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 menu.findItem(R.id.context_menu_download).setTitle(R.string.context_menu_download_attachment);
             }
         } else if (pageType == TYPE_THREADSLIST && isList) {
-            menu.add(Menu.NONE, R.id.context_menu_thread_preview, 1, R.string.context_menu_thread_preview);
-            menu.add(Menu.NONE, R.id.context_menu_reply_no_reading, 2, R.string.context_menu_reply_no_reading);
-            menu.add(Menu.NONE, R.id.context_menu_hide, 3, R.string.context_menu_hide_thread);
+            menu.add(Menu.NONE, R.id.context_menu_open_in_new_tab, 1, R.string.context_menu_open_in_new_tab);
+            menu.add(Menu.NONE, R.id.context_menu_thread_preview, 2, R.string.context_menu_thread_preview);
+            menu.add(Menu.NONE, R.id.context_menu_reply_no_reading, 3, R.string.context_menu_reply_no_reading);
+            menu.add(Menu.NONE, R.id.context_menu_hide, 4, R.string.context_menu_hide_thread);
             if (presentationModel.source.boardModel.readonlyBoard || tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_reply_no_reading).setVisible(false);
             }
@@ -675,6 +678,26 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         if (nullAdapterIsSet || position == -1 || adapter.getCount() <= position) return false;
         switch (item.getItemId()) {
+            case R.id.context_menu_open_in_new_tab:
+                UrlPageModel modelNewTab = new UrlPageModel();
+                modelNewTab.chanName = chan.getChanName();
+                modelNewTab.type = UrlPageModel.TYPE_THREADPAGE;
+                modelNewTab.boardName = tabModel.pageModel.boardName;
+                modelNewTab.threadNumber = adapter.getItem(position).sourceModel.parentThread;
+                String tabTitle = null;
+                String subject = adapter.getItem(position).sourceModel.subject;
+                if (subject != null && subject.length() != 0) {
+                    tabTitle = subject;
+                } else {
+                    Spanned spannedComment = adapter.getItem(position).spannedComment;
+                    if (spannedComment != null) {
+                        tabTitle = spannedComment.toString().replace('\n', ' ');
+                        if (tabTitle.length() > MAX_TITLE_LENGHT) tabTitle = tabTitle.substring(0, MAX_TITLE_LENGHT);
+                    }
+                }
+                if (tabTitle != null) tabTitle = resources.getString(R.string.tabs_title_threadpage_loaded, modelNewTab.boardName, tabTitle);
+                UrlHandler.open(modelNewTab, activity, false, tabTitle);
+                return true;
             case R.id.context_menu_thread_preview:
                 showThreadPreviewDialog(position);
                 return true;
@@ -1123,9 +1146,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (presentationModel == null || presentationModel.isNotReady())
+                                if (presentationModel == null || presentationModel.isNotReady() || adapter == null)
                                     Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
                                 
+                                if (adapter == null) return;
                                 if (nullAdapterIsSet) {
                                     listView.setAdapter(adapter);
                                     listView.setSelectionFromTop(nullAdapterSavedPosition, nullAdapterSavedTop);
@@ -1913,7 +1937,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         private void setNonBusy() {
-            if (!fragment().staticSettings.downloadThumbnails) return;
+            if (!fragment().downloadThumbnails()) return;
             int count = fragment().listView.getChildCount();
             for (int i=0; i<count; ++i) {
                 View v = fragment().listView.getChildAt(i);
@@ -2006,8 +2030,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         thumbnailPic,
                         fragment().imagesDownloadExecutor,
                         fragment().handler,
-                        fragment().staticSettings.downloadThumbnails && !curBusy,
-                        fragment().staticSettings.downloadThumbnails ? (curBusy ? 0 : R.drawable.thumbnail_error) :
+                        fragment().downloadThumbnails() && !curBusy,
+                        fragment().downloadThumbnails() ? (curBusy ? 0 : R.drawable.thumbnail_error) :
                             ChanModels.getDefaultThumbnailResId(attachment.type));
             } else {
                 thumbnailPic.setTag(Boolean.TRUE);
@@ -2035,7 +2059,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     badgeIcon,
                     fragment().imagesDownloadExecutor,
                     fragment().handler,
-                    fragment().staticSettings.downloadThumbnails && !curBusy,
+                    fragment().downloadThumbnails() && !curBusy,
                     0);
         }
     }
@@ -2047,6 +2071,17 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         int res = a/b;
         if (a%b != 0) ++res;
         return res;
+    }
+    
+    /**
+     * Загружать миниатюры автоматически
+     */
+    private boolean downloadThumbnails() {
+        switch (staticSettings.downloadThumbnails) {
+            case ALWAYS: return true;
+            case WIFI_ONLY: return Wifi.isConnected();
+            default: return false;
+        }
     }
     
     /**
@@ -2908,7 +2943,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 } else isBusy = true;
             }
             private void setNonBusy() {
-                if (!staticSettings.downloadThumbnails) return;
+                if (!downloadThumbnails()) return;
                 for (int i=0; i<view.getChildCount(); ++i) {
                     View v = view.getChildAt(i);
                     Object tnTag = v.findViewById(R.id.post_thumbnail_image).getTag();
@@ -2956,8 +2991,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         tnImage,
                         imagesDownloadExecutor,
                         handler,
-                        staticSettings.downloadThumbnails && !isBusy,
-                        staticSettings.downloadThumbnails ? (isBusy ? 0 : R.drawable.thumbnail_error) :
+                        downloadThumbnails() && !isBusy,
+                        downloadThumbnails() ? (isBusy ? 0 : R.drawable.thumbnail_error) :
                             ChanModels.getDefaultThumbnailResId(attachment.type));
             }
         }
@@ -2980,9 +3015,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             grid.setAdapter(gridAdapter);
             grid.setOnScrollListener(gridAdapter);
             Dialog gridDialog = new Dialog(activity);
-            gridDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             gridDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             gridDialog.setContentView(grid);
+            gridDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             gridDialog.show();
         } catch (OutOfMemoryError oom) {
             MainApplication.freeMemory();

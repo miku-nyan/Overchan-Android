@@ -103,6 +103,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:title="@string/pref_gallery_screen_title"
             android:summary="@string/pref_gallery_screen_summary" >
             <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/pref_key_gallery_scroll_thread"
+                android:title="@string/pref_gallery_scroll_thread_title"
+                android:summary="@string/pref_gallery_scroll_thread_summary" />
+            
+            <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="@string/pref_key_gallery_scaleimageview"
                 android:title="@string/pref_gallery_scaleimageview_title"
@@ -184,11 +190,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:entryValues="@array/pref_download_format_values"
             android:defaultValue="@string/pref_download_format_value_default" />
         
-        <CheckBoxPreference
-            android:defaultValue="true"
+        <ListPreference
             android:key="@string/pref_key_download_thumbs"
             android:title="@string/pref_download_thumbs_title"
-            android:summary="@string/pref_download_thumbs_summary" />
+            android:dialogTitle="@string/pref_download_thumbs_title"
+            android:entries="@array/pref_download_thumbs_choices"
+            android:entryValues="@array/pref_download_thumbs_values"
+            android:defaultValue="@string/pref_download_thumbs_value_default" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_date_time" >
@@ -212,6 +220,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:key="@string/pref_key_enable_autoupdate"
             android:title="@string/pref_enable_autoupdate_title"
             android:summary="@string/pref_enable_autoupdate_summary" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_autoupdate_only_wifi"
+            android:title="@string/pref_autoupdate_only_wifi_title"
+            android:summary="@string/pref_autoupdate_only_wifi_summary"
+            android:dependency="@string/pref_key_enable_autoupdate" />
         
         <EditTextPreference
             android:key="@string/pref_key_autoupdate_delay"

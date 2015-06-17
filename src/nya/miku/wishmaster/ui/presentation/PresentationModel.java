@@ -276,7 +276,7 @@ public class PresentationModel {
             }
             presentationList.add(model);
             for (int j=0; j<model.attachmentHashes.length; ++j) {
-                attachments.add(Triple.of(posts[i].attachments[j], model.attachmentHashes[j], posts[i].parentThread));
+                attachments.add(Triple.of(posts[i].attachments[j], model.attachmentHashes[j], posts[i].number));
             }
             
             //отсюда и до конца for - переместить в создание модели, распараллелить
@@ -339,7 +339,7 @@ public class PresentationModel {
     }
     
     /**
-     * Получить список вложений на данной странице, в виде {@link Triple} из модели вложения, хэша вложения и номера треда, к которому относится файл
+     * Получить список вложений на данной странице, в виде {@link Triple} из модели вложения, хэша вложения и номера поста, к которому относится файл
      * @return список или null, если модель не построена или обновляется в данный момент
      */
     public List<Triple<AttachmentModel, String, String>> getAttachments() {

@@ -58,9 +58,13 @@ import nya.miku.wishmaster.lib.gallery.WebViewFixed;
 import nya.miku.wishmaster.lib.gifdrawable.GifDrawable;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
+import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.presentation.PresentationModel;
 import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.tabs.TabModel;
+import nya.miku.wishmaster.ui.tabs.TabsState;
+import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -609,8 +613,24 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         }
     }
     
+    private void tryScrollParent(String attachmentHash) {
+        try {
+            TabsState tabsState = MainApplication.getInstance().tabsState;
+            TabsSwitcher tabsSwitcher = MainApplication.getInstance().tabsSwitcher;
+            if (tabsSwitcher.currentFragment instanceof BoardFragment) {
+                TabModel tab = tabsState.findTabById(tabsSwitcher.currentId);
+                if (tab != null && tab.pageModel != null && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
+                    ((BoardFragment) tabsSwitcher.currentFragment).scrollToItem(attachmentHash);
+                }
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+    }
+    
     private void updateItem() {
         AttachmentModel attachment = attachments.get(currentPosition).getLeft();
+        if (settings.scrollThreadFromGallery()) tryScrollParent(attachments.get(currentPosition).getRight());
         String navText = attachment.size == -1 ? (currentPosition + 1) + "/" + attachments.size() :
                 (currentPosition + 1) + "/" + attachments.size() + " (" + ChanModels.getAttachmentSizeString(attachment, getResources()) + ")";
         navigationInfo.setText(navText);

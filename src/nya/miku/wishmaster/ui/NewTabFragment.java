@@ -336,8 +336,9 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             private int drawablePadding = (int) (resources.getDisplayMetrics().density * 5 + 0.5f);
             
             {
+                boolean sfw = MainApplication.getInstance().isSFW();
                 for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-                    add(chan);
+                    if (!sfw || !(chan instanceof MikubaModule)) add(chan);
                 }
             }
             

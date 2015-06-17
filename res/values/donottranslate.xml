@@ -39,12 +39,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_open_spoilers">PREF_KEY_OPEN_SPOILERS</string>
     <string name="pref_key_replies_only_quantity">PREF_KEY_REPLIES_ONLY_QUANTITY</string>
     <string name="pref_key_gallery_screen">PREF_KEY_GALLERY_SCREEN</string>
+    <string name="pref_key_gallery_scroll_thread">PREF_KEY_GALLERY_SCROLL_THREAD</string>
     <string name="pref_key_gallery_scaleimageview">PREF_KEY_GALLERY_SCALEIMAGEVIEW</string>
     <string name="pref_key_gallery_nativegif">PREF_KEY_GALLERY_NATIVEGIF</string>
     <string name="pref_key_gallery_videoplayer">PREF_KEY_GALLERY_VIDEOPLAYER</string>
     <string name="pref_key_do_not_download_videos">PREF_KEY_DO_NOT_DOWNLOAD_VIDEOS</string>
     <string name="pref_key_gallery_audioplayer">PREF_KEY_GALLERY_AUDIOPLAYER</string>
     <string name="pref_key_enable_autoupdate">PREF_KEY_ENABLE_AUTOUPDATE</string>
+    <string name="pref_key_autoupdate_only_wifi">PREF_KEY_AUTOUPDATE_ONLY_WIFI</string>
     <string name="pref_key_autoupdate_delay">PREF_KEY_AUTOUPDATE_DELAY</string>
     <string name="pref_key_autoupdate_background">PREF_KEY_AUTOUPDATE_BACKGROUND</string>
     <string name="pref_key_autoupdate_notification">PREF_KEY_AUTOUPDATE_NOTIFICATION</string>
@@ -53,7 +55,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_about_version">PREF_KEY_ABOUT_VERSION</string>
     <string name="pref_key_about_license">PREF_KEY_ABOUT_LICENSE</string>
     <string name="pref_key_download_dir">PREF_KEY_DOWNLOAD_DIR</string>
-    <string name="pref_key_download_thumbs">PREF_KEY_DOWNLOAD_THUMBS</string>
+    <string name="pref_key_download_thumbs">PREF_KEY_DOWNLOAD_THUMBS1</string>
+    <string name="pref_download_thumbs_value_default">@string/pref_download_thumbs_value_always</string>
+    <string name="pref_download_thumbs_value_always">PREF_DOWNLOAD_THUMBS_VALUE_ALWAYS</string>
+    <string name="pref_download_thumbs_value_wifi_only">PREF_DOWNLOAD_THUMBS_VALUE_WIFI_ONLY</string>
+    <string name="pref_download_thumbs_value_never">PREF_DOWNLOAD_THUMBS_VALUE_NEVER</string>
+    <string-array name="pref_download_thumbs_values">
+        <item>@string/pref_download_thumbs_value_always</item>
+        <item>@string/pref_download_thumbs_value_wifi_only</item>
+        <item>@string/pref_download_thumbs_value_never</item>
+    </string-array>
     <string name="pref_key_download_format">PREF_KEY_DOWNLOAD_FORMAT</string>
     <string name="pref_download_format_value_default">@string/pref_download_format_value_directory</string>
     <string name="pref_download_format_value_directory">PREF_DOWNLOAD_FORMAT_VALUE_DIRECTORY</string>
