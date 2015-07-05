@@ -24,6 +24,7 @@ import java.util.List;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.chans.arhivach.ArhivachModule;
 import nya.miku.wishmaster.chans.cirno.MikubaModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.Logger;
@@ -338,7 +339,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             {
                 boolean sfw = MainApplication.getInstance().isSFW();
                 for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-                    if (!sfw || !(chan instanceof MikubaModule)) add(chan);
+                    if (!sfw || (!(chan instanceof MikubaModule) && !(chan instanceof ArhivachModule)))  add(chan);
                 }
             }
             
