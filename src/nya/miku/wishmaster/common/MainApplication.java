@@ -31,6 +31,7 @@ import nya.miku.wishmaster.cache.DraftsCache;
 import nya.miku.wishmaster.cache.FileCache;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.Serializer;
+import nya.miku.wishmaster.chans.arhivach.ArhivachModule;
 import nya.miku.wishmaster.chans.cirno.Chan410Module;
 import nya.miku.wishmaster.chans.cirno.CirnoModule;
 import nya.miku.wishmaster.chans.cirno.MikubaModule;
@@ -131,6 +132,7 @@ public class MainApplication extends Application {
         addChanModule(new OwlchanModule(preferences, resources));
         addChanModule(new DFWKModule(preferences, resources));
         addChanModule(new MakabaModule(preferences, resources));
+        addChanModule(new ArhivachModule(preferences, resources));
     }
     
     public ChanModule getChanModule(String chanName) {
