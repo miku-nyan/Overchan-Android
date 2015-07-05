@@ -88,7 +88,6 @@ public class Recaptcha2Interactive extends InteractiveException {
                     }
                 });
                 //webView.getSettings().setUserAgentString(HttpConstants.USER_AGENT_STRING);
-                webView.getSettings().setUserAgentString("Mozilla/5.0"); //should get easier captcha
                 webView.getSettings().setJavaScriptEnabled(true);
                 dialog.setTitle("Recaptcha");
                 dialog.setContentView(webView);
