@@ -26,7 +26,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 
 public class ArhivachBoardReader implements Closeable {
     private static final String TAG = "ArhivachBoardReader";
-
+    
     private static final DateFormat CHAN_DATEFORMAT;
     static {
         DateFormatSymbols chanSymbols = new DateFormatSymbols();
@@ -35,12 +35,12 @@ public class ArhivachBoardReader implements Closeable {
         CHAN_DATEFORMAT = new SimpleDateFormat("dd/MM/yy EEE HH:mm:ss", chanSymbols);
         CHAN_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
     }
-
+    
     private static final Pattern URL_PATTERN =
             Pattern.compile("((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
-
+    
     private static final char[] DATA_START = "id=\"thread_row_".toCharArray();
-
+    
     private static final int FILTER_THREAD_END = 0;
     private static final int FILTER_DATE = 1;
     private static final int FILTER_ATTACHMENT = 2;
@@ -52,8 +52,8 @@ public class ArhivachBoardReader implements Closeable {
     private static final int FILTER_OMITTEDPOSTS = 8;
     private static final int FILTER_THREAD_SAVED = 9;
     private static final int FILTER_THREAD_TAGS = 10;
-
-
+    
+    
     public static final char[][] FILTERS_OPEN = {
             "</tr>".toCharArray(),
             "class=\"thread_date\">".toCharArray(),
@@ -76,7 +76,7 @@ public class ArhivachBoardReader implements Closeable {
 
 
     };
-
+    
     private static final char[][] FILTERS_CLOSE = {
             null,
             "</td>".toCharArray(),
@@ -97,9 +97,9 @@ public class ArhivachBoardReader implements Closeable {
 
             "</div>".toCharArray(),
     };
-
+    
     private final Reader _in;
-
+    
     private StringBuilder readBuffer = new StringBuilder();
     private List<ThreadModel> threads;
     private ThreadModel currentThread;
@@ -107,17 +107,17 @@ public class ArhivachBoardReader implements Closeable {
     private PostModel currentPost;
     private StringBuilder omittedDigitsBuffer = new StringBuilder();
     private List<AttachmentModel> currentAttachments;
-
-
+    
+    
     public ArhivachBoardReader(Reader reader) {
         _in = reader;
     }
-
+    
     public ArhivachBoardReader(InputStream in) {
         this(new BufferedReader(new InputStreamReader(in)));
     }
-
-
+    
+    
     public ThreadModel[] readPage() throws IOException {
         threads = new ArrayList<ThreadModel>();
         initThreadModel();
@@ -127,7 +127,7 @@ public class ArhivachBoardReader implements Closeable {
 
         return threads.toArray(new ThreadModel[threads.size()]);
     }
-
+    
     private void readData() throws IOException {
         int filtersCount = FILTERS_OPEN.length;
         int[] pos = new int[filtersCount];
@@ -150,21 +150,21 @@ public class ArhivachBoardReader implements Closeable {
         }
         finalizeThread();
     }
-
+    
     private void initThreadModel() {
         currentThread = new ThreadModel();
         currentThread.postsCount = 0;
         currentThread.attachmentsCount = 0;
         postsBuf = new ArrayList<PostModel>();
     }
-
+    
     private void initPostModel() {
         currentPost = new PostModel();
         currentPost.number = "unknown";
         currentPost.trip = "";
         currentAttachments = new ArrayList<AttachmentModel>();
     }
-
+    
     private void finalizeThread() {
         if (postsBuf.size() > 0) {
             currentThread.posts = postsBuf.toArray(new PostModel[postsBuf.size()]);
@@ -174,7 +174,7 @@ public class ArhivachBoardReader implements Closeable {
             initThreadModel();
         }
     }
-
+    
     private void finalizePost() {
         if (currentPost.number != null && currentPost.number.length() > 0) {
             ++currentThread.postsCount;
@@ -188,7 +188,7 @@ public class ArhivachBoardReader implements Closeable {
         }
         initPostModel();
     }
-
+    
     private void handleFilter(int filterIndex) throws IOException {
         switch (filterIndex) {
             case FILTER_THREAD_END:
@@ -220,7 +220,7 @@ public class ArhivachBoardReader implements Closeable {
                 break;
         }
     }
-
+    
     protected void parseTags(String s) throws IOException {
         Matcher matcher = Pattern.compile("<a[^>]*>([^<]*)</a>",Pattern.MULTILINE).matcher(s);
         String tags="";
@@ -229,7 +229,7 @@ public class ArhivachBoardReader implements Closeable {
         }
         currentPost.name=tags;
     }
-
+    
     protected void readPost() throws IOException {
         skipUntilSequence(FILTERS_OPEN[FILTER_THREAD_LINK]);
         String link = readUntilSequence(FILTERS_CLOSE[FILTER_THREAD_LINK]);
@@ -248,9 +248,9 @@ public class ArhivachBoardReader implements Closeable {
             currentPost.comment = commentData.substring(matcher.group(0).length());
         } else
             currentPost.comment = commentData;
-
+        
     }
-
+    
     private void parseOmittedString(String omitted) {
         int postsOmitted = -1;
         int filesOmitted = -1;
@@ -266,21 +266,21 @@ public class ArhivachBoardReader implements Closeable {
         if (postsOmitted > 0) currentThread.postsCount += postsOmitted;
         if (filesOmitted > 0) currentThread.attachmentsCount += filesOmitted;
     }
-
+    
     private void parseAttachment() throws IOException {
         skipUntilSequence(FILTERS_OPEN[FILTER_ATTACHMENT_ORIGINAL]);
         String attachment = readUntilSequence(FILTERS_CLOSE[FILTER_ATTACHMENT_ORIGINAL]);
-
+        
         String thumbnail="";
         String original="";
-
+        
         Matcher matcher = URL_PATTERN.matcher(attachment);
         if (matcher.find()) original = matcher.group(1);
         skipUntilSequence(FILTERS_OPEN[FILTER_ATTACHMENT_THUMBNAIL]);
         attachment = readUntilSequence(FILTERS_CLOSE[FILTER_ATTACHMENT_THUMBNAIL]);
         matcher = URL_PATTERN.matcher(attachment);
         if (matcher.find()) thumbnail = matcher.group(1);
-
+        
         if ((original.length()>0)) {
             AttachmentModel model = new AttachmentModel();
             model.type = AttachmentModel.TYPE_OTHER_FILE;
@@ -301,7 +301,7 @@ public class ArhivachBoardReader implements Closeable {
             currentAttachments.add(model);
         }
     }
-
+    
     protected void parseDate(String date) {
         //TODO: Implement date parser
         /*
@@ -315,7 +315,7 @@ public class ArhivachBoardReader implements Closeable {
         }
         */
     }
-
+    
     private void skipUntilSequence(char[] sequence) throws IOException {
         int len = sequence.length;
         if (len == 0) return;
@@ -330,7 +330,7 @@ public class ArhivachBoardReader implements Closeable {
             }
         }
     }
-
+    
     private String readUntilSequence(char[] sequence) throws IOException {
         int len = sequence.length;
         if (len == 0) return "";
@@ -354,7 +354,7 @@ public class ArhivachBoardReader implements Closeable {
             return "";
         }
     }
-
+    
     @Override
     public void close() throws IOException {
         _in.close();

@@ -16,3 +16,4 @@
 * [Owlchan.ru](http://owlchan.ru/)
 * [chuck.dfwk.ru](http://chuck.dfwk.ru/)
 * [2ch.hk](https://2ch.hk/)
+* [arhivach.org](http://arhivach.org)

@@ -26,17 +26,17 @@ public class ArhivachBoards {
         if (board == null) return createDefaultBoardModel(boardName, boardName, null, false);
         return board;
     }
-
+    
     static SimpleBoardModel[] getBoardsList() {
         return SIMPLE_ARRAY;
     }
-
+    
     private static void addBoard(String name, String description, String category, boolean nsfw) {
         BoardModel model = createDefaultBoardModel(name, description, category, nsfw);
         LIST.add(model);
         MAP.put(name, model);
     }
-
+    
     private static BoardModel createDefaultBoardModel(String name, String description, String category, boolean nsfw) {
         BoardModel model = new BoardModel();
         model.chan = ArhivachModule.CHAN_NAME;
@@ -46,27 +46,13 @@ public class ArhivachBoards {
         model.nsfw = nsfw;
         model.uniqueAttachmentNames = false;
         model.timeZoneId = "GMT+3";
-        model.defaultUserName = "Анонимус";
+        model.defaultUserName = "Аноним";
         model.bumpLimit = 500;
-
         model.readonlyBoard = true;
-        model.requiredFileForNewThread = false;
-        model.allowDeletePosts = false;
-        model.allowDeleteFiles = false;
-        model.allowNames = false;
-        model.allowSubjects = true;
-        model.allowSage = false;
-        model.allowEmails = false;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
-        model.allowRandomHash = false;
-        model.allowIcons = false;
-        model.attachmentsMaxCount = 1;
-        model.attachmentsFormatFilters = null;
-        model.markType = BoardModel.MARK_NOMARK;
-
-        model.firstPage = 0;
+        model.firstPage = 1;
         model.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
+        model.searchAllowed = false;
+        model.catalogAllowed = false;
         return model;
     }
 }

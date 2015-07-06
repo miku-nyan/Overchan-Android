@@ -339,7 +339,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             {
                 boolean sfw = MainApplication.getInstance().isSFW();
                 for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-                    if (!sfw || (!(chan instanceof MikubaModule) && !(chan instanceof ArhivachModule)))  add(chan);
+                    if (!sfw || (!(chan instanceof MikubaModule) && !(chan instanceof ArhivachModule))) add(chan);
                 }
             }
             
