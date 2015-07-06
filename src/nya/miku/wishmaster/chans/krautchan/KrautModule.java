@@ -47,6 +47,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -85,10 +87,13 @@ public class KrautModule extends AbstractChanModule {
     
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
+    private static final String PREF_KEY_KOMPTURCODE_COOKIE = "PREF_KEY_KOMPTURCODE_COOKIE";
     
     private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
     private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
     private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
+    
+    private static final String KOMPTURCODE_COOKIE_NAME = "desuchan.komturcode";
     
     private Map<String, BoardModel> boardsMap = null;
     private String lastCaptchaId = null;
@@ -120,6 +125,7 @@ public class KrautModule extends AbstractChanModule {
             c.setDomain(CHAN_DOMAIN);
             httpClient.getCookieStore().addCookie(c);
         }
+        setKompturcodeCookie(preferences.getString(getSharedKey(PREF_KEY_KOMPTURCODE_COOKIE), null));
     }
     
     @Override
@@ -132,9 +138,35 @@ public class KrautModule extends AbstractChanModule {
         }
     }
     
+    private void setKompturcodeCookie(String kompturcodeCookie) {
+        if (kompturcodeCookie != null && kompturcodeCookie.length() > 0) {
+            BasicClientCookieHC4 c = new BasicClientCookieHC4(KOMPTURCODE_COOKIE_NAME, kompturcodeCookie);
+            c.setDomain(CHAN_DOMAIN);
+            httpClient.getCookieStore().addCookie(c);
+        }
+    }
+    
+    public void addKompturcodePreference(PreferenceGroup preferenceGroup) {
+        Context context = preferenceGroup.getContext();
+        EditTextPreference kompturcodePreference = new EditTextPreference(context);
+        kompturcodePreference.setTitle(R.string.kraut_prefs_kompturcode);
+        kompturcodePreference.setDialogTitle(R.string.kraut_prefs_kompturcode);
+        kompturcodePreference.setSummary(R.string.kraut_prefs_kompturcode_summary);
+        kompturcodePreference.setKey(getSharedKey(PREF_KEY_KOMPTURCODE_COOKIE));
+        kompturcodePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                setKompturcodeCookie((String) newValue);
+                return true;
+            }
+        });
+        preferenceGroup.addPreference(kompturcodePreference);
+    }
+    
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
+        addKompturcodePreference(preferenceGroup);
         addPasswordPreference(preferenceGroup);
         CheckBoxPreference httpsPref = new CheckBoxPreference(context);
         httpsPref.setTitle(R.string.pref_use_https);

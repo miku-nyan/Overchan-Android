@@ -358,6 +358,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="crash_dialog_comment_prompt">Здесь можно добавить ваши замечания о проблеме:</string>
     <string name="crash_dialog_ok_toast">Спасибо!</string>
     
+    <string name="kraut_prefs_kompturcode">Kompturcode</string>
+    <string name="kraut_prefs_kompturcode_summary">Kompturcode cookie</string>
+    
     <string name="makaba_catalog_standart">Сортировка по бампам</string>
     <string name="makaba_catalog_last_reply">Сортировка по последнему ответу</string>
     <string name="makaba_catalog_num">Сортировка по времени создания</string>

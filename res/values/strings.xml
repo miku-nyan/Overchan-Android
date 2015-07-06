@@ -351,6 +351,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you!</string>
     
+    <string name="kraut_prefs_kompturcode">Kompturcode</string>
+    <string name="kraut_prefs_kompturcode_summary">Kompturcode cookie</string>
+    
     <string name="makaba_catalog_standart">Sort by Bump order</string>
     <string name="makaba_catalog_last_reply">Sort by Last Reply</string>
     <string name="makaba_catalog_num">Sort by Creation date</string>
