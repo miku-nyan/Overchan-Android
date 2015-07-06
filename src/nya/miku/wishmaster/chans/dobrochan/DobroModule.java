@@ -385,11 +385,12 @@ public class DobroModule extends AbstractChanModule {
                 addString("captcha", model.captchaAnswer).
                 addString("password", model.password);
         
+        String rating = (model.icon >= 0 && model.icon < DobroBoards.RATINGS.length) ? DobroBoards.RATINGS[model.icon] : "SFW";
         int filesCount = model.attachments != null ? model.attachments.length : 0;
         postEntityBuilder.addString("post_files_count", Integer.toString(filesCount + 1));
         for (int i=0; i<filesCount; ++i) {
             postEntityBuilder.addFile("file_" + Integer.toString(i+1), model.attachments[i]);
-            postEntityBuilder.addString("file_" + Integer.toString(i+1) + "_rating", "SFW");
+            postEntityBuilder.addString("file_" + Integer.toString(i+1) + "_rating", rating);
         }
         postEntityBuilder.addString("goto", "thread");
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
