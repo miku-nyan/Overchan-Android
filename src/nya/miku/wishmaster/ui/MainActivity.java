@@ -34,6 +34,7 @@ import nya.miku.wishmaster.lib.dslv.DragSortListView;
 import nya.miku.wishmaster.lib.dslv.DragSortListView.DropListener;
 import nya.miku.wishmaster.ui.posting.PostFormActivity;
 import nya.miku.wishmaster.ui.posting.PostingService;
+import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.presentation.FlowTextHelper;
 import nya.miku.wishmaster.ui.settings.PreferencesActivity;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
@@ -56,6 +57,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.TypedValue;
@@ -448,11 +450,11 @@ public class MainActivity extends FragmentActivity {
         boolean newOrientation = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (newOrientation != isHorizontalOrientation) {
             if (FlowTextHelper.IS_AVAILABLE) {
-                Logger.d(TAG, "changed display orientation; clearing LRU cache and restarting activity");
-                restartActivityClearCache();
-            } else {
-                isHorizontalOrientation = newOrientation;
+                MainApplication.getInstance().pagesCache.clearLru();
+                Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                if (currentFragment instanceof BoardFragment) ((BoardFragment) currentFragment).handleWidthChange();
             }
+            isHorizontalOrientation = newOrientation;
         }
     }
     

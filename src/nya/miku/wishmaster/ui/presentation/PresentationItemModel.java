@@ -167,6 +167,19 @@ public class PresentationItemModel {
     }
     
     /**
+     * Установить новые модели обтекания картинки текстом (и перестроить текст комментария в случае необходимости)
+     * @param floatingModels массив из двух моделей обтекания картинки текстом
+     */
+    public void changeFloatingModels(FloatingModel[] floatingModels) {
+        this.floatingModels = floatingModels;
+        if (floating) {
+            this.spannedComment =
+                    HtmlParser.createSpanned(sourceModel.subject, sourceModel.comment, spanClickListener, imageGetter, themeColors, openSpoilers);
+            tryFlow(floatingModels);
+        }
+    }
+    
+    /**
      * Получить spanned-строку с комментарием поста для вывода на TextView с заданной шириной (для всплывающих диалогов) с корректным обтеканием
      * @param textFullWidth ширина текста TextView
      * @return объект класса {@link SpannedCommentContainer}

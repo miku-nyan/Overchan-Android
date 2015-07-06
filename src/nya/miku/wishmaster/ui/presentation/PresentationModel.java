@@ -62,7 +62,7 @@ public class PresentationModel {
     /** загрузчик картинок, содержащихся в тексте постов (например, смайлики) */
     public final ImageGetter imageGetter;
     private final Theme theme;
-    private final FloatingModel[] floatingModels;
+    private FloatingModel[] floatingModels;
     private final DateFormat dateFormat;
     private final boolean reduceNames;
     private final IsHiddenDelegate isHiddenDelegate;
@@ -212,6 +212,19 @@ public class PresentationModel {
         }
     }
     
+    /**
+     * Установить новые модели обтекания картинки текстом (и перестроить текст комментария в случае необходимости)
+     * @param floatingModels массив из двух моделей обтекания картинки текстом
+     */
+    public void changeFloatingModels(FloatingModel[] models) {
+        try {
+            this.floatingModels = models;
+            while (notReady) Thread.yield();
+            for (PresentationItemModel item : presentationList) item.changeFloatingModels(models);
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+    }
     
     private synchronized void updateViewModels(PostModel[] posts, boolean showIndex, CancellableTask task, RebuildCallback rebuildCallback) {
         if (task == null) task = CancellableTask.NOT_CANCELLABLE;
