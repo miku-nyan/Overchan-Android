@@ -70,6 +70,7 @@ public class LainModule extends AbstractVichanModule {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "literature", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "DIY & Electronics", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "w", "weeb", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "c", "cute", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rpg", "gaymes", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "random", " ", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "layer", "layer:03", " ", false),
