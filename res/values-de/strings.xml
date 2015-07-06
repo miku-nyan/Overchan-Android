@@ -184,9 +184,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_delete_autohide_rule">Die Regel entfernen</string>
     <string name="context_menu_quickaccess_add">Zum Schnellzugang</string>
     <string name="context_menu_quickaccess_remove">Von Schnellzugang entfernen</string>
-    <string name="context_menu_quickaccess_custom_board">Benutzerdefinierte Board fügen</string><!--  -->
+    <string name="context_menu_quickaccess_custom_board">Benutzerdefinierte Board fügen</string>
     
     <string name="share_via">Teilen per</string>
+    <string name="share_no_tabs">Keine offenen Tabs</string>
     
     <string name="dialog_delete_password">Passwort zum Löschen</string>
     <string name="dialog_delete_button">Löschen</string>
@@ -374,6 +375,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dobrochan_prefs_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     <string name="dobrochan_prefs_domain">Domain</string>
     <string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+    
+    <string name="nullchancc_prefs_only_new_posts">Nur neue Posts</string>
+    <string name="nullchancc_prefs_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     
     <string name="dvach_prefs_domain">Domain</string>
     <string name="dvach_prefs_domain_summary">Reserved domains: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>

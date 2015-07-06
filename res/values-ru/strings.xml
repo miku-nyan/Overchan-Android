@@ -192,6 +192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_quickaccess_custom_board">Добавить свою доску</string>
     
     <string name="share_via">Способ отправки</string>
+    <string name="share_no_tabs">Нет открытых вкладок</string>
     
     <string name="dialog_delete_password">Пароль для удаления</string>
     <string name="dialog_delete_button">Удалить</string>
@@ -380,6 +381,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dobrochan_prefs_only_new_posts_summary">Загружать только новые посты вместо обновления всего треда</string>
     <string name="dobrochan_prefs_domain">Домен</string>
     <string name="dobrochan_prefs_domain_summary">Резервные адреса: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+    
+    <string name="nullchancc_prefs_only_new_posts">Только новые посты</string>
+    <string name="nullchancc_prefs_only_new_posts_summary">Загружать только новые посты вместо обновления всего треда</string>
     
     <string name="dvach_prefs_domain">Домен</string>
     <string name="dvach_prefs_domain_summary">Резервные адреса: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>

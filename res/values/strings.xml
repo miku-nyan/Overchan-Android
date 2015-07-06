@@ -187,6 +187,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_quickaccess_custom_board">Add custom board</string>
     
     <string name="share_via">Share via</string>
+    <string name="share_no_tabs">No open tabs</string>
     
     <string name="dialog_delete_password">Password for deletion</string>
     <string name="dialog_delete_button">Delete</string>
@@ -373,6 +374,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dobrochan_prefs_only_new_posts_summary">Load only new posts without reloading the whole thread</string>
     <string name="dobrochan_prefs_domain">Domain</string>
     <string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+    
+    <string name="nullchancc_prefs_only_new_posts">Only new posts</string>
+    <string name="nullchancc_prefs_only_new_posts_summary">Load only new posts without reloading the whole thread</string>
     
     <string name="dvach_prefs_domain">Domain</string>
     <string name="dvach_prefs_domain_summary">Reserved domains: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>

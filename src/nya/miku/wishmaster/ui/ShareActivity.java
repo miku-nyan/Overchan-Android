@@ -81,7 +81,7 @@ public class ShareActivity extends ListActivity {
             }
         }
         if (adapter.getCount() == 0) {
-            Toast.makeText(this, "No Tabs", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.share_no_tabs, Toast.LENGTH_LONG).show();
             finish();
             return;
         }
