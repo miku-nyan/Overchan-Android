@@ -120,6 +120,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="history_yesterday">Вчера</string>
     <string name="history_last_week">Последняя неделя</string>
     <string name="history_other">Ранее</string>
+    <string name="history_last_closed">Последняя закрытая вкладка</string>
     
     <string name="favorites_empty">Нет закладок</string>
     <string name="favorites_all">Все закладки</string>

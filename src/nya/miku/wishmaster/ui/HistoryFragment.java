@@ -19,10 +19,13 @@
 package nya.miku.wishmaster.ui;
 
 import java.util.Calendar;
+import java.util.LinkedList;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import android.content.res.Resources;
 import android.os.Build;
@@ -47,6 +50,30 @@ public class HistoryFragment extends Fragment implements AdapterView.OnItemClick
     private HistoryAdapter adapter;
     private ListView listView;
     
+    private static LinkedList<Database.HistoryEntry> lastClosed = new LinkedList<>();
+    
+    public static void setLastClosed(TabModel tab) {
+         if (tab != null && tab.pageModel != null) {
+             switch (tab.pageModel.type) {
+                 case UrlPageModel.TYPE_INDEXPAGE:
+                     lastClosed.add(new Database.HistoryEntry(tab.pageModel.chanName, null, null, null, tab.title, tab.webUrl, 0));
+                     break;
+                 case UrlPageModel.TYPE_BOARDPAGE:
+                     lastClosed.add(new Database.HistoryEntry(tab.pageModel.chanName, tab.pageModel.boardName,
+                             Integer.toString(tab.pageModel.boardPage), null, tab.title, tab.webUrl, 0));
+                     break;
+                 case UrlPageModel.TYPE_THREADPAGE:
+                     lastClosed.add(new Database.HistoryEntry(tab.pageModel.chanName, tab.pageModel.boardName,
+                             null, tab.pageModel.threadNumber, tab.title, tab.webUrl, 0));
+                     break;
+             }
+             if (MainApplication.getInstance().tabsSwitcher.currentFragment instanceof HistoryFragment) {
+                 ((HistoryFragment) MainApplication.getInstance().tabsSwitcher.currentFragment).init();
+             }
+             if (lastClosed.size() > 30) lastClosed.removeFirst();
+         }
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +97,7 @@ public class HistoryFragment extends Fragment implements AdapterView.OnItemClick
         if (adapter == null) return;
         Object item = adapter.getItem(position);
         if (item instanceof Database.HistoryEntry) {
+            if (((Database.HistoryEntry) item).date == 0) lastClosed.removeLast();
             UrlHandler.open(((Database.HistoryEntry) item).url, activity);
         }
     }
@@ -85,6 +113,7 @@ public class HistoryFragment extends Fragment implements AdapterView.OnItemClick
         if (item.getItemId() == R.id.menu_clear_history) {
             if (adapter != null) {
                 MainApplication.getInstance().database.clearHistory();
+                lastClosed = new LinkedList<>();
                 init();
             }
             return true;
@@ -105,11 +134,13 @@ public class HistoryFragment extends Fragment implements AdapterView.OnItemClick
         Object item = adapter.getItem(info.position);
         if (item instanceof Database.HistoryEntry) {
             Database.HistoryEntry entry = (Database.HistoryEntry) item;
-            menu.add(Menu.NONE, R.id.context_menu_remove_history, 1, R.string.context_menu_remove_history);
-            menu.add(Menu.NONE, R.id.context_menu_open_browser, 2, R.string.context_menu_open_browser);
-            menu.add(Menu.NONE, R.id.context_menu_favorites_from_fragment, 3,
-                    MainApplication.getInstance().database.isFavorite(entry.chan, entry.board, entry.boardPage, entry.thread) ?
-                    R.string.context_menu_remove_favorites : R.string.context_menu_add_favorites);
+            if (entry.date != 0) {
+                menu.add(Menu.NONE, R.id.context_menu_remove_history, 1, R.string.context_menu_remove_history);
+                menu.add(Menu.NONE, R.id.context_menu_open_browser, 2, R.string.context_menu_open_browser);
+                menu.add(Menu.NONE, R.id.context_menu_favorites_from_fragment, 3,
+                        MainApplication.getInstance().database.isFavorite(entry.chan, entry.board, entry.boardPage, entry.thread) ?
+                        R.string.context_menu_remove_favorites : R.string.context_menu_add_favorites);
+            }
         }
     }
     
@@ -156,6 +187,10 @@ public class HistoryFragment extends Fragment implements AdapterView.OnItemClick
             long midnight = getMidnight();
             int current = 0;
             int previous = -1;
+            if (lastClosed.size() > 0) {
+                add(resources.getString(R.string.history_last_closed));
+                add(lastClosed.getLast());
+            }
             for (Database.HistoryEntry entity : MainApplication.getInstance().database.getHistory()) {
                 while (entity.date < midnight) {
                     if (current == 0) {

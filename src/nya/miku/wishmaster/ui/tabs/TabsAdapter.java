@@ -21,6 +21,7 @@ package nya.miku.wishmaster.ui.tabs;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.ui.HistoryFragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -135,6 +136,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
     public void closeTab(int position) {
         setDraggingItem(-1);
         if (position >= getCount()) return;
+        HistoryFragment.setLastClosed(tabsState.tabsArray.get(position));
         tabsIdStack.removeTab(getItem(position).id);
         remove(getItem(position));
         if (position == selectedItem) {

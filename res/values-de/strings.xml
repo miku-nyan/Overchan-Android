@@ -115,6 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="history_yesterday">Gestern</string>
     <string name="history_last_week">Letzte Woche</string>
     <string name="history_other">Früher</string>
+    <string name="history_last_closed">Zuletzt geschlossenen Tab</string>
     
     <string name="favorites_empty">Keine Lesezeichen</string>
     <string name="favorites_all">Alle Lesezeichen</string>

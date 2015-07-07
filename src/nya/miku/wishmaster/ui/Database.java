@@ -147,7 +147,7 @@ public class Database {
     
     /* *********************** HISTORY *********************** */
     
-    public class HistoryEntry {
+    public static class HistoryEntry {
         public final String chan;
         public final String board;
         public final String boardPage;
@@ -155,7 +155,7 @@ public class Database {
         public final String title;
         public final String url;
         public final long date;
-        private HistoryEntry(String chan, String board, String boardPage, String thread, String title, String url, long date) {
+        public HistoryEntry(String chan, String board, String boardPage, String thread, String title, String url, long date) {
             this.chan = chan;
             this.board = board;
             this.boardPage = boardPage;
