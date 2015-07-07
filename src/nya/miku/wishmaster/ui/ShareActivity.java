@@ -26,12 +26,15 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.cache.SerializablePage;
+import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.lib.UriFileUtils;
 import nya.miku.wishmaster.ui.posting.PostFormActivity;
 import nya.miku.wishmaster.ui.posting.PostingService;
 import nya.miku.wishmaster.ui.tabs.TabModel;
+import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.net.Uri;
@@ -45,6 +48,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ShareActivity extends ListActivity {
+    private static final String TAG = "ShareActivity";
+    
     private File selectedFile;
     
     @Override
@@ -62,6 +67,7 @@ public class ShareActivity extends ListActivity {
     
     private void handleIntent(Intent intent) {
         ArrayAdapter<Pair<TabModel, SerializablePage>> adapter = new ArrayAdapter<Pair<TabModel, SerializablePage>>(this, 0) {
+            private final int drawablePadding = (int) (getResources().getDisplayMetrics().density * 5 + 0.5f);
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = convertView == null ? getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false) : convertView;
@@ -69,6 +75,9 @@ public class ShareActivity extends ListActivity {
                 tv.setEllipsize(TextUtils.TruncateAt.END);
                 tv.setSingleLine();
                 tv.setText(getItem(position).getLeft().title);
+                tv.setCompoundDrawablesWithIntrinsicBounds(MainApplication.getInstance().
+                        getChanModule(getItem(position).getLeft().pageModel.chanName).getChanFavicon(), null, null, null);
+                tv.setCompoundDrawablePadding(drawablePadding);
                 return view;
             }
         };
@@ -81,9 +90,27 @@ public class ShareActivity extends ListActivity {
             }
         }
         if (adapter.getCount() == 0) {
-            Toast.makeText(this, R.string.share_no_tabs, Toast.LENGTH_LONG).show();
-            finish();
-            return;
+            for (Database.HistoryEntry entity : MainApplication.getInstance().database.getHistory()) {
+                try {
+                    TabModel tab = new TabModel();
+                    tab.title = entity.title;
+                    tab.type = TabModel.TYPE_NORMAL;
+                    tab.webUrl = entity.url;
+                    tab.pageModel = UrlHandler.getPageModel(entity.url);
+                    tab.hash = ChanModels.hashUrlPageModel(tab.pageModel);
+                    SerializablePage page = MainApplication.getInstance().pagesCache.getSerializablePage(tab.hash);
+                    if (page != null) {
+                        adapter.add(Pair.of(tab, page));
+                    }
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                }
+            }
+            if (adapter.getCount() == 0) {
+                Toast.makeText(this, R.string.share_no_tabs, Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
         }
         if (PostingService.isNowPosting()) {
             Toast.makeText(this, R.string.posting_now_posting, Toast.LENGTH_LONG).show();
