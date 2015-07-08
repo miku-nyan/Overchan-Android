@@ -133,6 +133,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private int currentPosition = 0;
     private int previousPosition = -1;
     
+    private boolean firstScroll = true;
+    
     private Menu menu;
     private boolean currentLoaded;
     
@@ -630,7 +632,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     
     private void updateItem() {
         AttachmentModel attachment = attachments.get(currentPosition).getLeft();
-        if (settings.scrollThreadFromGallery()) tryScrollParent(attachments.get(currentPosition).getRight());
+        if (settings.scrollThreadFromGallery() && !firstScroll) tryScrollParent(attachments.get(currentPosition).getRight());
+        firstScroll = false;
         String navText = attachment.size == -1 ? (currentPosition + 1) + "/" + attachments.size() :
                 (currentPosition + 1) + "/" + attachments.size() + " (" + ChanModels.getAttachmentSizeString(attachment, getResources()) + ")";
         navigationInfo.setText(navText);
