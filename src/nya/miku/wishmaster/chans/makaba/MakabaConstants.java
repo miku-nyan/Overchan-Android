@@ -70,14 +70,13 @@ public class MakabaConstants {
     public static final String PREF_KEY_FORCE_GOOGLE = "force_google";
     public static final String PREF_KEY_USE_HTTPS = "use_https";
     public static final String PREF_KEY_DOMAIN = "domain";
-    public static final String PREF_KEY_PASSCODE = "passcode";
-    public static final String PREF_KEY_PASSCODE_COOKIE_DOMAIN = "passcode_domain";
-    public static final String PREF_KEY_PASSCODE_COOKIE_VALUE = "passcode_cookie";
+    public static final String PREF_KEY_USERCODE_COOKIE_DOMAIN = "usercode_domain";
+    public static final String PREF_KEY_USERCODE_COOKIE_VALUE = "usercode_cookie";
     public static final String PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN = "cf_domain";
     public static final String PREF_KEY_CLOUDFLARE_COOKIE_VALUE = "cf_cookie";
     
     public static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    public static final String PASSCODE_COOKIE_NAME = "usercode";
+    public static final String USERCODE_COOKIE_NAME = "usercode_auth";
     
     public static final String YANDEX_CAPTCHA_URL = "://captcha.yandex.net/image?key=";
     public static final String RECAPTCHA_KEY = "6LcM2P4SAAAAAD97nF449oigatS5hPCIgt8AQanz";

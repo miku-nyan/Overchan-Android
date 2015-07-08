@@ -146,9 +146,9 @@ public class MakabaModule extends AbstractChanModule {
                 CLOUDFLARE_COOKIE_NAME,
                 preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE_VALUE), null));
         setCookie(
-                preferences.getString(getSharedKey(PREF_KEY_PASSCODE_COOKIE_DOMAIN), null),
-                PASSCODE_COOKIE_NAME,
-                preferences.getString(getSharedKey(PREF_KEY_PASSCODE_COOKIE_VALUE), null));
+                preferences.getString(getSharedKey(PREF_KEY_USERCODE_COOKIE_DOMAIN), null),
+                USERCODE_COOKIE_NAME,
+                preferences.getString(getSharedKey(PREF_KEY_USERCODE_COOKIE_VALUE), null));
     }
     
     private void updateDomain(String domain, boolean useHttps) {
@@ -177,11 +177,17 @@ public class MakabaModule extends AbstractChanModule {
                         putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN), cookie.getDomain()).
                         putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE_VALUE), cookie.getValue()).commit();
             }
-            if (cookie.getName().equals(PASSCODE_COOKIE_NAME)) {
+            if (cookie.getName().equals(USERCODE_COOKIE_NAME)) {
                 preferences.edit().
-                        putString(getSharedKey(PREF_KEY_PASSCODE_COOKIE_DOMAIN), cookie.getDomain()).
-                        putString(getSharedKey(PREF_KEY_PASSCODE_COOKIE_VALUE), cookie.getValue()).commit();
+                        putString(getSharedKey(PREF_KEY_USERCODE_COOKIE_DOMAIN), cookie.getDomain()).
+                        putString(getSharedKey(PREF_KEY_USERCODE_COOKIE_VALUE), cookie.getValue()).commit();
             }
+        }
+    }
+    
+    private void saveUsercodeCookie() {
+        for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
+            if (cookie.getName().equals(USERCODE_COOKIE_NAME) && cookie.getDomain().contains(domain)) saveCookie(cookie);
         }
     }
     
@@ -532,9 +538,6 @@ public class MakabaModule extends AbstractChanModule {
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         boolean forceGoogle = preferences.getBoolean(getSharedKey(PREF_KEY_FORCE_GOOGLE), false);
         String url = domainUrl + "makaba/captcha.fcgi";
-        /*if (!preferences.getString(getSharedKey(PREF_KEY_PASSCODE_COOKIE_VALUE), "").equals("")) {
-            url = url + "?usercode=" + preferences.getString(getSharedKey(PREF_KEY_PASSCODE_COOKIE_VALUE), "");
-        }*/
         UrlPageModel refererPage = new UrlPageModel();
         refererPage.chanName = CHAN_NAME;
         refererPage.boardName = boardName;
@@ -595,8 +598,6 @@ public class MakabaModule extends AbstractChanModule {
                 addString("board", model.boardName).
                 addString("thread", model.threadNumber == null ? "0" : model.threadNumber);
         
-        //postEntity.addString("usercode", usercode); (passcode??)
-        
         postEntityBuilder.addString("comment", model.comment);
         
         if (model.captchaAnswer != null) {
@@ -635,6 +636,7 @@ public class MakabaModule extends AbstractChanModule {
             checkCloudflareError(e, url);
             throw e;
         }
+        saveUsercodeCookie();
         JSONObject makabaResult = new JSONObject(response);
         try {
             String statusResult = makabaResult.getString("Status");
