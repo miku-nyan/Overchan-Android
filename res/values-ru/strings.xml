@@ -226,6 +226,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_switch_page_go">Перейти</string>
     <string name="dialog_switch_page_incorrect">Недопустимый номер страницы</string>
     
+    <string name="grid_gallery_select">Выбрать для загрузки</string>
+    <string name="grid_gallery_download">Скачать</string>
+    
     <string name="postform_title_post">Новое сообщение</string>
     <string name="postform_title_thread">Новый тред</string>
     <string name="postform_name">Имя</string>

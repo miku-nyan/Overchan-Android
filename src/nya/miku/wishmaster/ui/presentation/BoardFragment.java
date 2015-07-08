@@ -23,6 +23,7 @@ import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -125,6 +126,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -2932,16 +2934,20 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
     }
     
+    @SuppressLint("InlinedApi")
     private void openGridGallery() {
         final int tnSize = resources.getDimensionPixelSize(R.dimen.post_thumbnail_size);
         
         class GridGalleryAdapter extends ArrayAdapter<Triple<AttachmentModel, String, String>>
                 implements View.OnClickListener, AbsListView.OnScrollListener {
             private final GridView view;
+            private boolean selectingMode = false;
+            private boolean[] isSelected = null;
             private volatile boolean isBusy = false;
             public GridGalleryAdapter(GridView view, List<Triple<AttachmentModel, String, String>> list) {
                 super(activity, 0, list);
                 this.view = view;
+                this.isSelected = new boolean[list.size()];
             }
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
@@ -2975,11 +2981,27 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 registerForContextMenu(convertView);
                 convertView.setOnClickListener(this);
                 fill(position, convertView, isBusy);
+                if (isSelected[position]) {
+                    /*ImageView overlay = new ImageView(activity);
+                    overlay.setImageResource(android.R.drawable.checkbox_on_background);*/
+                    FrameLayout overlay = new FrameLayout(activity);
+                    overlay.setBackgroundColor(Color.argb(128, 0, 255, 0));
+                    if (((FrameLayout) convertView).getChildCount() < 2) ((FrameLayout) convertView).addView(overlay);
+                    
+                } else {
+                    if (((FrameLayout) convertView).getChildCount() > 1) ((FrameLayout) convertView).removeViewAt(1);
+                }
                 return convertView;
             }
             @Override
             public void onClick(View v) {
-                openAttachment((AttachmentModel) v.getTag());
+                if (selectingMode) {
+                    int position = view.getPositionForView(v);
+                    isSelected[position] = !isSelected[position];
+                    notifyDataSetChanged();
+                } else {
+                    openAttachment((AttachmentModel) v.getTag());
+                }
             }
             private void fill(int position, View view, boolean isBusy) {
                 AttachmentModel attachment = getItem(position).getLeft();
@@ -3005,6 +3027,24 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         downloadThumbnails() ? (isBusy ? 0 : R.drawable.thumbnail_error) :
                             ChanModels.getDefaultThumbnailResId(attachment.type));
             }
+            public void setSelectingMode(boolean selectingMode) {
+                this.selectingMode = selectingMode;
+                if (!selectingMode) {
+                    Arrays.fill(isSelected, false);
+                    notifyDataSetChanged();
+                }
+            }
+            public void selectAll() {
+                if (selectingMode) {
+                    Arrays.fill(isSelected, true);
+                    notifyDataSetChanged();
+                }
+            }
+            public void downloadSelected() {
+                for (int i=0; i<isSelected.length; ++i)
+                    if (isSelected[i])
+                        downloadFile(getItem(i).getLeft());
+            }
         }
         
         try {
@@ -3015,7 +3055,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             
             GridView grid = new GridView(activity);
-            GridGalleryAdapter gridAdapter = new GridGalleryAdapter(grid, list);
+            final GridGalleryAdapter gridAdapter = new GridGalleryAdapter(grid, list);
             grid.setNumColumns(GridView.AUTO_FIT);
             grid.setColumnWidth(tnSize);
             int spacing = (int) (resources.getDisplayMetrics().density * 5 + 0.5f);
@@ -3024,9 +3064,85 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             grid.setPadding(spacing, spacing, spacing, spacing);
             grid.setAdapter(gridAdapter);
             grid.setOnScrollListener(gridAdapter);
+            grid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+            
+            final Button btnToSelecting = new Button(activity);
+            btnToSelecting.setText(R.string.grid_gallery_select);
+            btnToSelecting.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            btnToSelecting.setSingleLine();
+            btnToSelecting.setVisibility(View.VISIBLE);
+            btnToSelecting.setLayoutParams(
+                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            
+            final LinearLayout layoutSelectingButtons = new LinearLayout(activity);
+            layoutSelectingButtons.setOrientation(LinearLayout.HORIZONTAL);
+            layoutSelectingButtons.setWeightSum(10f);
+            Button btnDownload = new Button(activity);
+            btnDownload.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 3.25f));
+            btnDownload.setText(R.string.grid_gallery_download);
+            btnDownload.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            btnDownload.setSingleLine();
+            Button btnSelectAll = new Button(activity);
+            btnSelectAll.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 3.75f));
+            btnSelectAll.setText(android.R.string.selectAll);
+            btnSelectAll.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            btnSelectAll.setSingleLine();
+            Button btnCancel = new Button(activity);
+            btnCancel.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 3f));
+            btnCancel.setText(android.R.string.cancel);
+            btnCancel.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            btnCancel.setSingleLine();
+            layoutSelectingButtons.addView(btnDownload);
+            layoutSelectingButtons.addView(btnSelectAll);
+            layoutSelectingButtons.addView(btnCancel);
+            layoutSelectingButtons.setVisibility(View.GONE);
+            layoutSelectingButtons.setLayoutParams(
+                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            
+            btnToSelecting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    btnToSelecting.setVisibility(View.GONE);
+                    layoutSelectingButtons.setVisibility(View.VISIBLE);
+                    gridAdapter.setSelectingMode(true);
+                }
+            });
+            
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    btnToSelecting.setVisibility(View.VISIBLE);
+                    layoutSelectingButtons.setVisibility(View.GONE);
+                    gridAdapter.setSelectingMode(false);
+                }
+            });
+            
+            btnSelectAll.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    gridAdapter.selectAll();
+                }
+            });
+            
+            btnDownload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    gridAdapter.downloadSelected();
+                    btnToSelecting.setVisibility(View.VISIBLE);
+                    layoutSelectingButtons.setVisibility(View.GONE);
+                    gridAdapter.setSelectingMode(false);
+                }
+            });
+            
+            LinearLayout dlgLayout = new LinearLayout(activity);
+            dlgLayout.setOrientation(LinearLayout.VERTICAL);
+            dlgLayout.addView(btnToSelecting);
+            dlgLayout.addView(layoutSelectingButtons);
+            dlgLayout.addView(grid);
+            
             Dialog gridDialog = new Dialog(activity);
             gridDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            gridDialog.setContentView(grid);
+            gridDialog.setContentView(dlgLayout);
             gridDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             gridDialog.show();
         } catch (OutOfMemoryError oom) {
