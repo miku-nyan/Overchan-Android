@@ -240,6 +240,13 @@ public class CirnoModule extends AbstractChanModule {
                             throw new Exception(htmlResponse.substring(start + 31, end).trim());
                         }
                     }
+                    start = htmlResponse.indexOf("<h1>");
+                    if (start != -1) {
+                        int end = htmlResponse.indexOf("</h1>");
+                        if (end != -1) {
+                            throw new Exception(htmlResponse.substring(start + 4, end).trim());
+                        }
+                    }
                 }
             } else throw new Exception(response.statusCode + " - " + response.statusReason);
         } finally {
