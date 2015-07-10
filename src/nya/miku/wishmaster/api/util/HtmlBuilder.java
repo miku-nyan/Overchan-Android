@@ -287,7 +287,9 @@ public class HtmlBuilder implements Closeable {
         buf.write(model.number);
         buf.write("')\">No.");
         buf.write(model.number);
-        buf.write("</a> </span>&nbsp; ");
+        buf.write("</a> </span>");
+        if (model.deleted) buf.write("<span class=\"de-post-deleted\"></span>");
+        buf.write("&nbsp; ");
         if (model.attachments != null && model.attachments.length != 0) {
             buf.write("<br />");
             boolean single = model.attachments.length == 1;
