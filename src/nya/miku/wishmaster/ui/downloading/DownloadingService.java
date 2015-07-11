@@ -317,6 +317,7 @@ public class DownloadingService extends Service {
                     };
                     
                     File directory = new File(settings.getDownloadDirectory(), item.chanName);
+                    if (item.subdirectory != null && item.subdirectory.length() > 0) directory = new File(directory, item.subdirectory);
                     if (!directory.mkdirs() && !directory.isDirectory()) {
                         addError(elementName, getString(R.string.downloading_error_mkdir));
                         continue;
@@ -784,6 +785,7 @@ public class DownloadingService extends Service {
         
         public final int type;
         public final AttachmentModel attachment;
+        public final String subdirectory;
         public final String chanName;
         public final BoardModel boardModel;
         public final UrlPageModel threadUrlPage;
@@ -792,16 +794,27 @@ public class DownloadingService extends Service {
         /**
          * Конструктор элемента загрузки - файла-вложения
          * @param attachment модель вложения
+         * @param subdirectory название подпапки, в которую требуется загрузить вложение (если в общую папку - null)
          * @param boardModel модель доски, с которой скачивается вложение
          */
-        public DownloadingQueueItem(AttachmentModel attachment, BoardModel boardModel) {
+        public DownloadingQueueItem(AttachmentModel attachment, String subdirectory, BoardModel boardModel) {
             this.type = TYPE_ATTACHMENT;
             this.attachment = attachment;
             if (attachment == null) throw new NullPointerException();
+            this.subdirectory = subdirectory;
             this.chanName = boardModel.chan;
             this.boardModel = boardModel;
             this.threadUrlPage = null;
             this.downloadingThreadMode = -1;
+        }
+        
+        /**
+         * Конструктор элемента загрузки - файла-вложения
+         * @param attachment модель вложения
+         * @param boardModel модель доски, с которой скачивается вложение
+         */
+        public DownloadingQueueItem(AttachmentModel attachment, BoardModel boardModel) {
+            this(attachment, null, boardModel);
         }
         
         /**
@@ -814,6 +827,7 @@ public class DownloadingService extends Service {
         public DownloadingQueueItem(UrlPageModel threadUrlPage, BoardModel boardModel, int downloadingThreadMode) {
             this.type = TYPE_THREAD;
             this.attachment = null;
+            this.subdirectory = null;
             this.chanName = threadUrlPage.chanName;
             this.boardModel = boardModel;
             this.threadUrlPage = threadUrlPage;
