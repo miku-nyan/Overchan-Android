@@ -842,6 +842,7 @@ public class DownloadingService extends Service {
                 if (cmp.type != type) return false;
                 switch (type) {
                     case TYPE_ATTACHMENT:
+                        if (!stringsEqual(cmp.subdirectory, subdirectory)) return false;
                         if (cmp.attachment == null) return attachment == null;
                         return ChanModels.hashAttachmentModel(cmp.attachment).equals(ChanModels.hashAttachmentModel(attachment));
                     case TYPE_THREAD:
@@ -850,6 +851,12 @@ public class DownloadingService extends Service {
                 }
             }
             return false;
+        }
+        
+        private static boolean stringsEqual(String s1, String s2) {
+            if (s1 == s2) return true;
+            if (s1 == null) return s2 == null;
+            return s1.equals(s2);
         }
         
         @Override

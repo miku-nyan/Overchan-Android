@@ -2852,14 +2852,24 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     private void downloadFile(AttachmentModel attachment) {
-        DownloadingService.DownloadingQueueItem item = new DownloadingService.DownloadingQueueItem(attachment, presentationModel.source.boardModel);
+        downloadFile(attachment, false);
+    }
+    
+    private void downloadFile(AttachmentModel attachment, boolean fromGridGallery) {
+        String subdir = (fromGridGallery && tabModel.pageModel.type == UrlPageModel.TYPE_THREADPAGE) ?
+                (tabModel.pageModel.boardName + "-" + tabModel.pageModel.threadNumber + "_originals") : null;
+        DownloadingService.DownloadingQueueItem item = (subdir != null) ?
+                new DownloadingService.DownloadingQueueItem(attachment, subdir, presentationModel.source.boardModel) :
+                    new DownloadingService.DownloadingQueueItem(attachment, presentationModel.source.boardModel);
         String fileName = ChanModels.getAttachmentLocalFileName(attachment, presentationModel.source.boardModel);
         
         String itemName = ChanModels.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel);
         if (DownloadingService.isInQueue(item)) {
             Toast.makeText(activity, resources.getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
         } else {
-            if (new File(new File(settings.getDownloadDirectory(), tabModel.pageModel.chanName), fileName).exists()) {
+            File dir = new File(settings.getDownloadDirectory(), tabModel.pageModel.chanName);
+            if (subdir != null) dir = new File(dir, subdir);
+            if (new File(dir, fileName).exists()) {
                 Toast.makeText(activity, resources.getString(R.string.notification_download_already_exists, fileName), Toast.LENGTH_LONG).show();
             } else {
                 Intent downloadIntent = new Intent(activity, DownloadingService.class);
@@ -3043,7 +3053,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             public void downloadSelected() {
                 for (int i=0; i<isSelected.length; ++i)
                     if (isSelected[i])
-                        downloadFile(getItem(i).getLeft());
+                        downloadFile(getItem(i).getLeft(), true);
             }
         }
         
