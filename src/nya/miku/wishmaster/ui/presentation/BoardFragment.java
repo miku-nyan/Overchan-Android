@@ -2856,6 +2856,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     private void downloadFile(AttachmentModel attachment, boolean fromGridGallery) {
+        if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return;
         String subdir = (fromGridGallery && tabModel.pageModel.type == UrlPageModel.TYPE_THREADPAGE) ?
                 (tabModel.pageModel.boardName + "-" + tabModel.pageModel.threadNumber + "_originals") : null;
         DownloadingService.DownloadingQueueItem item = (subdir != null) ?
