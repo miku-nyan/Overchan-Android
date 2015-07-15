@@ -330,6 +330,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_comment_copied">Message is copied to the clipboard</string>
     <string name="notification_download_already_in_queue">The task is already added:\n%s</string>
     <string name="notification_download_already_exists">File already exists:\n%s</string>
+    <string name="notification_download_exists_or_in_queue">Some files are already downloaded or in the queue</string>
     <string name="notification_not_found">Not found</string>
     <string name="notifacation_updating_now">The list is updated at the moment, try again later</string>
     

@@ -337,6 +337,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_comment_copied">Сообщение скопировано в буфер обмена</string>
     <string name="notification_download_already_in_queue">Задание уже добавлено:\n%s</string>
     <string name="notification_download_already_exists">Файл уже существует:\n%s</string>
+    <string name="notification_download_exists_or_in_queue">Некоторые файлы уже загружены или в очереди загрузок</string>
     <string name="notification_not_found">Ничего не найдено</string>
     <string name="notifacation_updating_now">В данный момент список обновляется, попробуйте позже</string>
     

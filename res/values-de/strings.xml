@@ -330,6 +330,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_comment_copied">Meldung ist in die Zwischenablage kopiert</string>
     <string name="notification_download_already_in_queue">Die Aufgabe ist bereits hinzugefügt:\n%s</string>
     <string name="notification_download_already_exists">Datei ist bereits vorhanden:\n%s</string>
+    <string name="notification_download_exists_or_in_queue">Einige Dateien bereits heruntergeladen oder in der Warteschlange</string>
     <string name="notification_not_found">Nicht gefunden</string>
     <string name="notifacation_updating_now">Die Liste wird im Moment aktualisiert, versuchen Sie es später</string>
     

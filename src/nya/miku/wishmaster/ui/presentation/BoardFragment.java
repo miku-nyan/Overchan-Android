@@ -2855,8 +2855,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         downloadFile(attachment, false);
     }
     
-    private void downloadFile(AttachmentModel attachment, boolean fromGridGallery) {
-        if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return;
+    private boolean downloadFile(AttachmentModel attachment, boolean fromGridGallery) {
+        if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return true;
         String subdir = (fromGridGallery && tabModel.pageModel.type == UrlPageModel.TYPE_THREADPAGE) ?
                 (tabModel.pageModel.boardName + "-" + tabModel.pageModel.threadNumber + "_originals") : null;
         DownloadingService.DownloadingQueueItem item = (subdir != null) ?
@@ -2866,16 +2866,21 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         String itemName = ChanModels.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel);
         if (DownloadingService.isInQueue(item)) {
-            Toast.makeText(activity, resources.getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
+            if (!fromGridGallery)
+                Toast.makeText(activity, resources.getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
+            return false;
         } else {
             File dir = new File(settings.getDownloadDirectory(), tabModel.pageModel.chanName);
             if (subdir != null) dir = new File(dir, subdir);
             if (new File(dir, fileName).exists()) {
-                Toast.makeText(activity, resources.getString(R.string.notification_download_already_exists, fileName), Toast.LENGTH_LONG).show();
+                if (!fromGridGallery)
+                    Toast.makeText(activity, resources.getString(R.string.notification_download_already_exists, fileName), Toast.LENGTH_LONG).show();
+                return false;
             } else {
                 Intent downloadIntent = new Intent(activity, DownloadingService.class);
                 downloadIntent.putExtra(DownloadingService.EXTRA_DOWNLOADING_ITEM, item);
                 activity.startService(downloadIntent);
+                return true;
             }
         }
     }
@@ -3052,9 +3057,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
             }
             public void downloadSelected() {
+                boolean toast = false;
                 for (int i=0; i<isSelected.length; ++i)
                     if (isSelected[i])
-                        downloadFile(getItem(i).getLeft(), true);
+                        if (!downloadFile(getItem(i).getLeft(), true))
+                            toast = true;
+                if (toast) Toast.makeText(activity, R.string.notification_download_exists_or_in_queue, Toast.LENGTH_LONG).show();
             }
         }
         
