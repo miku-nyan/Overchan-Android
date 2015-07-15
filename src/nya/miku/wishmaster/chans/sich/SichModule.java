@@ -150,7 +150,7 @@ public class SichModule extends AbstractVichanModule {
         model.uniqueAttachmentNames = true;
         model.chan = CHAN_NAME;
         model.boardName = shortName;
-        model.timeZoneId = "Europe/Kiev";
+        model.timeZoneId = "UTC";
         model.defaultUserName = model.boardName == "int" ? "Anonymous" : "Анонім";
         model.bumpLimit = 250;
         model.readonlyBoard = false;
