@@ -237,11 +237,11 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             Matcher linkMatcher = ATTACHMENT_EMBEDDED_LINK.matcher(embed);
             if (linkMatcher.find()) {
                 embedAttachment.path = linkMatcher.group(1);
-                if (embedAttachment.path.startsWith("//")) embedAttachment.path = "http:" + embedAttachment.path;
+                if (embedAttachment.path.startsWith("//")) embedAttachment.path = (useHttps() ? "https:" : "http:") + embedAttachment.path;
                 Matcher thumbMatcher = ATTACHMENT_EMBEDDED_THUMB.matcher(embed);
                 if (thumbMatcher.find()) {
                     embedAttachment.thumbnail = thumbMatcher.group(1);
-                    if (embedAttachment.thumbnail.startsWith("//")) embedAttachment.thumbnail = "http:" + embedAttachment.thumbnail;
+                    if (embedAttachment.thumbnail.startsWith("//")) embedAttachment.thumbnail = (useHttps() ? "https:" : "http:") + embedAttachment.thumbnail;
                 }
                 embedAttachment.isSpoiler = isSpoiler;
                 if (attachments != null) attachments.add(embedAttachment); else attachments = Collections.singletonList(embedAttachment);

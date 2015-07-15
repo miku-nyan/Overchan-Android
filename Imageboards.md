@@ -11,6 +11,7 @@
 * [nowere.net](http://nowere.net/)
 * [410chan.org](http://410chan.org/)
 * [0chan.cc](http://0chan.cc/)
+* [sich](https://sich.co.ua/)
 * [syn-ch](http://syn-ch.com/)
 * [Inach.org](http://inach.org/)
 * [lainchan.org](https://lainchan.org/)
