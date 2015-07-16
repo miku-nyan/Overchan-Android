@@ -67,6 +67,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="www.2chru.net" />
                 <data android:host="www.dmirrgetyojz735v.onion" />
                 
+                <data android:host="sich.co.ua" />
+                
                 <data android:host="syn-ch.com" />
                 <data android:host="syn-ch.org" />
                 <data android:host="syn-ch.ru" />
