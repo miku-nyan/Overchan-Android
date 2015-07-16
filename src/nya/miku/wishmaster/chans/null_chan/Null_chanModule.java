@@ -16,18 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans.nullchancc;
+package nya.miku.wishmaster.chans.null_chan;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.SequenceInputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,14 +36,11 @@ import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
-import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -58,7 +52,6 @@ import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
-import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
@@ -71,49 +64,21 @@ import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
 @SuppressWarnings("deprecation") //https://issues.apache.org/jira/browse/HTTPCLIENT-1632
-public class NullchanccModule extends AbstractWakabaModule {
-    private static final String TAG = "NullchanccModule";
+public class Null_chanModule extends AbstractWakabaModule {
+    private static final String TAG = "Null_chanModule";
     
-    private static final String CHAN_NAME = "0chan.cc";
-    private static final String DOMAIN = "0chan.cc";
+    private static final String CHAN_NAME = "0-chan.ru";
+    private static final String DOMAIN = "0-chan.ru";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "all", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Рисунки", "all", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "Реквесты", "all", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "0", "О Нульчане", "all", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "e", "Радиоэлектроника", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "t", "Технологии", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "hw", "Железо", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "s", "Софт", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "c", "Быдлокодинг", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "Видеоигры", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "8", "8-bit и pixel art", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "bg", "Настольные игры", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "wh", "Warhammer", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аниме", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "au", "Автомобили", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "bo", "Книги", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "co", "Комиксы", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cook", "Лепка супов", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "Flash", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fa", "Мода и стиль", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fl", "Иностранные языки", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "m", "Музыка", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "med", "Медицина", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ne", "Кошки", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ph", "Фотографии", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tv", "Кино и сериалы", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "wp", "Обои", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "war", "Вооружение", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Хентай", "adult", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "g", "Девушки", "adult", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fur", "Фурри", "adult", true)
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fur", "Мех", "adult", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "e", "Электроника", "geek", false)
         };
-    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
-    private static final Pattern PATTERN_EMBEDDED = Pattern.compile("<div (?:[^>]*)data-id=\"([^\"]*)\"(?:[^>]*)>", Pattern.DOTALL);
+    private static final Pattern PATTERN_EMBEDDED =
+            Pattern.compile("<object type=\"application/x-shockwave-flash\"(?:[^>]*)data=\"([^\"]*)\"(?:[^>]*)>", Pattern.DOTALL);
     private static final Pattern ERROR_POSTING = Pattern.compile("<h2(?:[^>]*)>(.*?)</h2>", Pattern.DOTALL);
     
-    public NullchanccModule(SharedPreferences preferences, Resources resources) {
+    public Null_chanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
     }
     
@@ -124,7 +89,7 @@ public class NullchanccModule extends AbstractWakabaModule {
     
     @Override
     public String getDisplayingName() {
-        return "Øчан (.cc)";
+        return "Øчан (0-chan.ru)";
     }
     
     @Override
@@ -139,27 +104,7 @@ public class NullchanccModule extends AbstractWakabaModule {
     
     @Override
     protected boolean canHttps() {
-        return true;
-    }
-    
-    private void addOnlyNewPostsPreference(PreferenceGroup group) {
-        Context context = group.getContext();
-        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
-        onlyNewPostsPreference.setTitle(R.string.nullchancc_prefs_only_new_posts);
-        onlyNewPostsPreference.setSummary(R.string.nullchancc_prefs_only_new_posts_summary);
-        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
-        onlyNewPostsPreference.setDefaultValue(true);
-        group.addItemFromInflater(onlyNewPostsPreference);
-    }
-    
-    private boolean loadOnlyNewPosts() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
-    }
-    
-    @Override
-    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        addOnlyNewPostsPreference(preferenceGroup);
-        super.addPreferencesOnScreen(preferenceGroup);
+        return false;
     }
     
     @Override
@@ -193,19 +138,18 @@ public class NullchanccModule extends AbstractWakabaModule {
     @SuppressLint("SimpleDateFormat")
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        if (urlModel != null && urlModel.chanName != null && urlModel.chanName.equals("expand")) {
-            stream = new SequenceInputStream(new ByteArrayInputStream("<form id=\"delform\">".getBytes()), stream);
-        }
         return new WakabaReader(stream) {
             private final DateFormat dateFormat;
             {
                 DateFormatSymbols symbols = new DateFormatSymbols();
-                symbols.setShortMonths(new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"});
-                dateFormat = new SimpleDateFormat("yyyy MMM dd HH:mm:ss", symbols);
+                symbols.setMonths(new String[] {
+                        "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"});
+                dateFormat = new SimpleDateFormat("dd MMMM yyyy в HH:mm:ss", symbols);
                 dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+3"));
             }
             @Override
             protected void parseDate(String date) {
+                System.out.println(date);
                 if (date.length() > 0) {
                     date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
                     try {
@@ -217,62 +161,37 @@ public class NullchanccModule extends AbstractWakabaModule {
             }
             @Override
             protected void parseOmittedString(String omitted) {
-                if (omitted.indexOf('>') != -1) omitted = omitted.substring(omitted.indexOf('>'));
+                System.out.println(omitted);
+                if (omitted.indexOf('<') != -1) omitted = omitted.substring(0, omitted.indexOf('<'));
                 super.parseOmittedString(omitted);
             }
             @Override
             protected void postprocessPost(PostModel post) {
                 Matcher matcher = PATTERN_EMBEDDED.matcher(post.comment);
                 while (matcher.find()) {
-                    String id = matcher.group(1);
-                    String div = matcher.group(0).toLowerCase(Locale.US);
-                    String url = null;
-                    if (div.contains("youtube")) {
-                        url = "http://www.youtube.com/watch?v=" + id;
-                    } else if (div.contains("vimeo")) {
-                        url = "http://vimeo.com/" + id;
-                    } else if (div.contains("coub")) {
-                        url = "http://coub.com/view/" + id;
+                    String url = matcher.group(1).replace("youtube.com/v/", "youtube.com/watch?v=");
+                    String id = null;
+                    if (url.contains("youtube") && url.contains("v=")) {
+                        id = url.substring(url.indexOf("v=") + 2);
+                        if (id.contains("&")) id = id.substring(0, id.indexOf("&"));
                     }
-                    if (url != null) {
-                        AttachmentModel attachment = new AttachmentModel();
-                        attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
-                        attachment.path = url;
-                        attachment.thumbnail = div.contains("youtube") ? ("http://img.youtube.com/vi/" + id + "/default.jpg") : null;
-                        int oldCount = post.attachments != null ? post.attachments.length : 0;
-                        AttachmentModel[] attachments = new AttachmentModel[oldCount + 1];
-                        for (int i=0; i<oldCount; ++i) attachments[i] = post.attachments[i];
-                        attachments[oldCount] = attachment;
-                        post.attachments = attachments;
-                    }
+                    AttachmentModel attachment = new AttachmentModel();
+                    attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    attachment.path = url;
+                    attachment.thumbnail = id != null ? ("http://img.youtube.com/vi/" + id + "/default.jpg") : null;
+                    int oldCount = post.attachments != null ? post.attachments.length : 0;
+                    AttachmentModel[] attachments = new AttachmentModel[oldCount + 1];
+                    for (int i=0; i<oldCount; ++i) attachments[i] = post.attachments[i];
+                    attachments[oldCount] = attachment;
+                    post.attachments = attachments;
                 }
             }
         };
     }
     
     @Override
-    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
-            throws Exception {
-        if (loadOnlyNewPosts() && oldList != null && oldList.length > 0) {
-            String url = getUsingUrl() + "expand.php?after=" + oldList[oldList.length-1].number + "&board=" + boardName + "&threadid=" + threadNumber;
-            UrlPageModel object = new UrlPageModel();
-            object.chanName = "expand";
-            ThreadModel[] page = readWakabaPage(url, listener, task, true, object);
-            if (page != null && page.length > 0) {
-                PostModel[] posts = new PostModel[oldList.length + page[0].posts.length];
-                for (int i=0; i<oldList.length; ++i) posts[i] = oldList[i];
-                for (int i=0; i<page[0].posts.length; ++i) posts[oldList.length + i] = page[0].posts[i];
-                return posts;
-            } else {
-                return oldList;
-            }
-        }
-        return super.getPostsList(boardName, threadNumber, listener, task, oldList);
-    }
-    
-    @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String captchaUrl = getUsingUrl() + "captcha.php?" + Math.random();
+        String captchaUrl = getUsingUrl() + "captcha/image.php?" + Math.random();
         Bitmap captchaBitmap = null;
         HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
@@ -293,19 +212,20 @@ public class NullchanccModule extends AbstractWakabaModule {
         String url = getUsingUrl() + "board.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("board", model.boardName).
-                addString("replythread", model.threadNumber == null ? "0" : model.threadNumber).
-                addString("name", model.name);
+                addString("replythread", model.threadNumber == null ? "0" : model.threadNumber);
         if (model.sage) postEntityBuilder.addString("sage", "on");
         postEntityBuilder.
                 addString("captcha", model.captchaAnswer).
+                addString("name", model.name).
                 addString("subject", model.subject).
-                addString("message", model.comment).
-                addString("postpassword", model.password);
+                addString("message", model.comment);
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
         else postEntityBuilder.addString("nofile", "on");
         
-        postEntityBuilder.addString("redirecttothread", "1");
+        postEntityBuilder.
+                addString("postpassword", model.password).
+                addString("gotothread", "1");
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
         HttpResponseModel response = null;
@@ -343,14 +263,9 @@ public class NullchanccModule extends AbstractWakabaModule {
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
-        if (result.contains("Неверный пароль")) throw new Exception("Неверный пароль");
+        if (result.contains("Неправильный пароль")) throw new Exception("Неправильный пароль");
+        if (result.contains("Ошибка при попытке удалить сообщение")) throw new Exception("Ошибка при попытке удалить сообщение");
         return null;
-    }
-    
-    @Override
-    public String fixRelativeUrl(String url) {
-        if (useHttps()) url = url.replace("http://0chan.cc", "https://0chan.cc");
-        return super.fixRelativeUrl(url);
     }
     
 }
