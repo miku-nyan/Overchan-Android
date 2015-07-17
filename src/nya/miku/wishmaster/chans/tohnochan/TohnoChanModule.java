@@ -244,7 +244,6 @@ public class TohnoChanModule extends AbstractWakabaModule {
                 Matcher errorMatcher = ERROR_POSTING.matcher(htmlResponse);
                 if (errorMatcher.find()) throw new Exception(errorMatcher.group(1).trim());
             } else throw new Exception(response.statusCode + " - " + response.statusReason);
-            System.out.println(response.statusCode + " - " + response.statusReason);
         } finally {
             if (response != null) response.release();
         }
@@ -264,7 +263,6 @@ public class TohnoChanModule extends AbstractWakabaModule {
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
-        System.out.println(result);
         if (result.contains("Incorrect password")) throw new Exception("Incorrect password");
         return null;
     }

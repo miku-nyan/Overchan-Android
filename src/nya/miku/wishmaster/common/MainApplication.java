@@ -124,13 +124,13 @@ public class MainApplication extends Application {
         addChanModule(new KrautModule(preferences, resources));
         addChanModule(new InfinityModule(preferences, resources));
         addChanModule(new CirnoModule(preferences, resources));
-        addChanModule(new SichModule(preferences, resources));
         addChanModule(new MikubaModule(preferences, resources));
         addChanModule(new DobroModule(preferences, resources));
         addChanModule(new DvachModule(preferences, resources));
         addChanModule(new SevenchanModule(preferences, resources));
         addChanModule(new NowereModule(preferences, resources));
         addChanModule(new Chan410Module(preferences, resources));
+        addChanModule(new SichModule(preferences, resources));
         addChanModule(new NullchanccModule(preferences, resources));
         addChanModule(new Null_chanModule(preferences, resources));
         addChanModule(new SynchModule(preferences, resources));

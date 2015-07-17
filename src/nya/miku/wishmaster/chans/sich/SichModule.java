@@ -31,15 +31,12 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
 import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
-import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -64,16 +61,10 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 @SuppressWarnings("deprecation") // https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 
 public class SichModule extends AbstractVichanModule {
-    private static final String TAG = "SichModule";
-    
-    static final String CHAN_NAME = "sich.co.ua";
+    private static final String CHAN_NAME = "sich.co.ua";
     private static final String DEFAULT_DOMAIN = "sich.co.ua";
-    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN };
-    
-    private static final String[] CATALOG = new String[] { "Catalog" };
     private static final String[] ATTACHMENT_FORMATS = new String[] {
-        "bmp", "gif", "jpeg", "jpg", "png",
-        "mp4", "webm"
+        "bmp", "gif", "jpeg", "jpg", "png", "mp4", "webm"
     };
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Балачки", "Основа", false),
@@ -105,16 +96,6 @@ public class SichModule extends AbstractVichanModule {
     }
     
     @Override
-    protected void initHttpClient() {
-        String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
-        if (cloudflareCookie != null) {
-            BasicClientCookieHC4 c = new BasicClientCookieHC4(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
-            c.setDomain(DEFAULT_DOMAIN);
-            httpClient.getCookieStore().addCookie(c);
-        }
-    }
-    
-    @Override
     protected boolean canCloudflare() {
         return true;
     }
@@ -125,18 +106,13 @@ public class SichModule extends AbstractVichanModule {
     }
     
     @Override
-    protected String[] getAllDomains() {
-        return DOMAINS;
-    }
-    
-    @Override
     protected boolean canHttps() {
         return true;
     }
     
     @Override
     protected boolean useHttpsDefaultValue() {
-        return false;
+        return true;
     }
     
     @Override
@@ -151,7 +127,7 @@ public class SichModule extends AbstractVichanModule {
         model.chan = CHAN_NAME;
         model.boardName = shortName;
         model.timeZoneId = "UTC";
-        model.defaultUserName = model.boardName == "int" ? "Anonymous" : "Анонім";
+        model.defaultUserName = "Anonymous";
         model.bumpLimit = 250;
         model.readonlyBoard = false;
         model.requiredFileForNewThread = true;

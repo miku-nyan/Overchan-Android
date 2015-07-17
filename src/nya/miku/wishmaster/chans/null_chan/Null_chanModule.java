@@ -149,7 +149,6 @@ public class Null_chanModule extends AbstractWakabaModule {
             }
             @Override
             protected void parseDate(String date) {
-                System.out.println(date);
                 if (date.length() > 0) {
                     date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
                     try {
@@ -161,7 +160,6 @@ public class Null_chanModule extends AbstractWakabaModule {
             }
             @Override
             protected void parseOmittedString(String omitted) {
-                System.out.println(omitted);
                 if (omitted.indexOf('<') != -1) omitted = omitted.substring(0, omitted.indexOf('<'));
                 super.parseOmittedString(omitted);
             }
