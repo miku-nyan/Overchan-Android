@@ -32,6 +32,7 @@ import nya.miku.wishmaster.cache.FileCache;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.Serializer;
 import nya.miku.wishmaster.chans.arhivach.ArhivachModule;
+import nya.miku.wishmaster.chans.chan420.Chan420Module;
 import nya.miku.wishmaster.chans.cirno.Chan410Module;
 import nya.miku.wishmaster.chans.cirno.CirnoModule;
 import nya.miku.wishmaster.chans.cirno.MikubaModule;
@@ -130,6 +131,7 @@ public class MainApplication extends Application {
         addChanModule(new SevenchanModule(preferences, resources));
         addChanModule(new NowereModule(preferences, resources));
         addChanModule(new Chan410Module(preferences, resources));
+        addChanModule(new Chan420Module(preferences, resources));
         addChanModule(new SichModule(preferences, resources));
         addChanModule(new NullchanccModule(preferences, resources));
         addChanModule(new Null_chanModule(preferences, resources));
@@ -177,6 +179,8 @@ public class MainApplication extends Application {
         
         RecaptchaAjax.init();
         sfw = getPackageName().endsWith(".sfw");
+        if (sfw) sfw = !NsfwUnlock.isUnlocked();
+        
         Wifi.updateState(this);
     }
     
