@@ -23,12 +23,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -47,12 +44,9 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-//@SuppressWarnings("deprecation")
-//https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class Chan420Module extends AbstractChanModule {
     
     static final String CHAN_NAME = "420chan.org";
-    private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     
     private Map<String, BoardModel> boardsMap = null;
     
@@ -91,22 +85,13 @@ public class Chan420Module extends AbstractChanModule {
         return array;
     }
     
-    @Override
-    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        Context context = preferenceGroup.getContext();
-        addPasswordPreference(preferenceGroup);
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(true);
-        preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
-        addProxyPreferences(preferenceGroup);
+    private boolean useHttps() {
+        return false;
     }
     
-    private boolean useHttps() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true);
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addProxyPreferences(preferenceGroup);
     }
     
     @Override
@@ -196,5 +181,5 @@ public class Chan420Module extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         return WakabaUtils.parseUrl(url.replace("boards.420chan.org", "420chan.org").replace(".php", ".html"), getChanName(), "420chan.org");
     }
-
+    
 }

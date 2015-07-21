@@ -124,7 +124,7 @@ public class NullchanccModule extends AbstractWakabaModule {
     
     @Override
     public String getDisplayingName() {
-        return "Øчан (.cc)";
+        return "Øчан (0chan.cc)";
     }
     
     @Override
