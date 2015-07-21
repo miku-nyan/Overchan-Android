@@ -53,6 +53,7 @@ import nya.miku.wishmaster.chans.sevenchan.SevenchanModule;
 import nya.miku.wishmaster.chans.sich.SichModule;
 import nya.miku.wishmaster.chans.synch.SynchModule;
 import nya.miku.wishmaster.chans.tohnochan.TohnoChanModule;
+import nya.miku.wishmaster.chans.uchan.UchanModule;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.ui.Database;
@@ -132,6 +133,7 @@ public class MainApplication extends Application {
         addChanModule(new NowereModule(preferences, resources));
         addChanModule(new Chan410Module(preferences, resources));
         addChanModule(new Chan420Module(preferences, resources));
+        addChanModule(new UchanModule(preferences, resources));
         addChanModule(new SichModule(preferences, resources));
         addChanModule(new NullchanccModule(preferences, resources));
         addChanModule(new Null_chanModule(preferences, resources));
