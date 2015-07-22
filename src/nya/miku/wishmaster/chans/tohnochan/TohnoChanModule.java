@@ -92,7 +92,7 @@ public class TohnoChanModule extends AbstractWakabaModule {
         static {
             DateFormatSymbols symbols = new DateFormatSymbols();
             symbols.setShortWeekdays(new String[] { "", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" });
-            DATE_FORMAT = new SimpleDateFormat("dd/MM/yy(EEE)HH:mm", symbols);
+            DATE_FORMAT = new SimpleDateFormat("MM/dd/yy(EEE)HH:mm", symbols);
             DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("US/Pacific"));
         }
     }
@@ -224,7 +224,7 @@ public class TohnoChanModule extends AbstractWakabaModule {
                 addString("postpassword", model.password);
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
-        else postEntityBuilder.addString("nofile", "on");
+        else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
         HttpResponseModel response = null;
