@@ -283,7 +283,7 @@ public class NullchanccModule extends AbstractWakabaModule {
             responseModel.release();
         }
         CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
+        captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
         captchaModel.bitmap = captchaBitmap;
         return captchaModel;
     }
@@ -304,6 +304,7 @@ public class NullchanccModule extends AbstractWakabaModule {
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
         else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
+        postEntityBuilder.addString("embed", "");
         
         postEntityBuilder.addString("redirecttothread", "1");
         

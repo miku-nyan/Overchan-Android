@@ -118,10 +118,10 @@ public class Null_chanModule extends AbstractWakabaModule {
         model.timeZoneId = "GMT+3";
         model.defaultUserName = "Аноним";
         model.readonlyBoard = false;
-        model.requiredFileForNewThread = !shortName.equals("0");
+        model.requiredFileForNewThread = false;
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
-        model.allowNames = !shortName.equals("b");
+        model.allowNames = true;
         model.allowSubjects = true;
         model.allowSage = true;
         model.allowEmails = false;
@@ -220,10 +220,11 @@ public class Null_chanModule extends AbstractWakabaModule {
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
         else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
+        postEntityBuilder.addString("embed", "");
         
         postEntityBuilder.
                 addString("postpassword", model.password).
-                addString("gotothread", "1");
+                addString("gotothread", "checked");
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
         HttpResponseModel response = null;
