@@ -345,8 +345,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             return;
         }
         GalleryItemViewTag tag = (GalleryItemViewTag) current.getTag();
+        boolean externalVideo = tag.attachmentModel.type == AttachmentModel.TYPE_VIDEO && settings.doNotDownloadVideos();
         menu.findItem(R.id.menu_update).setVisible(!currentLoaded);
-        menu.findItem(R.id.menu_save_attachment).setVisible(currentLoaded && tag.attachmentModel.type != AttachmentModel.TYPE_OTHER_NOTFILE);
+        menu.findItem(R.id.menu_save_attachment).setVisible(externalVideo ||
+                (currentLoaded && tag.attachmentModel.type != AttachmentModel.TYPE_OTHER_NOTFILE));
         menu.findItem(R.id.menu_open_external).setVisible(currentLoaded && (tag.attachmentModel.type == AttachmentModel.TYPE_OTHER_FILE ||
                 tag.attachmentModel.type == AttachmentModel.TYPE_AUDIO || tag.attachmentModel.type == AttachmentModel.TYPE_VIDEO));
         menu.findItem(R.id.menu_open_external).setTitle(tag.attachmentModel.type != AttachmentModel.TYPE_OTHER_FILE ?
