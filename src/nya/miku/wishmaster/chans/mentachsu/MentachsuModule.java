@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.mentachsu;
+package nya.miku.wishmaster.chans.mentachsu;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -205,7 +205,7 @@ public class MentachsuModule extends AbstractWakabaModule {
                 responseModel.release();
             }
             CaptchaModel captchaModel = new CaptchaModel();
-            captchaModel.type = CaptchaModel.TYPE_NORMAL;
+            captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
             captchaModel.bitmap = captchaBitmap;
             return captchaModel;
         } else throw new Exception("Captcha update epic fail");
