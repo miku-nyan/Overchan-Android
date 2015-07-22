@@ -37,7 +37,6 @@ import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.util.WakabaReader;
-import nya.miku.wishmaster.common.CryptoUtils;
 
 @SuppressLint("SimpleDateFormat")
 public class DvachReader extends WakabaReader {
@@ -67,7 +66,7 @@ public class DvachReader extends WakabaReader {
     private boolean inDate = false;
     
     public DvachReader(InputStream in) {
-        super(in);
+        super(in, null, true);
     }
     
     @Override
@@ -165,7 +164,6 @@ public class DvachReader extends WakabaReader {
     @Override
     protected void postprocessPost(PostModel post) {
         post.comment = post.comment.replaceAll("<span class=\"red italic\">(.*?)</span>", "<font color=\"red\"><em>$1</em></font>");
-        post.comment = CryptoUtils.fixCloudflareEmails(post.comment);
         if (post.attachments != null)
             for (AttachmentModel attachment : post.attachments)
                 attachment.originalName = null;

@@ -38,6 +38,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 
 /**
@@ -119,6 +120,7 @@ public class WakabaReader implements Closeable {
     
     protected final Reader _in;
     protected final DateFormat dateFormat;
+    protected final boolean canCloudflare;
     
     private StringBuilder readBuffer = new StringBuilder();
     private List<ThreadModel> threads;
@@ -139,17 +141,26 @@ public class WakabaReader implements Closeable {
      *  В конце чтения поста будет записан как массив в {@link PostModel#attachments} */
     protected List<AttachmentModel> currentAttachments;
     
-    public WakabaReader(Reader reader, DateFormat dateFormat) {
+    public WakabaReader(Reader reader, DateFormat dateFormat, boolean canCloudflare) {
         _in = reader;
+        this.canCloudflare = canCloudflare;
         this.dateFormat = dateFormat != null ? dateFormat : DateFormatHolder.DEFAULT_WAKABA_DATEFORMAT;
+    }
+    
+    public WakabaReader(Reader reader, DateFormat dateFormat) {
+        this(reader, dateFormat, false);
     }
     
     public WakabaReader(Reader reader) {
         this(reader, null);
     }
     
+    public WakabaReader(InputStream in, DateFormat dateFormat, boolean canCloudflare) {
+        this(new BufferedReader(new InputStreamReader(in)), dateFormat, canCloudflare);
+    }
+    
     public WakabaReader(InputStream in, DateFormat dateFormat) {
-        this(new BufferedReader(new InputStreamReader(in)), dateFormat);
+        this(in, dateFormat, false);
     }
     
     public WakabaReader(InputStream in) {
@@ -189,6 +200,11 @@ public class WakabaReader implements Closeable {
             if (currentPost.comment == null) currentPost.comment = "";
             if (currentPost.email == null) currentPost.email = "";
             if (currentPost.trip == null) currentPost.trip = "";
+            if (canCloudflare) {
+                currentPost.comment = CryptoUtils.fixCloudflareEmails(currentPost.comment);
+                if (currentPost.email.startsWith("/cdn-cgi/l/email-protection#"))
+                    currentPost.email = CryptoUtils.decodeCloudflareEmail(currentPost.email.substring(28));
+            }
             postprocessPost(currentPost);
             postsBuf.add(currentPost);
         }

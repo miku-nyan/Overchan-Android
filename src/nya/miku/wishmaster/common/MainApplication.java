@@ -56,6 +56,7 @@ import nya.miku.wishmaster.chans.tohnochan.TohnoChanModule;
 import nya.miku.wishmaster.chans.uchan.UchanModule;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.mentachsu.MentachsuModule;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
@@ -137,6 +138,7 @@ public class MainApplication extends Application {
         addChanModule(new SichModule(preferences, resources));
         addChanModule(new NullchanccModule(preferences, resources));
         addChanModule(new Null_chanModule(preferences, resources));
+        addChanModule(new MentachsuModule(preferences, resources));
         addChanModule(new SynchModule(preferences, resources));
         addChanModule(new InachModule(preferences, resources));
         addChanModule(new LainModule(preferences, resources));
@@ -181,7 +183,7 @@ public class MainApplication extends Application {
         
         RecaptchaAjax.init();
         sfw = getPackageName().endsWith(".sfw");
-        if (sfw) sfw = !NsfwUnlock.isUnlocked();
+        //if (sfw) sfw = !NsfwUnlock.isUnlocked();
         
         Wifi.updateState(this);
     }
