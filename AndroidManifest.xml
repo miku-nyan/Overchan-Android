@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nya.miku.wishmaster"
-    android:versionCode="23"
-    android:versionName="1.1.0" >
+    android:versionCode="24"
+    android:versionName="1.1.1" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
