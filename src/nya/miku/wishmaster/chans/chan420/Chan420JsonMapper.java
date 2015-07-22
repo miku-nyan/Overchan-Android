@@ -161,6 +161,10 @@ public class Chan420JsonMapper {
         com = com.replace("\r\n", "\n").replace("\n", "<br/>");
         com = com.replaceAll("(?i)\\[b\\](.*?)\\[/b\\]", "<b>$1</b>");
         com = com.replaceAll("(?i)\\[i\\](.*?)\\[/i\\]", "<i>$1</i>");
+        com = com.replaceAll("(?i)\\[s\\](.*?)\\[/s\\]", "<s>$1</s>");
+        com = com.replaceAll("(?i)\\[spoiler\\](.*?)\\[/spoiler\\]", "<span class=\"spoiler\">$1</span>");
+        com = com.replaceAll("\\[\\*\\*\\](.*?)\\[/\\*\\*\\]", "<b>$1</b>");
+        com = com.replaceAll("\\[\\*\\](.*?)\\[/\\*\\]", "<i>$1</i>");
         com = com.replaceAll("\\[%\\](.*?)\\[/%\\]", "<span class=\"spoiler\">$1</span>");
         com = com.replaceAll("&gt;&gt;(\\d+)", "<a href=\"/" + boardName + "/res/" + threadNumber + ".php#$1\">$0</a>");
         

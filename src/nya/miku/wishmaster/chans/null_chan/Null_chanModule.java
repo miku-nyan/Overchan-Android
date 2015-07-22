@@ -219,7 +219,7 @@ public class Null_chanModule extends AbstractWakabaModule {
                 addString("message", model.comment);
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
-        else postEntityBuilder.addString("nofile", "on");
+        else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
         
         postEntityBuilder.
                 addString("postpassword", model.password).

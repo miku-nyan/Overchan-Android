@@ -303,7 +303,7 @@ public class NullchanccModule extends AbstractWakabaModule {
                 addString("postpassword", model.password);
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
-        else postEntityBuilder.addString("nofile", "on");
+        else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
         
         postEntityBuilder.addString("redirecttothread", "1");
         

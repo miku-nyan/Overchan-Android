@@ -204,7 +204,7 @@ public class UchanModule extends AbstractWakabaModule {
                 addString("field4", model.comment);
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("file", model.attachments[0], model.randomHash);
-        else postEntityBuilder.addString("nofile", "on");
+        else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
         postEntityBuilder.
                 addString("noko", "on").
                 addString("password", model.password);
@@ -213,7 +213,6 @@ public class UchanModule extends AbstractWakabaModule {
         HttpResponseModel response = null;
         try {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
-            System.out.println(response.statusCode + " - " + response.statusReason);
             if (response.statusCode == 303) {
                 return null;
             } else if (response.statusCode == 200) {
