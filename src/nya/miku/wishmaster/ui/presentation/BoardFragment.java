@@ -596,6 +596,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             menu.add(Menu.NONE, R.id.context_menu_hide, 6, R.string.context_menu_hide_post);
             menu.add(Menu.NONE, R.id.context_menu_delete, 7, R.string.context_menu_delete_post);
             menu.add(Menu.NONE, R.id.context_menu_delete_files, 8, R.string.context_menu_delete_files);
+            menu.add(Menu.NONE, R.id.context_menu_report, 9, R.string.context_menu_report);
             if (!isList) {
                 for (int id : new int[] {
                         R.id.context_menu_reply,
@@ -605,7 +606,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         R.id.context_menu_share,
                         R.id.context_menu_hide,
                         R.id.context_menu_delete,
-                        R.id.context_menu_delete_files } ) {
+                        R.id.context_menu_delete_files,
+                        R.id.context_menu_report} ) {
                     menu.findItem(id).setOnMenuItemClickListener(contextMenuListener);
                 }
             }
@@ -619,6 +621,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             if (model.sourceModel.deleted || !presentationModel.source.boardModel.allowDeleteFiles ||
                     model.sourceModel.attachments == null || model.sourceModel.attachments.length == 0 || tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_delete_files).setVisible(false);
+            }
+            if (model.sourceModel.deleted || presentationModel.source.boardModel.allowReport == BoardModel.REPORT_NOT_ALLOWED ||
+                    tabModel.type == TabModel.TYPE_LOCAL) {
+                menu.findItem(R.id.context_menu_report).setVisible(false);
             }
             if (model.sourceModel.attachments == null || model.sourceModel.attachments.length == 0 || tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_download).setVisible(false);
@@ -790,6 +796,14 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 delModel.postNumber = adapter.getItem(position).sourceModel.number;
                 delModel.onlyFiles = item.getItemId() == R.id.context_menu_delete_files;
                 runDelete(delModel);
+                return true;
+            case R.id.context_menu_report:
+                DeletePostModel reportModel = new DeletePostModel();
+                reportModel.chanName = chan.getChanName();
+                reportModel.boardName = tabModel.pageModel.boardName;
+                reportModel.threadNumber = tabModel.pageModel.threadNumber;
+                reportModel.postNumber = adapter.getItem(position).sourceModel.number;
+                runReport(reportModel);
                 return true;
         }
         return false;
@@ -3255,6 +3269,81 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 setTitle(R.string.dialog_delete_password).
                 setView(inputField).
                 setPositiveButton(R.string.dialog_delete_button, dlgOnClick).
+                setNegativeButton(android.R.string.cancel, null).
+                create().
+                show();
+    }
+    
+    private void runReport(final DeletePostModel reportPostModel) {
+        final EditText inputField = new EditText(activity);
+        inputField.setSingleLine();
+        if (presentationModel.source.boardModel.allowReport != BoardModel.REPORT_WITH_COMMENT) {
+            inputField.setEnabled(false);
+            inputField.setKeyListener(null);
+        }
+        
+        DialogInterface.OnClickListener dlgOnClick = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (currentTask != null) currentTask.cancel();
+                if (pullableLayout.isRefreshing()) setPullableNoRefreshing();
+                reportPostModel.reportReason = inputField.getText().toString();
+                final ProgressDialog progressDlg = new ProgressDialog(activity);
+                final CancellableTask reportTask = new CancellableTask.BaseCancellableTask();
+                currentTask = reportTask;
+                progressDlg.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        reportTask.cancel();
+                    }
+                });
+                progressDlg.setCanceledOnTouchOutside(false);
+                progressDlg.setMessage(resources.getString(R.string.dialog_report_progress));
+                progressDlg.show();
+                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String error = null;
+                        String targetUrl = null;
+                        if (reportTask.isCancelled()) return;
+                        try {
+                            targetUrl = chan.reportPost(reportPostModel, null, reportTask);
+                        } catch (Exception e) {
+                            Logger.e(TAG, "cannot report post", e);
+                            if (e instanceof HttpRequestException && ((HttpRequestException) e).isSslException()) {
+                                error = resources.getString(R.string.error_ssl);
+                            } else {
+                                error = e.getMessage() == null ? "" : e.getMessage();
+                            }
+                        }
+                        if (reportTask.isCancelled()) return;
+                        final boolean success = error == null;
+                        final String result = success ? targetUrl : error;
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (reportTask.isCancelled()) return;
+                                progressDlg.dismiss();
+                                if (success) {
+                                    if (result == null) {
+                                        update();
+                                    } else {
+                                        UrlHandler.open(result, activity);
+                                    }
+                                } else {
+                                    Toast.makeText(activity, TextUtils.isEmpty(result) ? resources.getString(R.string.error_unknown) : result,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    }
+                }).start();
+            }
+        };
+        new AlertDialog.Builder(activity).
+                setTitle(R.string.dialog_report_reason).
+                setView(inputField).
+                setPositiveButton(R.string.dialog_report_button, dlgOnClick).
                 setNegativeButton(android.R.string.cancel, null).
                 create().
                 show();

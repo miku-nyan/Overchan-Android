@@ -56,16 +56,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_deleted_mark">Стертий пост</string>
     <plurals name="postitem_posts_quantity">
         <item quantity="one">%d пост</item>
+        <item quantity="few">%d пости</item>
         <item quantity="many">%d постів</item>
         <item quantity="other">%d пости</item>
     </plurals>
     <plurals name="postitem_files_quantity">
         <item quantity="one">%d файл</item>
+        <item quantity="few">%d файли</item>
         <item quantity="many">%d файлів</item>
         <item quantity="other">%d файли</item>
     </plurals>
     <plurals name="postitem_replies_quantity">
         <item quantity="one">%d відповідь</item>
+        <item quantity="few">%d відповіді</item>
         <item quantity="many">%d відповідей</item>
         <item quantity="other">%d відповіді</item>
     </plurals>
@@ -74,6 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postslist_no_new_posts">Нових постів немає</string>
     <plurals name="postslist_new_posts_quantity">
         <item quantity="one">%d новий пост</item>
+        <item quantity="few">%d нові пости</item>
         <item quantity="many">%d нових постів</item>
         <item quantity="other">%d нові пости</item>
     </plurals>
@@ -91,6 +95,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="tabs_tracker_updating">Оновлення триває</string>
     <plurals name="tabs_tracker_timer">
         <item quantity="one">%d секунда до оновлення</item>
+        <item quantity="few">%d секунди до оновлення</item>
         <item quantity="many">%d секунд до оновлення</item>
         <item quantity="other">%d секунди до оновлення</item>
     </plurals>
@@ -185,6 +190,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_hide_post">Сховати пост</string>
     <string name="context_menu_delete_post">Стерти пост</string>
     <string name="context_menu_delete_files">Стерти файли</string>
+    <string name="context_menu_report">Поскаржитися</string>
     <string name="context_menu_share">Поділитися</string>
     <string name="context_menu_search_google">Пошук Google</string>
     <string name="context_menu_delete_autohide_rule">Стерти правило</string>
@@ -198,6 +204,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_delete_password">Пароль видалення</string>
     <string name="dialog_delete_button">Стерти</string>
     <string name="dialog_delete_progress">Видалення</string>
+    
+    <string name="dialog_report_reason">Причина</string>
+    <string name="dialog_report_button">Поскаржитися</string>
+    <string name="dialog_report_progress">Зачекайте</string>
     
     <string name="dialog_cloudflare_captcha_text">Перевірка безпеки CloudFlare.\nВведіть символи з картинки:</string>
     <string name="dialog_cloudflare_captcha_hint">Капча</string>

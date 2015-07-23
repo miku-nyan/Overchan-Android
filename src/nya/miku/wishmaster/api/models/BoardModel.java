@@ -62,6 +62,9 @@ public class BoardModel implements Serializable {
     @Tag(11) public boolean allowDeletePosts;
     /** Должно принимать true, если на доске можно удалять вложения в своих постах. Только если {@link #readonlyBoard} равно false. */
     @Tag(12) public boolean allowDeleteFiles;
+    /** Разрешено ли на данной доске жаловаться на сообщения (сообщить модератору), одно из константных значений:
+     *  {@link #REPORT_NOT_ALLOWED}, {@link #REPORT_SIMPLE}, {@link #REPORT_WITH_COMMENT} */
+    @Tag(31) public int allowReport;
     /** Должно принимать true, если на доске можно указывать имя отправителя. Только если {@link #readonlyBoard} равно false. */
     @Tag(13) public boolean allowNames;
     /** Должно принимать true, если на доске можно указывать темы сообщенй. Только если {@link #readonlyBoard} равно false. */
@@ -122,4 +125,12 @@ public class BoardModel implements Serializable {
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - BBCode.<br>
      *  [i]italic[/i] [b]bold[/b] [spoiler]spoiler[/spoiler] [s]strike[/s] */
     public static final int MARK_BBCODE = 2;
+    
+    /** Константное значение, если на данной доске нет возможности пожаловаться на сообщения */
+    public static final int REPORT_NOT_ALLOWED = 0;
+    /** Константное значение, если на данной доске при репорте есть возможность указать только номер сообщения */
+    public static final int REPORT_SIMPLE = 1;
+    /** Константное значение, если на данной доске при репорте есть возможность указать номер сообщения и комментарий */
+    public static final int REPORT_WITH_COMMENT = 2;
+    
 }

@@ -180,6 +180,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_hide_post">Hide post</string>
     <string name="context_menu_delete_post">Delete post</string>
     <string name="context_menu_delete_files">Delete files</string>
+    <string name="context_menu_report">Report abuse</string>
     <string name="context_menu_share">Share</string>
     <string name="context_menu_search_google">Search in Google</string>
     <string name="context_menu_delete_autohide_rule">Remove the rule</string>
@@ -193,6 +194,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_delete_password">Password for deletion</string>
     <string name="dialog_delete_button">Delete</string>
     <string name="dialog_delete_progress">Deleting</string>
+    
+    <string name="dialog_report_reason">Reason for reporting</string>
+    <string name="dialog_report_button">Report</string>
+    <string name="dialog_report_progress">Wait</string>
     
     <string name="dialog_cloudflare_captcha_text">Cloudflare requested the checking.\nEnter the characters shown in the image.</string>
     <string name="dialog_cloudflare_captcha_hint">Captcha</string>

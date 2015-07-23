@@ -57,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item name="context_menu_hide" type="id"/>
     <item name="context_menu_delete" type="id"/>
     <item name="context_menu_delete_files" type="id"/>
+    <item name="context_menu_report" type="id"/>
     
     <item name="context_menu_quickaccess_move" type="id"/>
     <item name="context_menu_quickaccess_remove" type="id"/>

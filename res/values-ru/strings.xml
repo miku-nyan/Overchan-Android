@@ -185,6 +185,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_hide_post">Скрыть сообщение</string>
     <string name="context_menu_delete_post">Удалить сообщение</string>
     <string name="context_menu_delete_files">Удалить файлы</string>
+    <string name="context_menu_report">Пожаловаться</string>
     <string name="context_menu_share">Поделиться</string>
     <string name="context_menu_search_google">Искать в Google</string>
     <string name="context_menu_delete_autohide_rule">Удалить правило</string>
@@ -198,6 +199,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_delete_password">Пароль для удаления</string>
     <string name="dialog_delete_button">Удалить</string>
     <string name="dialog_delete_progress">Удаление</string>
+    
+    <string name="dialog_report_reason">Причина</string>
+    <string name="dialog_report_button">Пожаловаться</string>
+    <string name="dialog_report_progress">Подождите</string>
     
     <string name="dialog_cloudflare_captcha_text">Cloudflare запрашивает проверку безопасности.\nВведите символы с картинки:</string>
     <string name="dialog_cloudflare_captcha_hint">Капча</string>

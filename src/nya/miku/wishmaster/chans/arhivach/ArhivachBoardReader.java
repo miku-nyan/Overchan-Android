@@ -1,5 +1,6 @@
 package nya.miku.wishmaster.chans.arhivach;
 
+import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -24,8 +25,9 @@ import nya.miku.wishmaster.api.models.ThreadModel;
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 03.07.2015.
  */
 
+@SuppressLint("SimpleDateFormat")
 public class ArhivachBoardReader implements Closeable {
-    private static final String TAG = "ArhivachBoardReader";
+    //private static final String TAG = "ArhivachBoardReader";
     
     private static final DateFormat CHAN_DATEFORMAT;
     static {

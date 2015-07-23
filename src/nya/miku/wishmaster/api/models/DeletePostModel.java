@@ -25,7 +25,7 @@ import nya.miku.wishmaster.api.ChanModule;
 import com.esotericsoftware.kryo.serializers.TaggedFieldSerializer.Tag;
 
 /**
- * Модель удаления поста или прикреплённых файлов
+ * Модель удаления поста, прикреплённых файлов к посту или жалобы модератору
  * @author miku-nyan
  *
  */
@@ -36,12 +36,14 @@ public class DeletePostModel implements Serializable {
     @Tag(0) public String chanName;
     /** Название доски (код доски), например: "b", "int". */
     @Tag(1) public String boardName;
-    /** Номер треда, из которого удаляется сообщение (или файлы) */
+    /** Номер треда, к которому относится сообщение */
     @Tag(2) public String threadNumber;
-    /** Номер удаляемого поста (или номер поста, из которого удаляются прикреплённые файлы) */
+    /** Номер поста */
     @Tag(3) public String postNumber;
-    /** Пароль для удаления поста */
+    /** Пароль для удаления поста (только при удалении) */
     @Tag(4) public String password;
-    /** Должно принимать true, если удаляются только прикреплённые файлы, или false, если удаляется весь пост. */
+    /** Должно принимать true, если удаляются только прикреплённые файлы, или false, если удаляется весь пост. (только при удалении) */
     @Tag(5) public boolean onlyFiles;
+    /** Дополнительный комментарий для модератора (только при жалобе) */
+    @Tag(6) public String reportReason;
 }

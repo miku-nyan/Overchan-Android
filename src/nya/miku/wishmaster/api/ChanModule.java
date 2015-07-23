@@ -190,6 +190,16 @@ public interface ChanModule {
     String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception;
     
     /**
+     * Пожаловаться на сообщение модератору.<br>
+     * Если на данной имиджборде ни на одной доске эта функция не поддерживается, может бросать {@link UnsupportedOperationException}.
+     * @param model модель жалобы модератору
+     * @param listener интерфейс отслеживания прогресса (может принимать null)
+     * @param task интерфейс отменяемой задачи
+     * @return в случае успеха должен вернуть null или URL страницы пренаправления
+     */
+    String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception;
+    
+    /**
      * Скачать файл с данного чана в поток
      * @param url абсолютный или относительный (на данной имиджборде) URL адрес
      * @param out поток для записи результата

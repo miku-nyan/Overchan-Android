@@ -315,6 +315,11 @@ public abstract class AbstractChanModule implements ChanModule {
     }
     
     @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
     public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
         String fixedUrl = fixRelativeUrl(url);
         HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, true);
