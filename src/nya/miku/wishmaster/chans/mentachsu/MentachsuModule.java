@@ -178,7 +178,7 @@ public class MentachsuModule extends AbstractWakabaModule {
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
-        model.markType = BoardModel.MARK_WAKABAMARK;
+        model.markType = BoardModel.MARK_BBCODE;
         return model;
     }
     
