@@ -21,8 +21,10 @@ package nya.miku.wishmaster.common;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
@@ -31,32 +33,9 @@ import nya.miku.wishmaster.cache.DraftsCache;
 import nya.miku.wishmaster.cache.FileCache;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.Serializer;
-import nya.miku.wishmaster.chans.arhivach.ArhivachModule;
-import nya.miku.wishmaster.chans.chan420.Chan420Module;
-import nya.miku.wishmaster.chans.cirno.Chan410Module;
-import nya.miku.wishmaster.chans.cirno.CirnoModule;
-import nya.miku.wishmaster.chans.cirno.MikubaModule;
-import nya.miku.wishmaster.chans.cirno.NowereModule;
-import nya.miku.wishmaster.chans.dfwk.DFWKModule;
-import nya.miku.wishmaster.chans.dobrochan.DobroModule;
-import nya.miku.wishmaster.chans.dvach.DvachModule;
-import nya.miku.wishmaster.chans.fourchan.FourchanModule;
-import nya.miku.wishmaster.chans.incah.InachModule;
-import nya.miku.wishmaster.chans.infinity.InfinityModule;
-import nya.miku.wishmaster.chans.krautchan.KrautModule;
-import nya.miku.wishmaster.chans.lainchan.LainModule;
-import nya.miku.wishmaster.chans.makaba.MakabaModule;
-import nya.miku.wishmaster.chans.mentachsu.MentachsuModule;
-import nya.miku.wishmaster.chans.null_chan.Null_chanModule;
-import nya.miku.wishmaster.chans.nullchancc.NullchanccModule;
-import nya.miku.wishmaster.chans.owlchan.OwlchanModule;
-import nya.miku.wishmaster.chans.sevenchan.SevenchanModule;
-import nya.miku.wishmaster.chans.sich.SichModule;
-import nya.miku.wishmaster.chans.synch.SynchModule;
-import nya.miku.wishmaster.chans.tohnochan.TohnoChanModule;
-import nya.miku.wishmaster.chans.uchan.UchanModule;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
@@ -97,6 +76,33 @@ import android.preference.PreferenceManager;
 
 public class MainApplication extends Application {
     
+    private static final String[] MODULES = new String[] {
+            "nya.miku.wishmaster.chans.fourchan.FourchanModule",
+            "nya.miku.wishmaster.chans.krautchan.KrautModule",
+            "nya.miku.wishmaster.chans.infinity.InfinityModule",
+            "nya.miku.wishmaster.chans.cirno.CirnoModule",
+            "nya.miku.wishmaster.chans.cirno.MikubaModule",
+            "nya.miku.wishmaster.chans.dobrochan.DobroModule",
+            "nya.miku.wishmaster.chans.dvach.DvachModule",
+            "nya.miku.wishmaster.chans.sevenchan.SevenchanModule",
+            "nya.miku.wishmaster.chans.cirno.NowereModule",
+            "nya.miku.wishmaster.chans.cirno.Chan410Module",
+            "nya.miku.wishmaster.chans.chan420.Chan420Module",
+            "nya.miku.wishmaster.chans.uchan.UchanModule",
+            "nya.miku.wishmaster.chans.sich.SichModule",
+            "nya.miku.wishmaster.chans.nullchancc.NullchanccModule",
+            "nya.miku.wishmaster.chans.null_chan.Null_chanModule",
+            "nya.miku.wishmaster.chans.mentachsu.MentachsuModule",
+            "nya.miku.wishmaster.chans.synch.SynchModule",
+            "nya.miku.wishmaster.chans.incah.InachModule",
+            "nya.miku.wishmaster.chans.lainchan.LainModule",
+            "nya.miku.wishmaster.chans.tohnochan.TohnoChanModule",
+            "nya.miku.wishmaster.chans.owlchan.OwlchanModule",
+            "nya.miku.wishmaster.chans.dfwk.DFWKModule",
+            "nya.miku.wishmaster.chans.makaba.MakabaModule",
+            "nya.miku.wishmaster.chans.arhivach.ArhivachModule",
+    };
+    
     private static MainApplication instance;
     public static MainApplication getInstance() {
         if (instance == null) throw new IllegalStateException("Must be called after onCreate()");
@@ -123,40 +129,54 @@ public class MainApplication extends Application {
     private boolean sfw;
     
     private void registerChanModules() {
-        addChanModule(new FourchanModule(preferences, resources));
-        addChanModule(new KrautModule(preferences, resources));
-        addChanModule(new InfinityModule(preferences, resources));
-        addChanModule(new CirnoModule(preferences, resources));
-        addChanModule(new MikubaModule(preferences, resources));
-        addChanModule(new DobroModule(preferences, resources));
-        addChanModule(new DvachModule(preferences, resources));
-        addChanModule(new SevenchanModule(preferences, resources));
-        addChanModule(new NowereModule(preferences, resources));
-        addChanModule(new Chan410Module(preferences, resources));
-        addChanModule(new Chan420Module(preferences, resources));
-        addChanModule(new UchanModule(preferences, resources));
-        addChanModule(new SichModule(preferences, resources));
-        addChanModule(new NullchanccModule(preferences, resources));
-        addChanModule(new Null_chanModule(preferences, resources));
-        addChanModule(new MentachsuModule(preferences, resources));
-        addChanModule(new SynchModule(preferences, resources));
-        addChanModule(new InachModule(preferences, resources));
-        addChanModule(new LainModule(preferences, resources));
-        addChanModule(new TohnoChanModule(preferences, resources));
-        addChanModule(new OwlchanModule(preferences, resources));
-        addChanModule(new DFWKModule(preferences, resources));
-        addChanModule(new MakabaModule(preferences, resources));
-        addChanModule(new ArhivachModule(preferences, resources));
+        chanModulesIndex = new HashMap<String, Integer>();
+        chanModulesList = new ArrayList<ChanModule>();
+        registerChanModules(chanModulesList, chanModulesIndex);
+    }
+    
+    public void updateChanModules() {
+        Map<String, Integer> indexMap = new HashMap<>();
+        List<ChanModule> list = new ArrayList<>();
+        registerChanModules(list, indexMap);
+        chanModulesIndex = indexMap;
+        chanModulesList = list;
+    }
+    
+    private void registerChanModules(List<ChanModule> list, Map<String, Integer> indexMap) {
+        Set<String> added = new HashSet<>();
+        JSONArray order;
+        try {
+            order = new JSONArray(settings.getChansOrderJson());
+        } catch (Exception e) {
+            order = new JSONArray();
+        }
+        for (int i=0; i<order.length(); ++i) {
+            String module = order.optString(i);
+            if (!added.contains(module)) addChanModule(module, list, indexMap);
+            added.add(module);
+        }
+        for (String module : MODULES) {
+            if (!added.contains(module)) addChanModule(module, list, indexMap);
+            added.add(module);
+        }
+    }
+    
+    public void addChanModule(String className, List<ChanModule> list, Map<String, Integer> indexMap) {
+        try {
+            Class<?> c = Class.forName(className);
+            addChanModule((ChanModule) c.getConstructor(SharedPreferences.class, Resources.class).newInstance(preferences, resources),
+                    list, indexMap);
+        } catch (Exception e) {}
+    }
+    
+    public void addChanModule(ChanModule module, List<ChanModule> list, Map<String, Integer> indexMap) {
+        indexMap.put(module.getChanName(), list.size());
+        list.add(module);
     }
     
     public ChanModule getChanModule(String chanName) {
         if (!chanModulesIndex.containsKey(chanName)) return null;
         return chanModulesList.get(chanModulesIndex.get(chanName).intValue());
-    }
-    
-    public void addChanModule(ChanModule module) {
-        chanModulesIndex.put(module.getChanName(), chanModulesList.size());
-        chanModulesList.add(module);
     }
     
     private void initObjects() {
@@ -177,8 +197,6 @@ public class MainApplication extends Application {
         database = new Database(this);
         downloadingLocker = new DownloadingLocker();
         
-        chanModulesIndex = new HashMap<String, Integer>();
-        chanModulesList = new ArrayList<ChanModule>();
         registerChanModules();
         
         RecaptchaAjax.init();

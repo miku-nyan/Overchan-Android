@@ -243,6 +243,14 @@ public class ApplicationSettings {
         preferences.edit().putString(resources.getString(R.string.pref_key_quickaccess_json), json).commit();
     }
     
+    public String getChansOrderJson() {
+        return preferences.getString(resources.getString(R.string.pref_key_chans_order_json), "[]");
+    }
+    
+    public void saveChansOrderJson(String json) {
+        preferences.edit().putString(resources.getString(R.string.pref_key_chans_order_json), json).commit();
+    }
+    
     public int getLastFavoritesPage() {
         return preferences.getInt(resources.getString(R.string.pref_key_last_favorites_page), FavoritesFragment.PAGE_ALL);
     }

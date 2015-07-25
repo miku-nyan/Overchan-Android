@@ -73,6 +73,17 @@ public class PreferencesActivity extends PreferenceActivity {
             chan.addPreferencesOnScreen(curScreen);
         }
         
+        Preference rearrange = new Preference(this);
+        rearrange.setTitle(R.string.pref_chans_rearrange);
+        rearrange.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                startActivity(new Intent(PreferencesActivity.this, ChansSortActivity.class));
+                return true;
+            }
+        });
+        chansCat.addPreference(rearrange);
+        
         addPreferencesFromResource(R.xml.preferences);
         
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());

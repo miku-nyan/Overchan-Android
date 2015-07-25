@@ -414,6 +414,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="preferences">Опції</string>
     <string name="pref_cat_chans">Іміджборди</string>
+    <string name="pref_chans_rearrange">Переставити</string>
     <string name="pref_cat_appearance">Вигляд</string>
     <string name="pref_cat_advanced">Різне</string>
     <string name="pref_cat_date_time">Дата й час</string>

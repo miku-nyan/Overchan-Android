@@ -405,6 +405,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="preferences">Einstellungen</string>
     <string name="pref_cat_chans">Imageboards</string>
+    <string name="pref_chans_rearrange">Umstellen</string>
     <string name="pref_cat_appearance">Aussehen</string>
     <string name="pref_cat_advanced">Erweiterte</string>
     <string name="pref_cat_date_time">Datum und Uhrzeit</string>
