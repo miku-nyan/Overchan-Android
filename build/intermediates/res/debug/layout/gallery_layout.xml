@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:id="@android:id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+    
+    <nya.miku.wishmaster.lib.gallery.ViewPagerFixed
+        android:id="@+id/gallery_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/panel_height"
+        android:background="?attr/activityRootBackground" >
+        
+        <LinearLayout
+            android:id="@+id/gallery_navigation_bar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/panel_height"
+            android:orientation="horizontal"
+            android:weightSum="2" >
+            <ImageView
+                style="@style/SelectableItem"
+                android:id="@+id/gallery_navigation_previous"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="?attr/iconItemPrevious"
+                android:scaleType="fitStart"
+                android:padding="4dp"
+                android:contentDescription="@string/previous" />
+            <ImageView
+                style="@style/SelectableItem"
+                android:id="@+id/gallery_navigation_next"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="?attr/iconItemNext"
+                android:scaleType="fitEnd"
+                android:padding="4dp"
+                android:contentDescription="@string/next" />
+        </LinearLayout>
+        
+        <TextView
+            android:id="@+id/gallery_navigation_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    </FrameLayout>
+
+</LinearLayout>
+<!-- From: file:/C:/Users/Keiran/Documents/Overchan-Android/res/layout/gallery_layout.xml -->

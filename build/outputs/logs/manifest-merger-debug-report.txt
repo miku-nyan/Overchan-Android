@@ -1,0 +1,183 @@
+-- Merging decision tree log ---
+manifest
+ADDED from AndroidManifest.xml:20:1
+	xmlns:android
+		ADDED from AndroidManifest.xml:20:11
+	package
+		ADDED from AndroidManifest.xml:21:5
+	android:versionName
+		ADDED from AndroidManifest.xml:23:5
+	android:versionCode
+		ADDED from AndroidManifest.xml:22:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+uses-permission#android.permission.INTERNET
+ADDED from AndroidManifest.xml:25:5
+	android:name
+		ADDED from AndroidManifest.xml:25:22
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:26:5
+	android:name
+		ADDED from AndroidManifest.xml:26:22
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:27:5
+	android:name
+		ADDED from AndroidManifest.xml:27:22
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from AndroidManifest.xml:28:5
+	android:name
+		ADDED from AndroidManifest.xml:28:22
+uses-sdk
+ADDED from AndroidManifest.xml:30:5
+MERGED from com.android.support:support-v4:22.1.0:20:5
+	android:targetSdkVersion
+		ADDED from AndroidManifest.xml:32:9
+	android:minSdkVersion
+		ADDED from AndroidManifest.xml:31:9
+application
+ADDED from AndroidManifest.xml:34:5
+MERGED from com.android.support:support-v4:22.1.0:22:5
+	android:label
+		ADDED from AndroidManifest.xml:38:9
+	android:allowBackup
+		ADDED from AndroidManifest.xml:36:9
+	android:icon
+		ADDED from AndroidManifest.xml:37:9
+	android:name
+		ADDED from AndroidManifest.xml:35:9
+activity#nya.miku.wishmaster.ui.MainActivity
+ADDED from AndroidManifest.xml:40:9
+	android:configChanges
+		ADDED from AndroidManifest.xml:42:13
+	android:name
+		ADDED from AndroidManifest.xml:41:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:43:13
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:44:13
+action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:45:17
+	android:name
+		ADDED from AndroidManifest.xml:45:25
+category#android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:46:17
+	android:name
+		ADDED from AndroidManifest.xml:46:27
+intent-filter#android.intent.action.VIEW+android.intent.category.BROWSABLE+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:48:13
+action#android.intent.action.VIEW
+ADDED from AndroidManifest.xml:49:17
+	android:name
+		ADDED from AndroidManifest.xml:49:25
+category#android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:50:17
+	android:name
+		ADDED from AndroidManifest.xml:50:27
+category#android.intent.category.BROWSABLE
+ADDED from AndroidManifest.xml:51:17
+	android:name
+		ADDED from AndroidManifest.xml:51:27
+data
+ADDED from AndroidManifest.xml:52:17
+	android:scheme
+		ADDED from AndroidManifest.xml:52:23
+intent-filter#android.intent.action.VIEW+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:143:13
+activity#nya.miku.wishmaster.ui.posting.PostFormActivity
+ADDED from AndroidManifest.xml:163:9
+	android:configChanges
+		ADDED from AndroidManifest.xml:165:13
+	android:name
+		ADDED from AndroidManifest.xml:164:13
+activity#nya.miku.wishmaster.ui.GalleryActivity
+ADDED from AndroidManifest.xml:167:9
+	android:configChanges
+		ADDED from AndroidManifest.xml:169:13
+	android:theme
+		ADDED from AndroidManifest.xml:170:13
+	android:name
+		ADDED from AndroidManifest.xml:168:13
+activity#nya.miku.wishmaster.ui.posting.PostingProgressActivity
+ADDED from AndroidManifest.xml:172:9
+	android:theme
+		ADDED from AndroidManifest.xml:174:13
+	android:name
+		ADDED from AndroidManifest.xml:173:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:175:13
+activity#nya.miku.wishmaster.ui.downloading.DownloadingProgressActivity
+ADDED from AndroidManifest.xml:177:9
+	android:theme
+		ADDED from AndroidManifest.xml:179:13
+	android:name
+		ADDED from AndroidManifest.xml:178:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:180:13
+activity#nya.miku.wishmaster.ui.downloading.DownloadingErrorReportActivity
+ADDED from AndroidManifest.xml:182:9
+	android:theme
+		ADDED from AndroidManifest.xml:184:13
+	android:name
+		ADDED from AndroidManifest.xml:183:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:185:13
+activity#nya.miku.wishmaster.lib.FileDialogActivity
+ADDED from AndroidManifest.xml:187:9
+	android:name
+		ADDED from AndroidManifest.xml:187:19
+activity#nya.miku.wishmaster.ui.settings.PreferencesActivity
+ADDED from AndroidManifest.xml:188:9
+	android:name
+		ADDED from AndroidManifest.xml:188:19
+activity#nya.miku.wishmaster.ui.settings.AutohideActivity
+ADDED from AndroidManifest.xml:189:9
+	android:name
+		ADDED from AndroidManifest.xml:189:19
+activity#nya.miku.wishmaster.ui.settings.ChansSortActivity
+ADDED from AndroidManifest.xml:190:9
+	android:name
+		ADDED from AndroidManifest.xml:190:19
+activity#nya.miku.wishmaster.ui.ShareActivity
+ADDED from AndroidManifest.xml:192:9
+	android:name
+		ADDED from AndroidManifest.xml:192:19
+intent-filter#android.intent.action.SEND+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:193:13
+action#android.intent.action.SEND
+ADDED from AndroidManifest.xml:194:17
+	android:name
+		ADDED from AndroidManifest.xml:194:25
+activity#org.acra.CrashReportDialog
+ADDED from AndroidManifest.xml:201:9
+	android:theme
+		ADDED from AndroidManifest.xml:203:13
+	android:excludeFromRecents
+		ADDED from AndroidManifest.xml:205:13
+	android:name
+		ADDED from AndroidManifest.xml:202:13
+	android:finishOnTaskLaunch
+		ADDED from AndroidManifest.xml:206:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:204:13
+service#nya.miku.wishmaster.ui.posting.PostingService
+ADDED from AndroidManifest.xml:208:9
+	android:name
+		ADDED from AndroidManifest.xml:208:18
+service#nya.miku.wishmaster.ui.downloading.DownloadingService
+ADDED from AndroidManifest.xml:209:9
+	android:name
+		ADDED from AndroidManifest.xml:209:18
+service#nya.miku.wishmaster.ui.tabs.TabsTrackerService
+ADDED from AndroidManifest.xml:210:9
+	android:name
+		ADDED from AndroidManifest.xml:210:18
+receiver#nya.miku.wishmaster.ui.settings.Wifi
+ADDED from AndroidManifest.xml:212:9
+	android:name
+		ADDED from AndroidManifest.xml:212:19
+intent-filter#android.net.conn.CONNECTIVITY_CHANGE
+ADDED from AndroidManifest.xml:213:13
+action#android.net.conn.CONNECTIVITY_CHANGE
+ADDED from AndroidManifest.xml:214:17
+	android:name
+		ADDED from AndroidManifest.xml:214:25

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="kryo-3.0.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/kryo/3.0.1/8d945f3c03c3359fdfe46c62aa70c7fe7c1e00e2/kryo-3.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.esotericsoftware/kryo/3.0.1/801cebe2d20317c722f83b19609a8c12de5274f0/kryo-3.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
