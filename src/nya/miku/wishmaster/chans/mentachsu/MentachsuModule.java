@@ -167,6 +167,7 @@ public class MentachsuModule extends AbstractWakabaModule {
         model.requiredFileForNewThread = false;
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
+        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
         model.allowNames = false;
         model.allowSubjects = true;
         model.allowSage = true;
@@ -267,6 +268,23 @@ public class MentachsuModule extends AbstractWakabaModule {
         Matcher errorMatcher = ERROR_POSTING.matcher(result);
         if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
         return null;
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "board.php";
+        
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
+        if (model.onlyFiles) pairs.add(new BasicNameValuePair("fileonly", "on"));
+        pairs.add(new BasicNameValuePair("reportreason", model.reportReason));
+        pairs.add(new BasicNameValuePair("reportpost", "Аминь"));
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+        if (result.contains("Post successfully reported")) return null;
+        throw new Exception(result);
     }
     
 }

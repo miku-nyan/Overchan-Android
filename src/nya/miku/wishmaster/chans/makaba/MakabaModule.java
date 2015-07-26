@@ -40,6 +40,7 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
+import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
@@ -651,6 +652,34 @@ public class MakabaModule extends AbstractChanModule {
             }
         } catch (Exception e) {}
         throw new Exception(makabaResult.getString("Reason"));
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = domainUrl + "makaba/makaba.fcgi?json=1";
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
+                addString("task", "report").
+                addString("posts", "").
+                addString("board", model.boardName).
+                addString("thread", model.threadNumber).
+                addString("comment", ">>" + model.postNumber + " " + model.reportReason);
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
+        String response = null;
+        try {
+            response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, null, task, true);
+        } catch (HttpWrongStatusCodeException e) {
+            checkCloudflareError(e, url);
+            throw e;
+        }
+        try {
+            JSONObject json = new JSONObject(response);
+            if (json.getString("message_title").equals("Ошибок нет")) return null;
+            throw new Exception(json.getString("message_title") + " " + json.getString("message"));
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            throw new Exception(response);
+        }
     }
     
     @Override

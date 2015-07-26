@@ -57,6 +57,7 @@ public class MakabaJsonMapper {
         model.readonlyBoard = false;
         model.allowDeletePosts = false;
         model.allowDeleteFiles = false;
+        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = true;
