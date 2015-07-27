@@ -184,7 +184,7 @@ public class MainApplication extends Application {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         resources = this.getResources();
         settings = new ApplicationSettings(preferences, resources);
-        fileCache = new FileCache(getAvailableCacheDir(), settings.getMaxCacheSize());
+        fileCache = new FileCache(getAvailableCacheDir(), settings.getMaxCacheSize(), this);
         serializer = new Serializer(fileCache);
         tabsState = serializer.deserializeTabsState();
         tabsSwitcher = new TabsSwitcher();

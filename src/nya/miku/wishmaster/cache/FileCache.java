@@ -19,13 +19,17 @@
 package nya.miku.wishmaster.cache;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 import nya.miku.wishmaster.common.Logger;
 
 /**
@@ -33,7 +37,7 @@ import nya.miku.wishmaster.common.Logger;
  * @author miku-nyan
  *
  */
-public class FileCache { //TODO database
+public class FileCache {
     private static final String TAG = "FileCache";
     
     public static final String PREFIX_ORIGINALS = "orig_";
@@ -52,10 +56,12 @@ public class FileCache { //TODO database
     
     private static final float PAGES_QUOTE = 0.1f;
     
+    private final FileCacheDB database;
+    
     private final File directory;
     private long maxSize;
     private long maxPagesSize;
-
+    
     private volatile long size;
     private volatile long pagesSize;
     
@@ -63,12 +69,22 @@ public class FileCache { //TODO database
      * Конструктор
      * @param directory директория кэша
      * @param maxSize максимальный размер в байтах (0 - неограниченный)
+     * @param dbContext контекст для доступа к базе данных
      */
-    public FileCache(File directory, long maxSize) {
+    public FileCache(File directory, long maxSize, Context dbContext) {
         this.directory = directory;
+        this.database = new FileCacheDB(dbContext);
         makeDir();
         makeNomedia();
-        calculateSize();
+        
+        long[] sizeInDB = database.getSize();
+        if (sizeInDB[0] != 0) {
+            this.size = sizeInDB[0];
+            this.pagesSize = sizeInDB[1];
+        } else {
+            resetCache();
+        }
+        
         setMaxSize(maxSize);
     }
     
@@ -105,7 +121,7 @@ public class FileCache { //TODO database
         for (File f : allFilesOfDir(directory)) {
             if (!isUndeletable(f)) f.delete();
         }
-        calculateSize();
+        resetCache();
     }
     
     /**
@@ -117,6 +133,7 @@ public class FileCache { //TODO database
         File file = pathToFile(fileName);
         if (file.exists() && !file.isDirectory()) {
             file.setLastModified(System.currentTimeMillis());
+            database.touch(fileName);
             return file;
         }
         return null;
@@ -133,8 +150,9 @@ public class FileCache { //TODO database
         makeDir();
         File file = pathToFile(fileName);
         if (file.exists()) {
-            delete(file);
+            delete(file, false);
         }
+        database.put(fileName, -1);
         return file;
     }
     
@@ -145,6 +163,7 @@ public class FileCache { //TODO database
     public synchronized void put(File file) {
         size += file.length();
         if (isPageFile(file)) pagesSize += file.length();
+        database.put(file.getName(), file.length());
         trim();
     }
     
@@ -154,12 +173,17 @@ public class FileCache { //TODO database
      * @return true, если файл удалён успешно, false в противном случае
      */
     public synchronized boolean delete(File file) {
+        return delete(file, true);
+    }
+    
+    public synchronized boolean delete(File file, boolean removeFromDB) {
         size -= file.length();
         if (isPageFile(file)) pagesSize -= file.length();
         if (file.delete()) {
+            if (removeFromDB) database.remove(file.getName());
             return true;
         } else {
-            calculateSize();
+            resetCache();
             return false;
         }
     }
@@ -185,60 +209,55 @@ public class FileCache { //TODO database
     }
     
     private synchronized void trim() {
-        if (maxSize == 0 || size <= maxSize) return;
-        
-        LinkedList<Pair<File, Long>> files = new LinkedList<>();
-        for (File file : allFilesOfDir(directory)) {
-            if (!isUndeletable(file)) {
-                long age = file.lastModified();
-                if (age != 0L) files.add(Pair.of(file, age));
-            }
-        }
-        Collections.sort(files, new Comparator<Pair<File, Long>>() {
-            @Override
-            public int compare(Pair<File, Long> lhs, Pair<File, Long> rhs) {
-                return lhs.getRight().compareTo(rhs.getRight());
-            }
-        });
-        
-        while (size > maxSize) {
-            File oldest = null;
-            for (ListIterator<Pair<File, Long>> it = files.listIterator(); it.hasNext();) {
-                File file = it.next().getLeft();
-                if (isPageFile(file) && pagesSize < maxPagesSize) continue;
-                it.remove();
-                oldest = file;
-                break;
-            }
-            if (oldest == null) {
-                Logger.e(TAG, "No files to trim");
-                break;
-            } else {
-                Logger.d(TAG, "Deleting " + oldest.getPath());
-                if (!delete(oldest)) {
-                    Logger.e(TAG, "Cannot delete cache file: " + oldest.getPath());
+        for (int i=0; i<3; ++i) {
+            if (maxSize == 0 || size <= maxSize) return;
+            
+            LinkedList<Pair<String, Long>> files = database.getFilesForTrim(size - maxSize);
+            
+            while (size > maxSize) {
+                File oldest = null;
+                for (ListIterator<Pair<String, Long>> it = files.listIterator(); it.hasNext();) {
+                    File file = pathToFile(it.next().getLeft());
+                    if (isPageFile(file) && pagesSize < maxPagesSize) continue;
+                    it.remove();
+                    oldest = file;
                     break;
+                }
+                if (oldest == null) {
+                    Logger.e(TAG, "No files to trim");
+                    break;
+                } else {
+                    Logger.d(TAG, "Deleting " + oldest.getPath());
+                    if (!delete(oldest)) {
+                        Logger.e(TAG, "Cannot delete cache file: " + oldest.getPath());
+                        break;
+                    }
                 }
             }
         }
     }
     
-    private synchronized void calculateSize() {
-        size = 0;
-        pagesSize = 0;
-        for (File file : allFilesOfDir(directory)) {
-            size += file.length();
-            if (isPageFile(file)) pagesSize += file.length();
-        }
+    private synchronized void resetCache() {
+        database.resetDB();
+        for (File file : allFilesOfDir(directory)) database.put(file.getName(), file.length());
+        long[] sizeInDB = database.getSize();
+        size = sizeInDB[0];
+        pagesSize = sizeInDB[1];
     }
 
     private boolean isUndeletable(File file) {
-        String filename = file.getName();
-        return filename.equals(TABS_FILENAME) || filename.equals(TABS_FILENAME_2) || filename.startsWith(PREFIX_BOARDS) || filename.equals(NOMEDIA); 
+        return isUndeletable(file.getName()); 
+    }
+    
+    private static boolean isUndeletable(String filename) {
+        return filename.equals(TABS_FILENAME) || filename.equals(TABS_FILENAME_2) || filename.startsWith(PREFIX_BOARDS) || filename.equals(NOMEDIA);
     }
     
     private boolean isPageFile(File file) {
-        String filename = file.getName();
+        return isPageFile(file.getName());
+    }
+    
+    private static boolean isPageFile(String filename) {
         return filename.startsWith(PREFIX_PAGES) || filename.startsWith(PREFIX_DRAFTS);
     }
     
@@ -258,6 +277,154 @@ public class FileCache { //TODO database
                     list.add(file);
                 }
             }
+        }
+    }
+    
+    private static class FileCacheDB {
+        private static final int DB_VERSION = 1000;
+        private static final String DB_NAME = "filecache.db";
+        
+        private static final String TABLE_NAME = "files";
+        private static final String COL_FILENAME = "name";
+        private static final String COL_FILESIZE = "size";
+        private static final String COL_TIMESTAMP = "time";
+        
+        private final DBHelper dbHelper; 
+        public FileCacheDB(Context context) {
+            dbHelper = new DBHelper(context);
+        }
+        
+        public boolean isExists(String filename) {
+            Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, COL_FILENAME + " = ?",
+                    new String[] { filename }, null, null, null);
+            boolean result = false;
+            if (c != null && c.moveToFirst()) result = true;
+            if (c != null) c.close();
+            return result;
+        }
+        
+        public void touch(String filename) {
+            ContentValues cv = new ContentValues();
+            cv.put(COL_TIMESTAMP, System.currentTimeMillis());
+            dbHelper.getWritableDatabase().update(TABLE_NAME, cv, COL_FILENAME + " = ?", new String[] { filename });
+        }
+        
+        public void put(String filename, long size) {
+            ContentValues cv = new ContentValues();
+            cv.put(COL_FILENAME, filename);
+            cv.put(COL_FILESIZE, size);
+            cv.put(COL_TIMESTAMP, System.currentTimeMillis());
+            
+            if (isExists(filename)) {
+                dbHelper.getWritableDatabase().update(TABLE_NAME, cv, COL_FILENAME + " = ?", new String[] { filename });
+            } else {
+                dbHelper.getWritableDatabase().insert(TABLE_NAME, null, cv);
+            }
+        }
+        
+        public LinkedList<Pair<String, Long>> getFilesForTrim(long size) {
+            LinkedList<Pair<String, Long>> list = new LinkedList<>();
+            Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, null, null, null, null, COL_TIMESTAMP, "1000");
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    int nameIndex = c.getColumnIndex(COL_FILENAME);
+                    int timeIndex = c.getColumnIndex(COL_TIMESTAMP);
+                    int sizeIndex = c.getColumnIndex(COL_FILESIZE);
+                    long tSize = 0;
+                    do {
+                        String filename = c.getString(nameIndex);
+                        if (!isUndeletable(filename)) list.add(Pair.of(filename, c.getLong(timeIndex)));
+                        if (!isPageFile(filename)) tSize += c.getLong(sizeIndex);
+                        if (tSize >= size) break;
+                    } while (c.moveToNext());
+                }
+                c.close();
+            }
+            return list;
+        }
+        
+        public long[] getSize() {
+            long[] result = new long[] { 0, 0 };
+            Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, COL_FILESIZE + " = -1", null, null, null, null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    c.close();
+                    resetDB();
+                    return result;
+                }
+                c.close();
+            }
+            
+            c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, null, null, null, null, null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    int nameIndex = c.getColumnIndex(COL_FILENAME);
+                    int sizeIndex = c.getColumnIndex(COL_FILESIZE);
+                    do {
+                        String name = c.getString(nameIndex);
+                        long size = c.getLong(sizeIndex);
+                        result[0] += size;
+                        if (isPageFile(name)) result[1] += size;
+                    } while (c.moveToNext());
+                }
+                c.close();
+            }
+            return result;
+        }
+        
+        public void remove(String filename) {
+            dbHelper.getWritableDatabase().delete(TABLE_NAME, COL_FILENAME + " = ?", new String[] { filename });
+        }
+        
+        public void resetDB() {
+            dbHelper.resetDB();
+        }
+        
+        private static class DBHelper extends SQLiteOpenHelper implements BaseColumns {
+            public DBHelper(Context context) {
+                super(context, DB_NAME, null, DB_VERSION);
+            }
+            
+            @Override
+            public void onCreate(SQLiteDatabase db) {
+                db.execSQL(createTable(TABLE_NAME,
+                        new String[] { COL_FILENAME, COL_FILESIZE, COL_TIMESTAMP },
+                        new String[] { "text", "integer", "integer" }));
+            }
+            
+            @Override
+            public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+                if (oldVersion < newVersion) {
+                    db.execSQL(dropTable(TABLE_NAME));
+                    onCreate(db);
+                }
+            }
+            
+            @Override
+            public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+                onUpgrade(db, oldVersion, newVersion);
+            }
+            
+            private static String createTable(String tableName, String[] columns, String[] types) {
+                StringBuilder sql = new StringBuilder(110).append("create table ").append(tableName).append(" (").
+                        append(_ID).append(" integer primary key autoincrement,");
+                for (int i=0; i<columns.length; ++i) {
+                    sql.append(columns[i]).append(' ').append(types == null ? "text" : types[i]).append(',');
+                }
+                sql.setCharAt(sql.length()-1, ')');
+                return sql.append(';').toString();
+            }
+            
+            private static String dropTable(String tableName) {
+                return "DROP TABLE IF EXISTS " + tableName;
+            }
+            
+            private void resetDB() {
+                SQLiteDatabase db = getWritableDatabase();
+                db.execSQL(dropTable(TABLE_NAME));
+                onCreate(db);
+            }
+            
         }
     }
     
