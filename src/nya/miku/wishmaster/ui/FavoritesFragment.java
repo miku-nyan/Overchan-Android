@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.Database.FavoritesEntry;
@@ -248,8 +249,11 @@ public class FavoritesFragment extends Fragment implements AdapterView.OnItemCli
             tv2.setEllipsize(TextUtils.TruncateAt.START);
             tv1.setText(item.title);
             tv2.setText(item.url);
-            tv1.setCompoundDrawablesWithIntrinsicBounds(MainApplication.getInstance().getChanModule(item.chan).getChanFavicon(), null, null, null);
-            tv1.setCompoundDrawablePadding(drawablePadding);
+            ChanModule chan = MainApplication.getInstance().getChanModule(item.chan);
+            if (chan != null) {
+                tv1.setCompoundDrawablesWithIntrinsicBounds(chan.getChanFavicon(), null, null, null);
+                tv1.setCompoundDrawablePadding(drawablePadding);
+            }
             v.setTag(item);
             return v;
         }

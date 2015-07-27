@@ -253,9 +253,11 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
                     t2.setEllipsize(TextUtils.TruncateAt.START);
                     t1.setText(item.title);
                     t2.setText(item.filepath);
-                    t1.setCompoundDrawablesWithIntrinsicBounds(
-                            MainApplication.getInstance().getChanModule(item.chan).getChanFavicon(), null, null, null);
-                    t1.setCompoundDrawablePadding(drawablePadding);
+                    ChanModule chan = MainApplication.getInstance().getChanModule(item.chan);
+                    if (chan != null) {
+                        t1.setCompoundDrawablesWithIntrinsicBounds(chan.getChanFavicon(), null, null, null);
+                        t1.setCompoundDrawablePadding(drawablePadding);
+                    }
                 }
                 return v;
             }

@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
@@ -249,9 +250,11 @@ public class HistoryFragment extends Fragment implements AdapterView.OnItemClick
                 tv2.setEllipsize(TextUtils.TruncateAt.START);
                 tv1.setText(((Database.HistoryEntry) item).title);
                 tv2.setText(((Database.HistoryEntry) item).url);
-                tv1.setCompoundDrawablesWithIntrinsicBounds(
-                        MainApplication.getInstance().getChanModule(((Database.HistoryEntry) item).chan).getChanFavicon(), null, null, null);
-                tv1.setCompoundDrawablePadding(drawablePadding);
+                ChanModule chan = MainApplication.getInstance().getChanModule(((Database.HistoryEntry) item).chan);
+                if (chan != null) {
+                    tv1.setCompoundDrawablesWithIntrinsicBounds(chan.getChanFavicon(), null, null, null);
+                    tv1.setCompoundDrawablePadding(drawablePadding);
+                }
             } else {
                 v = convertView == null ? inflater.inflate(R.layout.list_separator, parent, false) : convertView;
                 TextView tv = (TextView) v;
