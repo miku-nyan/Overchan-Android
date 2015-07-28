@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/post_badge_size"
+    android:layout_gravity="center_vertical"
+    android:minWidth="@dimen/post_badge_size"
+    android:adjustViewBounds="false"
+    android:scaleType="fitStart"
+    android:contentDescription="@string/postitem_contentdescription_badge_icon"
+    android:layout_marginRight="4dp"
+    android:layout_marginEnd="4dp"
+    android:visibility="visible" />
+<!-- From: file:/C:/Users/Keiran/Documents/Overchan-Android/res/layout/post_badge_icon.xml -->

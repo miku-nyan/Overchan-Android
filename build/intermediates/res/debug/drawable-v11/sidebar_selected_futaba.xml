@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+    <solid android:color="#999991"/>
+</shape><!-- From: file:/C:/Users/Keiran/Documents/Overchan-Android/res/drawable-v11/sidebar_selected_futaba.xml -->

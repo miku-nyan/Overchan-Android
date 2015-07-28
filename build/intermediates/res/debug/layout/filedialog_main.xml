@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/activityRootBackground" >
+    
+    <LinearLayout
+        android:id="@+id/filedialog_LinearLayoutList"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        
+            <LinearLayout
+                android:id="@+id/filedialog_LinearLayoutSelect"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp" >
+                <Button
+                    android:id="@+id/filedialog_ButtonNew"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.3"
+                    android:text="@string/filedialog_new" />
+                <Button
+                    android:id="@+id/filedialog_ButtonSelect"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.7"
+                    android:text="@string/filedialog_select" />
+            </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/filedialog_LinearLayoutCreate"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="5dp" >
+            <TextView
+                android:id="@+id/filedialog_textViewFilename"
+                android:text="@string/filedialog_filename"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:text=""
+                android:id="@+id/filedialog_EditTextFile"
+                android:hint="@string/filedialog_filename_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                <Button
+                    android:id="@+id/filedialog_ButtonCancel"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.3"
+                    android:text="@string/filedialog_cancel" />
+                <Button
+                    android:id="@+id/filedialog_ButtonCreate"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.7"
+                    android:text="@string/filedialog_create" />
+            </LinearLayout>
+        </LinearLayout>
+        
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/filedialog_LinearLayoutList">
+        <TextView
+            android:id="@+id/path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/filedialog_no_data" />
+    </LinearLayout>
+    
+</RelativeLayout>
+<!-- From: file:/C:/Users/Keiran/Documents/Overchan-Android/res/layout/filedialog_main.xml -->

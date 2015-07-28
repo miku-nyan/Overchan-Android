@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/activityRootBackground" >
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        
+        <EditText
+            android:id="@+id/boardslist_board_field"
+            android:inputType="text"
+            android:hint="@string/boardslist_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/boardslist_btn_go"
+            android:layout_toStartOf="@+id/boardslist_btn_go"
+            android:singleLine="true" />
+        
+        <Button
+            android:id="@+id/boardslist_btn_go"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/boardslist_board_field"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/boardslist_btn_go" />
+        
+    </RelativeLayout>
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+        
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fastScrollEnabled="true"
+            android:scrollingCache="false" />
+        
+        <include
+            android:id="@+id/boardslist_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/frame_loading"
+            android:visibility="gone" />
+        
+        <include
+            android:id="@+id/boardslist_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/frame_error"
+            android:visibility="gone" />
+        
+    </FrameLayout>
+    
+</LinearLayout>
+<!-- From: file:/C:/Users/Keiran/Documents/Overchan-Android/res/layout/boardslist_fragment.xml -->

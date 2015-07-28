@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/C:/Users/Keiran/Documents/Overchan-Android/res/values-v11/styles.xml -->
+    <eat-comment/>
+    <style name="SelectableItem">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+    <style name="Theme_Dark_Switch" parent="@android:style/Theme.Holo"/>
+    <style name="Theme_Dialog_Switch" parent="@android:style/Theme.Holo.Dialog"/>
+    <style name="Theme_Light_Switch" parent="@android:style/Theme.Holo.Light"/>
+</resources>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Overchan Android (Meta Imageboard Client)
+Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="nya.miku.wishmaster"
+    android:versionCode="25"
+    android:versionName="1.1.2" >
+
+    <uses-sdk
+        android:minSdkVersion="4"
+        android:targetSdkVersion="22" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:name="nya.miku.wishmaster.common.MainApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:name="nya.miku.wishmaster.ui.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <!-- domains -->
+                <data android:host="iichan.hk" />
+                <data android:host="www.iichan.hk" />
+                <data android:host="hatsune.ru" />
+                <data android:host="410chan.org" />
+                <data android:host="www.410chan.org" />
+                <data android:host="nowere.net" />
+                <data android:host="www.nowere.net" />
+                <data android:host="420chan.org" />
+                <data android:host="boards.420chan.org" />
+                <data android:host="2-chru.net" />
+                <data android:host="2chru.net" />
+                <data android:host="dmirrgetyojz735v.onion" />
+                <data android:host="www.2-chru.net" />
+                <data android:host="www.2chru.net" />
+                <data android:host="www.dmirrgetyojz735v.onion" />
+                <data android:host="uchan.to" />
+                <data android:host="uchan.org.ua" />
+                <data android:host="sich.co.ua" />
+                <data android:host="syn-ch.com" />
+                <data android:host="syn-ch.org" />
+                <data android:host="syn-ch.ru" />
+                <data android:host="syn-ch.com.ua" />
+                <data android:host="inach.org" />
+                <data android:host="www.inach.org" />
+                <data android:host="owlchan.ru" />
+                <data android:host="www.owlchan.ru" />
+                <data android:host="chuck.dfwk.ru" />
+                <data android:host="4chan.org" />
+                <data android:host="www.4chan.org" />
+                <data android:host="boards.4chan.org" />
+                <data android:host="8ch.net" />
+                <data android:host="8chan.co" />
+                <data android:host="fullchan4jtta4sx.onion" />
+                <data android:host="www.8ch.net" />
+                <data android:host="www.8chan.co" />
+                <data android:host="www.fullchan4jtta4sx.onion" />
+                <data android:host="krautchan.net" />
+                <data android:host="www.krautchan.net" />
+                <data android:host="7chan.org" />
+                <data android:host="lainchan.org" />
+                <data android:host="www.lainchan.org" />
+                <data android:host="0chan.cc" />
+                <data android:host="www.0chan.cc" />
+                <data android:host="0-chan.ru" />
+                <data android:host="www.0-chan.ru" />
+                <data android:host="02ch.su" />
+                <data android:host="tohno-chan.com" />
+                <data android:host="www.tohno-chan.com" />
+                <data android:host="dobrochan.ru" />
+                <data android:host="dobrochan.com" />
+                <data android:host="dobrochan.org" />
+                <data android:host="www.dobrochan.ru" />
+                <data android:host="www.dobrochan.com" />
+                <data android:host="www.dobrochan.org" />
+                <data android:host="2ch.hk" />
+                <data android:host="www.2ch.hk" />
+                <data android:host="2ch.pm" />
+                <data android:host="2-ch.so" />
+                <data android:host="2ch.re" />
+                <data android:host="2ch.tf" />
+                <data android:host="2ch.wf" />
+                <data android:host="2ch.yt" />
+                <data android:host="arhivach.org" />
+                <data android:host="www.arhivach.org" />
+                <data android:host="honeychan.net" />
+                <data android:host="www.honeychan.net" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="text/html" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:host="*" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.mhtml" />
+                <data android:pathPattern=".*\\..*\\.mhtml" />
+                <data android:pathPattern=".*\\..*\\..*\\.mhtml" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.mhtml" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mhtml" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="nya.miku.wishmaster.ui.posting.PostFormActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="nya.miku.wishmaster.ui.GalleryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/Transparent" />
+        <activity
+            android:name="nya.miku.wishmaster.ui.posting.PostingProgressActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme_Dialog_Switch" />
+        <activity
+            android:name="nya.miku.wishmaster.ui.downloading.DownloadingProgressActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme_Dialog_Switch" />
+        <activity
+            android:name="nya.miku.wishmaster.ui.downloading.DownloadingErrorReportActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme_Dialog_Switch" />
+        <activity android:name="nya.miku.wishmaster.lib.FileDialogActivity" />
+        <activity android:name="nya.miku.wishmaster.ui.settings.PreferencesActivity" />
+        <activity android:name="nya.miku.wishmaster.ui.settings.AutohideActivity" />
+        <activity android:name="nya.miku.wishmaster.ui.settings.ChansSortActivity" />
+        <activity android:name="nya.miku.wishmaster.ui.ShareActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="org.acra.CrashReportDialog"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme_Dialog_Switch" />
+
+        <service android:name="nya.miku.wishmaster.ui.posting.PostingService" />
+        <service android:name="nya.miku.wishmaster.ui.downloading.DownloadingService" />
+        <service android:name="nya.miku.wishmaster.ui.tabs.TabsTrackerService" />
+
+        <receiver android:name="nya.miku.wishmaster.ui.settings.Wifi" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
