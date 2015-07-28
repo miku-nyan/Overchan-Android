@@ -101,6 +101,7 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.dfwk.DFWKModule",
             "nya.miku.wishmaster.chans.makaba.MakabaModule",
             "nya.miku.wishmaster.chans.arhivach.ArhivachModule",
+            "nya.miku.wishmaster.chans.honeychan.HoneyModule",
     };
     
     private static MainApplication instance;
@@ -184,7 +185,7 @@ public class MainApplication extends Application {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         resources = this.getResources();
         settings = new ApplicationSettings(preferences, resources);
-        fileCache = new FileCache(getAvailableCacheDir(), settings.getMaxCacheSize(), this);
+        fileCache = new FileCache(getAvailableCacheDir(), settings.getMaxCacheSize());
         serializer = new Serializer(fileCache);
         tabsState = serializer.deserializeTabsState();
         tabsSwitcher = new TabsSwitcher();

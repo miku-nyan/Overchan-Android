@@ -11,3 +11,8 @@ local.properties
 
 proguard/
 .settings/
+
+.gradle/*
+.idea/*
+build/*
+*.iml
