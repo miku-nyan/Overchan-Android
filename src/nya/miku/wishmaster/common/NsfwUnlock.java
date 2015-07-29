@@ -18,52 +18,49 @@
 
 package nya.miku.wishmaster.common;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import android.os.Build;
+import java.io.FileReader;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import android.os.Environment;
-import android.os.StatFs;
+import nya.miku.wishmaster.api.ChanModule;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 
 public class NsfwUnlock {
-    public static boolean isUnlocked() {
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File unlock = new File(Environment.getExternalStorageDirectory(), ".overchan");
-            if (unlock.exists()) {
-                byte[] controlValue = getUnlockData();
-                if (controlValue != null) {
-                    InputStream is = null;
-                    try {
-                        is = new FileInputStream(unlock);
-                        byte[] value = new byte[controlValue.length];
-                        is.read(value);
-                        for (int i=0; i<controlValue.length; ++i) if (controlValue[i] != value[i]) return false;
-                        return true;
-                    } catch (Exception e) {
-                        return false;
-                    } finally {
-                        if (is != null) IOUtils.closeQuietly(is);
+    public static Set<String> getUnlockedChans(List<ChanModule> chans) {
+        Set<String> set = new HashSet<>();
+        try {
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                File unlock = new File(Environment.getExternalStorageDirectory(), ".overchan");
+                if (unlock.exists()) {
+                    BufferedReader reader = new BufferedReader(new FileReader(unlock));
+                    String current;
+                    while ((current = reader.readLine()) != null) {
+                        if (!current.contains("://")) current = "http://" + current;
+                        for (ChanModule chan : chans) {
+                            try {
+                                UrlPageModel page = chan.parseUrl(current);
+                                if (page.type == UrlPageModel.TYPE_INDEXPAGE) {
+                                    set.add(chan.getChanName());
+                                    break;
+                                }
+                                
+                                //single-board chans
+                                UrlPageModel index = new UrlPageModel();
+                                index.type = UrlPageModel.TYPE_INDEXPAGE;
+                                index.chanName = chan.getChanName();
+                                if (page.type == chan.parseUrl(chan.buildUrl(index)).type) set.add(chan.getChanName());
+                                break;
+                            } catch (Exception e) {}
+                        }
                     }
+                    reader.close();
                 }
             }
-        }
-        return false;
-    }
-    
-    @SuppressWarnings("deprecation")
-    public static byte[] getUnlockData() {
-        try {
-            StringBuilder sb = new StringBuilder();
-            sb.append(Build.MODEL).append(';').append(Build.VERSION.SDK_INT).append(';');
-            StatFs fs = new StatFs(Environment.getExternalStorageDirectory().getPath());
-            sb.append(fs.getBlockCount()).append(';').append(fs.getBlockSize());
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            messageDigest.reset();
-            messageDigest.update(sb.toString().getBytes());
-            return messageDigest.digest();
-        } catch (Exception e) {
-            return null;
-        }
+        } catch (Exception e) {}
+        return set;
     }
 }

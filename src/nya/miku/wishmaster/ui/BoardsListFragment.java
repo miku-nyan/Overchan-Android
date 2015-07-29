@@ -516,7 +516,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
             this.resources = fragment.resources;
             String lastCategory = "";
             
-            boolean sfw = MainApplication.getInstance().isSFW();
+            boolean sfw = MainApplication.getInstance().isLocked(fragment.chan.getChanName());
             
             LinkedHashMap<String, String> favBoards = new LinkedHashMap<>();
             for (String board : fragment.database.getFavoriteBoards(fragment.chan)) favBoards.put(board, "");

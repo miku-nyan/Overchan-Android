@@ -24,8 +24,6 @@ import java.util.List;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.chans.arhivach.ArhivachModule;
-import nya.miku.wishmaster.chans.cirno.MikubaModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -333,15 +331,27 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
         }
     }
     
+    private static boolean isSingleboardChan(ChanModule chan) {
+        try {
+            UrlPageModel index = new UrlPageModel();
+            index.type = UrlPageModel.TYPE_INDEXPAGE;
+            index.chanName = chan.getChanName();
+            index = chan.parseUrl(chan.buildUrl(index));
+            return index.type != UrlPageModel.TYPE_INDEXPAGE;
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+        return false;
+    }
+    
     private void openChansList() {
         final ArrayAdapter<ChanModule> chansAdapter = new ArrayAdapter<ChanModule>(activity, 0) {
             private LayoutInflater inflater = LayoutInflater.from(activity);
             private int drawablePadding = (int) (resources.getDisplayMetrics().density * 5 + 0.5f);
             
             {
-                boolean sfw = MainApplication.getInstance().isSFW();
                 for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-                    if (!sfw || (!(chan instanceof MikubaModule) && !(chan instanceof ArhivachModule))) add(chan);
+                    if (!MainApplication.getInstance().isLocked(chan.getChanName()) || !isSingleboardChan(chan)) add(chan);
                 }
             }
             
@@ -478,7 +488,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
                         setVisible(canAddToQuickAccess);
                 menu.add(Menu.NONE, R.id.context_menu_quickaccess_custom_board, 3, R.string.context_menu_quickaccess_custom_board).
                         setOnMenuItemClickListener(contextMenuHandler);
-                if (chansAdapter.getItem(((AdapterView.AdapterContextMenuInfo) menuInfo).position) instanceof MikubaModule)
+                if (isSingleboardChan(chansAdapter.getItem(((AdapterView.AdapterContextMenuInfo) menuInfo).position)))
                     menu.findItem(R.id.context_menu_quickaccess_custom_board).setVisible(false);
             }
         });

@@ -128,6 +128,7 @@ public class MainApplication extends Application {
     public List<ChanModule> chanModulesList;
     
     private boolean sfw;
+    private Set<String> unlockedChans;
     
     private void registerChanModules() {
         chanModulesIndex = new HashMap<String, Integer>();
@@ -202,7 +203,7 @@ public class MainApplication extends Application {
         
         RecaptchaAjax.init();
         sfw = getPackageName().endsWith(".sfw");
-        //if (sfw) sfw = !NsfwUnlock.isUnlocked();
+        if (sfw) unlockedChans = NsfwUnlock.getUnlockedChans(chanModulesList);
         
         Wifi.updateState(this);
     }
@@ -227,6 +228,11 @@ public class MainApplication extends Application {
     
     public boolean isSFW() {
         return sfw;
+    }
+    
+    public boolean isLocked(String chanName) {
+        if (!sfw) return false;
+        return (!unlockedChans.contains(chanName));
     }
     
     @Override
