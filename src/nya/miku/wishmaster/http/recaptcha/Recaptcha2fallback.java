@@ -33,6 +33,7 @@ import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.base64.Base64;
+import nya.miku.wishmaster.ui.AppearanceUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
@@ -154,16 +155,22 @@ public class Recaptcha2fallback extends InteractiveException {
                             frame.setLayoutParams(new LinearLayout.LayoutParams(
                                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                             
-                            ImageView imageView = new ImageView(activity);
+                            final ImageView imageView = new ImageView(activity);
                             imageView.setLayoutParams(new FrameLayout.LayoutParams(
                                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
                             imageView.setScaleType(ImageView.ScaleType.FIT_XY);
                             imageView.setImageBitmap(challengeBitmap);
                             frame.addView(imageView);
                             
-                            LinearLayout selector = new LinearLayout(activity);
+                            final LinearLayout selector = new LinearLayout(activity);
                             selector.setLayoutParams(new FrameLayout.LayoutParams(
                                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                            AppearanceUtils.callWhenLoaded(imageView, new Runnable() {
+                                @Override
+                                public void run() {
+                                    selector.setLayoutParams(new FrameLayout.LayoutParams(imageView.getWidth(), imageView.getHeight()));
+                                }
+                            });
                             selector.setOrientation(LinearLayout.VERTICAL);
                             selector.setWeightSum(maxY);
                             for (int y=0; y<maxY; ++y) {
