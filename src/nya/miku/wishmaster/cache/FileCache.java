@@ -118,7 +118,7 @@ public class FileCache {
      * Очистить кэш (удалить все файлы)
      */
     public void clearCache() {
-        for (File f : allFilesOfDir(directory)) {
+        for (File f : filesOfDir(directory)) {
             if (!isUndeletable(f)) f.delete();
         }
         resetCache();
@@ -239,7 +239,7 @@ public class FileCache {
     
     private synchronized void resetCache() {
         database.resetDB();
-        for (File file : allFilesOfDir(directory)) database.put(file.getName(), file.length());
+        for (File file : filesOfDir(directory)) database.put(file.getName(), file.length());
         long[] sizeInDB = database.getSize();
         size = sizeInDB[0];
         pagesSize = sizeInDB[1];
@@ -261,23 +261,10 @@ public class FileCache {
         return filename.startsWith(PREFIX_PAGES) || filename.startsWith(PREFIX_DRAFTS);
     }
     
-    private Iterable<File> allFilesOfDir(File directory) {
-        LinkedList<File> list = new LinkedList<File>();
-        addDir(list, directory);
-        return list;
-    }
-    
-    private void addDir(LinkedList<File> list, File directory) {
+    private File[] filesOfDir(File directory) {
         File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    addDir(list, file);
-                } else {
-                    list.add(file);
-                }
-            }
-        }
+        if (files == null) return new File[0];
+        return files;
     }
     
     private static class FileCacheDB {

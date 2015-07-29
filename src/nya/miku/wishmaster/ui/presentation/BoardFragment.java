@@ -2139,7 +2139,11 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         PageGetter pageGetter = new PageGetter(forceUpdate, silent);
         currentTask = pageGetter;
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(pageGetter).start();
+        if (listLoaded) {
+            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(pageGetter).start();
+        } else {
+            new Thread(pageGetter).start();
+        }
     }
     
     /**
