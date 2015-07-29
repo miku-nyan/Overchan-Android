@@ -450,9 +450,14 @@ public class MainActivity extends FragmentActivity {
         boolean newOrientation = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (newOrientation != isHorizontalOrientation) {
             if (FlowTextHelper.IS_AVAILABLE) {
-                MainApplication.getInstance().pagesCache.clearLru();
                 Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
-                if (currentFragment instanceof BoardFragment) ((BoardFragment) currentFragment).handleWidthChange();
+                if (currentFragment instanceof BoardFragment) {
+                    Long id = MainApplication.getInstance().tabsSwitcher.currentId;
+                    if (id != null) {
+                        TabModel tab = MainApplication.getInstance().tabsState.findTabById(id);
+                        MainApplication.getInstance().tabsSwitcher.switchTo(tab, getSupportFragmentManager(), true);
+                    }
+                }
             }
             isHorizontalOrientation = newOrientation;
         }

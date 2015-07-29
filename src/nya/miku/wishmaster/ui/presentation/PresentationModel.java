@@ -216,11 +216,16 @@ public class PresentationModel {
      * Установить новые модели обтекания картинки текстом (и перестроить текст комментария в случае необходимости)
      * @param floatingModels массив из двух моделей обтекания картинки текстом
      */
-    public void changeFloatingModels(FloatingModel[] models) {
+    public void setFloatingModels(FloatingModel[] models) {
+        if (!FlowTextHelper.IS_AVAILABLE) return;
+        if (models == null || models.length != 2 || models[0] == null || models[1] == null) return;
+        if (floatingModels == null || floatingModels.length != 2 || floatingModels[0] == null || floatingModels[1] == null) return;
+        if (models[0].equals(floatingModels[0]) && models[1].equals(floatingModels[1])) return;
+        
         try {
             this.floatingModels = models;
-            while (notReady) Thread.yield();
-            for (PresentationItemModel item : presentationList) item.changeFloatingModels(models);
+            int size = presentationList.size();
+            for (int i=0; i<size; ++i) presentationList.get(i).changeFloatingModels(models);
         } catch (Exception e) {
             Logger.e(TAG, e);
         }

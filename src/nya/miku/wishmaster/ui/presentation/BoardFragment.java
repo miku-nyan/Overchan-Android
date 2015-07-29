@@ -979,16 +979,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         return floatingModels;
     }
     
-    public void handleWidthChange() {
-        floatingModels = measureFloatingModels(LayoutInflater.from(activity));
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
-            @Override
-            public void run() {
-                if (presentationModel != null) presentationModel.changeFloatingModels(floatingModels);
-            }
-        }).start();
-    }
-    
     private void switchToLoadingView() {
         loadingView.setVisibility(View.VISIBLE);
         errorView.setVisibility(View.GONE);
@@ -1066,6 +1056,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         ((AsyncImageGetter)presentationModel.imageGetter).setObjects(
                                 imagesDownloadExecutor, imagesDownloadTask, listView, handler, staticSettings);
                         ((VolatileSpanClickListener)presentationModel.spanClickListener).setListener(BoardFragment.this);
+                        presentationModel.setFloatingModels(floatingModels);
                         if (presentationModel.isNotReady()) presentationModel.updateViewModels(true, this, null);
                         toListView(forceUpdate);
                         return;
@@ -1103,6 +1094,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     ((AsyncImageGetter)presentationModel.imageGetter).setObjects(
                             imagesDownloadExecutor, imagesDownloadTask, listView, handler, staticSettings);
                     ((VolatileSpanClickListener)presentationModel.spanClickListener).setListener(BoardFragment.this);
+                    presentationModel.setFloatingModels(floatingModels);
                     if (presentationModel.isNotReady()) presentationModel.updateViewModels(isThreadPage, this, null);
                     toListView(forceUpdate);
                 } else {

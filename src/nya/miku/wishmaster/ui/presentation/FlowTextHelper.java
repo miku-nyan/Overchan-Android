@@ -119,6 +119,15 @@ public class FlowTextHelper {
             this.textFullWidth = textFullWidth;
             this.textPaint = textPaint;
         }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof FloatingModel) {
+                FloatingModel f = (FloatingModel) o;
+                return (f.width == width && f.height == height && f.textFullWidth == textFullWidth);
+            }
+            return false;
+        }
     }
     
     /**

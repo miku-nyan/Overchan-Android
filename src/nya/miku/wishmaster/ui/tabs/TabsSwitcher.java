@@ -45,12 +45,24 @@ public class TabsSwitcher {
      * @param fragmentManager менеджер фрагментов
      */
     public void switchTo(TabModel tabModel, FragmentManager fragmentManager) {
+        switchTo(tabModel, fragmentManager, false);
+    }
+    
+    /**
+     * Переключиться на вкладку (обычную) tabModel
+     * @param tabModel вкладка
+     * @param fragmentManager менеджер фрагментов
+     * @param force если true, перезагрузить вкладку, если в данный момент открыта эта же вкладка
+     */
+    public void switchTo(TabModel tabModel, FragmentManager fragmentManager, boolean force) {
         try {
-            if (currentId != null && currentId.equals(Long.valueOf(tabModel.id))) {
-                if (tabModel.forceUpdate && currentFragment != null && currentFragment instanceof BoardFragment) {
-                    ((BoardFragment) currentFragment).update();
+            if (!force) {
+                if (currentId != null && currentId.equals(Long.valueOf(tabModel.id))) {
+                    if (tabModel.forceUpdate && currentFragment != null && currentFragment instanceof BoardFragment) {
+                        ((BoardFragment) currentFragment).update();
+                    }
+                    return;
                 }
-                return;
             }
             if (MainApplication.getInstance().getChanModule(tabModel.pageModel.chanName) == null) {
                 Logger.e(TAG, "chan module " + tabModel.pageModel.chanName + " not registered");
