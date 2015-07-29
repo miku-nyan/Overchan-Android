@@ -69,7 +69,9 @@ import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.chans.AbstractChanModule;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
@@ -95,8 +97,7 @@ public class FourchanModule extends AbstractChanModule {
     
     private Map<String, BoardModel> boardsMap = null;
     
-    private Recaptcha2 recaptcha = null;
-    String recaptcha2 = null;
+    private Recaptcha recaptcha = null;
     
     private static final Pattern ERROR_POSTING = Pattern.compile("<span id=\"errmsg\"(?:[^>]*)>(.*?)(?:</span>|<br)");
     private static final Pattern SUCCESS_POSTING = Pattern.compile("<!-- thread:(\\d+),no:(?:\\d+) -->");
@@ -449,7 +450,7 @@ public class FourchanModule extends AbstractChanModule {
             recaptcha = null;
             return null;
         } else {
-            recaptcha = Recaptcha2.obtain(RECAPTCHA_KEY, task, httpClient, useHttps() ? "https" : "http");
+            recaptcha = Recaptcha.obtain(RECAPTCHA_KEY, task, httpClient, useHttps() ? "https" : "http");
             CaptchaModel result = new CaptchaModel();
             result.type = CaptchaModel.TYPE_NORMAL;
             result.bitmap = recaptcha.bitmap;
@@ -459,9 +460,10 @@ public class FourchanModule extends AbstractChanModule {
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String recaptcha2 = Recaptcha2solved.pop(RECAPTCHA_KEY);
         if (!usingPasscode) {
             if (useNewRecaptcha()) {
-                if (recaptcha2 == null) throw new Recaptcha2Interactive();
+                if (recaptcha2 == null) throw new Recaptcha2js(RECAPTCHA_KEY);
             } else if (recaptcha == null) throw new Exception("Invalid captcha");
         }
         String url = "https://sys.4chan.org/" + model.boardName + "/post";
@@ -474,7 +476,12 @@ public class FourchanModule extends AbstractChanModule {
                 addString("pwd", model.password);
         if (model.threadNumber != null) postEntityBuilder.addString("resto", model.threadNumber);
         if (!usingPasscode) {
-            postEntityBuilder.addString("g-recaptcha-response", useNewRecaptcha() ? recaptcha2 : recaptcha.checkCaptcha(model.captchaAnswer, task));
+            if (useNewRecaptcha()) {
+                postEntityBuilder.addString("g-recaptcha-response", recaptcha2);
+            } else {
+                postEntityBuilder.addString("recaptcha_challenge_field", recaptcha.challenge).
+                        addString("recaptcha_response_field", model.captchaAnswer);
+            }
             recaptcha2 = null;
         }
         if (model.attachments != null && model.attachments.length != 0) postEntityBuilder.addFile("upfile", model.attachments[0]);

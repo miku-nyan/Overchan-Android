@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans.fourchan;
+package nya.miku.wishmaster.http.recaptcha;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
-import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.cloudflare.InteractiveException;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -32,21 +31,39 @@ import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class Recaptcha2Interactive extends InteractiveException {
+/**
+ * Объект рекапчи 2.0, работает в обычном режиме (js через webview).<br>
+ * Работа через прокси не поддерживается.<br>
+ * Решённые капчи (значения, которые нужно будет передавать как "g-recaptcha-response") будут сохраняться в стеке объекта {@link Recaptcha2solved}.
+ * @author miku-nyan
+ *
+ */
+public class Recaptcha2js extends InteractiveException {
     private static final long serialVersionUID = 1L;
     
     private static final String INTERCEPT = "_intercept?";
     
-    private static final String RECAPTCHA_HTML =
+    private final String publicKey;
+    
+    private static final String getRecahtchaHtml(String publicKey) {
+        return
             "<script type=\"text/javascript\">" +
                 "window.globalOnCaptchaEntered = function(res) { " +
                     "location.href = \"" + INTERCEPT + "\" + res; " +
                 "}" +
             "</script>" +
             "<script src=\"https://www.google.com/recaptcha/api.js\" async defer></script>" +
-            "<div class=\"g-recaptcha\" data-sitekey=\"" + FourchanModule.RECAPTCHA_KEY + "\" data-callback=\"globalOnCaptchaEntered\"></div>";
+            "<div class=\"g-recaptcha\" data-sitekey=\"" + publicKey + "\" data-callback=\"globalOnCaptchaEntered\"></div>";
+    }
     
     private volatile boolean done = false;
+    
+    /**
+     * @param publicKey открытый ключ
+     */
+    public Recaptcha2js(String publicKey) {
+        this.publicKey = publicKey;
+    }
     
     @Override
     public String getServiceName() {
@@ -72,7 +89,7 @@ public class Recaptcha2Interactive extends InteractiveException {
                     public void onPageStarted(WebView view, String url, Bitmap favicon) {
                         if (url.contains(INTERCEPT)) {
                             String hash = url.substring(url.indexOf(INTERCEPT) + INTERCEPT.length());
-                            ((FourchanModule) MainApplication.getInstance().getChanModule(FourchanModule.CHAN_NAME)).recaptcha2 = hash;
+                            Recaptcha2solved.push(publicKey, hash);
                             if (!done && !task.isCancelled()) activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -103,7 +120,7 @@ public class Recaptcha2Interactive extends InteractiveException {
                 });
                 dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 dialog.show();
-                webView.loadDataWithBaseURL("https://127.0.0.1/", RECAPTCHA_HTML, "text/html", "UTF-8", null);
+                webView.loadDataWithBaseURL("https://127.0.0.1/", getRecahtchaHtml(publicKey), "text/html", "UTF-8", null);
             }
         });
     }

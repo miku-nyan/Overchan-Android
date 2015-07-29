@@ -51,7 +51,8 @@ import nya.miku.wishmaster.chans.AbstractChanModule;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -110,8 +111,6 @@ public class MakabaModule extends AbstractChanModule {
     private int captchaType;
     /** ключ текущей яндекс капчи*/
     private String captchaKey;
-    /** модель текущей рекапчи*/
-    private Recaptcha2 recaptcha2;
     
     /** карта досок из списка mobile.fcgi */
     private Map<String, BoardModel> boardsMap = null;
@@ -301,6 +300,17 @@ public class MakabaModule extends AbstractChanModule {
         addRecaptchaPreference(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
+        
+        final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceScreen.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
+        final Preference recaptchaPref = preferenceScreen.findPreference(getSharedKey(PREF_KEY_FORCE_GOOGLE));
+        recaptchaPref.setEnabled(!proxyPreference.isChecked());
+        proxyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {            
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                recaptchaPref.setEnabled(!proxyPreference.isChecked());
+                return false;
+            }
+        });
     }
     
     @Override
@@ -537,7 +547,8 @@ public class MakabaModule extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        boolean forceGoogle = preferences.getBoolean(getSharedKey(PREF_KEY_FORCE_GOOGLE), false);
+        boolean forceGoogle = !preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) &&
+                preferences.getBoolean(getSharedKey(PREF_KEY_FORCE_GOOGLE), false);
         String url = domainUrl + "makaba/captcha.fcgi";
         UrlPageModel refererPage = new UrlPageModel();
         refererPage.chanName = CHAN_NAME;
@@ -579,14 +590,9 @@ public class MakabaModule extends AbstractChanModule {
             return captchaModel;
         } else if (response.startsWith("SERVER ERROR") || forceGoogle) {
             //https://2ch.hk/makaba/captcha.fcgi?type=recaptcha
-            recaptcha2 = Recaptcha2.obtain(RECAPTCHA_KEY, task, getHttpClient(), domainUrl.startsWith("https") ? "https" : "http");
             captchaType = CAPTCHA_RECAPTCHA;
-            CaptchaModel captchaModel = new CaptchaModel();
-            captchaModel.type = CaptchaModel.TYPE_NORMAL;
-            captchaModel.bitmap = recaptcha2.bitmap;
-            return captchaModel;
+            return null;
         } else {
-            //or passcode
             throw new Exception("failed to get captcha");
         }
     }
@@ -605,9 +611,11 @@ public class MakabaModule extends AbstractChanModule {
             if (captchaType == CAPTCHA_YANDEX && captchaKey != null) {
                 postEntityBuilder.addString("captcha", captchaKey);
                 postEntityBuilder.addString("captcha_value", model.captchaAnswer);
-            } else if (captchaType == CAPTCHA_RECAPTCHA && recaptcha2 != null) {
+            } else if (captchaType == CAPTCHA_RECAPTCHA) {
+                String key = Recaptcha2solved.pop(RECAPTCHA_KEY);
+                if (key == null) throw new Recaptcha2js(RECAPTCHA_KEY);
                 postEntityBuilder.addString("captcha_type", "recaptcha");
-                postEntityBuilder.addString("g-recaptcha-response", recaptcha2.checkCaptcha(model.captchaAnswer, task));
+                postEntityBuilder.addString("g-recaptcha-response", key);
             }
         }
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
