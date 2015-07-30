@@ -195,6 +195,7 @@ public class TohnoChanModule extends AbstractWakabaModule {
         model.requiredFileForNewThread = !shortName.equals("mt") && !shortName.equals("fb");
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
+        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
         model.allowNames = true;
         model.allowSubjects = true;
         model.allowSage = true;
@@ -266,6 +267,22 @@ public class TohnoChanModule extends AbstractWakabaModule {
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
         if (result.contains("Incorrect password")) throw new Exception("Incorrect password");
         return null;
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "board.php";
+        
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
+        pairs.add(new BasicNameValuePair("reportreason", model.reportReason));
+        pairs.add(new BasicNameValuePair("reportpost", "Report"));
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+        if (result.contains("Post successfully reported")) return null;
+        throw new Exception(result);
     }
     
 }

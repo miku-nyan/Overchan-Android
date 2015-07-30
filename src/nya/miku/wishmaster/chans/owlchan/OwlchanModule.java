@@ -158,6 +158,7 @@ public class OwlchanModule extends AbstractWakabaModule {
         board.requiredFileForNewThread = !shortName.equals("d");
         board.allowDeletePosts = true;
         board.allowDeleteFiles = true;
+        board.allowReport = BoardModel.REPORT_WITH_COMMENT;
         board.allowNames = !shortName.equals("b");
         board.allowSubjects = true;
         board.allowSage = true;
@@ -236,5 +237,21 @@ public class OwlchanModule extends AbstractWakabaModule {
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
         if (result.contains("Неправильный пароль")) throw new Exception("Неправильный пароль");
         return null;
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "board.php";
+        
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
+        pairs.add(new BasicNameValuePair("reportreason", model.reportReason));
+        pairs.add(new BasicNameValuePair("reportpost", "Отчет"));
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+        if (result.contains("Post successfully reported")) return null;
+        throw new Exception(result);
     }
 }

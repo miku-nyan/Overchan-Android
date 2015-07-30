@@ -277,6 +277,21 @@ public class Chan410Module extends AbstractChanModule {
     }
     
     @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = CHAN410_URL + "board.php";
+        
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("delete[]", model.postNumber));
+        pairs.add(new BasicNameValuePair("reportpost", "Пожаловаться"));
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+        if (result.contains("Post successfully reported")) return null;
+        throw new Exception(result);
+    }
+    
+    @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN410_NAME)) throw new IllegalArgumentException("wrong chan");
         return WakabaUtils.buildUrl(model, CHAN410_URL);

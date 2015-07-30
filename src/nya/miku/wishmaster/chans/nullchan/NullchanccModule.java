@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans.nullchancc;
+package nya.miku.wishmaster.chans.nullchan;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -176,6 +176,7 @@ public class NullchanccModule extends AbstractWakabaModule {
         model.requiredFileForNewThread = !shortName.equals("0");
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
+        model.allowReport = BoardModel.REPORT_SIMPLE;
         model.allowNames = !shortName.equals("b");
         model.allowSubjects = true;
         model.allowSage = true;
@@ -345,6 +346,21 @@ public class NullchanccModule extends AbstractWakabaModule {
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
         if (result.contains("Неверный пароль")) throw new Exception("Неверный пароль");
         return null;
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "board.php";
+        
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
+        pairs.add(new BasicNameValuePair("reportpost", "Отправить"));
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+        if (result.contains("Post successfully reported")) return null;
+        throw new Exception(result);
     }
     
     @Override

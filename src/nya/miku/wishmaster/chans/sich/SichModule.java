@@ -133,6 +133,7 @@ public class SichModule extends AbstractVichanModule {
         model.requiredFileForNewThread = true;
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
+        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
         model.allowNames = false;
         model.allowSubjects = true;
         model.allowSage = false;
@@ -286,8 +287,43 @@ public class SichModule extends AbstractVichanModule {
         pairs.add(new BasicNameValuePair("delete_" + model.postNumber, "on"));
         if (model.onlyFiles) pairs.add(new BasicNameValuePair("file", "on"));
         pairs.add(new BasicNameValuePair("password", model.password));
-        pairs.add(new BasicNameValuePair("delete", model.boardName == "int" ? "Delete" : "Видалити"));
+        pairs.add(new BasicNameValuePair("delete", model.boardName.equals("int") ? "Delete" : "Видалити"));
         pairs.add(new BasicNameValuePair("reason", ""));
+        
+        UrlPageModel refererPage = new UrlPageModel();
+        refererPage.type = UrlPageModel.TYPE_THREADPAGE;
+        refererPage.chanName = CHAN_NAME;
+        refererPage.boardName = model.boardName;
+        refererPage.threadNumber = model.threadNumber;
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
+        HttpRequestModel rqModel = HttpRequestModel.builder().
+                setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
+            if (response.statusCode == 200 || response.statusCode == 400 || response.statusCode == 303) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
+                return null;
+            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "post.php";
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("delete_" + model.postNumber, "on"));
+        pairs.add(new BasicNameValuePair("password", ""));
+        pairs.add(new BasicNameValuePair("reason", model.reportReason));
+        pairs.add(new BasicNameValuePair("report", model.boardName.equals("int") ? "Report" : "Поскаржитися"));
         
         UrlPageModel refererPage = new UrlPageModel();
         refererPage.type = UrlPageModel.TYPE_THREADPAGE;

@@ -91,6 +91,7 @@ public class Chan410Boards {
         model.requiredFileForNewThread = true;
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
+        model.allowReport = BoardModel.REPORT_SIMPLE;
         model.allowNames = !name.equals("b");
         model.allowSubjects = true;
         model.allowSage = true;
