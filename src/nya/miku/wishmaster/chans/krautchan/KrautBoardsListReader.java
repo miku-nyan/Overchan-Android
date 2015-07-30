@@ -195,7 +195,8 @@ public class KrautBoardsListReader implements Closeable {
         bm.firstPage = 1;
         bm.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
         bm.searchAllowed = false;
-        bm.catalogAllowed = false;
+        bm.catalogAllowed = true;
+        bm.catalogTypeDescriptions = new String[] { boardName.equals("int") ? "Catalog" : "Katalog" };
         return bm;
     }
 }

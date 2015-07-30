@@ -186,8 +186,9 @@ public class KrautModule extends AbstractChanModule {
      * If (url == null) returns boards list (SimpleBoardModel[]), thread/threads page (ThreadModel[]) otherwise
      */
     private Object readPage(String url, ProgressListener listener, CancellableTask task, boolean checkIfModified) throws Exception {
-        boolean threadsList = url == null;
-        if (threadsList) url = (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/nav";
+        boolean boardsList = url == null;
+        if (boardsList) url = (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/nav";
+        boolean catalog = boardsList ? false : url.contains("/catalog/");
         
         HttpResponseModel responseModel = null;
         Closeable in = null;
@@ -195,9 +196,11 @@ public class KrautModule extends AbstractChanModule {
         try {
             responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
             if (responseModel.statusCode == 200) {
-                in = threadsList ? new KrautBoardsListReader(responseModel.stream) : new KrautReader(responseModel.stream);
+                in = boardsList ? new KrautBoardsListReader(responseModel.stream) :
+                    (catalog ? new KrautCatalogReader(responseModel.stream) : new KrautReader(responseModel.stream));
                 if (task != null && task.isCancelled()) throw new Exception("interrupted");
-                return threadsList ? ((KrautBoardsListReader) in).readBoardsList() : ((KrautReader) in).readPage();
+                return boardsList ? ((KrautBoardsListReader) in).readBoardsList() :
+                    (catalog ? ((KrautCatalogReader) in).readPage() : ((KrautReader) in).readPage());
             } else {
                 if (responseModel.notModified()) return null;
                 String html = null;
@@ -259,6 +262,23 @@ public class KrautModule extends AbstractChanModule {
         urlModel.type = UrlPageModel.TYPE_BOARDPAGE;
         urlModel.boardName = boardName;
         urlModel.boardPage = page;
+        String url = buildUrl(urlModel);
+        
+        ThreadModel[] threads = (ThreadModel[]) readPage(url, listener, task, oldList != null);
+        if (threads == null) {
+            return oldList;
+        } else {
+            return threads;
+        }
+    }
+    
+    @Override
+    public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
+            throws Exception {
+        UrlPageModel urlModel = new UrlPageModel();
+        urlModel.chanName = CHAN_NAME;
+        urlModel.type = UrlPageModel.TYPE_CATALOGPAGE;
+        urlModel.boardName = boardName;
         String url = buildUrl(urlModel);
         
         ThreadModel[] threads = (ThreadModel[]) readPage(url, listener, task, oldList != null);
