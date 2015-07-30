@@ -76,7 +76,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:id="@+id/postform_sage_op_watermark_layout" >
+            android:id="@+id/postform_checkbox_layout" >
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -85,12 +85,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/postform_watermark_checkbox"
-                android:text="@string/postform_watermark" />
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/postform_op_checkbox"
+                android:id="@+id/postform_custommark_checkbox"
                 android:text="@string/postform_opmark" />
         </LinearLayout>
         

@@ -38,6 +38,7 @@ public class FourchanJsonMapper {
         model.nsfw = object.optInt("ws_board") == 0;
         model.bumpLimit = object.optInt("bump_limit", 300);
         model.lastPage = object.optInt("pages", 10);
+        model.allowCustomMark = object.optInt("spoilers") == 1;
         return model;
     }
     
@@ -60,8 +61,8 @@ public class FourchanJsonMapper {
         model.allowSubjects = !model.boardName.equals("b");
         model.allowSage = true;
         model.allowEmails = false;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = false;
+        model.customMarkDescription = "Spoiler";
         model.allowRandomHash = false;
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;

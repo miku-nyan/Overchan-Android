@@ -235,8 +235,8 @@ public class InfinityModule extends AbstractVichanModule {
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = true;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = true;
+        model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = json.optBoolean("disable_images", false) ? 0 : 5;
@@ -334,6 +334,7 @@ public class InfinityModule extends AbstractVichanModule {
                 addString("post", model.threadNumber == null ? "New Topic" : "New Reply").
                 addString("board", model.boardName);
         if (model.threadNumber != null) postEntityBuilder.addString("thread", model.threadNumber);
+        if (model.custommark) postEntityBuilder.addString("spoiler", "on");
         postEntityBuilder.addString("password", TextUtils.isEmpty(model.password) ? getDefaultPassword() : model.password);
         if (model.attachments != null) {
             String[] images = new String[] { "file", "file2", "file3", "file4", "file5" };

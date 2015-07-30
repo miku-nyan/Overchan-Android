@@ -75,11 +75,14 @@ public class BoardModel implements Serializable {
     @Tag(16) public boolean allowEmails;
     /** Должно принимать true, если на доске при отправке поста с сажей невозможно указать e-mail. Только если {@link #readonlyBoard} равно false. */
     @Tag(17) public boolean ignoreEmailIfSage;
-    /** Должно принимать true, если на доске можно отправить пост с ватермаркой (к прикрепляемым изображениям).
+    
+    @Deprecated @Tag(18) public boolean allowWatermark;
+    
+    /** Должно принимать true, если на доске можно отправить пост с дополнительным модификатором (по умолчанию "ОП треда").
      *  Только если {@link #readonlyBoard} равно false. */
-    @Tag(18) public boolean allowWatermark;
-    /** Должно принимать true, если на доске можно при постинге указать, когда подписываться ОПом. Только если {@link #readonlyBoard} равно false. */
-    @Tag(19) public boolean allowOpMark;
+    @Tag(19) public boolean allowCustomMark;
+    /** Описание дополнительного модификатора (только если {@link #allowCustomMark} равно true), по умолчанию "ОП треда". */
+    @Tag(32) public String customMarkDescription;
     /** Должно принимать true, если на доске нельзя постить одинаковые файлы, но можно это обойти, добавив в хвост несколько случайных байт
      *  (произвольных хэш). Только если {@link #readonlyBoard} равно false. */
     @Tag(20) public boolean allowRandomHash;

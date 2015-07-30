@@ -485,6 +485,7 @@ public class FourchanModule extends AbstractChanModule {
             recaptcha2 = null;
         }
         if (model.attachments != null && model.attachments.length != 0) postEntityBuilder.addFile("upfile", model.attachments[0]);
+        if (model.custommark) postEntityBuilder.addString("spoiler", "on");
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
         String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);

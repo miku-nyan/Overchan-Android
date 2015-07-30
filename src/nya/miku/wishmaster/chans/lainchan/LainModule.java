@@ -125,8 +125,7 @@ public class LainModule extends AbstractVichanModule {
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = true;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = false;
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;

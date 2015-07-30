@@ -180,8 +180,7 @@ public class NullchanccModule extends AbstractWakabaModule {
         model.allowSubjects = true;
         model.allowSage = true;
         model.allowEmails = false;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = false;
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;

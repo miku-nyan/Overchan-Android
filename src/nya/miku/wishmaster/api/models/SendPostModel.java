@@ -59,10 +59,11 @@ public class SendPostModel implements Serializable {
     
     /** Должно принимать true, если сообщение отправляется с сажей (не поднимать тред) */
     @Tag(9) public boolean sage;
-    /** Должно принимать true, если пост отправляется с ватермаркой */
-    @Tag(10) public boolean watermark;
-    /** Должно принимать true, если пост отправляется с отметкой ОПа */
-    @Tag(11) public boolean opmark;
+    
+    @Deprecated @Tag(10) public boolean watermark;
+    
+    /** Должно принимать true, если пост отправляется с дополнительным модификатором */
+    @Tag(11) public boolean custommark;
     
     /** Должно принимать true, если к прикрепляемым файлам необходимо применить "произвольный хэш" */
     @Tag(12) public boolean randomHash;

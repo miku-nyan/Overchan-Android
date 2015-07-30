@@ -130,8 +130,8 @@ public class HoneyModule extends AbstractVichanModule {
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = true;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = true;
+        model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = 25;
@@ -167,7 +167,10 @@ public class HoneyModule extends AbstractVichanModule {
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().
                 setCharset(Charset.forName("UTF-8")).setDelegates(listener, task);
         for (Pair<String, String> pair : fields) {
-            if (pair.getKey().equals("spoiler")) continue;
+            if (pair.getKey().equals("spoiler")) {
+                if (model.custommark) postEntityBuilder.addString("spoiler", "on");
+                continue;
+            }
             String val;
             switch (pair.getKey()) {
                 case "name": val = model.name; break;

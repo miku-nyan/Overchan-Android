@@ -634,8 +634,8 @@ public class MakabaModule extends AbstractChanModule {
         
         if (model.icon != -1) postEntityBuilder.addString("icon", Integer.toString(model.icon));
         
-        if (model.opmark) postEntityBuilder.addString("water_mark", "on");
-        if (model.watermark) postEntityBuilder.addString("op_mark", "1");
+        //if (model.watermark) postEntityBuilder.addString("water_mark", "on");
+        if (model.custommark) postEntityBuilder.addString("op_mark", "1");
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
         String response = null;

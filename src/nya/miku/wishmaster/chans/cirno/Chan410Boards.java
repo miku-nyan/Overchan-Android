@@ -96,8 +96,7 @@ public class Chan410Boards {
         model.allowSage = true;
         model.allowEmails = false;
         model.ignoreEmailIfSage = false;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = false;
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;

@@ -61,8 +61,7 @@ public class MakabaJsonMapper {
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = true;
-        model.allowWatermark = true;
-        model.allowOpMark = true;
+        model.allowCustomMark = true;
         model.allowRandomHash = true;
         model.searchAllowed = true;
         model.catalogAllowed = true;

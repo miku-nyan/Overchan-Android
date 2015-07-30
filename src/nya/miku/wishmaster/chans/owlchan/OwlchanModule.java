@@ -163,8 +163,7 @@ public class OwlchanModule extends AbstractWakabaModule {
         board.allowSage = true;
         board.allowEmails = true;
         board.ignoreEmailIfSage = true;
-        board.allowWatermark = false;
-        board.allowOpMark = false;
+        board.allowCustomMark = false;
         board.allowRandomHash = true;
         board.allowIcons = false;
         board.attachmentsMaxCount = 1;

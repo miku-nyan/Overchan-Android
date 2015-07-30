@@ -173,8 +173,7 @@ public class MentachsuModule extends AbstractWakabaModule {
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = false;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = false;
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;

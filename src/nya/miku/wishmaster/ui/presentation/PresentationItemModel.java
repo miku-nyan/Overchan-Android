@@ -52,7 +52,7 @@ import android.text.style.StyleSpan;
  *
  */
 public class PresentationItemModel {
-    private static final Pattern REPLY_LINK_FULL_PATTERN = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)</a>");
+    private static final Pattern REPLY_LINK_FULL_PATTERN = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)(?:.*?)</a>");
     
     public static final String ALL_REFERENCES_URI = "references://all?from=";
     

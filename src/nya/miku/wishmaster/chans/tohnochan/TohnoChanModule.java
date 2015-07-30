@@ -200,8 +200,8 @@ public class TohnoChanModule extends AbstractWakabaModule {
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = true;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = true;
+        model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = 1;
@@ -224,6 +224,7 @@ public class TohnoChanModule extends AbstractWakabaModule {
                 addString("postpassword", model.password);
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
+        if (model.custommark) postEntityBuilder.addString("spoiler", "on");
         else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();

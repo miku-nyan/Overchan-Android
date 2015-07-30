@@ -47,6 +47,7 @@ public class ReadableMHTML extends ReadableContainer {
     
     private static final int SEARCH_META_BUF_SIZE = 8192;
     
+    @SuppressWarnings("resource")
     public ReadableMHTML(File file) throws IOException {
         this.file = file;
         this.positions = new HashMap<String, Long>();

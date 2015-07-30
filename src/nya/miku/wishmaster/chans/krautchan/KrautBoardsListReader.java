@@ -186,8 +186,7 @@ public class KrautBoardsListReader implements Closeable {
         bm.allowSubjects = true;
         bm.allowSage = true;
         bm.allowEmails = false;
-        bm.allowWatermark = false;
-        bm.allowOpMark = false;
+        bm.allowCustomMark = false;
         bm.allowRandomHash = false;
         bm.allowIcons = false;
         bm.attachmentsMaxCount = 4;

@@ -203,8 +203,7 @@ public class DvachModule extends AbstractWakabaModule {
         board.allowSubjects = true;
         board.allowSage = false;
         board.allowEmails = true;
-        board.allowWatermark = false;
-        board.allowOpMark = false;
+        board.allowCustomMark = false;
         board.allowRandomHash = true;
         board.allowIcons = false;
         board.attachmentsMaxCount = shortName.equals("d") ? 0 : 1;

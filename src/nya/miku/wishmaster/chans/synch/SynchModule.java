@@ -161,8 +161,8 @@ public class SynchModule extends AbstractVichanModule {
         model.allowSage = true;
         model.allowEmails = true;
         model.ignoreEmailIfSage = true;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = true;
+        model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false; //TODO?
         model.attachmentsMaxCount = 1;
@@ -215,6 +215,7 @@ public class SynchModule extends AbstractVichanModule {
                 case "subject": val = model.subject; break;
                 case "body": val = model.comment; break;
                 case "password": val = model.password; break;
+                case "spoiler": val = model.custommark ? "on" : ""; break;
                 default: val = pair.getValue();
             }
             if (pair.getKey().equals("file") && model.attachments != null && model.attachments.length > 0) {

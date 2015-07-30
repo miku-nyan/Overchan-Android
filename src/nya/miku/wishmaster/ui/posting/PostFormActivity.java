@@ -82,8 +82,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     private EditText passwordField;
     private View chkboxLayout;
     private CheckBox sageChkbox;
-    private CheckBox watermarkChkbox;
-    private CheckBox opChkbox;
+    private CheckBox custommarkChkbox;
     private LinearLayout attachmentsLayout;
     private Spinner spinner;
     private EditText subjectField;
@@ -422,11 +421,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         emailField = (EditText) findViewById(R.id.postform_email_field);
         passwordLayout = findViewById(R.id.postform_password_layout);
         passwordField = (EditText) findViewById(R.id.postform_password_field);
-        chkboxLayout = findViewById(R.id.postform_sage_op_watermark_layout);
+        chkboxLayout = findViewById(R.id.postform_checkbox_layout);
         sageChkbox = (CheckBox) findViewById(R.id.postform_sage_checkbox);
         sageChkbox.setOnClickListener(this);
-        watermarkChkbox = (CheckBox) findViewById(R.id.postform_watermark_checkbox);
-        opChkbox = (CheckBox) findViewById(R.id.postform_op_checkbox);
+        custommarkChkbox = (CheckBox) findViewById(R.id.postform_custommark_checkbox);
         attachmentsLayout = (LinearLayout) findViewById(R.id.postform_attachments_layout);
         spinner = (Spinner) findViewById(R.id.postform_spinner);
         subjectField = (EditText) findViewById(R.id.postform_subject_field);
@@ -467,10 +465,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         markLayout.setVisibility(boardModel.markType != BoardModel.MARK_NOMARK ? View.VISIBLE : View.GONE);
         if (boardModel.markType == BoardModel.MARK_WAKABAMARK) markLayout.findViewById(R.id.postform_mark_underline).setVisibility(View.GONE);
         subjectField.setVisibility(boardModel.allowSubjects ? View.VISIBLE : View.GONE);
-        chkboxLayout.setVisibility(boardModel.allowSage || boardModel.allowWatermark || boardModel.allowOpMark ? View.VISIBLE : View.GONE);
+        chkboxLayout.setVisibility(boardModel.allowSage || boardModel.allowCustomMark ? View.VISIBLE : View.GONE);
         sageChkbox.setVisibility(boardModel.allowSage ? View.VISIBLE : View.GONE);
-        watermarkChkbox.setVisibility(boardModel.allowWatermark ? View.VISIBLE : View.GONE);
-        opChkbox.setVisibility(boardModel.allowOpMark ? View.VISIBLE : View.GONE);
+        custommarkChkbox.setVisibility(boardModel.allowCustomMark ? View.VISIBLE : View.GONE);
+        if (boardModel.customMarkDescription != null) custommarkChkbox.setText(boardModel.customMarkDescription);
         spinner.setVisibility(boardModel.allowIcons ? View.VISIBLE : View.GONE);
         
         if (boardModel.allowIcons) {
@@ -499,8 +497,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         if (boardModel.allowIcons) spinner.setSelection(sendPostModel.icon != -1 ? sendPostModel.icon : 0);
         if (boardModel.allowSage) sageChkbox.setChecked(sendPostModel.sage);
         if (boardModel.ignoreEmailIfSage && boardModel.allowSage && sendPostModel.sage) emailField.setEnabled(false);
-        if (boardModel.allowWatermark) watermarkChkbox.setChecked(sendPostModel.watermark);
-        if (boardModel.allowOpMark) opChkbox.setChecked(sendPostModel.opmark);
+        if (boardModel.allowCustomMark) custommarkChkbox.setChecked(sendPostModel.custommark);
         captchaField.setText(sendPostModel.captchaAnswer != null ? sendPostModel.captchaAnswer : "");
         if (sendPostModel.attachments != null) {
             for (File attachment : sendPostModel.attachments) {
@@ -520,8 +517,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 chan.getDefaultPassword() : passwordField.getText().toString();
         sendPostModel.icon = boardModel.allowIcons ? spinner.getSelectedItemPosition() : -1;
         sendPostModel.sage = sageChkbox.isChecked();
-        sendPostModel.watermark = watermarkChkbox.isChecked();
-        sendPostModel.opmark = opChkbox.isChecked();
+        sendPostModel.custommark = custommarkChkbox.isChecked();
         sendPostModel.captchaAnswer = captchaField.getText().toString();
         sendPostModel.attachments = attachments.toArray(new File[attachments.size()]);
         sendPostModel.randomHash = boardModel.allowRandomHash && settings.isRandomHash();

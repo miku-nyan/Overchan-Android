@@ -137,8 +137,7 @@ public class SichModule extends AbstractVichanModule {
         model.allowSubjects = true;
         model.allowSage = false;
         model.allowEmails = false;
-        model.allowWatermark = false;
-        model.allowOpMark = false;
+        model.allowCustomMark = false;
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = 4;

@@ -110,8 +110,7 @@ public class MikubaModule extends AbstractChanModule {
         MIKUBA_BOARD.allowSubjects = true;
         MIKUBA_BOARD.allowSage = false;
         MIKUBA_BOARD.allowEmails = false;
-        MIKUBA_BOARD.allowWatermark = false;
-        MIKUBA_BOARD.allowOpMark = false;
+        MIKUBA_BOARD.allowCustomMark = false;
         MIKUBA_BOARD.allowRandomHash = true;
         MIKUBA_BOARD.allowIcons = false;
         MIKUBA_BOARD.attachmentsMaxCount = 1;
