@@ -185,6 +185,38 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                                 comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
                                 break;
                         }
+                    } else if (boardModel.markType == BoardModel.MARK_4CHAN) {
+                        switch (v.getId()) {
+                            case R.id.postform_mark_bold:
+                                comment.replace(selectionStart, selectionEnd, "**" + text.replace("\n", "**\n**") + "**");
+                                commentField.setSelection(selectionStart + 2);
+                                break;
+                            case R.id.postform_mark_italic:
+                                comment.replace(selectionStart, selectionEnd, "*" + text.replace("\n", "*\n*") + "*");
+                                commentField.setSelection(selectionStart + 1);
+                                break;
+                            case R.id.postform_mark_underline:
+                                comment.replace(selectionStart, selectionEnd, "__" + text.replace("\n", "__\n__") + "__");
+                                commentField.setSelection(selectionStart + 2);
+                                break;
+                            case R.id.postform_mark_strike:
+                                StringBuilder strike = new StringBuilder();
+                                for (String s : text.split("\n")) {
+                                    strike.append(s);
+                                    for (int i=0; i<s.length(); ++i) strike.append("^H");
+                                    strike.append('\n');
+                                }
+                                comment.replace(selectionStart, selectionEnd, strike.substring(0, strike.length() - 1));
+                                commentField.setSelection(selectionStart);
+                                break;
+                            case R.id.postform_mark_spoiler:
+                                comment.replace(selectionStart, selectionEnd, "[spoiler]" + text + "[/spoiler]");
+                                commentField.setSelection(selectionStart + 9);
+                                break;
+                            case R.id.postform_mark_quote:
+                                comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
+                                break;
+                        }
                     }
                 } catch (Exception e) {
                     Logger.e(TAG, e);

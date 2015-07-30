@@ -126,8 +126,11 @@ public class BoardModel implements Serializable {
      *  *italic* **bold** %%spoiler%% strike^H^H^H^H^H^H */
     public static final int MARK_WAKABAMARK = 1;
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - BBCode.<br>
-     *  [i]italic[/i] [b]bold[/b] [spoiler]spoiler[/spoiler] [s]strike[/s] */
+     *  [i]italic[/i] [b]bold[/b] [u]underline[/u] [spoiler]spoiler[/spoiler] [s]strike[/s] */
     public static final int MARK_BBCODE = 2;
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - 4chan.<br>
+     *  *italic* **bold** __underline__ [spoiler]spoiler[/spoiler] strike^H^H^H^H^H^H */
+    public static final int MARK_4CHAN = 3;
     
     /** Константное значение, если на данной доске нет возможности пожаловаться на сообщения */
     public static final int REPORT_NOT_ALLOWED = 0;
