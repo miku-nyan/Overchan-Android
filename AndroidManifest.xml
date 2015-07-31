@@ -107,6 +107,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="lainchan.org" />
                 <data android:host="www.lainchan.org" />
                 
+                <data android:host="dva-ch.net" />
+                
                 <data android:host="0chan.cc" />
                 <data android:host="www.0chan.cc" />
                 

@@ -126,7 +126,7 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
     }
     
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream);
+        return new WakabaReader(stream, null, canCloudflare());
     }
     
     protected ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkModified, UrlPageModel urlModel)
