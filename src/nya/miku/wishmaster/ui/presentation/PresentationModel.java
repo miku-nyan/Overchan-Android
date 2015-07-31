@@ -22,12 +22,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -273,18 +270,19 @@ public class PresentationModel {
         
         final boolean openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         
-        long t0 = System.currentTimeMillis();
-        
-        int threads = Runtime.getRuntime().availableProcessors();
-        boolean smpMode = threads > 1;
-        SMPHandler smpHandler = smpMode ? new SMPHandler(threads, task) : null;
-        if (smpMode) for (int i=presentationList.size(); i<posts.length; ++i) smpHandler.enqueue(posts[i], openSpoilers, showIndex ? i+1 : -1);
-        
         for (int i=presentationList.size(); i<posts.length; ++i) {
             if (task.isCancelled()) return;
-            PresentationItemModel model = smpMode ? smpHandler.dequeue() : createItemModel(posts[i], openSpoilers, showIndex ? i+1 : -1);
-            
-            if (task.isCancelled()) return;
+            PresentationItemModel model = new PresentationItemModel(
+                    posts[i],
+                    source.pageModel.chanName,
+                    source.pageModel.boardName,
+                    source.pageModel.type == UrlPageModel.TYPE_THREADPAGE ? source.pageModel.threadNumber : null,
+                    dateFormat,
+                    spanClickListener,
+                    imageGetter,
+                    ThemeUtils.ThemeColors.getInstance(theme),
+                    openSpoilers,
+                    floatingModels);
             postNumbersMap.put(posts[i].number, i);
             if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
                 for (String ref : model.referencesTo) {
@@ -298,9 +296,34 @@ public class PresentationModel {
             for (int j=0; j<model.attachmentHashes.length; ++j) {
                 attachments.add(Triple.of(posts[i].attachments[j], model.attachmentHashes[j], posts[i].number));
             }
+            
+            //отсюда и до конца for - переместить в создание модели, распараллелить
+            model.buildSpannedHeader(showIndex ? i+1 : -1, source.boardModel.bumpLimit, reduceNames ? source.boardModel.defaultUserName : null,
+                    source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? posts[i].parentThread : null);
+            
+            if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
+                model.hidden = isHiddenDelegate.
+                        isHidden(source.pageModel.chanName, source.pageModel.boardName, source.pageModel.threadNumber, posts[i].number);
+            } else if (source.pageModel.type == UrlPageModel.TYPE_BOARDPAGE || source.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE) {
+                model.hidden = isHiddenDelegate.isHidden(source.pageModel.chanName, source.pageModel.boardName, posts[i].number, null);
+            }
+            if (!model.hidden && ( //автоскрытие
+                    source.pageModel.type == UrlPageModel.TYPE_THREADPAGE ||
+                    source.pageModel.type == UrlPageModel.TYPE_BOARDPAGE ||
+                    source.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE)) {
+                for (AutohideActivity.CompiledAutohideRule rule : autohideRules) {
+                    if (
+                            (rule.inComment && model.spannedComment != null && rule.pattern.matcher(model.spannedComment).find()) ||
+                            (rule.inSubject && posts[i].subject != null && rule.pattern.matcher(posts[i].subject).find()) ||
+                            (rule.inName &&
+                                    (posts[i].name != null && rule.pattern.matcher(posts[i].name).find()) ||
+                                    (posts[i].trip != null && rule.pattern.matcher(posts[i].trip).find()))) {
+                        model.hidden = true;
+                        model.autohideReason = rule.regex;
+                    }
+                }
+            }
         }
-        
-        Logger.d(TAG, "time: " + (System.currentTimeMillis() - t0) + "; " + threads + " threads");
         
         if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
             for (PresentationItemModel model : presentationList) {
@@ -317,86 +340,6 @@ public class PresentationModel {
             }
         }
         notReady = false;
-    }
-    
-    private PresentationItemModel createItemModel(PostModel post, boolean openSpoilers, int index) {
-        PresentationItemModel model = new PresentationItemModel(
-                post,
-                source.pageModel.chanName,
-                source.pageModel.boardName,
-                source.pageModel.type == UrlPageModel.TYPE_THREADPAGE ? source.pageModel.threadNumber : null,
-                dateFormat,
-                spanClickListener,
-                imageGetter,
-                ThemeUtils.ThemeColors.getInstance(theme),
-                openSpoilers,
-                floatingModels);
-        
-        model.buildSpannedHeader(index, source.boardModel.bumpLimit, reduceNames ? source.boardModel.defaultUserName : null,
-                source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? post.parentThread : null);
-        
-        if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
-            model.hidden = isHiddenDelegate.
-                    isHidden(source.pageModel.chanName, source.pageModel.boardName, source.pageModel.threadNumber, post.number);
-        } else if (source.pageModel.type == UrlPageModel.TYPE_BOARDPAGE || source.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE) {
-            model.hidden = isHiddenDelegate.isHidden(source.pageModel.chanName, source.pageModel.boardName, post.number, null);
-        }
-        if (!model.hidden && ( //автоскрытие
-                source.pageModel.type == UrlPageModel.TYPE_THREADPAGE ||
-                source.pageModel.type == UrlPageModel.TYPE_BOARDPAGE ||
-                source.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE)) {
-            for (AutohideActivity.CompiledAutohideRule rule : autohideRules) {
-                if (
-                        (rule.inComment && model.spannedComment != null && rule.pattern.matcher(model.spannedComment).find()) ||
-                        (rule.inSubject && post.subject != null && rule.pattern.matcher(post.subject).find()) ||
-                        (rule.inName &&
-                                (post.name != null && rule.pattern.matcher(post.name).find()) ||
-                                (post.trip != null && rule.pattern.matcher(post.trip).find()))) {
-                    model.hidden = true;
-                    model.autohideReason = rule.regex;
-                }
-            }
-        }
-        return model;
-    }
-    
-    private class SMPHandler {
-        private final CancellableTask task;
-        private final Executor executor;
-        private LinkedList<SMPTask> queue;
-        
-        private SMPHandler(int threadsCount, CancellableTask task) {
-            this.task = task;
-            this.executor = Executors.newFixedThreadPool(threadsCount);
-            this.queue = new LinkedList<>();
-        }
-        
-        private void enqueue(final PostModel post, final boolean openSpoilers, final int index) {
-            final SMPTask smpTask = new SMPTask();
-            queue.add(smpTask);
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    if (task.isCancelled()) return;
-                    PresentationItemModel model = createItemModel(post, openSpoilers, index);
-                    smpTask.result = model;
-                    smpTask.isDone = true;
-                }
-            });
-        }
-        
-        private PresentationItemModel dequeue() {
-            if (task.isCancelled() || queue.isEmpty()) return null;
-            SMPTask smpTask = queue.removeFirst();
-            while (!smpTask.isDone && !task.isCancelled()) Thread.yield();
-            if (task.isCancelled()) return null;
-            return smpTask.result;
-        }
-    }
-    
-    private static class SMPTask {
-        private volatile boolean isDone = false;
-        private PresentationItemModel result = null;
     }
     
     /**
