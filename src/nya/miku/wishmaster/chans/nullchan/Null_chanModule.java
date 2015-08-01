@@ -94,7 +94,7 @@ public class Null_chanModule extends AbstractWakabaModule {
     
     @Override
     public Drawable getChanFavicon() {
-        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_0chan, null);
+        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_0chan_1, null);
     }
     
     @Override
