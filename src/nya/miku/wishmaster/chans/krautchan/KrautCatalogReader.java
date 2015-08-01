@@ -149,7 +149,7 @@ public class KrautCatalogReader implements Closeable {
                 attachment.width = -1;
                 attachment.height = -1;
                 attachment.thumbnail = "/thumbnails/" + readUntilSequence(FILTERS_CLOSE[filterIndex]);
-                attachment.path = attachment.thumbnail;
+                attachment.path = attachment.thumbnail.replace("/thumbnails/", "/files/");
                 currentThread.posts[0].attachments = new AttachmentModel[] { attachment };
                 break;
             case FILTER_OMITTED:
