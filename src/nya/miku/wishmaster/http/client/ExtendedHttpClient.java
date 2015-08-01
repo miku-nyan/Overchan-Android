@@ -18,11 +18,8 @@
 
 package nya.miku.wishmaster.http.client;
 
-import java.lang.reflect.Field;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.net.ssl.SSLContext;
 
 import nya.miku.wishmaster.common.Logger;
@@ -39,8 +36,6 @@ import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCookieStoreHC4;
 import org.apache.http.impl.client.HttpClients;
-
-import android.os.Build;
 
 /**
  * Основной HTTP-клиент, используемый в проекте.<br>
@@ -115,7 +110,6 @@ public class ExtendedHttpClient extends HttpClientWrapper {
      * @param safe безопасность, если false, проверка имени и сертификата будет отключена
      */
     private static LayeredConnectionSocketFactory obtainSSLSocketFactory(boolean safe) {
-        fixSupportedProtocols();
         if (safe) {
             return SSLConnectionSocketFactory.getSocketFactory();
         } else {
@@ -138,22 +132,4 @@ public class ExtendedHttpClient extends HttpClientWrapper {
             return true;
         }
     };
-    
-    private static AtomicBoolean fixedSupportedProtocols = new AtomicBoolean(false);
-    
-    private static void fixSupportedProtocols() {
-        if (fixedSupportedProtocols.compareAndSet(false, true)) {
-            try {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.FROYO) {
-                    Logger.d(TAG, "fix 'supportedProtocol' value of SSL socket factory");
-                    Class<?> classOpenSSLSocketImpl = Class.forName("org.apache.harmony.xnet.provider.jsse.OpenSSLSocketImpl");
-                    Field field = classOpenSSLSocketImpl.getDeclaredField("supportedProtocols");
-                    field.setAccessible(true);
-                    field.set(null, new String[] { "SSLv3", "SSLv3", "TLSv1" });
-                }
-            } catch (Exception e) {
-                Logger.e(TAG, e);
-            }
-        }
-    }
 }
