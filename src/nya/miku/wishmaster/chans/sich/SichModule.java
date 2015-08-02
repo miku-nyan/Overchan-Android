@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +43,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
+import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
@@ -165,6 +167,14 @@ public class SichModule extends AbstractVichanModule {
             "class=\"quote dice\">",
             "class=\"unkfunc\">"
         );
+        if (boardName.equals("int")) {
+            String country = object.optString("country");
+            if (country != null && country.length() > 0) {
+                model.icons = new BadgeIconModel[] { new BadgeIconModel() };
+                model.icons[0].source = "/static/flags/" + country.toLowerCase(Locale.US) + ".png";
+                model.icons[0].description = object.optString("country_name", country);
+            }
+        }
         return model;
     }
     
