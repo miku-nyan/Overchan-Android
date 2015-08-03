@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
@@ -283,7 +284,15 @@ public class DobroModule extends AbstractChanModule {
         model.parentThread = parentThread;
         model.comment = json.optString("message_html", "");
         if (TextUtils.isEmpty(model.comment)) {
-            model.comment = json.optString("message", "").replace("\r\n", "<br />").replace("\n", "<br />");
+            model.comment = StringEscapeUtils.escapeHtml4(json.optString("message", "")).
+                    replace("\r\n", "<br />").replace("\n", "<br />").
+                    replaceAll("[_\\*][_\\*](.*?)[_\\*][_\\*]", "<b>$1</b>").
+                    replaceAll("[_\\*](.*?)[_\\*]", "<i>$1</i>").
+                    replaceAll("%%(.*?)%%", "<span class=\"spoiler\">$1</spoiler>").
+                    replaceAll("`(.*?)`", "<tt>$1</tt>").
+                    replaceAll("\\bhttps?://.+\\b", "<a href=\"$0\">$0</a>").
+                    replaceAll("&gt;&gt;(\\d+)\\b", "<a href=\"#i$1\">&gt;&gt;$1</a>").
+                    replaceAll("(^|<br />)(&gt;.*?)($|<br />)", "$1<span class=\"unkfunc\">$2</span>$3");
         } else {
             model.comment = model.comment.replaceAll("<blockquote depth=\"\\d*\">", "<blockquote class=\"unkfunc\">");
         }
