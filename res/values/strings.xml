@@ -226,6 +226,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="grid_gallery_select">Select for downloading</string>
     <string name="grid_gallery_download">Download</string>
+    <string name="grid_gallery_dlg_title">Downloading</string>
+    <string name="grid_gallery_dlg_message">Wait</string>
     
     <string name="postform_title_post">Add a Reply</string>
     <string name="postform_title_thread">New Thread</string>

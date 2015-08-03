@@ -236,6 +236,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="grid_gallery_select">Обрати для звантаження</string>
     <string name="grid_gallery_download">Звантажити</string>
+    <string name="grid_gallery_dlg_title">Звантаження</string>
+    <string name="grid_gallery_dlg_message">Зачекайте</string>
     
     <string name="postform_title_post">Новий пост</string>
     <string name="postform_title_thread">Новий тред</string>

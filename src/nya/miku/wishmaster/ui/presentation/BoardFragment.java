@@ -3066,13 +3066,28 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     notifyDataSetChanged();
                 }
             }
-            public void downloadSelected() {
-                boolean toast = false;
-                for (int i=0; i<isSelected.length; ++i)
-                    if (isSelected[i])
-                        if (!downloadFile(getItem(i).getLeft(), true))
-                            toast = true;
-                if (toast) Toast.makeText(activity, R.string.notification_download_exists_or_in_queue, Toast.LENGTH_LONG).show();
+            public void downloadSelected(final Runnable onFinish) {
+                final Dialog progressDialog = ProgressDialog.show(activity,
+                        resources.getString(R.string.grid_gallery_dlg_title), resources.getString(R.string.grid_gallery_dlg_message), true, false);
+                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean flag = false;
+                        for (int i=0; i<isSelected.length; ++i)
+                            if (isSelected[i])
+                                if (!downloadFile(getItem(i).getLeft(), true))
+                                    flag = true;
+                        final boolean toast = flag;
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (toast) Toast.makeText(activity, R.string.notification_download_exists_or_in_queue, Toast.LENGTH_LONG).show();
+                                progressDialog.dismiss();
+                                onFinish.run();
+                            }
+                        });
+                    }
+                }).start();
             }
         }
         
@@ -3156,10 +3171,14 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             btnDownload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    gridAdapter.downloadSelected();
-                    btnToSelecting.setVisibility(View.VISIBLE);
-                    layoutSelectingButtons.setVisibility(View.GONE);
-                    gridAdapter.setSelectingMode(false);
+                    gridAdapter.downloadSelected(new Runnable() {
+                        @Override
+                        public void run() {
+                            btnToSelecting.setVisibility(View.VISIBLE);
+                            layoutSelectingButtons.setVisibility(View.GONE);
+                            gridAdapter.setSelectingMode(false);
+                        }
+                    });
                 }
             });
             
