@@ -56,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_about_version">PREF_KEY_ABOUT_VERSION</string>
     <string name="pref_key_about_license">PREF_KEY_ABOUT_LICENSE</string>
     <string name="pref_key_download_dir">PREF_KEY_DOWNLOAD_DIR</string>
+    <string name="pref_key_download_lazy">PREF_KEY_DOWNLOAD_LAZY</string>
     <string name="pref_key_download_thumbs">PREF_KEY_DOWNLOAD_THUMBS1</string>
     <string name="pref_download_thumbs_value_default">@string/pref_download_thumbs_value_always</string>
     <string name="pref_download_thumbs_value_always">PREF_DOWNLOAD_THUMBS_VALUE_ALWAYS</string>

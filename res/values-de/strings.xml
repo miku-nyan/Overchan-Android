@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Overchan</string>
     
     <string name="drawer_open">Drawer öffnen</string>
@@ -251,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="posting_post">Sendung eines Posten</string>
     <string name="posting_post_format">zu Thread /%2$s/ %3$s (%1$s)</string>
     <string name="posting_thread">Hinzufügung eines neuen Thread</string>
-    <string name="posting_thread_format">an Board /%2$s/ (%1$s)</string>
+    <string name="posting_thread_format" tools:ignore="Typos">an Board /%2$s/ (%1$s)</string>
     <string name="posting_error">Senden fehlgeschlagen</string>
     <string name="posting_error_interactive_format">%s Überprüfung wurde beantragt</string>
     <string name="posting_error_default">Ein unbekannter Fehler</string>
@@ -500,6 +500,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Verzeichnis für Herunterladen</string>
     <string name="pref_download_dir_summary">Das Verzeichnis, in dem Dateien gespeichert werden sollen</string>
+    <string name="pref_download_lazy_title">Lazy Loading</string>
+    <string name="pref_download_lazy_summary">Nur Thumbnails laden, die derzeit sichtbar sind</string>
     <string name="pref_download_thumbs_title">Thumbnails automatisch herunterladen</string>
     <string-array name="pref_download_thumbs_choices">
         <item>Immer</item>

@@ -197,6 +197,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:entries="@array/pref_download_thumbs_choices"
             android:entryValues="@array/pref_download_thumbs_values"
             android:defaultValue="@string/pref_download_thumbs_value_default" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_download_lazy"
+            android:title="@string/pref_download_lazy_title"
+            android:summary="@string/pref_download_lazy_summary" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_date_time" >

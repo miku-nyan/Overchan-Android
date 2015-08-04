@@ -499,6 +499,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Downloads directory</string>
     <string name="pref_download_dir_summary">The directory where files should be saved</string>
+    <string name="pref_download_lazy_title">Lazy downloading</string>
+    <string name="pref_download_lazy_summary">Download only thumbnails that are visible currently</string>
     <string name="pref_download_thumbs_title">Download thumbnails automatically</string>
     <string-array name="pref_download_thumbs_choices">
         <item>Always</item>

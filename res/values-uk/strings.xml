@@ -509,6 +509,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Тека звантажень</string>
     <string name="pref_download_dir_summary">Тека, до якої будуть звантажуватися файли</string>
+    <string name="pref_download_lazy_title">Лінива завантаження</string>
+    <string name="pref_download_lazy_summary">Завантажувати тільки прев’ю, які видно в даний момент</string>
     <string name="pref_download_thumbs_title">Автоматично звантажувати прев’ю</string>
     <string-array name="pref_download_thumbs_choices">
         <item>Завжди</item>

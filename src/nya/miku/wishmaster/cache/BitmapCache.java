@@ -91,6 +91,18 @@ public class BitmapCache {
     }
     
     /**
+     * Проверить, существует ли картинка в кэше
+     * @param hash хэш (уникальный для картинки)
+     * @return true, если картинка в наличии
+     */
+    public boolean isInCache(String hash) {
+        if (getFromMemory(hash) != null) return true;
+        File file = fileCache.get(FileCache.PREFIX_BITMAPS + hash);
+        if (file != null && file.exists()) return true;
+        return false;
+    }
+    
+    /**
      * Попытаться получить картинку из кэша (сначала берётся из памяти, в случае отсутствия - из файлового кэша) 
      * @param hash хэш (уникальный для картинки)
      * @return Bitmap с картинкой, или null, если отсутствует и в памяти, и в файловом кэше

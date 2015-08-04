@@ -33,6 +33,7 @@ import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.cloudflare.InteractiveException;
 import nya.miku.wishmaster.ui.MainActivity;
+import nya.miku.wishmaster.ui.downloading.BackgroundThumbDownloader;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.presentation.PresentationModel;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
@@ -160,7 +161,7 @@ public class TabsTrackerService extends Service {
         running = true;
     }
     
-    private void doUpdate(CancellableTask task) {
+    private void doUpdate(final CancellableTask task) {
         if (backgroundTabs) {
             int tabsArrayLength = tabsState.tabsArray.size();
             TabModel[] tabsArray = new TabModel[tabsArrayLength]; //avoid of java.util.ConcurrentModificationException
@@ -190,6 +191,7 @@ public class TabsTrackerService extends Service {
                     updatingTask = new PageLoaderFromChan(serializablePage, new PageLoaderFromChan.PageLoaderCallback() {
                         @Override
                         public void onSuccess() {
+                            BackgroundThumbDownloader.download(serializablePage, task);
                             tab.autoupdateError = false;
                             int newCount = serializablePage.posts != null ? serializablePage.posts.length : 0;
                             if (oldCount != newCount) {

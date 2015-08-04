@@ -96,6 +96,10 @@ public class ApplicationSettings {
         }
     }
     
+    public boolean isLazyDownloading() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_download_lazy), true);
+    }
+    
     public boolean isPopupLinks() {
         return true;
     }

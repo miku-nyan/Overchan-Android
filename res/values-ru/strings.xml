@@ -506,6 +506,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_about_license_summary">GPLv3</string>
     <string name="pref_download_dir_title">Директория загрузок</string>
     <string name="pref_download_dir_summary">Директория, куда будут скачиваться файлы</string>
+    <string name="pref_download_lazy_title">Ленивая загрузка</string>
+    <string name="pref_download_lazy_summary">Скачивать только миниатюры, которые видны в данный момент</string>
     <string name="pref_download_thumbs_title">Загружать миниатюры автоматически</string>
     <string-array name="pref_download_thumbs_choices">
         <item>Всегда</item>
