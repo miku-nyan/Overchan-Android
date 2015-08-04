@@ -133,6 +133,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private int currentPosition = 0;
     private int previousPosition = -1;
     
+    private String customSubdir = null;
+    
     private boolean firstScroll = true;
     
     private Menu menu;
@@ -223,6 +225,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         PresentationModel presentationModel = MainApplication.getInstance().pagesCache.getPresentationModel(pagehash);
         if (presentationModel != null) {
             boolean isThread = presentationModel.source.pageModel.type == UrlPageModel.TYPE_THREADPAGE;
+            customSubdir = BoardFragment.getCustomSubdir(presentationModel.source.pageModel);
             List<Triple<AttachmentModel, String, String>> list = presentationModel.getAttachments();
             presentationModel = null;
             if (list != null) {
@@ -692,6 +695,16 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 String filename = file.getAbsolutePath();
                 while (downloadingLocker.isLocked(filename)) Thread.yield();
                 if (isCancelled()) return;
+            }
+            if (customSubdir != null) {
+                if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
+                    File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
+                    dir = new File(dir, customSubdir);
+                    file = new File(dir, ChanModels.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
+                    String filename = file.getAbsolutePath();
+                    while (downloadingLocker.isLocked(filename)) Thread.yield();
+                    if (isCancelled()) return;
+                }
             }
             if (!file.exists() || file.isDirectory() || file.length() == 0) {
                 runOnUiThread(new Runnable() {

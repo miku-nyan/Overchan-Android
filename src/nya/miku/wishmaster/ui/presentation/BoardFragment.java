@@ -2867,10 +2867,15 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         downloadFile(attachment, false);
     }
     
+    public static String getCustomSubdir(UrlPageModel pageModel) {
+        if (pageModel == null || pageModel.boardName == null || pageModel.threadNumber == null || pageModel.type != UrlPageModel.TYPE_THREADPAGE)
+            return null;
+        return pageModel.boardName + "-" + pageModel.threadNumber + "_originals";
+    }
+    
     private boolean downloadFile(AttachmentModel attachment, boolean fromGridGallery) {
         if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return true;
-        String subdir = (fromGridGallery && tabModel.pageModel.type == UrlPageModel.TYPE_THREADPAGE) ?
-                (tabModel.pageModel.boardName + "-" + tabModel.pageModel.threadNumber + "_originals") : null;
+        String subdir = (fromGridGallery && tabModel.pageModel.type == UrlPageModel.TYPE_THREADPAGE) ? getCustomSubdir(tabModel.pageModel) : null;
         DownloadingService.DownloadingQueueItem item = (subdir != null) ?
                 new DownloadingService.DownloadingQueueItem(attachment, subdir, presentationModel.source.boardModel) :
                     new DownloadingService.DownloadingQueueItem(attachment, presentationModel.source.boardModel);
