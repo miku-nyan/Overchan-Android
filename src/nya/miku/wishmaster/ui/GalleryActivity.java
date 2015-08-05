@@ -211,6 +211,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         
         AttachmentModel attachment = (AttachmentModel) getIntent().getSerializableExtra(EXTRA_ATTACHMENT);
         boardModel = (BoardModel) getIntent().getSerializableExtra(EXTRA_BOARDMODEL);
+        if (boardModel == null) return;
         String pagehash = getIntent().getStringExtra(EXTRA_PAGEHASH);
         String localFilename = getIntent().getStringExtra(EXTRA_LOCALFILENAME);
         if (localFilename != null) {

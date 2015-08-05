@@ -1058,6 +1058,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 imagesDownloadExecutor, imagesDownloadTask, listView, handler, staticSettings);
                         ((VolatileSpanClickListener)presentationModel.spanClickListener).setListener(BoardFragment.this);
                         presentationModel.setFloatingModels(floatingModels);
+                        if (presentationModel == null) return;
                         if (presentationModel.isNotReady()) presentationModel.updateViewModels(true, this, null);
                         toListView(forceUpdate);
                         return;
@@ -1096,6 +1097,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             imagesDownloadExecutor, imagesDownloadTask, listView, handler, staticSettings);
                     ((VolatileSpanClickListener)presentationModel.spanClickListener).setListener(BoardFragment.this);
                     presentationModel.setFloatingModels(floatingModels);
+                    if (presentationModel == null) return;
                     if (presentationModel.isNotReady()) presentationModel.updateViewModels(isThreadPage, this, null);
                     toListView(forceUpdate);
                 } else {
@@ -1437,7 +1439,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             @Override
             public void onClick(View v) {
-                fragmentRef.get().openAttachment((AttachmentModel)v.getTag());
+                BoardFragment fragment = fragmentRef.get();
+                if (fragment != null) fragment.openAttachment((AttachmentModel)v.getTag());
             }
         }
         
