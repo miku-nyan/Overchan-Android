@@ -459,4 +459,10 @@ public class InfinityModule extends AbstractVichanModule {
         }
     }
     
+    @Override
+    public String fixRelativeUrl(String url) {
+        if (url.startsWith("?/")) url = url.substring(1);
+        return super.fixRelativeUrl(url);
+    }
+    
 }
