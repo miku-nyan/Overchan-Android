@@ -26,6 +26,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class FourchanJsonMapper {
@@ -97,6 +98,7 @@ public class FourchanJsonMapper {
         String id = object.optString("id", "");
         model.sage = id.equalsIgnoreCase("Heaven");
         if (!id.equals("")) model.name += (" ID:" + id);
+        if (!id.equals("") && !id.equalsIgnoreCase("Heaven")) model.color = CryptoUtils.hashIdColor(id);
         model.timestamp = object.getLong("time") * 1000;
         model.parentThread = object.optString("resto", "0");
         if (model.parentThread.equals("0")) model.parentThread = model.number;

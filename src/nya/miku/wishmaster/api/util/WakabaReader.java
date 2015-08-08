@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import android.graphics.Color;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
@@ -501,6 +502,7 @@ public class WakabaReader implements Closeable {
         } else {
             currentPost.name = StringEscapeUtils.unescapeHtml4(raw).trim();
         }
+        if (currentPost.name.contains("<span class=\"adminname\">")) currentPost.color = Color.RED;
         if (currentPost.name.startsWith("<")) currentPost.name = currentPost.name.replaceAll("<[^>]*>", "");
     }
     
@@ -514,6 +516,7 @@ public class WakabaReader implements Closeable {
      * @param date строка с датой
      */
     protected void parseDate(String date) {
+        date = date.replaceAll("<[^>]*>", "").trim();
         if (date.length() > 0) {
             try {
                 currentPost.timestamp = dateFormat.parse(date).getTime();

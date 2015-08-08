@@ -26,6 +26,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.graphics.Color;
+
 public class CryptoUtils {
     private CryptoUtils() {}
     
@@ -129,5 +131,18 @@ public class CryptoUtils {
         return sb.toString();
     }
     
+    /**
+     * Получить значение цвета для данного id (строки)
+     */
+    public static int hashIdColor(String id) {
+        if (id.length() == 6) {
+            try {
+                return Color.rgb(
+                        Integer.parseInt(id.substring(0, 2), 16), Integer.parseInt(id.substring(2, 4), 16), Integer.parseInt(id.substring(4), 16));
+            } catch (Exception e) {}
+        }
+        Random random = new Random(id.hashCode());
+        return Color.rgb(random.nextInt() % 256, random.nextInt() % 256, random.nextInt() % 256);
+    }
     
 }

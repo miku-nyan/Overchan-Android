@@ -38,9 +38,11 @@ import nya.miku.wishmaster.ui.presentation.FlowTextHelper.FloatingModel;
 import nya.miku.wishmaster.ui.presentation.HtmlParser.ImageGetter;
 import nya.miku.wishmaster.ui.presentation.ThemeUtils.ThemeColors;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -308,6 +310,14 @@ public class PresentationItemModel {
             builder.append(" ").append(sageMark);
             builder.setSpan(new ForegroundColorSpan(themeColors.sageForeground), positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             builder.setSpan(new RelativeSizeSpan(0.8f), positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        
+        if (sourceModel.color != Color.TRANSPARENT) {
+            positionStart = positionEnd + 1;
+            positionEnd = positionStart + 1;
+            builder.append(" \u25A0");
+            builder.setSpan(new ForegroundColorSpan(Color.TRANSPARENT), positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            builder.setSpan(new BackgroundColorSpan(sourceModel.color), positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         
         String name = sourceModel.name;

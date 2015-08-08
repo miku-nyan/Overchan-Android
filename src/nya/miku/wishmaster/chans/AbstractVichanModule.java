@@ -47,6 +47,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaUtils;
+import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -212,6 +213,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         String id = object.optString("id", "");
         model.sage = id.equalsIgnoreCase("Heaven") || model.email.toLowerCase(Locale.US).contains("sage");
         if (!id.equals("")) model.name += (" ID:" + id);
+        if (!id.equals("") && !id.equalsIgnoreCase("Heaven")) model.color = CryptoUtils.hashIdColor(id);
         model.timestamp = object.getLong("time") * 1000;
         model.parentThread = object.optString("resto", "0");
         if (model.parentThread.equals("0")) model.parentThread = model.number;
@@ -244,6 +246,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
                     if (embedAttachment.thumbnail.startsWith("//")) embedAttachment.thumbnail = (useHttps() ? "https:" : "http:") + embedAttachment.thumbnail;
                 }
                 embedAttachment.isSpoiler = isSpoiler;
+                embedAttachment.size = -1;
                 if (attachments != null) attachments.add(embedAttachment); else attachments = Collections.singletonList(embedAttachment);
             }
         }

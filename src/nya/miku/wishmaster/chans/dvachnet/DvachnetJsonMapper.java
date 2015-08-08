@@ -37,7 +37,7 @@ public class DvachnetJsonMapper {
         model.nsfw = nsfw;
         model.uniqueAttachmentNames = true;
         model.timeZoneId = "GMT+3";
-        model.defaultUserName = "Anon";
+        model.defaultUserName = "Аноним";
         model.bumpLimit = 500;
         model.readonlyBoard = false;
         model.requiredFileForNewThread = shortName.equals("d") ? false : true;

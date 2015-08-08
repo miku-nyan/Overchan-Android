@@ -95,6 +95,8 @@ public class ChanModels {
                 for (Object o : new Object[] { attach.thumbnail, attach.path, attach.originalName, attach.type, attach.size, attach.isSpoiler })
                     hash = hash*31 + (o==null ? 0 : o.hashCode());
         
+        if (m.color != 0) hash = hash*31 + m.color;
+        
         return hash;
     }
     

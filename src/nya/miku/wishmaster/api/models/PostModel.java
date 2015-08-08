@@ -22,6 +22,8 @@ import java.io.Serializable;
 
 import com.esotericsoftware.kryo.serializers.TaggedFieldSerializer.Tag;
 
+import android.graphics.Color;
+
 /**
  * Модель поста (сообщения)
  * @author miku-nyan
@@ -35,6 +37,8 @@ public class PostModel implements Serializable {
     @Tag(0) public String number;
     /** Имя отправителя */
     @Tag(1) public String name;
+    /** Цвет, отображаемый в заголовки сообщения (напр. для визуального определения id пользователя) */
+    @Tag(13) public int color = Color.TRANSPARENT;
     /** Тема сообщения */
     @Tag(2) public String subject;
     /** Комментарий в формате HTML.<br>
