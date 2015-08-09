@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Overchan Android (Meta Imageboard Client)
  * Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
  *     
@@ -70,10 +70,8 @@ public class HoneyModule extends AbstractVichanModule {
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "m", "Meta", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Random", "", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "honey", "Honey", "", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Anime & Manga", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "g", "Technology", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "λ", "Programming", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tech", "Technology", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "v", "Video Games", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pol", "Politically Incorrect", "", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "n", "News", "", false),
