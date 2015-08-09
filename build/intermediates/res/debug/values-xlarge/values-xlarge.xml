@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- From: file:/C:/Users/Keiran/Documents/Overchan-Android/res/values-xlarge/dimens.xml -->
-    <eat-comment/>
-    <dimen name="inpost_image_size">24dp</dimen>
-    <dimen name="post_badge_size">24dp</dimen>
-    <dimen name="post_thumbnail_size">144dp</dimen>
-</resources>

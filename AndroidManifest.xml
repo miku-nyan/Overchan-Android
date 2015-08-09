@@ -136,9 +136,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="arhivach.org" />
                 <data android:host="www.arhivach.org" />
-
-                <data android:host="honeychan.net" />
-                <data android:host="www.honeychan.net" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
