@@ -76,7 +76,7 @@ public class InfinityModule extends AbstractVichanModule {
     
     static final String CHAN_NAME = "8chan";
     private static final String DEFAULT_DOMAIN = "8ch.net";
-    private static final String ONION_DOMAIN = "fullchan4jtta4sx.onion";
+    private static final String ONION_DOMAIN = "oxwugzccvk3dk6tj.onion";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "8chan.co" };
     
     private static final String[] CATALOG = new String[] { "Catalog" };
