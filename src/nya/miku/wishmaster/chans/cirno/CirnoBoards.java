@@ -66,7 +66,6 @@ public class CirnoBoards {
         addBoard("dev", "Разработка", "Общее", "Стив Балмер", false);
         addBoard("maid", "Служанки", "Общее", "Госюдзин-сама", false);
         addBoard("sp", "Спорт", "Общее", "Спортакус", false);
-        addBoard("t", "Торренты", "Общее", "Аноним", true); //???
         addBoard("tr", "Транспорт", "Общее", "Аноним", false);
         addBoard("tu", "Туризм", "Общее", "Аноним", false);
         addBoard("ph", "Фото", "Общее", "Аноним", false);
