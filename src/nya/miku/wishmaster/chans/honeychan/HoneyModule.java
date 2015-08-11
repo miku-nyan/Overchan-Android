@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Overchan Android (Meta Imageboard Client)
  * Copyright (C) 2014-2015  miku-nyan <https://github.com/miku-nyan>
  *     
