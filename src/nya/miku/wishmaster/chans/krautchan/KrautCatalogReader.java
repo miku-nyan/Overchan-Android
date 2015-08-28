@@ -140,18 +140,17 @@ public class KrautCatalogReader implements Closeable {
                 currentThread.posts[0].number = readUntilSequence(FILTERS_CLOSE[filterIndex]);
                 break;
             case FILTER_THREAD_TITLE:
-            	String headerHtml = readUntilSequence(FILTERS_CLOSE[filterIndex]);
-            	int countryBallIndex = headerHtml.indexOf("<img class=\"post_country\" src=\"/images/balls/");
-            	if (countryBallIndex != -1) {
-            		int start = countryBallIndex + 31;
-            		int end = headerHtml.indexOf('\"', start);
-            		if (end != -1) {
-            			BadgeIconModel icon = new BadgeIconModel();
-                    	icon.source = headerHtml.substring(start, end);
-                    	System.out.println(icon.source);
-                    	currentThread.posts[0].icons = new BadgeIconModel[] { icon };
-            		}
-            	}
+                String headerHtml = readUntilSequence(FILTERS_CLOSE[filterIndex]);
+                int countryBallIndex = headerHtml.indexOf("<img class=\"post_country\" src=\"/images/balls/");
+                if (countryBallIndex != -1) {
+                    int start = countryBallIndex + 31;
+                    int end = headerHtml.indexOf('\"', start);
+                    if (end != -1) {
+                        BadgeIconModel icon = new BadgeIconModel();
+                        icon.source = headerHtml.substring(start, end);
+                        currentThread.posts[0].icons = new BadgeIconModel[] { icon };
+                    }
+                }
                 currentThread.posts[0].subject = StringEscapeUtils.unescapeHtml4(headerHtml.replaceAll("<[^>]*>", "")).trim();
                 break;
             case FILTER_THUMBNAIL:

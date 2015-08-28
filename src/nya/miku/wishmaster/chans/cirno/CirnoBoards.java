@@ -37,7 +37,7 @@ public class CirnoBoards {
     private static final SimpleBoardModel[] SIMPLE_ARRAY_IICHAN;
     
     static {
-    	addBoard("es", "Бесконечное лето", "На пробу", "Пионер", false);
+        addBoard("es", "Бесконечное лето", "На пробу", "Пионер", false);
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
         addBoard("au", "Автомобили", "Общее", "Джереми Кларксон", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
