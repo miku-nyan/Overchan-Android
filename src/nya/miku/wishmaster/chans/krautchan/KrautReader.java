@@ -54,7 +54,7 @@ public class KrautReader implements Closeable {
     private static final Pattern ATTACHMENT_FILENAME_PATTERN =
             Pattern.compile("<span id=\"filename_[^>]*>(.*?)</span>", Pattern.DOTALL);
     private static final Pattern ATTACHMENT_LINKS_PATTERN =
-            Pattern.compile("a\\s+href=\"/files/(\\d+\\..+?)\".+?src=\"?/thumbnails/(\\d+\\..+?)\\s\"?", Pattern.DOTALL);
+            Pattern.compile("a\\s+href=\"/files/(\\d+\\..+?)\"(?:.+?src=\"?/thumbnails/(\\d+\\..+?)\\s\"?)?", Pattern.DOTALL);
     private static final Pattern ATTACHMENT_INFO_PATTERN =
             Pattern.compile("<span class=\"fileinfo\">\\s*(.*?),\\s*(.*?),\\s*(.*?)</span>", Pattern.DOTALL);
     private static final Pattern ATTACHMENT_PX_SIZE_PATTERN = Pattern.compile("(\\d+)[x×х](\\d+)"); // \u0078 \u00D7 \u0445
@@ -317,12 +317,13 @@ public class KrautReader implements Closeable {
             model.width = -1;
             model.height = -1;
             model.path = "/files/" + attachmentMatcher.group(1);
-            model.thumbnail = "/thumbnails/" + attachmentMatcher.group(2);
+            String thumbnailGroup = attachmentMatcher.group(2);
+            model.thumbnail = thumbnailGroup == null ? null : "/thumbnails/" + thumbnailGroup;
             String ext = model.path.substring(model.path.lastIndexOf('.') + 1).toLowerCase(Locale.US);
             if (ext.equals("png") || ext.equals("jpg") || ext.equals("jpeg")) model.type = AttachmentModel.TYPE_IMAGE_STATIC;
             else if (ext.equals("gif")) model.type = AttachmentModel.TYPE_IMAGE_GIF;
             else if (ext.equals("webm")) model.type = AttachmentModel.TYPE_VIDEO;
-            else if (ext.equals("mp3") || ext.equals("ogg")) model.type = AttachmentModel.TYPE_VIDEO;
+            else if (ext.equals("mp3") || ext.equals("ogg")) model.type = AttachmentModel.TYPE_AUDIO;
             Matcher origFilenameMatcher = ATTACHMENT_FILENAME_PATTERN.matcher(html);
             if (origFilenameMatcher.find()) {
                 model.originalName = StringEscapeUtils.unescapeHtml4(origFilenameMatcher.group(1).replaceAll("<[^>]*>", "").trim());
