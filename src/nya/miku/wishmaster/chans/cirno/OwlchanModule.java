@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans.owlchan;
+package nya.miku.wishmaster.chans.cirno;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -154,6 +154,7 @@ public class OwlchanModule extends AbstractWakabaModule {
             default: board.defaultUserName = "Аноним"; break;
         }
         board.timeZoneId = "GMT+3";
+        if (shortName.equals("es")) board.bumpLimit = 1000;
         board.readonlyBoard = shortName.equals("o");
         board.requiredFileForNewThread = !shortName.equals("d");
         board.allowDeletePosts = true;
