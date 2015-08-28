@@ -37,6 +37,7 @@ public class CirnoBoards {
     private static final SimpleBoardModel[] SIMPLE_ARRAY_IICHAN;
     
     static {
+    	addBoard("es", "Бесконечное лето", "На пробу", "Пионер", false);
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
         addBoard("au", "Автомобили", "Общее", "Джереми Кларксон", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
@@ -71,7 +72,7 @@ public class CirnoBoards {
         addBoard("ph", "Фото", "Общее", "Аноним", false);
         addBoard("fr", "Фурри", "Общее", "Аноним", false);
         addBoard("s", "Электроника и ПО", "Общее", "Чии", false);
-        addBoard("a", "Аниме", "Японская культура", "Мокона", false);
+        addBoard("a", "Аниме и манга", "Японская культура", "Мокона", false);
         addBoard("aa", "Аниме-арт", "Японская культура", "Ракка", false);
         addBoard("azu", "Azumanga Daioh", "Японская культура", "Осака", false);
         addBoard("vn", "Визуальные новеллы", "Японская культура", "Сэйбер", false);
@@ -80,7 +81,7 @@ public class CirnoBoards {
         addBoard("abe", "ёситоси абэ", "Японская культура", "Chada", false);
         addBoard("c", "Косплей", "Японская культура", "Аноним", false);
         addBoard("ls", "Lucky☆Star", "Японская культура", "Цукаса", false);
-        addBoard("ma", "Манга", "Японская культура", "Иноуэ Орихимэ", false);
+        //addBoard("ma", "Манга", "Японская культура", "Иноуэ Орихимэ", false);
         addBoard("me", "Меха", "Японская культура", "Лакс Кляйн", false);
         addBoard("rm", "Rozen Maiden", "Японская культура", "Суйгинто", false);
         addBoard("tan", "Сетевые персонажи", "Японская культура", "Уныл-тян", false);
@@ -127,7 +128,7 @@ public class CirnoBoards {
         model.defaultUserName = defaultPosterName;
         model.bumpLimit = 500;
         
-        model.readonlyBoard = name.equals("o") || name.equals("w") || name.equals("abe");
+        model.readonlyBoard = name.equals("o") || name.equals("w") || name.equals("abe") || name.equals("ma");
         model.requiredFileForNewThread = !name.equals("d");
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;

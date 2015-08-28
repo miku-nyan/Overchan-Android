@@ -298,6 +298,8 @@ public class CirnoModule extends AbstractChanModule {
                 return "http://hatsune.ru/b/";
             } else if (model.boardName.equals("tu")) {
                 return WakabaUtils.buildUrl(model, NowereModule.NOWERE_URL_HTTP);
+            } else if (model.boardName.equals("es")) {
+            	return "http://owlchan.ru/es/";
             } else if (CirnoBoards.is410Board(model.boardName)) {
                 return WakabaUtils.buildUrl(model, Chan410Module.CHAN410_URL);
             }
