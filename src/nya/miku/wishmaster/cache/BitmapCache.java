@@ -36,6 +36,7 @@ import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.containers.ReadableContainer;
+import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -212,6 +213,14 @@ public class BitmapCache {
                 bmp = BitmapFactory.decodeStream(data.toInputStream());
             } catch (Exception e) {
                 Logger.e(TAG, e);
+                if (url.startsWith("data:image")) {
+                    try {
+                        byte[] data = Base64.decode(url.substring(url.indexOf("base64,") + 7), Base64.DEFAULT);
+                        bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    } catch (Exception e1) {
+                        Logger.e(TAG, e1);
+                    }
+                }
             }
             if (bmp == null || (task != null && task.isCancelled())) {
                 return null;

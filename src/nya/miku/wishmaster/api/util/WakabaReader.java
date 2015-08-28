@@ -440,6 +440,11 @@ public class WakabaReader implements Closeable {
                 }
                 int value = Math.round(Float.parseFloat(digits) / 1024 * multiplier);
                 attachment.size = value;
+                
+                char nextChar = ' ';
+                int index = byteSizeMatcher.end();
+                while (index < html.length() && nextChar <= ' ') nextChar = html.charAt(index++);
+                if (nextChar == ',') break;
             } catch (NumberFormatException e) {}
         }
         
@@ -452,6 +457,11 @@ public class WakabaReader implements Closeable {
                 attachment.width = width;
                 attachment.height = height;
                 indexEndPxSize = pxSizeMatcher.end();
+                
+                char nextChar = ' ';
+                int index = pxSizeMatcher.end();
+                while (index < html.length() && nextChar <= ' ') nextChar = html.charAt(index++);
+                if (nextChar == ',') break;
             } catch (NumberFormatException e) {}
         }
         
