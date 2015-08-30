@@ -204,6 +204,7 @@ public class CirnoModule extends AbstractChanModule {
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("file", model.attachments[0], model.randomHash);
         else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "1");
+        if (model.custommark) postEntityBuilder.addString("spoiler", "on");
         
         UrlPageModel refererPageModel = new UrlPageModel();
         refererPageModel.chanName = IICHAN_NAME;

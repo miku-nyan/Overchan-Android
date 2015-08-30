@@ -137,7 +137,8 @@ public class CirnoBoards {
         model.allowSage = false;
         model.allowEmails = true;
         model.ignoreEmailIfSage = false;
-        model.allowCustomMark = false;
+        model.allowCustomMark = name.equals("a");
+        model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false;
         model.attachmentsMaxCount = name.equals("d") ? 0 : 1;
