@@ -197,6 +197,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_quickaccess_add">До швидкого доступу</string>
     <string name="context_menu_quickaccess_remove">Стерти зі швидкого доступу</string>
     <string name="context_menu_quickaccess_custom_board">Додати приховану дошку</string>
+    <string name="context_menu_save_captcha">Зберегти капчу</string>
     
     <string name="share_via">Метод</string>
     <string name="share_no_tabs">Відкритих вкладок немає</string>
@@ -462,6 +463,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Запит перед відкриттям лінків назовні</string>
     <string name="pref_do_not_close_tabs_title">Не закривати вкладки</string>
     <string name="pref_do_not_close_tabs_summary">Дія кнопки Назад</string>
+    <string name="pref_pin_markup_title">Закріпити кнопки розмітки</string>
+    <string name="pref_pin_markup_summary">Закріпити кнопки розмітки у формі відправки</string>
     <string name="pref_show_date_title">Дата й час</string>
     <string name="pref_show_date_summary">Показувати дату й час створення постів</string>
     <string name="pref_local_time_title">Місцевий час</string>

@@ -19,6 +19,8 @@
 package nya.miku.wishmaster.ui.posting;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import nya.miku.wishmaster.R;
@@ -45,6 +47,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,11 +56,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -260,6 +266,47 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     }
     
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.postform_captcha_view) {
+            if (captchaField != null && captchaField.isEnabled()) {
+                menu.add(Menu.NONE, R.id.context_menu_save_captcha, 1, R.string.context_menu_save_captcha);
+            }
+        }
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.context_menu_save_captcha) {
+            try {
+                Drawable drawable = captchaView.getDrawable();
+                if (Math.min(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()) <= 0) throw new Exception("null drawable size"); 
+                Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                drawable.draw(new Canvas(bmp));
+                
+                File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
+                if (!dir.mkdirs() && !dir.isDirectory()) throw new Exception("Couldn't create directory");
+                int i = 0;
+                File file = null;
+                do file = new File(dir, "captcha-" + (++i) + ".png"); while (file.exists() || file.isDirectory());
+                OutputStream stream = null;
+                try {
+                    stream = new FileOutputStream(file);
+                    if (!bmp.compress(Bitmap.CompressFormat.PNG, 100, stream)) throw new Exception("Couldn't compress bitmap");
+                    Toast.makeText(this, "captcha-" + (++i) + ".png", Toast.LENGTH_LONG).show();
+                    return true;
+                } finally {
+                    if (stream != null) stream.close();
+                }
+            } catch (Exception e) {
+                Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_LONG).show();
+                Logger.e(TAG, e);
+            }
+        }
+        return false;
+    }
+    
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem itemAttach = menu.add(Menu.NONE, R.id.menu_attach_file, 1, R.string.menu_attach_file);
         MenuItem itemGallery = menu.add(Menu.NONE, R.id.menu_attach_gallery, 2, R.string.menu_attach_gallery);
@@ -447,7 +494,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     }
 
     private void setViews() {
-        setContentView(R.layout.postform_layout);
+        setContentView(settings.isPinnedMarkup() ? R.layout.postform_layout_pinned_markup : R.layout.postform_layout);
         nameLayout = findViewById(R.id.postform_name_email_layout);
         nameField = (EditText) findViewById(R.id.postform_name_field);
         emailField = (EditText) findViewById(R.id.postform_email_field);
@@ -466,6 +513,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         captchaLayout = findViewById(R.id.postform_captcha_layout);
         captchaView = (ImageView) findViewById(R.id.postform_captcha_view);
         captchaView.setOnClickListener(this);
+        captchaView.setOnCreateContextMenuListener(this);
         captchaLoading = findViewById(R.id.postform_captcha_loading);
         captchaField = (EditText) findViewById(R.id.postform_captcha_field);
         captchaField.setOnKeyListener(new View.OnKeyListener() {

@@ -187,6 +187,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_quickaccess_add">Zum Schnellzugang</string>
     <string name="context_menu_quickaccess_remove">Von Schnellzugang entfernen</string>
     <string name="context_menu_quickaccess_custom_board">Benutzerdefinierte Board fügen</string>
+    <string name="context_menu_save_captcha">Captcha speichern</string>
     
     <string name="share_via">Teilen per</string>
     <string name="share_no_tabs">Keine offenen Tabs</string>
@@ -453,6 +454,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Bestätigen Sie, bevor Sie externe Links öffnen</string>
     <string name="pref_do_not_close_tabs_title">Tabs nicht schließen</string>
     <string name="pref_do_not_close_tabs_summary">Tabs durch Drücken der Zurück-Taste nicht schließen</string>
+    <string name="pref_pin_markup_title">Markup-Buttons stecken</string>
+    <string name="pref_pin_markup_summary">Markup-Buttons in Postform stecken</string>
     <string name="pref_show_date_title">Die Zeit anzeigen</string>
     <string name="pref_show_date_summary">Das Datum und die Uhrzeit jedes Posts zeigen</string>
     <string name="pref_local_time_title">Lokalzeit zeigen</string>

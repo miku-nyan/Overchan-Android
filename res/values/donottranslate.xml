@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_chans_order_json">PREF_KEY_CHANS_ORDER_JSON</string>
     <string name="pref_key_external_links_confirmation">PREF_KEY_EXTERNAL_LINKS_CONFIRMATION</string>
     <string name="pref_key_do_not_close_tabs">PREF_KEY_DO_NOT_CLOSE_TABS</string>
+    <string name="pref_key_pin_markup">PREF_KEY_PIN_MARKUP</string>
     <string name="pref_key_show_date">PREF_KEY_SHOW_DATE</string>
     <string name="pref_key_local_time">PREF_KEY_LOCAL_TIME</string>
     <string name="pref_key_cut_posts">PREF_KEY_CUT_POSTS</string>

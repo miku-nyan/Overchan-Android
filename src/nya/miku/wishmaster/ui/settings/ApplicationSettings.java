@@ -313,6 +313,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_do_not_close_tabs), false);
     }
     
+    public boolean isPinnedMarkup() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_pin_markup), false);
+    }
+    
     public boolean isAutoupdateEnabled() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_enable_autoupdate), false);
     }

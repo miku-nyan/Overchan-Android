@@ -192,6 +192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_quickaccess_add">Добавить в быстрый доступ</string>
     <string name="context_menu_quickaccess_remove">Удалить из быстого доступа</string>
     <string name="context_menu_quickaccess_custom_board">Добавить свою доску</string>
+    <string name="context_menu_save_captcha">Сохранить капчу</string>
     
     <string name="share_via">Способ отправки</string>
     <string name="share_no_tabs">Нет открытых вкладок</string>
@@ -459,6 +460,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Спрашивать, предже чем открывать внешние ссылки</string>
     <string name="pref_do_not_close_tabs_title">Не закрывать вкладки</string>
     <string name="pref_do_not_close_tabs_summary">Не закрывать вкладки по нажатию кнопки Назад</string>
+    <string name="pref_pin_markup_title">Закрепить кнопки разметки</string>
+    <string name="pref_pin_markup_summary">Закрепить кнопки разметки в форме отправки</string>
     <string name="pref_show_date_title">Показывать время</string>
     <string name="pref_show_date_summary">Показывать дату и время создания сообщения</string>
     <string name="pref_local_time_title">Локальное время</string>
