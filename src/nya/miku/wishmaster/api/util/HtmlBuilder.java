@@ -45,6 +45,7 @@ import nya.miku.wishmaster.common.MainApplication;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.text.Html;
 
 /**
@@ -249,6 +250,11 @@ public class HtmlBuilder implements Closeable {
         buf.write("</span> <span class=\"");
         if (!isOpPost) buf.write("comment");
         buf.write("postername\">");
+        if (model.color != Color.TRANSPARENT) {
+            buf.write("<font color=\"");
+            buf.write(String.format("#%06X", (0xFFFFFF & model.color)));
+            buf.write("\">&#9632;</font>");
+        }
         String name = StringEscapeUtils.escapeHtml4(model.name == null ? model.email : model.name);
         if (name != null) {
             if (model.email != null && model.email.length() != 0) {
