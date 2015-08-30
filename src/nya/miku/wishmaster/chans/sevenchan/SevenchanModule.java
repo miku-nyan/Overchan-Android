@@ -32,6 +32,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
 import org.apache.http.message.BasicNameValuePair;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.AbstractWakabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -42,7 +43,6 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
-import nya.miku.wishmaster.chans.AbstractWakabaModule;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;

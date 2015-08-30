@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.AbstractChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -47,7 +48,6 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.chans.AbstractChanModule;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;

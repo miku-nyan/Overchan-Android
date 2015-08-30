@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans;
+package nya.miku.wishmaster.api;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

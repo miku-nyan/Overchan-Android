@@ -16,12 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans;
+package nya.miku.wishmaster.api;
 
 import java.io.OutputStream;
 
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.CaptchaModel;

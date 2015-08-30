@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.AbstractWakabaModule;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
