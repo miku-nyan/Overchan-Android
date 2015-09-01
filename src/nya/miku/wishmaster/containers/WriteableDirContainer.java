@@ -76,6 +76,12 @@ public class WriteableDirContainer extends WriteableContainer {
             if (name.length() == 0) throw new IllegalArgumentException("empty file name");
             File subdir = new File(directory, subdirname);
             if (!subdir.mkdirs() && !subdir.isDirectory()) throw new IOException("cannot make directory");
+            switch (subdir.getName()) {
+                case "data":
+                case "thumbnails":
+                    File nomedia = new File(subdir, ".nomedia");
+                    if (!nomedia.exists()) nomedia.createNewFile();
+            }
             return new FileOutputStream(new File(subdir, name));
         }
         return new FileOutputStream(new File(directory, filename));
