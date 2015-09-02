@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans.incah;
+package nya.miku.wishmaster.chans.inach;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
