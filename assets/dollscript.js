@@ -3639,7 +3639,7 @@ function loadDocFiles(imgOnly) {
 			' link[rel="alternate stylesheet"], script, ' + aib.qPostForm, dc), $del);
 		$each($T('a', dc), function(el) {
 			var num, tc = el.textContent;
-			if(tc[0] === '>' && tc[1] === '>' && (num = +tc.substr(2)) && (num in pByNum)) {
+			if(tc[0] === '>' && tc[1] === '>' && (num = +/(\d+)/.exec(tc.substr(2))[1]) && (num in pByNum)) {
 				el.href = aib.anchor + num;
 			} else {
 				el.href = getAbsLink(el.href);
@@ -9211,7 +9211,7 @@ function genRefMap(posts, thrURL) {
 	for(pNum in posts) {
 		for(i = 0, links = $T('a', posts[pNum].msg), len = links.length; i < len; ++i) {
 			tc = links[i].textContent;
-			if(tc[0] === '>' && tc[1] === '>' && (lNum = +tc.substr(2)) && (lNum in posts)) {
+			if(tc[0] === '>' && tc[1] === '>' && (lNum = +/(\d+)/.exec(tc.substr(2))[1]) && (lNum in posts)) {
 				post = posts[lNum];
 				ref = post.ref;
 				if(ref.indexOf(pNum) === -1) {
@@ -9239,7 +9239,7 @@ function updRefMap(post, add) {
 	for(i = 0, links = $T('a', post.msg), len = links.length; i < len; ++i) {
 		link = links[i];
 		tc = link.textContent;
-		if(tc[0] === '>' && tc[1] === '>' && (lNum = +tc.substr(2)) && (lNum in pByNum)) {
+		if(tc[0] === '>' && tc[1] === '>' && (lNum = +/(\d+)/.exec(tc.substr(2))[1]) && (lNum in pByNum)) {
 			lPost = pByNum[lNum];
 			if(!TNum) {
 				link.href = '#' + (aib.fch ? 'p' : '') + lNum;
