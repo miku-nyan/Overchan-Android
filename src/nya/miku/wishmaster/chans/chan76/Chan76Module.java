@@ -99,6 +99,16 @@ public class Chan76Module extends AbstractVichanModule {
     }
     
     @Override
+    protected boolean canHttps() {
+        return true;
+    }
+    
+    @Override
+    protected boolean useHttpsDefaultValue() {
+        return false;
+    }
+    
+    @Override
     protected SimpleBoardModel[] getBoardsList() {
         return BOARDS;
     }
