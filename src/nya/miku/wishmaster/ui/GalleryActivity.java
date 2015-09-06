@@ -403,8 +403,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
         DownloadingService.DownloadingQueueItem queueItem = new DownloadingService.DownloadingQueueItem(tag.attachmentModel, boardModel);
-        String fileName = ChanModels.getAttachmentLocalFileName(tag.attachmentModel, boardModel);
-        String itemName = ChanModels.getAttachmentLocalShortName(tag.attachmentModel, boardModel);
+        String fileName = Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel);
+        String itemName = Attachments.getAttachmentLocalShortName(tag.attachmentModel, boardModel);
         if (DownloadingService.isInQueue(queueItem)) {
             Toast.makeText(this, getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
         } else {
@@ -443,7 +443,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        String extension = ChanModels.getAttachmentExtention(tag.attachmentModel);
+        String extension = Attachments.getAttachmentExtention(tag.attachmentModel);
         switch (tag.attachmentModel.type) {
             case AttachmentModel.TYPE_IMAGE_GIF:
                 shareIntent.setType("image/gif");
@@ -641,9 +641,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         if (settings.scrollThreadFromGallery() && !firstScroll) tryScrollParent(attachments.get(currentPosition).getRight());
         firstScroll = false;
         String navText = attachment.size == -1 ? (currentPosition + 1) + "/" + attachments.size() :
-                (currentPosition + 1) + "/" + attachments.size() + " (" + ChanModels.getAttachmentSizeString(attachment, getResources()) + ")";
+                (currentPosition + 1) + "/" + attachments.size() + " (" + Attachments.getAttachmentSizeString(attachment, getResources()) + ")";
         navigationInfo.setText(navText);
-        setTitle(ChanModels.getAttachmentDisplayName(attachment));
+        setTitle(Attachments.getAttachmentDisplayName(attachment));
         
         if (previousPosition != -1) {
             View previous = instantiatedViews.get(previousPosition);
@@ -684,7 +684,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 showError(tag, getString(R.string.gallery_error_incorrect_attachment));
                 return;
             }
-            File file = fileCache.get(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + ChanModels.getAttachmentExtention(tag.attachmentModel));
+            File file = fileCache.get(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + Attachments.getAttachmentExtention(tag.attachmentModel));
             if (file != null) {
                 String filename = file.getAbsolutePath();
                 while (downloadingLocker.isLocked(filename)) Thread.yield();
@@ -692,7 +692,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
             if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
                 File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
-                file = new File(dir, ChanModels.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
+                file = new File(dir, Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
                 String filename = file.getAbsolutePath();
                 while (downloadingLocker.isLocked(filename)) Thread.yield();
                 if (isCancelled()) return;
@@ -701,7 +701,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
                     File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
                     dir = new File(dir, customSubdir);
-                    file = new File(dir, ChanModels.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
+                    file = new File(dir, Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
                     String filename = file.getAbsolutePath();
                     while (downloadingLocker.isLocked(filename)) Thread.yield();
                     if (isCancelled()) return;
@@ -714,7 +714,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                         tag.loadingView.setVisibility(View.VISIBLE);
                     }
                 });
-                file = fileCache.create(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + ChanModels.getAttachmentExtention(tag.attachmentModel));
+                file = fileCache.create(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + Attachments.getAttachmentExtention(tag.attachmentModel));
                 String filename = file.getAbsolutePath();
                 while (!downloadingLocker.lock(filename)) Thread.yield();
                 InputStream fromLocal = null;
@@ -723,7 +723,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 try {
                     out = new FileOutputStream(file);
                     String localName = DownloadingService.ORIGINALS_FOLDER + "/" +
-                            ChanModels.getAttachmentLocalFileName(tag.attachmentModel, boardModel);
+                            Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel);
                     if (localFile != null && localFile.hasFile(localName)) {
                         fromLocal = IOUtils.modifyInputStream(localFile.openStream(localName), null, this);
                         IOUtils.copyStream(fromLocal, out);

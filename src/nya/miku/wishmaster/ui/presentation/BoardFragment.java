@@ -60,6 +60,7 @@ import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.lib.JellyBeanSpanFixTextView;
 import nya.miku.wishmaster.lib.pullable_layout.SwipeRefreshLayout;
 import nya.miku.wishmaster.ui.AppearanceUtils;
+import nya.miku.wishmaster.ui.Attachments;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.Clipboard;
 import nya.miku.wishmaster.ui.Database;
@@ -670,7 +671,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 Toast.makeText(activity, resources.getString(R.string.notification_url_copied, url), Toast.LENGTH_LONG).show();
                 return true;
             case R.id.context_menu_thumb_attachment_info:
-                String info = ChanModels.getAttachmentInfoString(chan, ((AttachmentModel) lastContextMenuAttachment.getTag()), resources);
+                String info = Attachments.getAttachmentInfoString(chan, ((AttachmentModel) lastContextMenuAttachment.getTag()), resources);
                 Toast.makeText(activity, info, Toast.LENGTH_LONG).show();
                 return true;
             case R.id.context_menu_thumb_search_google:
@@ -2036,7 +2037,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) {
                 size.setVisibility(View.GONE);
             } else {
-                size.setText(ChanModels.getAttachmentSizeString(attachment, fragment().resources));
+                size.setText(Attachments.getAttachmentSizeString(attachment, fragment().resources));
                 size.setVisibility(View.VISIBLE);
             }
             
@@ -2055,10 +2056,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         fragment().handler,
                         fragment().downloadThumbnails() && !curBusy,
                         fragment().downloadThumbnails() ? (curBusy ? 0 : R.drawable.thumbnail_error) :
-                            ChanModels.getDefaultThumbnailResId(attachment.type));
+                            Attachments.getDefaultThumbnailResId(attachment.type));
             } else {
                 thumbnailPic.setTag(Boolean.TRUE);
-                thumbnailPic.setImageResource(ChanModels.getDefaultThumbnailResId(attachment.type));
+                thumbnailPic.setImageResource(Attachments.getDefaultThumbnailResId(attachment.type));
             }
         }
         
@@ -2882,9 +2883,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         DownloadingService.DownloadingQueueItem item = (subdir != null) ?
                 new DownloadingService.DownloadingQueueItem(attachment, subdir, presentationModel.source.boardModel) :
                     new DownloadingService.DownloadingQueueItem(attachment, presentationModel.source.boardModel);
-        String fileName = ChanModels.getAttachmentLocalFileName(attachment, presentationModel.source.boardModel);
+        String fileName = Attachments.getAttachmentLocalFileName(attachment, presentationModel.source.boardModel);
         
-        String itemName = ChanModels.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel);
+        String itemName = Attachments.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel);
         if (DownloadingService.isInQueue(item)) {
             if (!fromGridGallery)
                 Toast.makeText(activity, resources.getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
@@ -3045,7 +3046,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 ImageView tnImage = (ImageView) view.findViewById(R.id.post_thumbnail_image);
                 if (attachment.thumbnail == null || attachment.thumbnail.length() == 0) {
                     tnImage.setTag(Boolean.TRUE);
-                    tnImage.setImageResource(ChanModels.getDefaultThumbnailResId(attachment.type));
+                    tnImage.setImageResource(Attachments.getDefaultThumbnailResId(attachment.type));
                     return;
                 }
                 tnImage.setTag(Boolean.FALSE);
@@ -3061,7 +3062,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         handler,
                         downloadThumbnails() && !isBusy,
                         downloadThumbnails() ? (isBusy ? 0 : R.drawable.thumbnail_error) :
-                            ChanModels.getDefaultThumbnailResId(attachment.type));
+                            Attachments.getDefaultThumbnailResId(attachment.type));
             }
             public void setSelectingMode(boolean selectingMode) {
                 this.selectingMode = selectingMode;

@@ -18,7 +18,6 @@
 
 package nya.miku.wishmaster.api.util;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,12 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import android.content.res.Resources;
-import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
-import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
@@ -150,144 +145,6 @@ public class ChanModels {
     }
     
     /**
-     * Получить ID ресурса миниатюры по умолчанию (в зависимости от типа вложения)
-     * @param attachmentType тип вложения ({@link AttachmentModel})
-     * @return ID ресурса (drawable)
-     */
-    public static int getDefaultThumbnailResId(int attachmentType) {
-        switch (attachmentType) {
-            case AttachmentModel.TYPE_IMAGE_STATIC:
-            case AttachmentModel.TYPE_IMAGE_GIF:
-                return R.drawable.thumbnail_default_image;
-            case AttachmentModel.TYPE_VIDEO:
-                return R.drawable.thumbnail_default_video;
-            case AttachmentModel.TYPE_AUDIO:
-                return R.drawable.thumbnail_default_audio;
-            case AttachmentModel.TYPE_OTHER_FILE:
-                return R.drawable.thumbnail_default_other;
-            case AttachmentModel.TYPE_OTHER_NOTFILE:
-                return R.drawable.thumbnail_default_link;
-        }
-        return R.drawable.thumbnail_default_image;
-    }
-    
-    /**
-     * Получить строку с информацией о размере вложения
-     * @param attachment модель вложения
-     * @param resources объект ресурсов
-     */
-    public static String getAttachmentSizeString(AttachmentModel attachment, Resources resources) {
-        int kb = attachment.size;
-        if (kb == -1) return "";
-        if (kb >= 1000) {
-            double mb = (double)kb / 1024;
-            return resources.getString(R.string.postitem_attachment_size_mb_format, mb);
-        } else {
-            return resources.getString(R.string.postitem_attachment_size_kb_format, kb);
-        }
-    }
-    
-    /**
-     * Получить строку с информацией о вложении (размер, разрешение, имя)
-     * @param chan модуль имиджборды
-     * @param attachment модель вложения
-     * @param resources объект ресурсов
-     */
-    public static String getAttachmentInfoString(ChanModule chan, AttachmentModel attachment, Resources resources) {
-        StringBuilder info = new StringBuilder(chan.fixRelativeUrl(attachment.path)).append('\n');
-        if (attachment.size != -1)
-            info.append(resources.getString(R.string.attachment_info_size_format, getAttachmentSizeString(attachment, resources))).append('\n');
-        if (attachment.width > 0 && attachment.height > 0)
-            info.append(resources.getString(R.string.attachment_info_resolution_format, attachment.width, attachment.height)).append('\n');
-        if (attachment.originalName != null)
-            info.append(resources.getString(R.string.attachment_info_original_name_format, attachment.originalName)).append('\n');
-        return info.substring(0, info.length() - 1);
-    }
-    
-    /**
-     * Получить строку с отображаемым названием вложения (не обязательно совпадает с именем файла)
-     * @param attachment модель вложения
-     */
-    public static String getAttachmentDisplayName(AttachmentModel attachment) {
-        if (attachment.originalName != null && attachment.originalName.length() != 0) return attachment.originalName;
-        if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) {
-            return attachment.path == null ? "" : attachment.path;
-        }
-        String usingPath = attachment.path != null ? attachment.path : attachment.thumbnail;
-        if (usingPath == null) return "";
-        return usingPath.substring(usingPath.lastIndexOf('/') + 1);
-    }
-    
-    /**
-     * Получить локальное имя файла вложения, с указанием доски, к которой относится вложение
-     * и с учётом возможности наличия файлов с одинаковыми именами на доске (в зависимости от значения {@link BoardModel#uniqueAttachmentNames})
-     * @param attachment модель вложения
-     * @param boardModel модель доски, к которой относится вложение
-     */
-    public static String getAttachmentLocalFileName(AttachmentModel attachment, BoardModel boardModel) {
-        final String result;
-        if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return attachment.path;
-        if (attachment.path == null) return null;
-        String filename = attachment.path.substring(attachment.path.lastIndexOf('/') + 1);
-        if (filename.length() == 0) return null;
-        int dotLastPos = filename.lastIndexOf('.');
-        if (dotLastPos == -1) dotLastPos = filename.length();
-        if (boardModel == null) {
-            result = filename.substring(0, dotLastPos) + '-' + hashAttachmentModel(attachment).substring(0, 4) + filename.substring(dotLastPos);
-        } else {
-            String dashBoardName = boardModel.boardName == null || boardModel.boardName.length() == 0 ? "" : '-' + boardModel.boardName;
-            if (boardModel.uniqueAttachmentNames) {
-                result = filename.substring(0, dotLastPos) + dashBoardName + filename.substring(dotLastPos);
-            } else {
-                result = filename.substring(0, dotLastPos) + dashBoardName + '-' + hashAttachmentModel(attachment).substring(0, 4) +
-                        filename.substring(dotLastPos);
-            }
-        }
-        try {
-            return URLDecoder.decode(result, "UTF-8");
-        } catch (Exception e) {
-            return result;
-        }
-    }
-    
-    /**
-     * Получить короткое локальное название вложения, используемое в сервисе загрузок
-     * @param attachment модель вложения
-     * @param boardModel модель доски, к которой относится вложение
-     */
-    public static String getAttachmentLocalShortName(AttachmentModel attachment, BoardModel boardModel) {
-        final String result;
-        if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return attachment.path;
-        if (attachment.path == null) return null;
-        String filename = attachment.path.substring(attachment.path.lastIndexOf('/') + 1);
-        if (filename.length() == 0) return null;
-        int dotLastPos = filename.lastIndexOf('.');
-        if (dotLastPos == -1) dotLastPos = filename.length();
-        if (boardModel == null || boardModel.boardName == null || boardModel.boardName.length() == 0) {
-            result = filename.substring(0, dotLastPos);
-        } else {
-            result = filename.substring(0, dotLastPos) + '-' + boardModel.boardName;
-        }
-        try {
-            return URLDecoder.decode(result, "UTF-8");
-        } catch (Exception e) {
-            return result;
-        }
-    }
-    
-    /**
-     * Получить расширение файла вложения, включая точку (например: ".jpg")
-     * @param attachment модель вложения
-     * @return расширение файла, включая точку
-     */
-    public static String getAttachmentExtention(AttachmentModel attachment) {
-        if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return null;
-        int dotLastPos = attachment.path.lastIndexOf('.');
-        if (dotLastPos == -1) return "";
-        return attachment.path.substring(dotLastPos);
-    }
-    
-    /**
      * Рассчитать хэш для модели иконки бэйджа (флаг страны, политические предпочтения и т.д.)
      * @param model модель
      * @param chanName название АИБ (модуля чана)
@@ -301,6 +158,23 @@ public class ChanModels {
         return CryptoUtils.computeMD5(key.toString());
     }
     
+    /**
+     * Создать упрощённую модель доски ({@link SimpleBoardModel}
+     * @param chan название имиджборды
+     * @param boardName код доски (короткое название)
+     * @param description описание доски (полное название)
+     * @param category категория, к которой относится доска (в случае деления досок по категориям), может принимать null.
+     * @param nsfw должно принимать true, если на доске содержится контент 18+ или доска является немодерируемой
+     */
+    public static SimpleBoardModel obtainSimpleBoardModel(String chan, String boardName, String description, String category, boolean nsfw) {
+        SimpleBoardModel model = new SimpleBoardModel();
+        model.chan = chan;
+        model.boardName = boardName;
+        model.boardDescription = description;
+        model.boardCategory = category;
+        model.nsfw = nsfw;
+        return model;
+    }
     
     /**
      * Слияние списков постов, с сохранением удалённых постов (которые присутствовали в старом списке, но отсутствуют в новом).<br>
@@ -358,24 +232,6 @@ public class ChanModels {
             result.add(post.number);
         }
         return result;
-    }
-    
-    /**
-     * Создать упрощённую модель доски ({@link SimpleBoardModel}
-     * @param chan название имиджборды
-     * @param boardName код доски (короткое название)
-     * @param description описание доски (полное название)
-     * @param category категория, к которой относится доска (в случае деления досок по категориям), может принимать null.
-     * @param nsfw должно принимать true, если на доске содержится контент 18+ или доска является немодерируемой
-     */
-    public static SimpleBoardModel obtainSimpleBoardModel(String chan, String boardName, String description, String category, boolean nsfw) {
-        SimpleBoardModel model = new SimpleBoardModel();
-        model.chan = chan;
-        model.boardName = boardName;
-        model.boardDescription = description;
-        model.boardCategory = category;
-        model.nsfw = nsfw;
-        return model;
     }
     
 }

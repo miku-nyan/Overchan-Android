@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
@@ -52,6 +53,7 @@ import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.WriteableContainer;
 import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+import nya.miku.wishmaster.ui.Attachments;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -87,6 +89,8 @@ public class DownloadingService extends Service {
     
     /** путь и имя файла с основным (сериализованным) объектом сохранённой страницы внутри архива */
     public static final String MAIN_OBJECT_FILE = "data/serialized.bin";
+    /** имя файла со значком favicon сохраняемой HTML страницы внутри архива */
+    public static final String FAVICON_FILE = "favicon.png";
     /** формат расположения файлов-превью внутри архива сохранённой страницы (%s соответствует хэшу вложения) */
     public static final String THUMBNAIL_FILE_FORMAT = "thumbnails/%s.png";
     /** формат расположения файлов-иконок (флаги/полит.предпочтения) внутри архива сохранённой страницы (%s соответствует хэшу иконки) */
@@ -275,10 +279,10 @@ public class DownloadingService extends Service {
                         getString(R.string.downloading_title, downloadingQueue.size() + 1) : getString(R.string.downloading_title_simple));
                 
                 if (item.type == DownloadingQueueItem.TYPE_ATTACHMENT) {
-                    final String filename = ChanModels.getAttachmentLocalFileName(item.attachment, item.boardModel);
+                    final String filename = Attachments.getAttachmentLocalFileName(item.attachment, item.boardModel);
                     if (filename == null) continue;
                     String elementName = getString(R.string.downloading_element_format, item.chanName,
-                            ChanModels.getAttachmentLocalShortName(item.attachment, item.boardModel));
+                            Attachments.getAttachmentLocalShortName(item.attachment, item.boardModel));
                     currentItemName = elementName;
                     
                     curProgress = -1;
@@ -328,7 +332,7 @@ public class DownloadingService extends Service {
                         continue;
                     }
                     File fromCache = fileCache.get(FileCache.PREFIX_ORIGINALS + ChanModels.hashAttachmentModel(item.attachment) +
-                            ChanModels.getAttachmentExtention(item.attachment));
+                            Attachments.getAttachmentExtention(item.attachment));
                     if (fromCache != null) {
                         String fromCacheFilename = fromCache.getAbsolutePath();
                         while (downloadingLocker.isLocked(fromCacheFilename)) Thread.yield();
@@ -402,13 +406,46 @@ public class DownloadingService extends Service {
                         } catch (Exception e) {
                             throw new Exception(getString(IOUtils.isENOSPC(e) ? R.string.error_no_space : R.string.downloading_error_mkfile));
                         }
-                        SerializablePage page = getSerializablePage(item);
+                        final SerializablePage page = getSerializablePage(item);
                         if (isCancelled()) throw new Exception();
                         
                         HtmlBuilder htmlBuilder = null;
                         try {
-                            htmlBuilder = new HtmlBuilder(
-                                    zip.openStream(htmlname), getResources(), ORIGINALS_FOLDER, THUMBNAIL_FILE_FORMAT, ICON_FILE_FORMAT);
+                            htmlBuilder = new HtmlBuilder(zip.openStream(htmlname), 
+                                    new HtmlBuilder.RefsGetter() {
+                                        final ChanModule chan = MainApplication.getInstance().getChanModule(page.boardModel.chan);
+                                        
+                                        @Override
+                                        public String getFavicon() {
+                                            return HtmlBuilder.DATA_DIR + "/" + FAVICON_FILE;
+                                        }
+                                        
+                                        @Override
+                                        public String getThumbnail(AttachmentModel attachment) {
+                                            return attachment.thumbnail == null ? null : String.format(Locale.US, THUMBNAIL_FILE_FORMAT,
+                                                    ChanModels.hashAttachmentModel(attachment));
+                                        }
+                                        
+                                        @Override
+                                        public String getOriginal(AttachmentModel attachment) {
+                                            String chanRef = chan.fixRelativeUrl(attachment.path != null ? attachment.path : attachment.thumbnail);
+                                            if (attachment.type != AttachmentModel.TYPE_OTHER_NOTFILE) {
+                                                String filename = Attachments.getAttachmentLocalFileName(attachment, page.boardModel);
+                                                if (filename != null && filename.length() != 0) {
+                                                    //TODO проверять, когда вложение отсутствует и в папке с загрузками, и в кэше, отдавать ссылку
+                                                    return ORIGINALS_FOLDER + "/" + filename;
+                                                } else {
+                                                    return chanRef;
+                                                }
+                                            } else return chanRef;
+                                        }
+                                        
+                                        @Override
+                                        public String getIcon(BadgeIconModel icon) {
+                                            return String.format(Locale.US, ICON_FILE_FORMAT,
+                                                    ChanModels.hashBadgeIconModel(icon, chan.getChanName()));
+                                        }
+                                    });
                             htmlBuilder.write(page);
                         } catch (Exception e) {
                             Logger.e(TAG, e);
@@ -451,7 +488,7 @@ public class DownloadingService extends Service {
                         
                         OutputStream faviconStream = null;
                         try {
-                            faviconStream = zip.openStream(HtmlBuilder.DATA_DIR + "/" + HtmlBuilder.FAVICON);
+                            faviconStream = zip.openStream(HtmlBuilder.DATA_DIR + "/" + FAVICON_FILE);
                             Drawable favicon = new LayerDrawable(new Drawable[] {
                                     MainApplication.getInstance().getChanModule(item.chanName).getChanFavicon(),
                                     ResourcesCompat.getDrawable(getResources(), R.drawable.favicon_overlay_local, null)
@@ -466,7 +503,7 @@ public class DownloadingService extends Service {
                                 if (IOUtils.isENOSPC(e)) {
                                     throw new Exception(getString(R.string.error_no_space));
                                 } else {
-                                    addError(HtmlBuilder.FAVICON, getString(R.string.downloading_error_copy));
+                                    addError(FAVICON_FILE, getString(R.string.downloading_error_copy));
                                 }
                             }
                         } finally {
@@ -544,10 +581,10 @@ public class DownloadingService extends Service {
                             if (isCancelled()) throw new Exception();
                             
                             AttachmentModel attachment = attachments.get(i);
-                            String curFile = ChanModels.getAttachmentLocalFileName(attachment, item.boardModel);
+                            String curFile = Attachments.getAttachmentLocalFileName(attachment, item.boardModel);
                             if (curFile == null) continue;
                             String curElementName = getString(R.string.downloading_element_format, item.chanName,
-                                    ChanModels.getAttachmentLocalShortName(attachment, item.boardModel));
+                                    Attachments.getAttachmentLocalShortName(attachment, item.boardModel));
                             String curThumbElementName = getString(R.string.downloading_thumbnail_format, curElementName);
                             String curHash = ChanModels.hashAttachmentModel(attachment);
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -562,7 +599,7 @@ public class DownloadingService extends Service {
                                 File cur = new File(directory, curFile);
                                 if (!cur.exists() || cur.isDirectory() || cur.length() == 0) {
                                     cur = fileCache.get(FileCache.PREFIX_ORIGINALS + ChanModels.hashAttachmentModel(attachment) +
-                                            ChanModels.getAttachmentExtention(attachment));
+                                            Attachments.getAttachmentExtention(attachment));
                                     if (cur != null) {
                                         String curFilename = cur.getAbsolutePath();
                                         while (downloadingLocker.isLocked(curFilename)) Thread.yield();
@@ -570,7 +607,7 @@ public class DownloadingService extends Service {
                                     }
                                     if (cur == null && item.downloadingThreadMode == MODE_DOWNLOAD_ALL) {
                                         cur = fileCache.create(FileCache.PREFIX_ORIGINALS + ChanModels.hashAttachmentModel(attachment) +
-                                                ChanModels.getAttachmentExtention(attachment));
+                                                Attachments.getAttachmentExtention(attachment));
                                         String curFilename = cur.getAbsolutePath();
                                         while (!downloadingLocker.lock(curFilename)) Thread.yield();
                                         if (isCancelled()) {

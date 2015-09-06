@@ -26,7 +26,6 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.ui.presentation.HtmlParser.ImageGetter;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
 import nya.miku.wishmaster.ui.settings.Wifi;
 import android.content.res.Resources;
@@ -43,7 +42,7 @@ import android.view.View;
  * @author miku-nyan
  *
  */
-public class AsyncImageGetter implements ImageGetter {
+public class AsyncImageGetter implements HtmlParser.ImageGetter {
     private static final Bitmap EMPTY_BMP = Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8);
     
     private final Resources res;

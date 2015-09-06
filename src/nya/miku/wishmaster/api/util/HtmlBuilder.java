@@ -41,7 +41,6 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.MainApplication;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.content.res.Resources;
@@ -65,9 +64,6 @@ public class HtmlBuilder implements Closeable {
     /** Папка в которой должны будут лежать необходимые для веб-страницы файлы ({@link #FAVICON} и {@link #ASSETS}) */
     public static final String DATA_DIR = "data";
     
-    /** Имя файла со значком, отображаемым в заголовке (favicon) */
-    public static final String FAVICON = "favicon.png";
-    
     private static final String DOLLSCRIPT = "dollscript.js";
     private static final String WAKABA3JS = "wakaba3.js";
     
@@ -82,15 +78,18 @@ public class HtmlBuilder implements Closeable {
     
     private static final String HTML_HEADER_1 =
             "<!DOCTYPE html>" +
-                "<script type=\"text/javascript\" src=\"" + DATA_DIR + "/" + DOLLSCRIPT + "\"></script>" +
+                "<script type=\"text/javascript\" src=\"";
+    private static final String HTML_HEADER_2 = 
+                "\"></script>" +
                     "<html>" +
                         "<head>" +
                             "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />" +
                             "<title>";
-    
-    private static final String HTML_HEADER_2 =
+    private static final String HTML_HEADER_3 =
                             "</title>" +
-                            "<link rel=\"icon\" type=\"image/png\" href=\"" + DATA_DIR + "/" + FAVICON + "\" />" +
+                            "<link rel=\"icon\" type=\"image/png\" href=\"";
+    private static final String HTML_HEADER_4 =
+                            "\" />" +
                             "<style type=\"text/css\"> " + 
                                     "body { margin: 0; padding: 8px; margin-bottom: auto; } " +
                                     "blockquote blockquote { margin-left: 0em } " +
@@ -108,19 +107,18 @@ public class HtmlBuilder implements Closeable {
                                     ".userdelete { float: right; text-align: center; white-space: nowrap } " +
                                     ".replypage .replylink { display: none } " +
                             "</style>";
-    
-    private static final String HTML_HEADER_3 =
+    private static final String HTML_HEADER_5 =
                             "<script type=\"text/javascript\">var style_cookie=\"wakabastyle\";</script>" +
-                            "<script type=\"text/javascript\" src=\"" + DATA_DIR + "/" + WAKABA3JS + "\"></script>" + 
+                            "<script type=\"text/javascript\" src=\"";
+    private static final String HTML_HEADER_6 = 
+                            "\"></script>" +
                         "</head>" +
                         "<body class=\"replypage\">" +
                             "<div class=\"adminbar\"> ";
-    
-    private static final String HTML_HEADER_4 =
+    private static final String HTML_HEADER_7 =
                             "</div>" +
                             "<div class=\"logo\">";
-    
-    private static final String HTML_HEADER_5 =
+    private static final String HTML_HEADER_8 =
                             "</div>" +
                             "<hr />" +
                             "<form id=\"delform\" action=\"/wakaba/wakaba.pl\" method=\"post\">";
@@ -137,32 +135,27 @@ public class HtmlBuilder implements Closeable {
     
     private final Writer buf;
     private final OutputStream _stream;
-    private final Resources res;
+    private final RefsGetter refsGetter;
+    private Resources res;
     private ChanModule chan;
     private UrlPageModel pageModel;
     private BoardModel boardModel;
     private DateFormat dateFormat;
-    private final String originalsDir, thumbFileFormat, iconFileFormat;
     
     /**
      * Конструктор класса
      * @param out поток, в который будет записан HTML
-     * @param resources объект ресурсов
-     * @param originalsDir папка, в которой будут лежать оригиналы вложений
-     * @param thumbFileFormat формат пути к файлам миниатюр (превью) вложений: %s соответствует хэшу вложения
-     * @param iconFileFormat формат пути к файлам значков (флаг страны/полит.предпочтения): %s соответствует хэшу значка
+     * @param refsGetter интерфейс для получения ссылок на вложения и картинки
      */
-    public HtmlBuilder(OutputStream out, Resources resources, String originalsDir, String thumbFileFormat, String iconFileFormat) throws IOException {
+    public HtmlBuilder(OutputStream out, RefsGetter refsGetter) throws IOException {
         _stream = out;
         buf = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
-        res = resources;
         
-        this.originalsDir = originalsDir;
-        this.thumbFileFormat = thumbFileFormat;
-        this.iconFileFormat = iconFileFormat;
+        this.refsGetter = refsGetter;
     }
     
     public void write(SerializablePage page) throws IOException {
+        this.res = MainApplication.getInstance().resources;
         this.chan = MainApplication.getInstance().getChanModule(page.boardModel.chan);
         this.pageModel = page.pageModel;
         this.boardModel = page.boardModel;
@@ -211,15 +204,21 @@ public class HtmlBuilder implements Closeable {
     
     private void buildHeader(String pageTitle, String logoTitle) throws IOException {
         buf.write(HTML_HEADER_1);
-        buf.write(pageTitle);
+        buf.write(DATA_DIR + "/" + DOLLSCRIPT);
         buf.write(HTML_HEADER_2);
+        buf.write(pageTitle);
+        buf.write(HTML_HEADER_3);
+        buf.write(refsGetter.getFavicon());
+        buf.write(HTML_HEADER_4);
         buf.write(String.format(Locale.US, CSS_FORMAT_1, (DATA_DIR + "/" + CSS_LINKS[0]), CSS[0]));
         for (int i=1; i<CSS.length; ++i) buf.write(String.format(Locale.US, CSS_FORMAT_2, (DATA_DIR + "/" + CSS_LINKS[i]), CSS[i]));
-        buf.write(HTML_HEADER_3);
-        for (int i=0; i<CSS.length; ++i) buf.write(String.format(Locale.US, CSS_FORMAT_3, CSS[i], CSS[i]));
-        buf.write(HTML_HEADER_4);
-        buf.write(logoTitle);
         buf.write(HTML_HEADER_5);
+        buf.write(DATA_DIR + "/" + WAKABA3JS);
+        buf.write(HTML_HEADER_6);
+        for (int i=0; i<CSS.length; ++i) buf.write(String.format(Locale.US, CSS_FORMAT_3, CSS[i], CSS[i]));
+        buf.write(HTML_HEADER_7);
+        buf.write(logoTitle);
+        buf.write(HTML_HEADER_8);
     }
     
     private void buildThread(PostModel[] posts) throws IOException {
@@ -273,7 +272,7 @@ public class HtmlBuilder implements Closeable {
                 if (!firstIcon) buf.write("&nbsp;");
                 firstIcon = false;
                 buf.write("<img hspace=\"3\" src=\"");
-                buf.write(String.format(Locale.US, iconFileFormat, ChanModels.hashBadgeIconModel(icon, chan.getChanName())));
+                buf.write(refsGetter.getIcon(icon));
                 buf.write("\" title=\"");
                 buf.write((icon.description != null && icon.description.length() != 0) ?
                         icon.description :
@@ -295,7 +294,7 @@ public class HtmlBuilder implements Closeable {
         buf.write(model.number);
         buf.write("</a> </span>");
         if (model.deleted) buf.write("<span class=\"de-post-deleted\"></span>");
-        buf.write("&nbsp; ");
+        buf.write("&nbsp; "); 
         if (model.attachments != null && model.attachments.length != 0) {
             buf.write("<br />");
             boolean single = model.attachments.length == 1;
@@ -360,21 +359,10 @@ public class HtmlBuilder implements Closeable {
             tnHeight = -1;
         }
         
-        String thumbRef = model.thumbnail == null ? null :
-            String.format(Locale.US, thumbFileFormat, ChanModels.hashAttachmentModel(model));
-        String chanRef = chan.fixRelativeUrl(model.path != null ? model.path : model.thumbnail);
-        String origRef;
-        if (model.type != AttachmentModel.TYPE_OTHER_NOTFILE) {
-            origRef = ChanModels.getAttachmentLocalFileName(model, boardModel);
-            if (origRef != null && origRef.length() != 0) {
-                origRef = originalsDir + "/" + origRef;
-            } else {
-                origRef = chanRef;
-            }
-        } else origRef = chanRef;
+        String thumbRef = refsGetter.getThumbnail(model);
+        String origRef = refsGetter.getOriginal(model);
         
         String filenameDesc;
-        
         if (model.type != AttachmentModel.TYPE_OTHER_NOTFILE) {
             filenameDesc = model.path != null ? model.path : model.thumbnail;
             filenameDesc = filenameDesc.substring(filenameDesc.lastIndexOf('/') + 1);
@@ -434,6 +422,17 @@ public class HtmlBuilder implements Closeable {
             buf.write("/></a>");
         }
         if (!isSingle) buf.write("</div>");
+    }
+    
+    public static interface RefsGetter {
+        /** Получить местонахождение значка favicon (локальный файл) */
+        String getFavicon();
+        /** Получить местонахождение оригинала вложения (может быть удалённым как локальным файлом, так и удалённым URL) */
+        String getOriginal(AttachmentModel attachment);
+        /** Получить метонахождение картинки превью вложения (локльный файл или null) */
+        String getThumbnail(AttachmentModel attachment);
+        /** Получить местонахождение картинки со значком (локальный файл, не может быть null) */
+        String getIcon(BadgeIconModel icon);
     }
     
 }
