@@ -61,7 +61,7 @@ public class HtmlBuilder implements Closeable {
         "futaba.css", "photon.css", "burichan.css", "gurochan.css", "dollscript.js", "wakaba3.js"
     };
     
-    /** Папка в которой должны будут лежать необходимые для веб-страницы файлы ({@link #FAVICON} и {@link #ASSETS}) */
+    /** Папка в которой должны будут лежать необходимые для веб-страницы файлы ({@link #ASSETS}) */
     public static final String DATA_DIR = "data";
     
     private static final String DOLLSCRIPT = "dollscript.js";
@@ -135,6 +135,7 @@ public class HtmlBuilder implements Closeable {
     
     private final Writer buf;
     private final OutputStream _stream;
+    private final boolean writeDeleted;
     private final RefsGetter refsGetter;
     private Resources res;
     private ChanModule chan;
@@ -148,9 +149,20 @@ public class HtmlBuilder implements Closeable {
      * @param refsGetter интерфейс для получения ссылок на вложения и картинки
      */
     public HtmlBuilder(OutputStream out, RefsGetter refsGetter) throws IOException {
+        this(out, true, refsGetter);
+    }
+    
+    /**
+     * Конструктор класса
+     * @param out поток, в который будет записан HTML
+     * @param writeDeleted записывать удалённые посты
+     * @param refsGetter интерфейс для получения ссылок на вложения и картинки
+     */
+    public HtmlBuilder(OutputStream out, boolean writeDeleted, RefsGetter refsGetter) throws IOException {
         _stream = out;
         buf = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
         
+        this.writeDeleted = writeDeleted;
         this.refsGetter = refsGetter;
     }
     
@@ -171,9 +183,15 @@ public class HtmlBuilder implements Closeable {
         buildHeader(buildTitle(page), logo);
         
         if (page.posts != null && page.posts.length != 0) {
-            buildThread(page.posts);
-        } else if (page.threads != null) {
-            for (ThreadModel thread : page.threads) buildThread(thread.posts);
+            ThreadModel thread = new ThreadModel();
+            thread.posts = page.posts;
+            thread.threadNumber = page.posts[0].number;
+            thread.postsCount = -1;
+            thread.attachmentsCount = -1;
+            buildThread(thread);
+        }
+        if (page.threads != null) {
+            for (ThreadModel thread : page.threads) buildThread(thread);
         }
         buf.write(HTML_FOOTER);
         buf.flush();
@@ -221,7 +239,8 @@ public class HtmlBuilder implements Closeable {
         buf.write(HTML_HEADER_8);
     }
     
-    private void buildThread(PostModel[] posts) throws IOException {
+    private void buildThread(ThreadModel thread) throws IOException {
+        PostModel[] posts = thread.posts;
         if (posts == null || posts.length == 0) return;
         buildPost(posts[0], true);
         for (int i=1; i<posts.length; ++i) buildPost(posts[i], false);
@@ -233,6 +252,7 @@ public class HtmlBuilder implements Closeable {
     }
     
     private void buildPost(PostModel model, boolean isOpPost) throws IOException {
+        if (!isOpPost && !writeDeleted && model.deleted) return;
         if (!isOpPost) {
             buf.write("<table><tbody><tr><td class=\"doubledash\">&gt;&gt;</td> <td class=\"reply\" id=\"reply");
             buf.write(model.number);
