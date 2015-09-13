@@ -3289,13 +3289,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         DialogInterface.OnClickListener dlgOnClick = new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(final DialogInterface dialog, final int which) {
                 if (currentTask != null) currentTask.cancel();
                 if (pullableLayout.isRefreshing()) setPullableNoRefreshing();
                 deletePostModel.password = inputField.getText().toString();
                 final ProgressDialog progressDlg = new ProgressDialog(activity);
                 final CancellableTask deleteTask = new CancellableTask.BaseCancellableTask();
-                currentTask = deleteTask;
                 progressDlg.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
@@ -3314,6 +3313,28 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         try {
                             targetUrl = chan.deletePost(deletePostModel, null, deleteTask);
                         } catch (Exception e) {
+                            if (e instanceof InteractiveException) {
+                                if (deleteTask.isCancelled()) return;
+                                ((InteractiveException) e).handle(activity, deleteTask, new InteractiveException.Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        if (!deleteTask.isCancelled()) {
+                                            progressDlg.dismiss();
+                                            onClick(dialog, which);
+                                        }
+                                    }
+                                    @Override
+                                    public void onError(String message) {
+                                        if (!deleteTask.isCancelled()) {
+                                            progressDlg.dismiss();
+                                            Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+                                            runDelete(deletePostModel);
+                                        }
+                                    }
+                                });
+                                return;
+                            }
+                            
                             Logger.e(TAG, "cannot delete post", e);
                             if (e instanceof HttpRequestException && ((HttpRequestException) e).isSslException()) {
                                 error = resources.getString(R.string.error_ssl);
@@ -3360,17 +3381,18 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (presentationModel.source.boardModel.allowReport != BoardModel.REPORT_WITH_COMMENT) {
             inputField.setEnabled(false);
             inputField.setKeyListener(null);
+        } else {
+            inputField.setText(reportPostModel.reportReason == null ? "" : reportPostModel.reportReason);
         }
         
         DialogInterface.OnClickListener dlgOnClick = new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(final DialogInterface dialog, final int which) {
                 if (currentTask != null) currentTask.cancel();
                 if (pullableLayout.isRefreshing()) setPullableNoRefreshing();
                 reportPostModel.reportReason = inputField.getText().toString();
                 final ProgressDialog progressDlg = new ProgressDialog(activity);
                 final CancellableTask reportTask = new CancellableTask.BaseCancellableTask();
-                currentTask = reportTask;
                 progressDlg.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
@@ -3389,6 +3411,28 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         try {
                             targetUrl = chan.reportPost(reportPostModel, null, reportTask);
                         } catch (Exception e) {
+                            if (e instanceof InteractiveException) {
+                                if (reportTask.isCancelled()) return;
+                                ((InteractiveException) e).handle(activity, reportTask, new InteractiveException.Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        if (!reportTask.isCancelled()) {
+                                            progressDlg.dismiss();
+                                            onClick(dialog, which);
+                                        }
+                                    }
+                                    @Override
+                                    public void onError(String message) {
+                                        if (!reportTask.isCancelled()) {
+                                            progressDlg.dismiss();
+                                            Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+                                            runReport(reportPostModel);
+                                        }
+                                    }
+                                });
+                                return;
+                            }
+                            
                             Logger.e(TAG, "cannot report post", e);
                             if (e instanceof HttpRequestException && ((HttpRequestException) e).isSslException()) {
                                 error = resources.getString(R.string.error_ssl);

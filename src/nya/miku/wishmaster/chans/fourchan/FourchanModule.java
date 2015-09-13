@@ -42,6 +42,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.preference.CheckBoxPreference;
@@ -69,6 +70,7 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.http.interactive.SimpleCaptchaException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
@@ -98,6 +100,9 @@ public class FourchanModule extends AbstractChanModule {
     private Map<String, BoardModel> boardsMap = null;
     
     private Recaptcha recaptcha = null;
+    
+    private Recaptcha reportRecaptcha = null;
+    private String reportCaptchaAnswer = null;
     
     private static final Pattern ERROR_POSTING = Pattern.compile("<span id=\"errmsg\"(?:[^>]*)>(.*?)(?:</span>|<br)");
     private static final Pattern SUCCESS_POSTING = Pattern.compile("<!-- thread:(\\d+),no:(?:\\d+) -->");
@@ -519,6 +524,45 @@ public class FourchanModule extends AbstractChanModule {
             throw new Exception(Html.fromHtml(errorMatcher.group(1)).toString());
         }
         return null;
+    }
+    
+    @Override
+    public String reportPost(final DeletePostModel model, ProgressListener listener, final CancellableTask task) throws Exception {
+        if (reportCaptchaAnswer == null) {
+            throw new SimpleCaptchaException() {
+                private static final long serialVersionUID = 1L;
+                @Override
+                public String getServiceName() {
+                    return "Recaptcha";
+                }
+                @Override
+                protected Bitmap getNewCaptcha() throws Exception {
+                    reportRecaptcha = Recaptcha.obtain(RECAPTCHA_KEY, task, httpClient, "https");
+                    return reportRecaptcha.bitmap;
+                }
+                @Override
+                protected void storeResponse(String response) {
+                    reportCaptchaAnswer = response;
+                }
+            };
+        } else {
+            String url = "https://sys.4chan.org/" + model.boardName + "/imgboard.php?mode=report&no=" + model.postNumber;
+            ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
+                    addString("cat", "vio").
+                    addString("recaptcha_challenge_field", reportRecaptcha.challenge).
+                    addString("recaptcha_response_field", reportCaptchaAnswer).
+                    addString("board", model.boardName).
+                    addString("no", model.postNumber);
+            reportCaptchaAnswer = null;
+            reportRecaptcha = null;
+            HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
+            String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+            if (response.contains("https://www.4chan.org/banned")) throw new Exception("You can't report posts because you are banned");
+            if (response.contains("You seem to have mistyped the CAPTCHA")) throw new Exception("You seem to have mistyped the CAPTCHA");
+            if (response.contains("That post doesn't exist anymore")) throw new Exception("That post doesn't exist anymore");
+            if (response.contains("You forgot to solve the CAPTCHA")) throw new Exception("You forgot to solve the CAPTCHA");
+            return null;
+        }
     }
     
     @Override

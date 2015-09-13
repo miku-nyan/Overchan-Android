@@ -58,6 +58,7 @@ public class FourchanJsonMapper {
         model.requiredFileForNewThread = true;
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
+        model.allowReport = BoardModel.REPORT_SIMPLE;
         model.allowNames = !model.boardName.equals("b");
         model.allowSubjects = !model.boardName.equals("b");
         model.allowSage = true;
