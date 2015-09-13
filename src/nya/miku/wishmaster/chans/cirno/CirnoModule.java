@@ -48,16 +48,22 @@ import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.http.interactive.SimpleCaptchaException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.preference.EditTextPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.InputFilter;
+import android.text.InputType;
 
 /* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
  * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
@@ -77,6 +83,9 @@ public class CirnoModule extends AbstractChanModule {
     private static final String HARUHIISM_DOMAIN = "boards.haruhiism.net";
     private static final String HARUHIISM_URL = "http://" + HARUHIISM_DOMAIN + "/";
     
+    private static final String PREF_KEY_REPORT_THREAD = "PREF_KEY_REPORT_THREAD";
+    private String lastReportCaptcha;
+    
     public CirnoModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
     }
@@ -94,6 +103,22 @@ public class CirnoModule extends AbstractChanModule {
     @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_cirno, null);
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        final Context context = preferenceGroup.getContext();
+        EditTextPreference passwordPref = new EditTextPreference(context);
+        passwordPref.setTitle(R.string.iichan_prefs_report_thread);
+        passwordPref.setDialogTitle(R.string.iichan_prefs_report_thread);
+        passwordPref.setSummary(R.string.iichan_prefs_report_thread_summary);
+        passwordPref.setKey(getSharedKey(PREF_KEY_REPORT_THREAD));
+        passwordPref.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
+        passwordPref.getEditText().setSingleLine();
+        passwordPref.getEditText().setFilters(new InputFilter[] { new InputFilter.LengthFilter(255) });
+        preferenceGroup.addPreference(passwordPref);
+        
+        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
@@ -289,6 +314,53 @@ public class CirnoModule extends AbstractChanModule {
             if (response != null) response.release();
         }
         return null;
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, final ProgressListener listener, final CancellableTask task) throws Exception {
+        final String dNum;
+        String pref = preferences.getString(getSharedKey(PREF_KEY_REPORT_THREAD), null);
+        if (pref != null && pref.length() > 0) {
+            dNum = pref;
+        } else {
+            String url = "http://miku-nyan.github.io/Overchan-Android/data/report_thread";
+            dNum = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false);
+        }
+        
+        if (lastReportCaptcha == null) {
+            throw new SimpleCaptchaException() {
+                private static final long serialVersionUID = 1L;
+                @Override
+                protected Bitmap getNewCaptcha() throws Exception {
+                    return CirnoModule.this.getNewCaptcha("d", dNum, listener, task).bitmap;
+                }
+                @Override
+                protected void storeResponse(String response) {
+                    lastReportCaptcha = response;
+                }
+            };
+        } else {
+            UrlPageModel subject = new UrlPageModel();
+            subject.chanName = IICHAN_NAME;
+            subject.type = UrlPageModel.TYPE_THREADPAGE;
+            subject.boardName = model.boardName;
+            subject.threadNumber = model.threadNumber;
+            subject.postNumber = model.postNumber;
+            SendPostModel sendModel = new SendPostModel();
+            sendModel.chanName = IICHAN_NAME;
+            sendModel.boardName = "d";
+            sendModel.threadNumber = dNum;
+            sendModel.name = "";
+            sendModel.subject = "";
+            sendModel.email = "";
+            sendModel.comment = buildUrl(subject);
+            if (model.reportReason != null) sendModel.comment += "\n" + model.reportReason;
+            sendModel.password = getDefaultPassword();
+            sendModel.captchaAnswer = lastReportCaptcha;
+            lastReportCaptcha = null;
+            sendPost(sendModel, listener, task);
+            return null;
+        }
     }
     
     @Override

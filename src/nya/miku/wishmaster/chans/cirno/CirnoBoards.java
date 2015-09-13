@@ -132,6 +132,7 @@ public class CirnoBoards {
         model.requiredFileForNewThread = !name.equals("d");
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
+        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
         model.allowNames = !name.equals("b") && !name.equals("bro");
         model.allowSubjects = true;
         model.allowSage = false;
