@@ -417,6 +417,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Використовувати нову версію Recaptcha</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback">Recaptcha 2.0 fallback</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback_summary">Використовувати Recaptcha 2.0 в режимі сумісності</string>
     
     <string name="preferences">Опції</string>
     <string name="pref_cat_chans">Іміджборди</string>

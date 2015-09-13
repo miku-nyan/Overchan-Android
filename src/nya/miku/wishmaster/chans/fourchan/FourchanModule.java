@@ -72,7 +72,7 @@ import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.interactive.SimpleCaptchaException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -89,6 +89,7 @@ public class FourchanModule extends AbstractChanModule {
     
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_NEW_RECAPTCHA = "PREF_KEY_NEW_RECAPTCHA1";
+    private static final String PREF_KEY_NEW_RECAPTCHA_FALLBACK = "PREF_KEY_NEW_RECAPTCHA_FALLBACK";
     private static final String PREF_KEY_PASS_TOKEN = "PREF_KEY_PASS_TOKEN";
     private static final String PREF_KEY_PASS_PIN = "PREF_KEY_PASS_PIN";
     private static final String PREF_KEY_PASS_COOKIE = "PREF_KEY_PASS_COOKIE";
@@ -308,12 +309,20 @@ public class FourchanModule extends AbstractChanModule {
         Context context = preferenceGroup.getContext();
         addPasscodePreference(preferenceGroup);
         
-        final CheckBoxPreference newRecaptchaPref = new CheckBoxPreference(context);
+        CheckBoxPreference newRecaptchaPref = new CheckBoxPreference(context);
         newRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha);
         newRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_summary);
         newRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
         newRecaptchaPref.setDefaultValue(NEW_RECAPTCHA_DEFAULT);
         preferenceGroup.addPreference(newRecaptchaPref);
+        
+        final CheckBoxPreference fallbackRecaptchaPref = new CheckBoxPreference(context);
+        fallbackRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha_fallback);
+        fallbackRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_fallback_summary);
+        fallbackRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA_FALLBACK));
+        fallbackRecaptchaPref.setDefaultValue(false);
+        preferenceGroup.addPreference(fallbackRecaptchaPref);
+        fallbackRecaptchaPref.setDependency(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
         
         addPasswordPreference(preferenceGroup);
         CheckBoxPreference httpsPref = new CheckBoxPreference(context);
@@ -326,11 +335,12 @@ public class FourchanModule extends AbstractChanModule {
         addProxyPreferences(preferenceGroup);
         
         final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
-        newRecaptchaPref.setEnabled(!proxyPreference.isChecked());
+        fallbackRecaptchaPref.setEnabled(!proxyPreference.isChecked());
         proxyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {            
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                newRecaptchaPref.setEnabled(!proxyPreference.isChecked());
+                fallbackRecaptchaPref.setEnabled(!proxyPreference.isChecked());
+                if (proxyPreference.isChecked() && !fallbackRecaptchaPref.isChecked()) fallbackRecaptchaPref.setChecked(true);
                 return false;
             }
         });
@@ -341,8 +351,12 @@ public class FourchanModule extends AbstractChanModule {
     }
     
     private boolean useNewRecaptcha() {
-        return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) &&
-                preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
+        return preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
+    }
+    
+    private boolean newRecaptchaFallback() {
+        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) ||
+                preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA_FALLBACK), false);
     }
     
     @Override
@@ -468,7 +482,7 @@ public class FourchanModule extends AbstractChanModule {
         String recaptcha2 = Recaptcha2solved.pop(RECAPTCHA_KEY);
         if (!usingPasscode) {
             if (useNewRecaptcha()) {
-                if (recaptcha2 == null) throw new Recaptcha2js(RECAPTCHA_KEY);
+                if (recaptcha2 == null) throw Recaptcha2.obtain(RECAPTCHA_KEY, CHAN_NAME, newRecaptchaFallback());
             } else if (recaptcha == null) throw new Exception("Invalid captcha");
         }
         String url = "https://sys.4chan.org/" + model.boardName + "/post";

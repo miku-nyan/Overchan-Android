@@ -407,7 +407,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="inach_prefs_ajax_update_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
-    <string name="fourchan_prefs_new_recaptcha_summary">Verwenden Sie die neue Version von Recaptcha</string>
+    <string name="fourchan_prefs_new_recaptcha_summary">Die neue Version von Recaptcha verwenden</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback">Recaptcha 2.0 fallback</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback_summary">Den Kompatibilitätsmodus verwenden</string>
     
     <string name="preferences">Einstellungen</string>
     <string name="pref_cat_chans">Imageboards</string>

@@ -407,6 +407,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Use the new version of Recaptcha</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback">Recaptcha 2.0 fallback</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback_summary">Use the Recaptcha 2.0 in compatibility mode</string>
     
     <string name="preferences">Preferences</string>
     <string name="pref_cat_chans">Imageboards</string>

@@ -35,6 +35,7 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.ui.AppearanceUtils;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
@@ -65,6 +66,7 @@ public class Recaptcha2fallback extends InteractiveException {
     private static final long serialVersionUID = 1L;
     
     private static final String TAG = "Recaptcha2fallback";
+    private static Pair<String, String> lastChallenge = null;
     
     private static final String RECAPTCHA_FALLBACK_URL = "://www.google.com/recaptcha/api/fallback?k=";
     private static final String RECAPTCHA_IMAGE_URL = "://www.google.com/recaptcha/api2/payload?c=";
@@ -94,14 +96,20 @@ public class Recaptcha2fallback extends InteractiveException {
             final HttpClient httpClient = MainApplication.getInstance().getChanModule(chanName).getHttpClient();
             final String usingURL = scheme + RECAPTCHA_FALLBACK_URL + publicKey;
             Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, usingURL) };
-            String htmlChallenge = HttpStreamer.getInstance().getStringFromUrl(usingURL,
-                    HttpRequestModel.builder().setGET().setCustomHeaders(customHeaders).build(), httpClient, null, task, false);
+            String htmlChallenge;
+            if (lastChallenge != null && lastChallenge.getLeft().equals(usingURL)) {
+                htmlChallenge = lastChallenge.getRight();
+            } else {
+                htmlChallenge = HttpStreamer.getInstance().getStringFromUrl(usingURL,
+                        HttpRequestModel.builder().setGET().setCustomHeaders(customHeaders).build(), httpClient, null, task, false);
+            }
+            lastChallenge = null;
             
             Matcher challengeMatcher = Pattern.compile("name=\"c\" value=\"([\\w-]+)").matcher(htmlChallenge);
             if (challengeMatcher.find()) {
                 final String challenge = challengeMatcher.group(1);
-                HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(scheme + RECAPTCHA_IMAGE_URL +
-                        challenge + "&k=" + publicKey, HttpRequestModel.builder().setGET().build(), httpClient, null, task);
+                HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(scheme + RECAPTCHA_IMAGE_URL + challenge + "&k=" + publicKey,
+                        HttpRequestModel.builder().setGET().setCustomHeaders(customHeaders).build(), httpClient, null, task);
                 try {
                     InputStream imageStream = responseModel.stream;
                     final Bitmap challengeBitmap = BitmapFactory.decodeStream(imageStream);
@@ -259,6 +267,7 @@ public class Recaptcha2fallback extends InteractiveException {
                                                         }
                                                     });
                                                 } else {
+                                                    lastChallenge = Pair.of(usingURL, response);
                                                     throw new RecaptchaException("incorrect answer (hash is empty)");
                                                 }
                                             } catch (final Exception e){
