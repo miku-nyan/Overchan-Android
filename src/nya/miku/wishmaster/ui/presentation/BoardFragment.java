@@ -99,6 +99,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Layout;
+import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -106,6 +107,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
@@ -890,7 +892,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     @Override
-    public void onURLSpanClick(View v, ClickableURLSpan span, String url) {
+    public void onURLSpanClick(View v, ClickableURLSpan span, String url, String referer) {
         if (presentationModel == null || presentationModel.presentationList == null) return;
         if (tabModel.pageModel.type != UrlPageModel.TYPE_THREADPAGE) {
             if (!url.startsWith("#")) UrlHandler.open(chan.fixRelativeUrl(url), activity);
@@ -930,7 +932,17 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             if (itemPosition != -1) {
                 if (settings.isPopupLinks()) {
-                    showPostPopupDialog(itemPosition, settings.isRealTablet(), getSpanCoordinates(v, span));
+                    String refererPost = null;
+                    if (referer != null) {
+                        if (referer.startsWith(PresentationItemModel.POST_REFERER)) {
+                            refererPost = referer.substring(PresentationItemModel.POST_REFERER.length());
+                        } else {
+                            try {
+                                refererPost = UrlHandler.getPageModel(referer).postNumber;
+                            } catch (Exception e) {}
+                        }
+                    }
+                    showPostPopupDialog(itemPosition, settings.isRealTablet(), getSpanCoordinates(v, span), refererPost);
                 } else {
                     listView.setSelection(itemPosition);
                 }
@@ -1585,7 +1597,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
          * @return
          */
         public View getView(int position, View convertView, ViewGroup parent, Integer popupWidth) {
-            return getView(position, convertView, parent, popupWidth, null);
+            return getView(position, convertView, parent, popupWidth, null, null);
         }
         
         /**
@@ -1598,6 +1610,32 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
          * не для элемента на позиции position, а для этой модели. При этом комментарий не переносится в ScrollView (т.к. в диалоге будет ListView)
          */
         public View getView(int position, View convertView, ViewGroup parent, Integer popupWidth, PresentationItemModel custom) {
+            return getView(position, convertView, parent, popupWidth, custom, null);
+        }
+        
+        /**
+         * @param position позиция элемента в списке
+         * @param convertView старый view для вторичного использования (при вызове через адаптер)
+         * @param parent родительский view, к которому будет прикреплён создающийся (при вызове через адаптер)
+         * @param popupWidth ширина окна, в котором вид будет отображён (если необходимо получить view для всплывающего диалога).
+         * Для получения вида по умолчанию (в адаптере listview) необходимо передать null.
+         * @param referer номер поста, из которого открывается диалог (здесь будет выделен цветом {@link ThemeUtils.ThemeColors#refererForeground})
+         */
+        public View getView(int position, View convertView, ViewGroup parent, Integer popupWidth, String referer) {
+            return getView(position, convertView, parent, popupWidth, null, referer);
+        }
+        
+        /**
+         * @param position позиция элемента в списке
+         * @param convertView старый view для вторичного использования (при вызове через адаптер)
+         * @param parent родительский view, к которому будет прикреплён создающийся (при вызове через адаптер)
+         * @param popupWidth ширина окна, в котором вид будет отображён (если необходимо получить view для всплывающего диалога).
+         * Для получения вида по умолчанию (в адаптере listview) необходимо передать null.
+         * @param custom если != null, строится View (только для всплывающего диалога, popupWidth не должно быть равно null)
+         * не для элемента на позиции position, а для этой модели. При этом комментарий не переносится в ScrollView (т.к. в диалоге будет ListView)
+         * @param referer номер поста, из которого открывается диалог (здесь будет выделен цветом {@link ThemeUtils.ThemeColors#refererForeground})
+         */
+        public View getView(int position, View convertView, ViewGroup parent, Integer popupWidth, PresentationItemModel custom, String referer) {
             final PresentationItemModel model = custom == null ? this.getItem(position) : custom;
             
             //(popupWidth == null) <=> (элемент не для всплывающего диалога, а для ListView)            
@@ -1747,16 +1785,17 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             
             //комментарий
             boolean isFloating;
+            int refererHighlightColor = ThemeUtils.ThemeColors.getInstance(fragment().activity.getTheme()).refererForeground;
             if (popupWidth == null) {
-                tag.commentView.setText(
+                tag.commentView.setText(highlightReferer(referer, refererHighlightColor,
                         fragment().searchHighlightActive && fragment().cachedSearchHighlightedSpanables != null &&
                         fragment().cachedSearchHighlightedSpanables.get(position) != null ?
-                                fragment().cachedSearchHighlightedSpanables.get(position) : model.spannedComment);
+                                fragment().cachedSearchHighlightedSpanables.get(position) : model.spannedComment));
                 isFloating = model.floating;
             } else {
                 PresentationItemModel.SpannedCommentContainer customSpanned =
                         model.getSpannedCommentForCustomWidth(popupWidth - fragment().postItemPadding, fragment().floatingModels);
-                tag.commentView.setText(customSpanned.spanned);
+                tag.commentView.setText(highlightReferer(referer, refererHighlightColor, customSpanned.spanned));
                 isFloating = customSpanned.floating;
             }
             if (attachmentsCount == 1) {
@@ -1857,7 +1896,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             //ссылки на ответы
             Spanned usingReferencesString = fragment().staticSettings.repliesOnlyQuantity ? model.referencesQuantityString : model.referencesString;
             if (usingReferencesString != null && usingReferencesString.length() != 0) {
-                tag.repliesView.setText(usingReferencesString);
+                tag.repliesView.setText(highlightReferer(referer, refererHighlightColor, usingReferencesString));
                 if (!tag.repliesIsVisible) {
                     tag.repliesView.setVisibility(View.VISIBLE);
                     tag.repliesIsVisible = true;
@@ -1953,6 +1992,21 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             return view;
         }
         
+        private Spanned highlightReferer(String referer, int color, Spanned spanned) {
+            if (referer == null || referer.length() == 0) return spanned;
+            SpannableStringBuilder builder = null;
+            ClickableURLSpan[] spans = spanned.getSpans(0, spanned.length(), ClickableURLSpan.class);
+            for (ClickableURLSpan span : spans) {
+                int spanStart = spanned.getSpanStart(span);
+                int spanEnd = spanned.getSpanEnd(span);
+                if (spanned.subSequence(spanStart, spanEnd).toString().contains(referer)) {
+                    if (builder == null) builder = new SpannableStringBuilder(spanned);
+                    builder.setSpan(new ForegroundColorSpan(color), spanStart, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+            return builder == null ? spanned : builder;
+        }
+
         public void setBusy(boolean isBusy) {
             if (isBusy == this.isBusy) return;
             this.isBusy = isBusy;
@@ -2098,7 +2152,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     /**
-     * Загружать миниатюры автоматически
+     * Загружать ли миниатюры автоматически
      */
     private boolean downloadThumbnails() {
         switch (staticSettings.downloadThumbnails) {
@@ -2586,7 +2640,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
      * @param isTablet true, если планшетный режим (задается положение окна относительно ссылки)
      * @param coordinates координаты нажатой ссылки
      */
-    private void showPostPopupDialog(final int itemPosition, final boolean isTablet, final Point coordinates) {
+    private void showPostPopupDialog(final int itemPosition, final boolean isTablet, final Point coordinates, final String refererPost) {
         final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
         final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
         final int measuredWidth = isTablet ? adapter.measureViewWidth(itemPosition) : -1; //измерять требуется только для планшета
@@ -2622,7 +2676,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 tmpDlg.cancel();
                 int newWidth = isTablet ? Math.min(measuredWidth, dlgWidth) : dlgWidth;
                 
-                View view = adapter.getView(itemPosition, null, null, newWidth);
+                View view = adapter.getView(itemPosition, null, null, newWidth, refererPost);
                 view.setBackgroundColor(bgColor);
                 //Logger.d(TAG, "measured: "+view.findViewById(R.id.post_frame_main).getMeasuredWidth()+
                 //        "x"+view.findViewById(R.id.post_frame_main).getMeasuredHeight());
@@ -2705,7 +2759,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     
                     ClickableURLSpan.URLSpanClickListener spanClickListener = new ClickableURLSpan.URLSpanClickListener() {
                         @Override
-                        public void onClick(View v, ClickableURLSpan span, String url) {
+                        public void onClick(View v, ClickableURLSpan span, String url, String referer) {
                             if (url.startsWith("#")) {
                                 try {
                                     UrlPageModel threadPageModel = new UrlPageModel();
@@ -2841,7 +2895,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     public View getView(int position, View convertView, ViewGroup parent) {
                         try {
                             int adapterPositon = getItem(position);
-                            View view = adapter.getView(adapterPositon, convertView, parent, dlgWidth, adapter.getItem(adapterPositon));
+                            View view = adapter.getView(adapterPositon, convertView, parent, dlgWidth, adapter.getItem(adapterPositon), from);
                             view.setBackgroundColor(bgColor);
                             return view;
                         } catch (Exception e) {

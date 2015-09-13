@@ -25,7 +25,7 @@ import android.view.View;
 public class VolatileSpanClickListener implements ClickableURLSpan.URLSpanClickListener {
     
     public interface Listener {
-        public void onURLSpanClick(View v, ClickableURLSpan span, String url);
+        public void onURLSpanClick(View v, ClickableURLSpan span, String url, String referer);
     }
     
     private volatile WeakReference<Listener> listenerRef;
@@ -39,11 +39,11 @@ public class VolatileSpanClickListener implements ClickableURLSpan.URLSpanClickL
     }
     
     @Override
-    public void onClick(View v, ClickableURLSpan span, String url) {
+    public void onClick(View v, ClickableURLSpan span, String url, String referer) {
         if (listenerRef != null) {
             Listener listener = listenerRef.get();
             if (listener != null) {
-                listener.onURLSpanClick(v, span, url);
+                listener.onURLSpanClick(v, span, url, referer);
             }
         }
     }

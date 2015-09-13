@@ -57,6 +57,7 @@ public class PresentationItemModel {
     private static final Pattern REPLY_LINK_FULL_PATTERN = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)(?:.*?)</a>", Pattern.DOTALL);
     
     public static final String ALL_REFERENCES_URI = "references://all?from=";
+    public static final String POST_REFERER = "refpost://";
     
     private Resources resources = MainApplication.getInstance().resources;
     private URLSpanClickListener spanClickListener;
@@ -146,7 +147,8 @@ public class PresentationItemModel {
         this.openSpoilers = openSpoilers;
         this.floatingModels = floatingModels;
         
-        this.spannedComment = HtmlParser.createSpanned(source.subject, source.comment, spanClickListener, imageGetter, themeColors, openSpoilers);
+        this.spannedComment = HtmlParser.createSpanned(source.subject, source.comment, spanClickListener, imageGetter, themeColors, openSpoilers,
+                POST_REFERER + source.number);
         this.dateString = source.timestamp != 0 ? dateFormat.format(source.timestamp) : "";
         parseReferences();
         parseBadge();
@@ -175,8 +177,8 @@ public class PresentationItemModel {
     public void changeFloatingModels(FloatingModel[] floatingModels) {
         this.floatingModels = floatingModels;
         if (floating) {
-            this.spannedComment =
-                    HtmlParser.createSpanned(sourceModel.subject, sourceModel.comment, spanClickListener, imageGetter, themeColors, openSpoilers);
+            this.spannedComment = HtmlParser.createSpanned(sourceModel.subject, sourceModel.comment, spanClickListener, imageGetter,
+                    themeColors, openSpoilers, POST_REFERER + sourceModel.number);
             tryFlow(floatingModels);
         }
     }
@@ -202,8 +204,8 @@ public class PresentationItemModel {
         }
         
         boolean flow;
-        SpannableStringBuilder builder =
-                HtmlParser.createSpanned(sourceModel.subject, sourceModel.comment, spanClickListener, imageGetter, themeColors, openSpoilers);
+        SpannableStringBuilder builder = HtmlParser.createSpanned(sourceModel.subject, sourceModel.comment, spanClickListener, imageGetter,
+                themeColors, openSpoilers, POST_REFERER + sourceModel.number);
         int attachmentType = sourceModel.attachments[0].type;
         if (attachmentType == AttachmentModel.TYPE_IMAGE_STATIC || attachmentType == AttachmentModel.TYPE_OTHER_NOTFILE) {
             flow = FlowTextHelper.flowText(builder, floatingModels[0], textFullWidth);
@@ -407,6 +409,7 @@ public class PresentationItemModel {
             builder.setSpan(refLinkSpan, positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             builder.setSpan(new ForegroundColorSpan(themeColors.urlLinkForeground), positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             refLinkSpan.setOnClickListener(spanClickListener);
+            refLinkSpan.setReferer(POST_REFERER + sourceModel.number);
         }
         builder.setSpan(new StyleSpan(Typeface.ITALIC), 0, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         referencesString = builder;

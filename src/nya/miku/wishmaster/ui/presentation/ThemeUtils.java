@@ -74,10 +74,12 @@ public class ThemeUtils {
         public final int spoilerForeground;
         public final int spoilerBackground;
         public final int urlLinkForeground;
+        public final int refererForeground;
         public final int subjectForeground;
         
         private ThemeColors(int indexForeground, int indexBumpLimit, int numberForeground, int nameForeground, int opForeground, int sageForeground,
-                int tripForeground, int quoteForeground, int spoilerForeground, int spoilerBackground, int urlLinkForeground, int subjectForeground) {
+                int tripForeground, int quoteForeground, int spoilerForeground, int spoilerBackground, int urlLinkForeground, int refererForeground,
+                int subjectForeground) {
             this.indexForeground = indexForeground;
             this.indexOverBumpLimit = indexBumpLimit;
             this.numberForeground = numberForeground;
@@ -89,6 +91,7 @@ public class ThemeUtils {
             this.spoilerForeground = spoilerForeground;
             this.spoilerBackground = spoilerBackground;
             this.urlLinkForeground = urlLinkForeground;
+            this.refererForeground = refererForeground;
             this.subjectForeground = subjectForeground;
         }
         
@@ -111,6 +114,7 @@ public class ThemeUtils {
                 int spoilerForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_spoilerForeground, Color.BLACK);
                 int spoilerBackground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_spoilerBackground, Color.parseColor("#BBBBBB"));
                 int urlLinkForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_urlLinkForeground, Color.parseColor("#0000EE"));
+                int refererForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_refererForeground, Color.parseColor("#FF0000"));
                 int subjectForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postTitleForeground, Color.BLACK);
                 instance = new ThemeColors(
                         indexColor,
@@ -124,6 +128,7 @@ public class ThemeUtils {
                         spoilerForeground,
                         spoilerBackground,
                         urlLinkForeground,
+                        refererForeground,
                         subjectForeground);
             }
             return instance;

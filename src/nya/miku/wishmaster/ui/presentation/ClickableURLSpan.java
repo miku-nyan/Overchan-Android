@@ -27,10 +27,11 @@ import android.view.View;
 
 public class ClickableURLSpan extends ClickableSpan {
     public static interface URLSpanClickListener {
-        public void onClick(View v, ClickableURLSpan span, String url);
+        public void onClick(View v, ClickableURLSpan span, String url, String referer);
     }
     
     private final String url;
+    private String referer;
     private URLSpanClickListener listener;
     
     public ClickableURLSpan(String url) {
@@ -39,13 +40,19 @@ public class ClickableURLSpan extends ClickableSpan {
     
     @Override
     public void onClick(View widget) {
-        if (this.listener != null) {
-            this.listener.onClick(widget, this, this.url);
+        if (listener != null) {
+            listener.onClick(widget, this, url, referer);
         }
     }
     
-    public void setOnClickListener(URLSpanClickListener listener) {
+    public ClickableURLSpan setOnClickListener(URLSpanClickListener listener) {
         this.listener = listener;
+        return this;
+    }
+    
+    public ClickableURLSpan setReferer(String referer) {
+        this.referer = referer;
+        return this;
     }
     
     public String getURL() {

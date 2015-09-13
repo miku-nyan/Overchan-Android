@@ -96,12 +96,13 @@ public class HtmlParser {
      * @param imageGetter обработчик загрузки изображений (тэг &lt;img&gt; внутри html текста)
      * @param themeColors объект {@link ThemeUtils.ThemeColors} для текущей темы оформления
      * @param openSpoilers отображать спойлеры открытыми
+     * @param referer ссылка на этот текущий пост (для задания referer у ссылок)
      * @return объект SpannableStringBuilder
      */
     public static SpannableStringBuilder createSpanned(String subject, String source,
-            URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors, boolean openSpoilers) {
+            URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors, boolean openSpoilers, String referer) {
         SpannableStringBuilder spanned = fromHtml(subject, source, themeColors, imageGetter, openSpoilers);
-        replaceUrls(spanned, spanClickListener, themeColors);
+        replaceUrls(spanned, spanClickListener, themeColors, referer);
         if (!openSpoilers) fixSpoilerSpans(spanned, themeColors);
         return spanned;
     }
@@ -110,11 +111,11 @@ public class HtmlParser {
      * Заменить ссылки (URLSpan) на ClickableURLSpan со своим обработчиком нажатия
      * @param listener обработчик нажатий на ссылки 
      */
-    private static void replaceUrls(SpannableStringBuilder builder, URLSpanClickListener listener, ThemeColors themeColors) {
+    private static void replaceUrls(SpannableStringBuilder builder, URLSpanClickListener listener, ThemeColors themeColors, String referer) {
         URLSpan[] spans = builder.getSpans(0, builder.length(), URLSpan.class);
         if (spans.length > 0) {
             for (URLSpan span : spans) {
-                ClickableURLSpan.replaceURLSpan(builder, span, themeColors.urlLinkForeground).setOnClickListener(listener);
+                ClickableURLSpan.replaceURLSpan(builder, span, themeColors.urlLinkForeground).setOnClickListener(listener).setReferer(referer);
             }
         }
     }

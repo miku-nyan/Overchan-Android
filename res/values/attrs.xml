@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <attr name="spoilerForeground" format="color|reference" />
         <attr name="spoilerBackground" format="color|reference" />
         <attr name="urlLinkForeground" format="color|reference" />
+        <attr name="refererForeground" format="color|reference" />
         <attr name="itemInfoForeground" format="color|reference" />
         <attr name="searchHighlightBackground" format="color|reference" />
         
