@@ -56,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="spoilerForeground">#800000</item>
         <item name="spoilerBackground">#F0D0B6</item>
         <item name="urlLinkForeground">#0000EE</item>
+        <item name="refererForeground">#EE0000</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
         
