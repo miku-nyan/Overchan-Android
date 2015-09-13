@@ -20,6 +20,9 @@ package nya.miku.wishmaster.http.recaptcha;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -42,6 +45,8 @@ public class Recaptcha2js extends InteractiveException {
     private static final long serialVersionUID = 1L;
     
     private static final String INTERCEPT = "_intercept?";
+    private static final String FALLBACK_INTERCEPT = "_fallback";
+    private static final String FALLBACK_FILTER = "g-recaptcha-response=";
     
     private final String publicKey;
     
@@ -53,7 +58,18 @@ public class Recaptcha2js extends InteractiveException {
                 "}" +
             "</script>" +
             "<script src=\"https://www.google.com/recaptcha/api.js\" async defer></script>" +
-            "<div class=\"g-recaptcha\" data-sitekey=\"" + publicKey + "\" data-callback=\"globalOnCaptchaEntered\"></div>";
+            "<form action=\"" + FALLBACK_INTERCEPT + "\" method=\"GET\" id=\"_overchan_submitform\">" +
+                "<div class=\"g-recaptcha\" data-sitekey=\"" + publicKey + "\" data-callback=\"globalOnCaptchaEntered\"></div>" +
+            "</form>" +
+            "<script type=\"text/javascript\">" +
+                "function _overchan_add_fallback_submit() { " +
+                    "var element = document.createElement(\"input\"); " +
+                    "element.setAttribute(\"type\", \"submit\"); " +
+                    "element.setAttribute(\"value\", \"Submit\");" +
+                    "var foo = document.getElementById(\"_overchan_submitform\"); " +
+                    "foo.appendChild(element); " +
+                "}" +
+            "</script>";
     }
     
     private volatile boolean done = false;
@@ -81,15 +97,17 @@ public class Recaptcha2js extends InteractiveException {
                 WebView webView = new WebView(activity);
                 webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 webView.setWebViewClient(new WebViewClient() {
+                    AtomicBoolean fallbackButtonAdded = new AtomicBoolean(false);
                     @Override
                     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                         handler.proceed();
                     }
                     @Override
                     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                        if (url.contains(INTERCEPT)) {
-                            String hash = url.substring(url.indexOf(INTERCEPT) + INTERCEPT.length());
-                            Recaptcha2solved.push(publicKey, hash);
+                        if (url.contains(INTERCEPT) || url.contains(FALLBACK_INTERCEPT)) {
+                            String hash = url.contains(INTERCEPT) ? url.substring(url.indexOf(INTERCEPT) + INTERCEPT.length()) :
+                                (url.indexOf(FALLBACK_FILTER) != -1 ? url.substring(url.indexOf(FALLBACK_FILTER) + FALLBACK_FILTER.length()) : null);
+                            Recaptcha2solved.push(publicKey, hash != null ? hash : "NULL");
                             if (!done && !task.isCancelled()) activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -102,6 +120,13 @@ public class Recaptcha2js extends InteractiveException {
                             });
                         }
                         super.onPageStarted(view, url, favicon);
+                    }
+                    @Override
+                    public void onLoadResource(WebView view, String url) {
+                        if (url.contains("/api/fallback?") && fallbackButtonAdded.compareAndSet(false, true)) {
+                            view.loadUrl("javascript:_overchan_add_fallback_submit()");
+                        }
+                        super.onLoadResource(view, url);
                     }
                 });
                 //webView.getSettings().setUserAgentString(HttpConstants.USER_AGENT_STRING);
