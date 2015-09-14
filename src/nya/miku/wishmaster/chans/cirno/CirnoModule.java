@@ -358,8 +358,7 @@ public class CirnoModule extends AbstractChanModule {
             sendModel.password = getDefaultPassword();
             sendModel.captchaAnswer = lastReportCaptcha;
             lastReportCaptcha = null;
-            sendPost(sendModel, listener, task);
-            return null;
+            return sendPost(sendModel, listener, task);
         }
     }
     
