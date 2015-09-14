@@ -378,8 +378,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_no_icon">No Icon</string>
     <string name="makaba_prefs_mobile_api">Mobile API</string>
     <string name="makaba_prefs_mobile_api_summary">Load only new posts without reloading the whole thread</string>
-    <string name="makaba_prefs_force_google">Google Recaptcha</string>
-    <string name="makaba_prefs_force_google_summary">Use Recaptcha instead of captcha from Mail.Ru</string>
+    <string name="makaba_prefs_captcha_category">Captcha</string>
+    <string name="makaba_prefs_captcha_type">Captcha type</string>
+    <string name="makaba_prefs_google_fallback">Recaptcha 2.0 fallback</string>
+    <string name="makaba_prefs_google_fallback_summary">Use Google Recaptcha 2.0 in compatibility mode</string>
     <string name="makaba_prefs_domain_category">Domain</string>
     <string name="makaba_prefs_domain">Domain</string>
     <string name="makaba_prefs_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
