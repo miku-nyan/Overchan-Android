@@ -295,7 +295,7 @@ public class NullchanccModule extends AbstractWakabaModule {
                 addString("board", model.boardName).
                 addString("replythread", model.threadNumber == null ? "0" : model.threadNumber).
                 addString("name", model.name);
-        if (model.sage) postEntityBuilder.addString("sage", "on");
+        if (model.sage) postEntityBuilder.addString("em", "sage");
         postEntityBuilder.
                 addString("captcha", model.captchaAnswer).
                 addString("subject", model.subject).
