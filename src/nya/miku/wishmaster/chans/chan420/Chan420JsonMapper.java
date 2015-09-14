@@ -18,6 +18,7 @@
 
 package nya.miku.wishmaster.chans.chan420;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -84,7 +85,19 @@ public class Chan420JsonMapper {
         model.timeZoneId = "US/Eastern";
         model.defaultUserName = "Anonymous";
         model.bumpLimit = 300;
-        model.readonlyBoard = true;
+        model.readonlyBoard = false;
+        model.requiredFileForNewThread = true;
+        model.allowDeletePosts = false;
+        model.allowDeleteFiles = false;
+        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
+        model.allowNames = !boardName.equals("b");
+        model.allowSubjects = true;
+        model.allowSage = true;
+        model.allowEmails = false;
+        model.allowRandomHash = true;
+        model.allowIcons = false;
+        model.attachmentsMaxCount = 1;
+        model.markType = BoardModel.MARK_BBCODE;
         model.firstPage = 0;
         model.lastPage = 0;
         model.searchAllowed = false;
@@ -135,8 +148,14 @@ public class Chan420JsonMapper {
             if (tim != 0) {
                 attachment.thumbnail = "/" + boardName + "/thumb/" + Long.toString(tim) + "s.jpg";
                 attachment.path = "/" + boardName + "/src/" + Long.toString(tim) + ext;
-                model.attachments = new AttachmentModel[] { attachment };
+            } else {
+                String filename = attachment.originalName;
+                try {
+                    filename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
+                } catch (Exception e) {}
+                attachment.path = "/" + boardName + "/src/" + filename;
             }
+            model.attachments = new AttachmentModel[] { attachment };
         }
         return model;
     }

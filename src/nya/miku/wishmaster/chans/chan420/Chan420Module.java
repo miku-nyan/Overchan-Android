@@ -18,11 +18,22 @@
 
 package nya.miku.wishmaster.chans.chan420;
 
+import java.io.ByteArrayOutputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.http.Header;
+import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
+
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -33,21 +44,29 @@ import nya.miku.wishmaster.api.AbstractChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaUtils;
+import nya.miku.wishmaster.common.IOUtils;
+import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
+import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
+@SuppressWarnings("deprecation") //https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class Chan420Module extends AbstractChanModule {
     
     static final String CHAN_NAME = "420chan.org";
     
+    private static final Pattern ERROR_PATTERN = Pattern.compile("<pre[^>]*>(.*?)</pre>", Pattern.DOTALL);
+    private static final Pattern REPORT_PATTERN = Pattern.compile("text:[^']*'([^']*)'");
     private Map<String, BoardModel> boardsMap = null;
     
     public Chan420Module(SharedPreferences preferences, Resources resources) {
@@ -168,6 +187,72 @@ public class Chan420Module extends AbstractChanModule {
             result = ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(result));
         }
         return result;
+    }
+    
+    @Override
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        int bVal = (int) (Math.random() * 10000);
+        String banana = HttpStreamer.getInstance().getJSONObjectFromUrl((useHttps() ? "https://" : "http://") + "boards.420chan.org/bunker/",
+                HttpRequestModel.builder().
+                setPOST(new UrlEncodedFormEntityHC4(Collections.singletonList(new BasicNameValuePair("b", Integer.toString(bVal))), "UTF-8")).
+                setCustomHeaders(new Header[] { new BasicHeader("X-Requested-With", "XMLHttpRequest") }).
+                build(), httpClient, null, task, false).optString("response");
+        
+        String url = (useHttps() ? "https://" : "http://") + "boards.420chan.org/" + model.boardName + "/taimaba.pl";
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
+                addString("board", model.boardName).
+                addString("task", "post").
+                addString("password", model.password);
+        if (model.threadNumber != null) postEntityBuilder.addString("parent", model.threadNumber);
+        postEntityBuilder.
+                addString("field1", model.name).
+                addString("field3", model.subject).
+                addString("field4", model.comment);
+        if (model.attachments != null && model.attachments.length > 0)
+            postEntityBuilder.addFile("file", model.attachments[0], model.randomHash);
+        if (model.sage) postEntityBuilder.addString("sage", "on");
+        postEntityBuilder.addString("banana", banana);
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
+            if (response.statusCode == 302) {
+                return null;
+            } else if (response.statusCode == 200) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
+            } else throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        UrlPageModel pageModel = new UrlPageModel();
+        pageModel.chanName = CHAN_NAME;
+        pageModel.type = UrlPageModel.TYPE_THREADPAGE;
+        pageModel.boardName = model.boardName;
+        pageModel.threadNumber = model.threadNumber;
+        String location = buildUrl(pageModel);
+        String url = (useHttps() ? "https://" : "http://") + "420chan.org:8080/narcbot/ajaxReport.jsp?postId=" + model.postNumber +
+                "&reason=RULE_VIOLATION&note=" + URLEncoder.encode(model.reportReason).replace("+", "%20") +
+                "&location=" + URLEncoder.encode(location).replace("+", "%20") + "&parentId=" + model.threadNumber;
+        String response =
+                HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false);
+        Matcher matcher = REPORT_PATTERN.matcher(response);
+        if (matcher.find()) {
+            String text = matcher.group(1);
+            if (text.contains("reported")) return null;
+            return text;
+        }
+        return null;
     }
     
     @Override
