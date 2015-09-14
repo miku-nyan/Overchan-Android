@@ -422,6 +422,7 @@ public class DownloadingService extends Service {
                                         
                                         @Override
                                         public String getThumbnail(AttachmentModel attachment) {
+                                            if (attachment.isSpoiler) return getFavicon(); //TODO запилить картинку спойлера
                                             return attachment.thumbnail == null ? null : String.format(Locale.US, THUMBNAIL_FILE_FORMAT,
                                                     ChanModels.hashAttachmentModel(attachment));
                                         }
