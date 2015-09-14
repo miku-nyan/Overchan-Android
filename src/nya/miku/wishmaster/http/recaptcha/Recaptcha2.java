@@ -18,7 +18,7 @@
 
 package nya.miku.wishmaster.http.recaptcha;
 
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 
 /**
  * Recaptcha 2 Exception factory

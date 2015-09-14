@@ -28,7 +28,7 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;

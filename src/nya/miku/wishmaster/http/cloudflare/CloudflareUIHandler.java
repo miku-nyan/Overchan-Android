@@ -23,6 +23,7 @@ import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaException;
 

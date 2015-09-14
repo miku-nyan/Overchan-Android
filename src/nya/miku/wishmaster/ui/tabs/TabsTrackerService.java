@@ -31,7 +31,7 @@ import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.ui.MainActivity;
 import nya.miku.wishmaster.ui.downloading.BackgroundThumbDownloader;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;

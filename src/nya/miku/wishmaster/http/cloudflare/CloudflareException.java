@@ -20,6 +20,7 @@ package nya.miku.wishmaster.http.cloudflare;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 import android.app.Activity;
 
 /**

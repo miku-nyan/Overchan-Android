@@ -31,7 +31,6 @@ import android.widget.LinearLayout;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
 
 public abstract class SimpleCaptchaException extends InteractiveException {
     private static final long serialVersionUID = 1L;

@@ -52,7 +52,7 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.WriteableContainer;
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.ui.Attachments;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import android.annotation.SuppressLint;

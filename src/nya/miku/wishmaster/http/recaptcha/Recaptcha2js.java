@@ -19,7 +19,7 @@
 package nya.miku.wishmaster.http.recaptcha;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

@@ -53,7 +53,7 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.ReadableContainer;
-import nya.miku.wishmaster.http.cloudflare.InteractiveException;
+import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.ClickableLinksTextView;
 import nya.miku.wishmaster.lib.ClickableToast;
