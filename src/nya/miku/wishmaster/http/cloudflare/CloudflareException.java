@@ -18,6 +18,7 @@
 
 package nya.miku.wishmaster.http.cloudflare;
 
+import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
@@ -52,7 +53,7 @@ public class CloudflareException extends InteractiveException {
      * Создать новый экземпляр cloudflare-исключения (обычная js-antiddos проверка, без рекапчи).
      * @param url адрес, по которому вызвана проверка
      * @param cfCookieName название cloudflare-куки
-     * @param chanName название модуля чана
+     * @param chanName название модуля чана (модуль должен имплементировать {@link HttpChanModule})
      * @return созданный объект
      */
     public static CloudflareException antiDDOS(String url, String cfCookieName, String chanName) {
@@ -127,6 +128,6 @@ public class CloudflareException extends InteractiveException {
     
     @Override
     public void handle(Activity activity, CancellableTask task, Callback callback) {
-        CloudflareUIHandler.handleCloudflare(this, MainApplication.getInstance().getChanModule(chanName), activity, task, callback);
+        CloudflareUIHandler.handleCloudflare(this, (HttpChanModule) MainApplication.getInstance().getChanModule(chanName), activity, task, callback);
     }
 }

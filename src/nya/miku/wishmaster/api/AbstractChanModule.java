@@ -57,7 +57,7 @@ import android.text.InputType;
  * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
 @SuppressWarnings("deprecation")
 
-public abstract class AbstractChanModule implements ChanModule {
+public abstract class AbstractChanModule implements HttpChanModule {
     private static final String TAG = "AbstractChanModule";
     
     protected static final String DEFAULT_PROXY_HOST = "127.0.0.1";

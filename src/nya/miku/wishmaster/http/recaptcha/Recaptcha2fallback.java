@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -82,7 +83,7 @@ public class Recaptcha2fallback extends InteractiveException {
     
     /**
      * @param publicKey открытый ключ
-     * @param chanName название модуля чана
+     * @param chanName название модуля чана (модуль должен имплементировать {@link HttpChanModule})
      */
     public Recaptcha2fallback(String publicKey, String chanName) throws RecaptchaException {
         this.chanName = chanName;
@@ -93,7 +94,7 @@ public class Recaptcha2fallback extends InteractiveException {
     @Override
     public void handle(final Activity activity, final CancellableTask task, final Callback callback) {
         try {
-            final HttpClient httpClient = MainApplication.getInstance().getChanModule(chanName).getHttpClient();
+            final HttpClient httpClient = ((HttpChanModule) MainApplication.getInstance().getChanModule(chanName)).getHttpClient();
             final String usingURL = scheme + RECAPTCHA_FALLBACK_URL + publicKey;
             Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, usingURL) };
             String htmlChallenge;

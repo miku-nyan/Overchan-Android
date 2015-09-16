@@ -19,7 +19,7 @@
 package nya.miku.wishmaster.http.cloudflare;
 
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.ChanModule;
+import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
@@ -67,7 +67,7 @@ import android.widget.ImageView;
      * @param cfTask отменяемая задача
      * @param callback интерфейс {@link Callback}
      */
-    static void handleCloudflare(final CloudflareException e, final ChanModule chan, final Activity activity, final CancellableTask cfTask,
+    static void handleCloudflare(final CloudflareException e, final HttpChanModule chan, final Activity activity, final CancellableTask cfTask,
             final InteractiveException.Callback callback) {
         if (cfTask.isCancelled()) return;
         

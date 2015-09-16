@@ -32,9 +32,6 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.cookie.Cookie;
-
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceGroup;
 
@@ -43,11 +40,6 @@ import android.preference.PreferenceGroup;
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public interface ChanModule {
     
@@ -65,16 +57,6 @@ public interface ChanModule {
      * Получить значок имиджборды (объект Drawable)
      */
     Drawable getChanFavicon();
-    
-    /**
-     * Получить HTTP клиент, используемый данным чаном
-     */
-    HttpClient getHttpClient();
-    
-    /**
-     * Добавить Cookie к HTTP клиенту и сохранить его в параметрах, если это предусмотрено конкретной имиджбордой (напр. в случае Cloudflare)
-     */
-    void saveCookie(Cookie cookie);
     
     /**
      * Добавить параметры (отдельные для этой имиджборды), на экран настроек
