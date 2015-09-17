@@ -320,9 +320,11 @@ public class FileCache {
                     long tSize = 0;
                     do {
                         String filename = c.getString(nameIndex);
-                        if (!isUndeletable(filename)) list.add(Pair.of(filename, c.getLong(timeIndex)));
-                        if (!isPageFile(filename)) tSize += c.getLong(sizeIndex);
-                        if (tSize >= size) break;
+                        if (!isUndeletable(filename)) {
+                            list.add(Pair.of(filename, c.getLong(timeIndex)));
+                            if (!isPageFile(filename)) tSize += c.getLong(sizeIndex);
+                            if (tSize >= size) break;
+                        }
                     } while (c.moveToNext());
                 }
                 c.close();
