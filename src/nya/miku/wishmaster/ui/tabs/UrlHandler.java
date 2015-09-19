@@ -18,6 +18,7 @@
 
 package nya.miku.wishmaster.ui.tabs;
 
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Random;
@@ -56,9 +57,15 @@ public class UrlHandler {
             }
         };
         if (MainApplication.getInstance().settings.askExternalLinks()) {
+            String dialogUrl;
+            try {
+                dialogUrl = URLDecoder.decode(url, "UTF-8");
+            } catch (Exception e) {
+                dialogUrl = url;
+            }
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity).
                     setTitle(isEmail ? R.string.dialog_external_mail_title : R.string.dialog_external_url_title).
-                    setMessage(activity.getString(isEmail ? R.string.dialog_external_mail_text : R.string.dialog_external_url_text, url)).
+                    setMessage(activity.getString(isEmail ? R.string.dialog_external_mail_text : R.string.dialog_external_url_text, dialogUrl)).
                     setPositiveButton(android.R.string.yes, dialogClickListener).
                     setNegativeButton(android.R.string.no, dialogClickListener);
             dialogBuilder.show();
