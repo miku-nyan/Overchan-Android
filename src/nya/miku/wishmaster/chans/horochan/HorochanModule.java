@@ -99,7 +99,7 @@ public class HorochanModule extends AbstractChanModule {
     
     @Override
     public Drawable getChanFavicon() {
-        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_02ch, null);
+        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_horochan, null);
     }
     
     private boolean useHttps() {
