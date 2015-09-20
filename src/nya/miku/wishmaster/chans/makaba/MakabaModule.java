@@ -247,7 +247,7 @@ public class MakabaModule extends AbstractChanModule {
         final Context context = group.getContext();
         CheckBoxPreference mobileAPIPref = new CheckBoxPreference(context);
         mobileAPIPref.setTitle(R.string.makaba_prefs_mobile_api);
-        mobileAPIPref.setSummary(R.string.makaba_prefs_mobile_api_summary);
+        mobileAPIPref.setSummary(R.string.pref_only_new_posts_summary);
         mobileAPIPref.setKey(getSharedKey(PREF_KEY_MOBILE_API));
         mobileAPIPref.setDefaultValue(true);
         group.addPreference(mobileAPIPref);

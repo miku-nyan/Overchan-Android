@@ -127,7 +127,7 @@ public class InachModule extends AbstractWakabaModule {
         Context context = preferenceGroup.getContext();
         CheckBoxPreference ajaxPref = new CheckBoxPreference(context);
         ajaxPref.setTitle(R.string.inach_prefs_ajax_update);
-        ajaxPref.setSummary(R.string.inach_prefs_ajax_update_summary);
+        ajaxPref.setSummary(R.string.pref_only_new_posts_summary);
         ajaxPref.setKey(getSharedKey(PREF_AJAX_UPDATE));
         ajaxPref.setDefaultValue(true);
         preferenceGroup.addPreference(ajaxPref);

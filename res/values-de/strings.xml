@@ -378,7 +378,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_catalog_image_size">Nach Bildgröße sortieren</string>
     <string name="makaba_no_icon">Kein Symbol</string>
     <string name="makaba_prefs_mobile_api">Mobile API</string>
-    <string name="makaba_prefs_mobile_api_summary">Laden Sie nur neue Posts ohne Neuladen der ganzen Thread</string>
     <string name="makaba_prefs_captcha_category">Captcha</string>
     <string name="makaba_prefs_captcha_type">Captcha-Typ</string>
     <string name="makaba_prefs_google_fallback">Recaptcha 2.0 Fallback</string>
@@ -389,13 +388,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="mikuba_password_ignored">(wird ignoriert)</string>
     
-    <string name="dobrochan_prefs_only_new_posts">Nur neue Posts</string>
-    <string name="dobrochan_prefs_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     <string name="dobrochan_prefs_domain">Domain</string>
     <string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
-    
-    <string name="nullchancc_prefs_only_new_posts">Nur neue Posts</string>
-    <string name="nullchancc_prefs_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     
     <string name="dvach_prefs_domain">Domain</string>
     <string name="dvach_prefs_domain_summary">Reserved domains: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
@@ -406,7 +400,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="infinity_tor_message">Um 8chan über Tor zu senden, müssen Sie den .onion Domain verwenden.</string>
     
     <string name="inach_prefs_ajax_update">JSON-Update</string>
-    <string name="inach_prefs_ajax_update_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Die neue Version von Recaptcha verwenden</string>
@@ -437,6 +430,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_https_summary">Sichere, verschlüsselte Verbindung</string>
     <string name="pref_ignore_ssl_errors">SSL-Fehler ignorieren</string>
     <string name="pref_ignore_ssl_errors_summary">Hostname und Certificate Validation deaktivieren</string>
+    <string name="pref_only_new_posts">Nur neue Posts</string>
+    <string name="pref_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     <string name="pref_cat_connection_extended">Erweiterte Einstellungen</string>
     <string name="pref_okhttp">OkHttp</string>
     <string name="pref_okhttp_summary">Alternativer HTTP-Client mit SPDY (kann instabil sein!)</string>

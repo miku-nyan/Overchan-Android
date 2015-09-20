@@ -387,7 +387,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_catalog_image_size">Сортування за розміром картинки</string>
     <string name="makaba_no_icon">Іконки немає</string>
     <string name="makaba_prefs_mobile_api">Мобільний API</string>
-    <string name="makaba_prefs_mobile_api_summary">Запитувати лише нові пости, а не цілий тред</string>
     <string name="makaba_prefs_captcha_category">Капча</string>
     <string name="makaba_prefs_captcha_type">Тип капчі</string>
     <string name="makaba_prefs_google_fallback">Recaptcha 2.0 fallback</string>
@@ -398,13 +397,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="mikuba_password_ignored">(ігнорується)</string>
     
-    <string name="dobrochan_prefs_only_new_posts">Лише нові пости</string>
-    <string name="dobrochan_prefs_only_new_posts_summary">Запитувати лише нові пости, а не цілий тред</string>
     <string name="dobrochan_prefs_domain">Домен</string>
     <string name="dobrochan_prefs_domain_summary">Резрвні адреси: dobrochan.com, dobrochan.org, dobrochan.ru</string>
-    
-    <string name="nullchancc_prefs_only_new_posts">Лише нові пости</string>
-    <string name="nullchancc_prefs_only_new_posts_summary">Запитувати лише нові пости, а не цілий тред</string>
     
     <string name="dvach_prefs_domain">Домен</string>
     <string name="dvach_prefs_domain_summary">Резервні адреси: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
@@ -415,7 +409,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="infinity_tor_message">Домен .onion потрібен, щоб постити на 8ch через Tor.</string>
     
     <string name="inach_prefs_ajax_update">JSON-оновлення</string>
-    <string name="inach_prefs_ajax_update_summary">Запитувати лише нові пости, а не цілий тред</string>
     
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Використовувати нову версію Recaptcha</string>
@@ -446,6 +439,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_https_summary">Захищене шифроване з’єднання</string>
     <string name="pref_ignore_ssl_errors">Ігнорувати помилки SSL</string>
     <string name="pref_ignore_ssl_errors_summary">Не зважати на хостнейм і сертифікат</string>
+    <string name="pref_only_new_posts">Лише нові пости</string>
+    <string name="pref_only_new_posts_summary">Запитувати лише нові пости, а не цілий тред</string>
     <string name="pref_cat_connection_extended">Додаткові опції</string>
     <string name="pref_okhttp">OkHttp</string>
     <string name="pref_okhttp_summary">HTTP-клієнт із SPDY (стабільність під питанням!)</string>

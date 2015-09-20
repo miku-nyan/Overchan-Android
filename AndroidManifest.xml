@@ -64,6 +64,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="owlchan.ru" />
                 <data android:host="www.owlchan.ru" />
                 
+                <data android:host="horochan.ru" />
+                
                 <data android:host="420chan.org" />
                 <data android:host="boards.420chan.org" />
                 

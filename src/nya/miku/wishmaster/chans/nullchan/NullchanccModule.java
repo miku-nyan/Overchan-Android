@@ -145,8 +145,8 @@ public class NullchanccModule extends AbstractWakabaModule {
     private void addOnlyNewPostsPreference(PreferenceGroup group) {
         Context context = group.getContext();
         CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
-        onlyNewPostsPreference.setTitle(R.string.nullchancc_prefs_only_new_posts);
-        onlyNewPostsPreference.setSummary(R.string.nullchancc_prefs_only_new_posts_summary);
+        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
+        onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
         onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
         onlyNewPostsPreference.setDefaultValue(true);
         group.addItemFromInflater(onlyNewPostsPreference);
