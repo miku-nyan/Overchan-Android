@@ -220,7 +220,7 @@ public class HorochanModule extends AbstractChanModule {
         board.uniqueAttachmentNames = true;
         board.timeZoneId = "GMT+3";
         board.defaultUserName = "Anonymous";
-        board.bumpLimit = 500;
+        board.bumpLimit = 250;
         
         board.readonlyBoard = false;
         board.requiredFileForNewThread = true;
