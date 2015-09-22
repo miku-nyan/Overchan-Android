@@ -32,6 +32,8 @@ public class CirnoBoards {
     
     private static final List<String> IICHAN_BOARDS_410 = Arrays.asList(new String[] { "gnx", "int", "ts", "cu", "dev" });
     
+    private static final List<String> IICHAN_SPOILER_MARK_BOARDS = Arrays.asList(new String[] { "bro", "maid", "med", "tv", "a", "fi", "to", "vn" });
+    
     private static final List<BoardModel> LIST_IICHAN = new ArrayList<BoardModel>();
     private static final Map<String, BoardModel> MAP_IICHAN = new HashMap<String, BoardModel>();
     private static final SimpleBoardModel[] SIMPLE_ARRAY_IICHAN;
@@ -138,7 +140,7 @@ public class CirnoBoards {
         model.allowSage = false;
         model.allowEmails = true;
         model.ignoreEmailIfSage = false;
-        model.allowCustomMark = name.equals("a");
+        model.allowCustomMark = IICHAN_SPOILER_MARK_BOARDS.indexOf(name) != -1;
         model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false;
