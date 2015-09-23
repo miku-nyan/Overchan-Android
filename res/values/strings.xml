@@ -208,7 +208,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_external_url_text">%s\n\nThis page will be opened by an external application.
         Keep in mind that the site may contain malware, dangerous for your device.\n\nAre you sure you want to proceed?</string>
     <string name="dialog_external_mail_title">E-mail</string>
-    <string name="dialog_external_mail_text">%s\n\nFor email will be open an external application.\n\nDo you want to continue?</string>
+    <string name="dialog_external_mail_text">%s\n\nFor email an external application will be opened.\n\nDo you want to continue?</string>
     
     <string name="dialog_save_thread_title">Saving the thread</string>
     <string name="dialog_save_thread_text">All attachments and thumbnails that have already been downloaded or present in the
@@ -368,8 +368,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="iichan_prefs_report_thread">Thread for reporting</string>
     <string name="iichan_prefs_report_thread_summary">Number of the thread in /d/ for reporting abuse</string>
     
-    <string name="kraut_prefs_kompturcode">Kompturcode</string>
-    <string name="kraut_prefs_kompturcode_summary">Kompturcode cookie</string>
+    <string name="kraut_prefs_kompturcode">Komturcode</string>
+    <string name="kraut_prefs_kompturcode_summary">Komturcode cookie</string>
     
     <string name="makaba_catalog_standart">Sort by Bump order</string>
     <string name="makaba_catalog_last_reply">Sort by Last Reply</string>
