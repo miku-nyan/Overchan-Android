@@ -182,7 +182,10 @@ public class WakabaReader implements Closeable {
         dateBuffer.setLength(0);
     }
     
-    private void finalizeThread() {
+    /**
+     * Завершить чтение текущего треда (последующие прочитанные сообщения будут добавляться в новый тред)
+     */
+    protected final void finalizeThread() {
         if (postsBuf.size() > 0) {
             currentThread.posts = postsBuf.toArray(new PostModel[postsBuf.size()]);
             currentThread.threadNumber = currentThread.posts[0].number;
@@ -192,7 +195,10 @@ public class WakabaReader implements Closeable {
         }
     }
     
-    private void finalizePost() {
+    /**
+     * Завершить чтение текущего поста
+     */
+    protected final void finalizePost() {
         if (currentPost.number != null && currentPost.number.length() > 0) {
             ++currentThread.postsCount;
             currentPost.attachments = currentAttachments.toArray(new AttachmentModel[currentAttachments.size()]);

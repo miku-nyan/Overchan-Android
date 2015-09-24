@@ -20,7 +20,6 @@ package nya.miku.wishmaster.chans.sevenchan;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -79,24 +78,8 @@ public class SevenchanReader extends WakabaReader {
     private int curDateEndPos = 0;
     private int curAdminPos = 0;
     
-    private Method finalizePost;
-    
     public SevenchanReader(InputStream in) {
         super(in, DATE_FORMAT);
-        try {
-            finalizePost = WakabaReader.class.getDeclaredMethod("finalizePost");
-            finalizePost.setAccessible(true);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    private void finalizePost() {
-        try {
-            finalizePost.invoke(this);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
     
     @Override
