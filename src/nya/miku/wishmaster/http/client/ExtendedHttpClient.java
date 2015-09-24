@@ -18,38 +18,24 @@
 
 package nya.miku.wishmaster.http.client;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.ProxySelector;
-import java.net.SocketAddress;
-import java.net.URI;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
-import java.util.List;
-
 import javax.net.ssl.SSLContext;
 
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.HttpConstants;
 
-import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.BasicCookieStoreHC4;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
-import org.apache.http.protocol.HttpContext;
 
 /**
  * Основной HTTP-клиент, используемый в проекте.<br>
@@ -110,41 +96,13 @@ public class ExtendedHttpClient extends HttpClientWrapper {
     }
     
     private static HttpClient build(boolean safe, final HttpHost proxy, CookieStore cookieStore) {
-        if (proxy != null && proxy.getHostName() != null && proxy.getHostName().endsWith(".googlezip.net")) {
-            HttpRoutePlanner routePlanner = new SystemDefaultRoutePlanner(new ProxySelector() {
-                @Override
-                public List<Proxy> select(URI uri) {
-                    if (uri.getScheme().equalsIgnoreCase("http"))
-                        return Collections.singletonList(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHostName(), proxy.getPort())));
-                    return Collections.emptyList();
-                }
-                @Override
-                public void connectFailed(URI uri, SocketAddress address, IOException failure) {}
-            }) {
-                @Override
-                protected HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
-                    HttpHost host = super.determineProxy(target, request, context);
-                    if (host != null && host.getPort() == 443) return new HttpHost(host.getHostName(), host.getPort(), "https");
-                    return host;
-                }
-            };
-            return HttpClients.custom().
-                    setDefaultRequestConfig(getDefaultRequestConfigBuilder(HttpConstants.DEFAULT_HTTP_TIMEOUT).build()).
-                    setUserAgent(HttpConstants.USER_AGENT_STRING).
-                    setRoutePlanner(routePlanner).
-                    addInterceptorLast(DCP.INSTANCE).
-                    setDefaultCookieStore(cookieStore).
-                    setSSLSocketFactory(obtainSSLSocketFactory(safe)).
-                    build(); 
-        } else {
-            return HttpClients.custom().
-                    setDefaultRequestConfig(getDefaultRequestConfigBuilder(HttpConstants.DEFAULT_HTTP_TIMEOUT).build()).
-                    setUserAgent(HttpConstants.USER_AGENT_STRING).
-                    setProxy(proxy).
-                    setDefaultCookieStore(cookieStore).
-                    setSSLSocketFactory(obtainSSLSocketFactory(safe)).
-                    build();
-        }
+        return HttpClients.custom().
+                setDefaultRequestConfig(getDefaultRequestConfigBuilder(HttpConstants.DEFAULT_HTTP_TIMEOUT).build()).
+                setUserAgent(HttpConstants.USER_AGENT_STRING).
+                setProxy(proxy).
+                setDefaultCookieStore(cookieStore).
+                setSSLSocketFactory(obtainSSLSocketFactory(safe)).
+                build();
     }
     
     /**
