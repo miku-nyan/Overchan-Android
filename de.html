@@ -57,7 +57,8 @@
             <!-- <a href="yastore://details?id=nya.miku.wishmaster">Yandex.Store</a><br> -->
             <a href="https://github.com/miku-nyan/Overchan-Android/releases">Release Archiv</a><br>
             <a href="https://github.com/miku-nyan/Overchan-Android/blob/master/Imageboards.md">Unterstützte Imageboards</a><br>
-            <a href="http://iichan.hk/b/res/3583268.html">Offiziellen Thread auf iichan.hk</a><br>
+            <a href="data/thread.html" id="ThreadLink">Offiziellen Thread auf iichan.hk</a><br>
+            <script>$.getJSON('data/thread.json', function(data) { document.getElementById('ThreadLink').href = data.url; });</script>
           </p>
           
           
