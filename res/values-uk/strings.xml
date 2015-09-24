@@ -378,8 +378,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="iichan_prefs_report_thread">Тред для скарг</string>
     <string name="iichan_prefs_report_thread_summary">Номер треду в /d/ для повідомлень про порушення</string>
     
-    <string name="kraut_prefs_kompturcode">Kompturcode</string>
-    <string name="kraut_prefs_kompturcode_summary">Kompturcode cookie</string>
+    <string name="kraut_prefs_kompturcode">Komturcode</string>
+    <string name="kraut_prefs_kompturcode_summary">Komturcode cookie</string>
     
     <string name="makaba_catalog_standart">Сортування за бампами</string>
     <string name="makaba_catalog_last_reply">Сортування за останньою відповіддю</string>
