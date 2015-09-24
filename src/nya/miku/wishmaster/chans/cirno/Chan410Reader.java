@@ -18,8 +18,13 @@
 
 package nya.miku.wishmaster.chans.cirno;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.util.WakabaReader;
@@ -31,6 +36,10 @@ import nya.miku.wishmaster.api.util.WakabaReader;
  */
 public class Chan410Reader extends WakabaReader {
     
+    private static final Pattern SPAN_ADMIN_PATTERN = Pattern.compile("<span class=\"admin\">(.*?)</span>(.*?)", Pattern.DOTALL);
+    private static final char[] END_THREAD_FILTER = "<div id=\"thread".toCharArray();
+    private int curPos = 0;
+    
     public Chan410Reader(InputStream in) {
         super(in, DateFormats.CHAN_410_DATE_FORMAT);
     }
@@ -40,7 +49,34 @@ public class Chan410Reader extends WakabaReader {
     }
     
     @Override
+    protected void customFilters(int ch) throws IOException {
+        if (ch == END_THREAD_FILTER[curPos]) {
+            ++curPos;
+            if (curPos == END_THREAD_FILTER.length) {
+                skipUntilSequence(">".toCharArray());
+                finalizeThread();
+                
+                curPos = 0;
+            }
+        } else {
+            if (curPos != 0) curPos = ch == END_THREAD_FILTER[0] ? 1 : 0;
+        }
+    }
+    
+    @Override
     protected void postprocessPost(PostModel post) {
         if (post.subject.contains("\u21E9")) post.sage = true;
+    }
+    
+    @Override
+    protected void parseDate(String date) {
+        super.parseDate(date);
+        if (currentPost.timestamp == 0) {
+            Matcher matcher = SPAN_ADMIN_PATTERN.matcher(date);
+            if (matcher.matches()) {
+                currentPost.trip = (currentPost.trip == null ? "" : currentPost.trip) + StringEscapeUtils.unescapeHtml4(matcher.group(1).trim());
+                super.parseDate(matcher.group(2));
+            }
+        }
     }
 }

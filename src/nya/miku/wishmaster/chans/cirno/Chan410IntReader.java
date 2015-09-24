@@ -39,6 +39,7 @@ public class Chan410IntReader extends Chan410Reader {
     
     @Override
     protected void customFilters(int ch) throws IOException {
+        super.customFilters(ch);
         if (ch == COUNTRY_ICON_FILTER[curPos]) {
             ++curPos;
             if (curPos == COUNTRY_ICON_FILTER.length) {
