@@ -39,6 +39,7 @@ public class NsfwUnlock {
                     BufferedReader reader = new BufferedReader(new FileReader(unlock));
                     String current;
                     while ((current = reader.readLine()) != null) {
+                        current = current.trim();
                         if (!current.contains("://")) current = "http://" + current;
                         for (ChanModule chan : chans) {
                             try {
