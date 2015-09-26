@@ -2257,8 +2257,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             
         } else if (tabModel.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE) {
-            catalogBarView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item,
-                    presentationModel.source.boardModel.catalogTypeDescriptions));
+            String[] catalogTypes = presentationModel.source.boardModel.catalogTypeDescriptions;
+            if (catalogTypes == null) catalogTypes = new String[] { resources.getString(R.string.catalog_default) }; 
+            catalogBarView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item, catalogTypes));
             catalogBarView.setSelection(tabModel.pageModel.catalogType);
             catalogBarView.setOnItemSelectedListener(new CatalogOnSelectedListener(this));
         }

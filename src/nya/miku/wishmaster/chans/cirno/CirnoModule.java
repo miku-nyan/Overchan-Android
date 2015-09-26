@@ -174,6 +174,37 @@ public class CirnoModule extends AbstractChanModule {
     }
     
     @Override
+    public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
+            throws Exception {
+        UrlPageModel urlModel = new UrlPageModel();
+        urlModel.chanName = IICHAN_NAME;
+        urlModel.type = UrlPageModel.TYPE_CATALOGPAGE;
+        urlModel.boardName = boardName;
+        String url = buildUrl(urlModel);
+        
+        HttpResponseModel responseModel = null;
+        CirnoCatalogReader in = null;
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(oldList != null).build();
+        try {
+            responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
+            if (responseModel.statusCode == 200) {
+                in = new CirnoCatalogReader(responseModel.stream);
+                if (task != null && task.isCancelled()) throw new Exception("interrupted");
+                return in.readPage();
+            } else {
+                if (responseModel.notModified()) return null;
+                throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
+            }
+        } catch (Exception e) {
+            if (responseModel != null) HttpStreamer.getInstance().removeFromModifiedMap(url);
+            throw e;
+        } finally {
+            IOUtils.closeQuietly(in);
+            if (responseModel != null) responseModel.release();
+        }
+    }
+    
+    @Override
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
         UrlPageModel urlModel = new UrlPageModel();
@@ -377,11 +408,18 @@ public class CirnoModule extends AbstractChanModule {
             }
         }
         boolean haruhiism = "abe".equals(model.boardName) || (model.otherPath != null && model.otherPath.startsWith("/abe"));
+        if (!haruhiism && model.type == UrlPageModel.TYPE_CATALOGPAGE) return IICHAN_URL + model.boardName + "/catalogue.html";
         return WakabaUtils.buildUrl(model, haruhiism ? HARUHIISM_URL : IICHAN_URL);
     }
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return WakabaUtils.parseUrl(url, IICHAN_NAME, IICHAN_DOMAIN, HARUHIISM_DOMAIN);
+        UrlPageModel model = WakabaUtils.parseUrl(url, IICHAN_NAME, IICHAN_DOMAIN, HARUHIISM_DOMAIN);
+        if (model.type == UrlPageModel.TYPE_OTHERPAGE && model.otherPath != null && model.otherPath.endsWith("/catalogue.html")) {
+            model.type = UrlPageModel.TYPE_CATALOGPAGE;
+            model.boardName = model.otherPath.substring(0, model.otherPath.length() - 15);
+            model.otherPath = null;
+        }
+        return model;
     }
 }

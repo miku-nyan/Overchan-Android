@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="mark_strike">Durchgestrichen</string>
     <string name="mark_spoiler">Spoiler</string>
     
+    <string name="catalog_default">Katalog</string>
+    
     <string name="postitem_contentdescription_thumbnail_image">Thumbnail</string>
     <string name="postitem_contentdescription_badge_icon">Symbol</string>
     <string name="postitem_op_mark">#OP</string>

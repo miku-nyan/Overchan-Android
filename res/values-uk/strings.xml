@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="mark_strike">Закреслити</string>
     <string name="mark_spoiler">Спойлер</string>
     
+    <string name="catalog_default">Каталог</string>
+    
     <string name="postitem_contentdescription_thumbnail_image">Прев’ю</string>
     <string name="postitem_contentdescription_badge_icon">Іконка</string>
     <string name="postitem_op_mark">#ОП</string>
