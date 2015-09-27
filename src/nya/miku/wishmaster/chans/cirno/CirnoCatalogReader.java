@@ -157,7 +157,7 @@ public class CirnoCatalogReader implements Closeable {
                 attachment.width = -1;
                 attachment.height = -1;
                 attachment.thumbnail = readUntilSequence(FILTERS_CLOSE[filterIndex]);
-                attachment.path = attachment.thumbnail.replace("/thumbs/", "/src/");
+                attachment.path = attachment.thumbnail.replace("/thumb/", "/src/").replaceAll("(\\d+)s\\.", "$1.");
                 currentThread.posts[0].attachments = new AttachmentModel[] { attachment };
                 break;
             case FILTER_SUBJECT:
