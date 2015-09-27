@@ -508,6 +508,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cache_maxsize_hint">0 - неограниченный; 50 МБ по умолчанию</string>
     <string name="pref_clear_cache_title">Очистить кэш</string>
     <string name="pref_clear_cache_summary">%.1f MБ</string>
+    <string name="pref_clear_cache_confirmation">Вы действительно хотите очистить кэш?</string>
     <string name="pref_about_version_title">Overchan Android</string>
     <string name="pref_about_license_title">Лицензия</string>
     <string name="pref_about_license_summary">GPLv3</string>

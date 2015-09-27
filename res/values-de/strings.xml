@@ -502,6 +502,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cache_maxsize_hint">0 - unbegrenzt; 50 MB standardmäßig</string>
     <string name="pref_clear_cache_title">Cache löschen</string>
     <string name="pref_clear_cache_summary">%.1f MB</string>
+    <string name="pref_clear_cache_confirmation">Sind Sie sicher, dass Sie Cache löschen?</string>
     <string name="pref_about_version_title">Overchan Android</string>
     <string name="pref_about_license_title">Lizenz</string>
     <string name="pref_about_license_summary">GPLv3</string>

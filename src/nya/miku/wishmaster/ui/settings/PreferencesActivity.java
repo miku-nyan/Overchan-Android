@@ -25,6 +25,8 @@ import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -98,9 +100,21 @@ public class PreferencesActivity extends PreferenceActivity {
         clearCachePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                MainApplication.getInstance().fileCache.clearCache();
-                clearCachePreference.setSummary(getString(R.string.pref_clear_cache_summary,
-                        MainApplication.getInstance().fileCache.getCurrentSizeMB()));
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            MainApplication.getInstance().fileCache.clearCache();
+                            clearCachePreference.setSummary(getString(R.string.pref_clear_cache_summary,
+                                    MainApplication.getInstance().fileCache.getCurrentSizeMB()));
+                        }
+                    }
+                };
+                new AlertDialog.Builder(PreferencesActivity.this).
+                        setMessage(R.string.pref_clear_cache_confirmation).
+                        setPositiveButton(android.R.string.yes, dialogClickListener).
+                        setNegativeButton(android.R.string.no, null).
+                        show();
                 return true;
             }
         });
