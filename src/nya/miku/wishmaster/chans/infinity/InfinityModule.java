@@ -339,7 +339,7 @@ public class InfinityModule extends AbstractVichanModule {
         if (model.attachments != null) {
             String[] images = new String[] { "file", "file2", "file3", "file4", "file5" };
             for (int i=0; i<model.attachments.length; ++i) {
-                postEntityBuilder.addFile(images[i], model.attachments[i]);
+                postEntityBuilder.addFile(images[i], model.attachments[i], model.randomHash);
             }
         }
         if (needNewthreadCaptcha) {

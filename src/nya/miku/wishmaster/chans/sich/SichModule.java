@@ -69,10 +69,10 @@ public class SichModule extends AbstractVichanModule {
         "bmp", "gif", "jpeg", "jpg", "png", "mp4", "webm"
     };
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Балачки", "Основа", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Балачки", "Основа", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "int", "International", "Основа", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аніме", "Тематика", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "Фап", "Тематика", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "Фап", "Тематика", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "po", "Політика", "Тематика", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "soc", "Соціум", "Тематика", false),
     };
@@ -255,7 +255,7 @@ public class SichModule extends AbstractVichanModule {
                     if (model.attachments == null || model.attachments.length < i) {
                         postEntityBuilder.addPart(pair.getKey(), new ByteArrayBody(new byte[0], ""));
                     } else {
-                        postEntityBuilder.addFile(pair.getKey(), model.attachments[i - 1]);
+                        postEntityBuilder.addFile(pair.getKey(), model.attachments[i - 1], model.randomHash);
                     }
                     break;
                 default:

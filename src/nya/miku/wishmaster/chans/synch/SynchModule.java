@@ -220,7 +220,7 @@ public class SynchModule extends AbstractVichanModule {
                 default: val = pair.getValue();
             }
             if (pair.getKey().equals("file") && model.attachments != null && model.attachments.length > 0) {
-                postEntityBuilder.addFile(pair.getKey(), model.attachments[0]);
+                postEntityBuilder.addFile(pair.getKey(), model.attachments[0], model.randomHash);
             } else {
                 postEntityBuilder.addString(pair.getKey(), val);
             }

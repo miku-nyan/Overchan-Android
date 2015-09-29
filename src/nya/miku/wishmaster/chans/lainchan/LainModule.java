@@ -174,7 +174,7 @@ public class LainModule extends AbstractVichanModule {
             }
             if (pair.getKey().equals("file")) {
                 if (model.attachments != null && model.attachments.length > 0) {
-                    postEntityBuilder.addFile(pair.getKey(), model.attachments[0]);
+                    postEntityBuilder.addFile(pair.getKey(), model.attachments[0], model.randomHash);
                 } else {
                     postEntityBuilder.addPart(pair.getKey(), new ByteArrayBody(new byte[0], ""));
                 }

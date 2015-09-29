@@ -389,7 +389,7 @@ public class KrautModule extends AbstractChanModule {
         if (model.attachments != null) {
             String[] images = new String[] { "file_0", "file_1", "file_2", "file_3" };
             for (int i=0; i<model.attachments.length; ++i) {
-                postEntityBuilder.addFile(images[i], model.attachments[i]);
+                postEntityBuilder.addFile(images[i], model.attachments[i], model.randomHash);
             }
         }
         
