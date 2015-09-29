@@ -135,7 +135,7 @@ public class PonyachModule extends AbstractWakabaModule {
     
     @Override
     public String getDisplayingName() {
-        return "Поняч";
+        return "Поня.ч";
     }
     
     @Override
