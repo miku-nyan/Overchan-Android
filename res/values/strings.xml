@@ -395,6 +395,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dvach_prefs_domain">Domain</string>
     <string name="dvach_prefs_domain_summary">Reserved domains: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
     
+    <string name="ponyach_prefs_domain">Domain</string>
+    <string name="ponyach_prefs_passcode">Passcode</string>
+    <string name="ponyach_prefs_captcha">Captcha type</string>
+    
     <string name="synch_prefs_domain">Domain</string>
     <string name="synch_prefs_domain_summary">Reserved domains: syn-ch.com, syn-ch.org, syn-ch.ru, syn-ch.com.ua</string>
     

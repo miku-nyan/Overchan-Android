@@ -66,6 +66,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="horochan.ru" />
                 
+                <data android:host="ponyach.ru" />
+                <data android:host="ponychan.ru" />
+                <data android:host="ponya.ch" />
+                <data android:host="ponyach.cf" />
+                <data android:host="ponyach.ga" />
+                <data android:host="ponyach.ml" />
+                
                 <data android:host="420chan.org" />
                 <data android:host="boards.420chan.org" />
                 

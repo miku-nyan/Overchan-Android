@@ -405,6 +405,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dvach_prefs_domain">Домен</string>
     <string name="dvach_prefs_domain_summary">Резервні адреси: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
     
+    <string name="ponyach_prefs_domain">Домен</string>
+    <string name="ponyach_prefs_passcode">Пасскод</string>
+    <string name="ponyach_prefs_captcha">Капча</string>
+    
     <string name="synch_prefs_domain">Домен</string>
     <string name="synch_prefs_domain_summary">Резервні адреси: syn-ch.com, syn-ch.org, syn-ch.ru, syn-ch.com.ua</string>
     
