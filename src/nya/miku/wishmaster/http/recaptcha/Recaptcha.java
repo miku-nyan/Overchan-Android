@@ -19,9 +19,6 @@
 package nya.miku.wishmaster.http.recaptcha;
 
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -44,8 +41,6 @@ import android.graphics.BitmapFactory;
 @SuppressWarnings("deprecation")
 
 public class Recaptcha {
-    // сюда передавать открытый ключ
-    private static final String RECAPTCHA_CHALLENGE_URL = "://www.google.com/recaptcha/api/challenge?k=";
     // сюда передавать значение Challenge
     private static final String RECAPTCHA_IMAGE_URL = "://www.google.com/recaptcha/api/image?c=";
     
@@ -60,7 +55,7 @@ public class Recaptcha {
         new ChallengeGetter() {
             @Override
             public String get(String publicKey, CancellableTask task, HttpClient httpClient, String scheme) throws Exception {
-                return getNoscriptChallenge(publicKey, task, httpClient, scheme);
+                return RecaptchaNoscript.getChallenge(publicKey, task, httpClient, scheme);
             }
         },
     };
@@ -108,15 +103,6 @@ public class Recaptcha {
         } else {
             throw new RecaptchaException("Can't get recaptcha");
         }
-    }
-    
-    private static String getNoscriptChallenge(String publicKey, CancellableTask task, HttpClient httpClient, String scheme) throws Exception {
-        if (scheme == null) scheme = "http";
-        String response = HttpStreamer.getInstance().getStringFromUrl(scheme + RECAPTCHA_CHALLENGE_URL + publicKey,
-                HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
-        Matcher matcher = Pattern.compile("challenge.?:.?'([\\w-]+)'").matcher(response);
-        if (matcher.find()) return matcher.group(1);
-        throw new RecaptchaException("can't parse recaptcha challenge answer");
     }
     
     private Recaptcha() {}
