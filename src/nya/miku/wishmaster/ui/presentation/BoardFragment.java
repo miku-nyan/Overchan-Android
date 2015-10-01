@@ -324,6 +324,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (isFailInstance) {
+            Logger.e(TAG, "an instance with NULL tabModel was created");
             Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
             return new View(activity);
         }
@@ -1641,19 +1642,23 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             //(popupWidth == null) <=> (элемент не для всплывающего диалога, а для ListView)            
 
             if (popupWidth == null && model.hidden) {
-                View view = convertView == null ? inflater.inflate(R.layout.post_item_hidden, parent, false) : convertView;
-                view.setTag(Integer.valueOf(position));
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        fragment().onItemClick(null, null, (Integer)v.getTag(), 0);
-                    }
-                });
-                ((TextView) view).setText(fragment().resources.getString(
-                        fragment().pageType == TYPE_THREADSLIST ? R.string.postitem_hidden_thread : R.string.postitem_hidden_post,
-                        model.sourceModel.number,
-                        model.autohideReason != null ? model.autohideReason : model.spannedComment.toString()));
-                return view;
+                if (fragment().staticSettings.showHiddenItems) {
+                    View view = convertView == null ? inflater.inflate(R.layout.post_item_hidden, parent, false) : convertView;
+                    view.setTag(Integer.valueOf(position));
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            fragment().onItemClick(null, null, (Integer)v.getTag(), 0);
+                        }
+                    });
+                    ((TextView) view).setText(fragment().resources.getString(
+                            fragment().pageType == TYPE_THREADSLIST ? R.string.postitem_hidden_thread : R.string.postitem_hidden_post,
+                            model.sourceModel.number,
+                            model.autohideReason != null ? model.autohideReason : model.spannedComment.toString()));
+                    return view;
+                } else {
+                    return convertView == null ? inflater.inflate(R.layout.post_item_null, parent, false) : convertView;
+                }
             }
             
             final View view = convertView == null ? inflater.inflate(R.layout.post_item_frame, parent, false) : convertView;

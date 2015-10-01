@@ -467,6 +467,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_show_nsfw_boards_summary">Показувати дошки без модерації</string>
     <string name="pref_autohide_title">Автосхов</string>
     <string name="pref_autohide_summary">Автоматично ховати пости за регулярними виразами</string>
+    <string name="pref_hide_completely_title">Ховати повністю</string>
+    <string name="pref_hide_completely_summary">Не відображати приховані пости і треди</string>
     <string name="pref_external_links_confirmation_title">Підтвердження лінків</string>
     <string name="pref_external_links_confirmation_summary">Запит перед відкриттям лінків назовні</string>
     <string name="pref_do_not_close_tabs_title">Не закривати вкладки</string>

@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_autohide_json">PREF_KEY_AUTOHIDE_JSON</string>
     <string name="pref_key_quickaccess_json">PREF_KEY_QUICKACCESS_JSON</string>
     <string name="pref_key_chans_order_json">PREF_KEY_CHANS_ORDER_JSON</string>
+    <string name="pref_key_hide_completely">PREF_KEY_HIDE_COMPLETELY</string>
     <string name="pref_key_external_links_confirmation">PREF_KEY_EXTERNAL_LINKS_CONFIRMATION</string>
     <string name="pref_key_do_not_close_tabs">PREF_KEY_DO_NOT_CLOSE_TABS</string>
     <string name="pref_key_pin_markup">PREF_KEY_PIN_MARKUP</string>

@@ -406,12 +406,16 @@ public class MainActivity extends FragmentActivity {
         StaticSettingsContainer newSettings = MainApplication.getInstance().settings.getStaticSettings();
         if (settings.theme != newSettings.theme || settings.isDisplayDate != newSettings.isDisplayDate ||
                 (settings.isDisplayDate && (settings.isLocalTime != newSettings.isLocalTime)) ||
-                settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
                 MainApplication.getInstance().settings.getAutohideRulesJson().hashCode() != autohideRulesHash ||
                 MainApplication.getInstance().settings.getRootViewWeight() != rootViewWeight ||
                 MainApplication.getInstance().settings.openSpoilers() != openSpoilers) {
             Logger.d(TAG, "appearance settings were changed; clearing LRU cache and restarting activity");
             restartActivityClearCache();
+            return;
+        } else if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
+                settings.showHiddenItems != newSettings.showHiddenItems) {
+            Logger.d(TAG, "appearance settings were changed; restarting activity");
+            restartActivity(false);
             return;
         } else {
             MainApplication.getInstance().settings.updateStaticSettings(settings);
@@ -421,9 +425,13 @@ public class MainActivity extends FragmentActivity {
     }
     
     private void restartActivityClearCache() {
+        restartActivity(true);
+    }
+    
+    private void restartActivity(boolean clearCache) {
         MainApplication.getInstance().tabsSwitcher.currentId = null;
         MainApplication.getInstance().tabsSwitcher.currentFragment = null;
-        MainApplication.getInstance().pagesCache.clearLru();
+        if (clearCache) MainApplication.getInstance().pagesCache.clearLru();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             CompatibilityImpl.recreateActivity(this);
         } else {

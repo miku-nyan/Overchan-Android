@@ -161,6 +161,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:summary="@string/pref_autohide_summary" />
         
         <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_hide_completely"
+            android:title="@string/pref_hide_completely_title"
+            android:summary="@string/pref_hide_completely_summary" />
+        
+        <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_key_external_links_confirmation"
             android:title="@string/pref_external_links_confirmation_title"
