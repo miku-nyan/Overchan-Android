@@ -33,6 +33,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
-import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 @SuppressWarnings("deprecation") // https://issues.apache.org/jira/browse/HTTPCLIENT-1632
@@ -63,7 +64,7 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class VichanModule extends AbstractVichanModule {
     private static final String CHAN_NAME = "pl.vichan.net";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Radom", " ", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Radom", " ", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cp", "Chłodne Pasty", " ", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "id", "Inteligentne dyskusje", " ", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "int", "True International", " ", false),
@@ -98,7 +99,7 @@ public class VichanModule extends AbstractVichanModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pr", "Prawny", " ", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pro", "Problemy i protipy", " ", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "psy", "Psychologia", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sex", "Seks i związki", " ", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sex", "Seks i związki", " ", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "soc", "Socjalizacja i atencja", " ", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sr", "Samorozwój", " ", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "swag", "Styl i wygląd", " ", false),
@@ -120,7 +121,7 @@ public class VichanModule extends AbstractVichanModule {
     
     @Override
     public String getDisplayingName() {
-        return "vichan";
+        return "Polski vichan";
     }
     
     @Override
@@ -230,8 +231,7 @@ public class VichanModule extends AbstractVichanModule {
             } else if (response.statusCode == 303) {
                 for (Header header : response.headers) {
                     if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
-                        return fixRelativeUrl(header.getValue().replace(
-                                new String(new byte[] { (byte)0xc3,(byte)0x8e, (byte)0xc2, (byte)0xbb }, "UTF-8"), "%CE%BB")); // lambda
+                        return fixRelativeUrl(header.getValue());
                     }
                 }
             }
@@ -313,23 +313,16 @@ public class VichanModule extends AbstractVichanModule {
     }
     
     @Override
-    protected JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        return super.downloadJSONObject(url.replace("λ", "%CE%BB"), checkIfModidied, listener, task);
-    }
-    
-    @Override
-    protected JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        return super.downloadJSONArray(url.replace("λ", "%CE%BB"), checkIfModidied, listener, task);
-    }
-    
-    @Override
-    public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
-        return super.buildUrl(model).replace("λ", "%CE%BB");
-    }
-    
-    @Override
-    public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return super.parseUrl(url.replace("%CE%BB", "λ"));
+    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
+        try {
+            super.downloadFile(url, out, listener, task);
+        } catch (HttpWrongStatusCodeException e) {
+            if (url.contains("/thumb/") && url.endsWith(".jpg") && e.getStatusCode() == 404) {
+                super.downloadFile(url.substring(0, url.length() - 3) + "gif", out, listener, task);
+            } else {
+                throw e;
+            }
+        }
     }
     
 }

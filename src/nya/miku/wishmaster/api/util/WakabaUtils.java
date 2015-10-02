@@ -28,7 +28,7 @@ public class WakabaUtils {
     private WakabaUtils() {}
     
     public static String buildUrl(UrlPageModel model, String rootUrl) {
-        if (model.boardName != null && !model.boardName.matches("\\w+(/arch)?")) throw new IllegalArgumentException("wrong board name");
+        if (model.boardName != null && !model.boardName.matches("[^/\\s]+(/arch)?")) throw new IllegalArgumentException("wrong board name");
         StringBuilder url = new StringBuilder(rootUrl);
         switch (model.type) {
             case UrlPageModel.TYPE_INDEXPAGE:
