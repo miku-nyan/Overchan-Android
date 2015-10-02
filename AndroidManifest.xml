@@ -117,6 +117,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="7chan.org" />
                 
+                <data android:host="pl.vichan.net" />
+
                 <data android:host="lainchan.org" />
                 <data android:host="www.lainchan.org" />
                 
