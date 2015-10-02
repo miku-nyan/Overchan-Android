@@ -88,7 +88,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:background="?attr/postBackground"
                 android:fastScrollEnabled="true"
                 android:divider="?attr/activityRootBackground"
-                android:dividerHeight="4dp"
+                android:dividerHeight="0dp"
                 android:scrollingCache="false"
                 android:animationCache="false" />
         </nya.miku.wishmaster.lib.pullable_layout.SwipeRefreshLayout>

@@ -17,10 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textStyle="italic"
-    android:singleLine="true"
-    android:padding="4dp" />
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/post_hidden_text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="italic"
+        android:singleLine="true"
+        android:padding="4dp" />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:id="@+id/post_hidden_divider"
+        android:background="?attr/activityRootBackground"
+        android:visibility="visible" />
+    
+</LinearLayout>

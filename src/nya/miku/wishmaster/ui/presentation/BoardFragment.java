@@ -1484,6 +1484,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             public View unreadFrame;
             public boolean unreadFrameIsVisible = false;
             
+            public View dividerFrame;
+            public boolean dividerFrameIsVisible = true;
+            
             public JellyBeanSpanFixTextView headerView;
             public TextView stickyClosedThreadView;
             public boolean stickyClosedThreadIsVisible = false;
@@ -1644,14 +1647,32 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             if (popupWidth == null && model.hidden) {
                 if (fragment().staticSettings.showHiddenItems) {
                     View view = convertView == null ? inflater.inflate(R.layout.post_item_hidden, parent, false) : convertView;
-                    view.setTag(Integer.valueOf(position));
+                    //(локально) tag (ViewHolder): ([0]:TextView; [1]:View divider; [2]:Boolean dividerIsVisible; [3]Integer position)
+                    Object[] tag = (Object[]) view.getTag();
+                    if (tag == null) {
+                        tag = new Object[] { view.findViewById(R.id.post_hidden_text), view.findViewById(R.id.post_hidden_divider), true, null };
+                        view.setTag(tag);
+                    }
+                    tag[3] = position;
+                    boolean dividerIsVisible = (Boolean)tag[2];
+                    if (position == getCount() - 1) {
+                        if (dividerIsVisible) {
+                            ((View)tag[1]).setVisibility(View.GONE);
+                            tag[2] = false;
+                        }
+                    } else {
+                        if (!dividerIsVisible) {
+                            ((View)tag[1]).setVisibility(View.VISIBLE);
+                            tag[2] = true;
+                        }
+                    }
                     view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            fragment().onItemClick(null, null, (Integer)v.getTag(), 0);
+                            fragment().onItemClick(null, null, (Integer)(((Object[])v.getTag())[3]), 0);
                         }
                     });
-                    ((TextView) view).setText(fragment().resources.getString(
+                    ((TextView) tag[0]).setText(fragment().resources.getString(
                             fragment().pageType == TYPE_THREADSLIST ? R.string.postitem_hidden_thread : R.string.postitem_hidden_post,
                             model.sourceModel.number,
                             model.autohideReason != null ? model.autohideReason : model.spannedComment.toString()));
@@ -1670,6 +1691,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 tag.unreadFrame = view.findViewById(R.id.post_frame_unread);
                 tag.unreadFrame.setOnClickListener(onUnreadFrameListener);
                 tag.unreadFrame.setOnLongClickListener(onUnreadFrameListener);
+                tag.dividerFrame = view.findViewById(R.id.post_frame_divider);
                 tag.headerView = (JellyBeanSpanFixTextView) view.findViewById(R.id.post_header);
                 tag.stickyClosedThreadView = (TextView) view.findViewById(R.id.post_sticky_closed_thread);
                 tag.deletedPostView = view.findViewById(R.id.post_deleted_mark);
@@ -1686,6 +1708,27 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             tag.position = position;
             
+            // вкл/выкл отображение "разделителя"
+            if (popupWidth == null) {
+                if (position == getCount() - 1) {
+                    if (tag.dividerFrameIsVisible) {
+                        tag.dividerFrame.setVisibility(View.GONE);
+                        tag.dividerFrameIsVisible = false;
+                    }
+                } else {
+                    if (!tag.dividerFrameIsVisible) {
+                        tag.dividerFrame.setVisibility(View.VISIBLE);
+                        tag.dividerFrameIsVisible = true;
+                    }
+                }
+            } else {
+                if (tag.dividerFrameIsVisible) {
+                    tag.dividerFrame.setVisibility(View.GONE);
+                    tag.dividerFrameIsVisible = false;
+                }
+            }
+            
+            // заголовок и дата
             tag.headerView.setText(model.spannedHeader);
             tag.dateView.setText(model.dateString);
             if (fragment().staticSettings.isDisplayDate) {
