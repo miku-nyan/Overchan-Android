@@ -34,7 +34,7 @@ public class DobroBoards {
     private static final SimpleBoardModel[] SIMPLE_ARRAY;
     
     static {
-        addBoard("b", "Бред", "Общее", true);
+        addBoard("b", "Братство", "Общее", true);
         addBoard("u", "Университет", "Общее", false);
         addBoard("rf", "Refuge", "Общее", false);
         addBoard("dt", "Dates and datings", "Общее", false);
