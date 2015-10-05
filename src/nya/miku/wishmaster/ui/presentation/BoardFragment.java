@@ -2466,6 +2466,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             if (safePresentationList != null) {
                                 for (int i=0; i<safePresentationList.size(); ++i) {
                                     PresentationItemModel model = safePresentationList.get(i);
+                                    if (model.hidden && !staticSettings.showHiddenItems) continue;
                                     String comment = model.spannedComment.toString().toLowerCase(Locale.US).replace('\n', ' ');
                                     List<Integer> altFoundPositions = null;
                                     if (model.floating) {
