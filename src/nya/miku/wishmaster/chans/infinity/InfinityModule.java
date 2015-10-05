@@ -217,7 +217,12 @@ public class InfinityModule extends AbstractVichanModule {
         BoardModel fromMap = boardsMap.get(shortName);
         if (fromMap != null) return fromMap;
         String url = getUsingUrl() + "settings.php?board=" + shortName;
-        JSONObject json = downloadJSONObject(url, false, listener, task);
+        JSONObject json;
+        try {
+            json = downloadJSONObject(url, false, listener, task);
+        } catch (Exception e) {
+            json = new JSONObject();
+        }
         BoardModel model = new BoardModel();
         model.chan = CHAN_NAME;
         model.boardName = shortName;
