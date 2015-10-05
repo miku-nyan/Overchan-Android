@@ -82,7 +82,8 @@ public class ClairewsModule extends NullchanccModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        if (boardName.equals("b")) return null;
-        return super.getNewCaptcha(boardName, threadNumber, listener, task);
+        CaptchaModel captcha = super.getNewCaptcha(boardName, threadNumber, listener, task);
+        captcha.type = CaptchaModel.TYPE_NORMAL;
+        return captcha;
     }
 }
