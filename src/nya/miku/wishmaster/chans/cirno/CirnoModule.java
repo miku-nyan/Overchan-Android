@@ -192,7 +192,7 @@ public class CirnoModule extends AbstractChanModule {
                 if (task != null && task.isCancelled()) throw new Exception("interrupted");
                 return in.readPage();
             } else {
-                if (responseModel.notModified()) return null;
+                if (responseModel.notModified()) return oldList;
                 throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
             }
         } catch (Exception e) {
