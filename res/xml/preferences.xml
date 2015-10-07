@@ -160,11 +160,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:title="@string/pref_autohide_title"
             android:summary="@string/pref_autohide_summary" />
         
-        <CheckBoxPreference
+        <!-- <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_key_hide_completely"
             android:title="@string/pref_hide_completely_title"
-            android:summary="@string/pref_hide_completely_summary" />
+            android:summary="@string/pref_hide_completely_summary" />  -->
         
         <CheckBoxPreference
             android:defaultValue="true"

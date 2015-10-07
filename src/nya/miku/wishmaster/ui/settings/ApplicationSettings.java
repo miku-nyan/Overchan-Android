@@ -126,7 +126,8 @@ public class ApplicationSettings {
     }
     
     public boolean showHiddenItems() {
-        return !preferences.getBoolean(resources.getString(R.string.pref_key_hide_completely), false);
+        return true;
+        //return !preferences.getBoolean(resources.getString(R.string.pref_key_hide_completely), false);
     }
     
     public int getTheme() {
