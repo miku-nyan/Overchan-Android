@@ -467,7 +467,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 if (presentationModel.source.boardModel.catalogAllowed) {
                     catalogMenuVisible = true;
                 }
-                if (presentationModel.source.boardModel.searchAllowed) {
+                if (presentationModel.source.boardModel.searchAllowed || tabModel.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE) {
                     searchMenuVisible = true;
                 }
             }
@@ -2402,10 +2402,18 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             searchBarView.findViewById(id).setOnClickListener(searchOnClickListener);
         }
         field.setOnKeyListener(new View.OnKeyListener() {
+            private boolean searchUsingChan() {
+                if (pageType != TYPE_THREADSLIST) return false;
+                if (presentationModel != null)
+                    if (presentationModel.source != null) 
+                        if (presentationModel.source.boardModel != null)
+                            if (!presentationModel.source.boardModel.searchAllowed) return false;
+                return true;
+            }
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    if (pageType == TYPE_THREADSLIST) {
+                    if (searchUsingChan()) {
                         UrlPageModel model = new UrlPageModel();
                         model.chanName = chan.getChanName();
                         model.type = UrlPageModel.TYPE_SEARCHPAGE;
