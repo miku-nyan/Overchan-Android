@@ -48,9 +48,8 @@ import android.content.res.Resources;
 public class MakabaJsonMapper {
     private static final Pattern ICON_PATTERN = Pattern.compile("<img.+?src=\"(.+?)\".+?(?:title=\"(.+?)\")?.*?/>");
     
-    static BoardModel mapBoardModel(JSONObject source, boolean fromMobileBoardsList, Resources resources) throws JSONException {
+    static BoardModel defaultBoardModel(String boardName, Resources resources) {
         BoardModel model = new BoardModel();
-        
         model.chan = CHAN_NAME;
         model.uniqueAttachmentNames = true;
         model.timeZoneId = "GMT+3";
@@ -75,6 +74,26 @@ public class MakabaJsonMapper {
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         model.markType = BoardModel.MARK_BBCODE;
         
+        model.boardName = boardName;
+        model.boardDescription = boardName;
+        model.boardCategory = "";
+        
+        model.defaultUserName = "Аноним";
+        model.bumpLimit = 500;
+        model.lastPage = 9;
+        
+        model.nsfw = SFW_BOARDS.indexOf(model.boardName) == -1;
+        model.requiredFileForNewThread = NO_IMAGES_BOARDS.indexOf(model.boardName) == -1;
+        model.attachmentsMaxCount = NO_IMAGES_BOARDS.indexOf(model.boardName) == -1 ? 4 : 0;
+        model.allowSubjects = NO_SUBJECTS_BOARDS.indexOf(model.boardName) == -1;
+        model.allowNames = NO_USERNAMES_BOARDS.indexOf(model.boardName) == -1;
+        
+        return model;
+    }
+    
+    static BoardModel mapBoardModel(JSONObject source, boolean fromMobileBoardsList, Resources resources) throws JSONException {
+        BoardModel model = defaultBoardModel(null, resources);
+        
         if (fromMobileBoardsList) {
             model.boardName = source.getString("id");
             model.boardDescription = source.getString("name");
@@ -96,12 +115,6 @@ public class MakabaJsonMapper {
                 model.lastPage = 9;
             }
         }
-        
-        model.nsfw = SFW_BOARDS.indexOf(model.boardName) == -1;
-        model.requiredFileForNewThread = NO_IMAGES_BOARDS.indexOf(model.boardName) == -1;
-        model.attachmentsMaxCount = NO_IMAGES_BOARDS.indexOf(model.boardName) == -1 ? 4 : 0;
-        model.allowSubjects = NO_SUBJECTS_BOARDS.indexOf(model.boardName) == -1;
-        model.allowNames = NO_USERNAMES_BOARDS.indexOf(model.boardName) == -1;
         
         try {
             JSONArray iconsArray = source.getJSONArray("icons");

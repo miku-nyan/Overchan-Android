@@ -62,6 +62,31 @@ public class CryptoUtils {
     }
     
     /**
+     * Вычислить SHA-1 контрольную сумму, представить в виде hex-строки
+     * @param str строка, от которой вычисляется хэш
+     * @return строка с hex-представлением значения SHA-1
+     */
+    public static String computeSHA1(String str) {
+        if (str == null) str = "";
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+            messageDigest.reset();
+            messageDigest.update(str.getBytes());
+            byte[] digest = messageDigest.digest();
+            BigInteger bigInt = new BigInteger(1, digest);
+            String sha1Hex = bigInt.toString(16);
+            if (sha1Hex.length() < 40){
+                char[] head = new char[40 - sha1Hex.length()];
+                Arrays.fill(head, '0');
+                sha1Hex = new StringBuilder(40).append(head).append(sha1Hex).toString();
+            }
+            return sha1Hex;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    /**
      * Сгенерировать пароль, состоящий из букв латинского алфавита и цифр, длиной от 10 до 15 символов
      * @return строка с паролем
      */

@@ -393,6 +393,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_prefs_domain_category">Настройки домена</string>
     <string name="makaba_prefs_domain">Домен</string>
     <string name="makaba_prefs_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    <string name="makaba_prefs_skip_captcha">Пропустить капчу</string>
     
     <string name="mikuba_password_ignored">(игнорируется)</string>
     

@@ -48,6 +48,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
@@ -108,6 +109,7 @@ public class MakabaModule extends AbstractChanModule {
     private static final int CAPTCHA_RECAPTCHA = 2;
     private static final int CAPTCHA_MAILRU = 3;
     private static final int CAPTCHA_RECAPTCHAV1 = 4;
+    private static final int CAPTCHA_SIGNER = 5;
     
     private static final String HASHTAG_PREFIX = "\u00A0#";
     
@@ -253,7 +255,7 @@ public class MakabaModule extends AbstractChanModule {
         group.addPreference(mobileAPIPref);
     }
     
-    private void addRecaptchaPreference(PreferenceGroup group) {
+    private void addCaptchaPreference(PreferenceGroup group) {
         final Context context = group.getContext();
         PreferenceCategory captchaCategory = new PreferenceCategory(context);
         captchaCategory.setTitle(R.string.makaba_prefs_captcha_category);
@@ -276,6 +278,12 @@ public class MakabaModule extends AbstractChanModule {
         googleFallbackPreference.setKey(getSharedKey(PREF_KEY_GOOGLE_FALLBACK));
         googleFallbackPreference.setDefaultValue(false);
         captchaCategory.addPreference(googleFallbackPreference);
+        
+        CheckBoxPreference skipCaptchaPreference = new CheckBoxPreference(context);
+        skipCaptchaPreference.setTitle(R.string.makaba_prefs_skip_captcha);
+        skipCaptchaPreference.setKey(getSharedKey(PREF_KEY_SKIP_CAPTCHA));
+        skipCaptchaPreference.setDefaultValue(true);
+        captchaCategory.addPreference(skipCaptchaPreference);
     }
     
     /** Добавить категорию настроек домена (в т.ч. https) */
@@ -320,7 +328,7 @@ public class MakabaModule extends AbstractChanModule {
     @Override
     public void addPreferencesOnScreen(final PreferenceGroup preferenceScreen) {
         addMobileAPIPreference(preferenceScreen);
-        addRecaptchaPreference(preferenceScreen);
+        addCaptchaPreference(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
         
@@ -400,34 +408,39 @@ public class MakabaModule extends AbstractChanModule {
 
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
-        if (this.boardsMap == null) {
-            try {
-                getBoardsList(listener, task, null);
-            } catch (Exception e) {
-                Logger.d(TAG, "cannot update boards list from mobile.fcgi");
-            }
-        }
-        if (this.boardsMap != null) {
-            if (this.boardsMap.containsKey(shortName)) {
-                return this.boardsMap.get(shortName);
-            }
-        }
-        
-        if (this.customBoardsMap.containsKey(shortName)) {
-            return this.customBoardsMap.get(shortName);
-        }
-        
-        String url = domainUrl + shortName + "/index.json";
-        JSONObject json;
         try {
-            json = downloadJSONObject(url, false, listener, task);
-        } finally {
-            HttpStreamer.getInstance().removeFromModifiedMap(url);
+            if (this.boardsMap == null) {
+                try {
+                    getBoardsList(listener, task, null);
+                } catch (Exception e) {
+                    Logger.d(TAG, "cannot update boards list from mobile.fcgi");
+                }
+            }
+            if (this.boardsMap != null) {
+                if (this.boardsMap.containsKey(shortName)) {
+                    return this.boardsMap.get(shortName);
+                }
+            }
+            
+            if (this.customBoardsMap.containsKey(shortName)) {
+                return this.customBoardsMap.get(shortName);
+            }
+            
+            String url = domainUrl + shortName + "/index.json";
+            JSONObject json;
+            try {
+                json = downloadJSONObject(url, false, listener, task);
+            } finally {
+                HttpStreamer.getInstance().removeFromModifiedMap(url);
+            }
+            BoardModel result = mapBoardModel(json, false, resources);
+            if (!shortName.equals(result.boardName)) throw new Exception();
+            this.customBoardsMap.put(result.boardName, result);
+            return result;
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            return defaultBoardModel(shortName, resources);
         }
-        BoardModel result = mapBoardModel(json, false, resources);
-        if (!shortName.equals(result.boardName)) throw new Exception();
-        this.customBoardsMap.put(result.boardName, result);
-        return result;
     }
 
     @Override
@@ -589,6 +602,26 @@ public class MakabaModule extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (threadNumber != null && preferences.getBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), true)) {
+            String url = null;
+            try {
+                url = domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY + "&check=1";
+                String check = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(),
+                        httpClient, listener, task, true);
+                if (check.equals("APP VALID")) {
+                    captchaType = CAPTCHA_SIGNER;
+                    return null;
+                } else {
+                    Logger.d(TAG, "(signer failed)response: "+check);
+                }
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+                if (e instanceof HttpWrongStatusCodeException && url != null) {
+                    checkCloudflareError((HttpWrongStatusCodeException) e, url);
+                }
+            }
+        }
+        
         switch (getUsingCaptchaType()) {
             case CAPTCHA_MAILRU:
                 UrlPageModel refererPage = new UrlPageModel();
@@ -651,24 +684,35 @@ public class MakabaModule extends AbstractChanModule {
         
         postEntityBuilder.addString("comment", model.comment);
         
-        if (model.captchaAnswer != null) {
-            if (captchaType == CAPTCHA_YANDEX && captchaKey != null) {
-                postEntityBuilder.addString("captcha", captchaKey);
-                postEntityBuilder.addString("captcha_value", model.captchaAnswer);
-            } else if (captchaType == CAPTCHA_RECAPTCHA) {
-                String key = Recaptcha2solved.pop(RECAPTCHA_KEY);
-                if (key == null) throw Recaptcha2.obtain(RECAPTCHA_KEY, CHAN_NAME, fallbackGoogle());
-                postEntityBuilder.addString("captcha_type", "recaptcha");
-                postEntityBuilder.addString("g-recaptcha-response", key);
-            } else if (captchaType == CAPTCHA_MAILRU && captchaMailRuId != null) {
-                postEntityBuilder.addString("captcha_type", "mailru");
-                postEntityBuilder.addString("captcha_id", captchaMailRuId);
-                postEntityBuilder.addString("captcha_value", model.captchaAnswer);
-            } else if (captchaType == CAPTCHA_RECAPTCHAV1 && recaptchaV1 != null) {
-                postEntityBuilder.addString("captcha_type", "recaptchav1");
-                postEntityBuilder.addString("recaptcha_challenge_field", recaptchaV1.challenge);
-                postEntityBuilder.addString("recaptcha_response_field", model.captchaAnswer);
-            }
+        if (captchaType == CAPTCHA_YANDEX && captchaKey != null) {
+            postEntityBuilder.addString("captcha", captchaKey);
+            postEntityBuilder.addString("captcha_value", model.captchaAnswer);
+        } else if (captchaType == CAPTCHA_RECAPTCHA) {
+            String key = Recaptcha2solved.pop(RECAPTCHA_KEY);
+            if (key == null) throw Recaptcha2.obtain(RECAPTCHA_KEY, CHAN_NAME, fallbackGoogle());
+            postEntityBuilder.addString("captcha_type", "recaptcha");
+            postEntityBuilder.addString("g-recaptcha-response", key);
+        } else if (captchaType == CAPTCHA_MAILRU && captchaMailRuId != null) {
+            postEntityBuilder.addString("captcha_type", "mailru");
+            postEntityBuilder.addString("captcha_id", captchaMailRuId);
+            postEntityBuilder.addString("captcha_value", model.captchaAnswer);
+        } else if (captchaType == CAPTCHA_RECAPTCHAV1 && recaptchaV1 != null) {
+            postEntityBuilder.addString("captcha_type", "recaptchav1");
+            postEntityBuilder.addString("recaptcha_challenge_field", recaptchaV1.challenge);
+            postEntityBuilder.addString("recaptcha_response_field", model.captchaAnswer);
+        } else if (captchaType == CAPTCHA_SIGNER) {
+            String response = HttpStreamer.getInstance().getStringFromUrl(domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY,
+                    HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+            if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
+            if (!response.startsWith("APP CHECK KEY")) throw new Exception("Invalid response");
+            String[] responseSplit = response.split("\n");
+            if (responseSplit.length < 3) throw new Exception("Invalid response");
+            StringBuilder sb = new StringBuilder();
+            while (sb.length() < 22) sb.append((int)(Math.random() * 10));
+            String appSignature = sb.toString();
+            postEntityBuilder.addString("app_signature", appSignature);
+            postEntityBuilder.addString("app_response_id", responseSplit[1]);
+            postEntityBuilder.addString("app_response", CryptoUtils.computeSHA1(responseSplit[2]+"|"+appSignature+"|"+DASHCHAN_PRIVATE_KEY));
         }
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
         

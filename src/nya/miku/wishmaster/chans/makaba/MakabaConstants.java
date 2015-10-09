@@ -76,6 +76,7 @@ public class MakabaConstants {
     public static final String PREF_KEY_GOOGLE_FALLBACK = "google_fallback";
     public static final String PREF_KEY_USE_HTTPS = "use_https";
     public static final String PREF_KEY_DOMAIN = "domain";
+    public static final String PREF_KEY_SKIP_CAPTCHA = "skip_captcha";
     public static final String PREF_KEY_USERCODE_COOKIE_DOMAIN = "usercode_domain";
     public static final String PREF_KEY_USERCODE_COOKIE_VALUE = "usercode_cookie";
     public static final String PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN = "cf_domain";
@@ -95,4 +96,7 @@ public class MakabaConstants {
     
     public static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog";
     public static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
+    
+    public static final String DASHCHAN_PUBLIC_KEY = "CVjh9SfLC46PzUkv3gc5CeMhLOlnpQ8z";
+    public static final String DASHCHAN_PRIVATE_KEY = "slqOXfj0CmOnDvNMxZwj1X1JXj24URhK";
 }
