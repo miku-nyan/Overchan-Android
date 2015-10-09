@@ -23,6 +23,7 @@
 * [syn-ch](http://syn-ch.com/)
 * [Inach.org](http://inach.org/)
 * [claire.ws](http://claire.ws/)
+* [pl.vichan.net](https://pl.vichan.net/)
 * [lainchan.org](https://lainchan.org/)
 * [Tohno chan](http://tohno-chan.com)
 * [76chan](http://76chan.org)
