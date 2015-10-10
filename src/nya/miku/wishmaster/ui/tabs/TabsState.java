@@ -20,6 +20,7 @@ package nya.miku.wishmaster.ui.tabs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import com.esotericsoftware.kryo.serializers.TaggedFieldSerializer.Tag;
 
@@ -53,10 +54,14 @@ public class TabsState implements Serializable {
      * @return модель вкладки или null если вкладка отсутствует
      */
     public TabModel findTabById(long id) {
-        for (TabModel model : tabsArray) {
-            if (model.id == id) {
-                return model;
+        try {
+            for (TabModel model : tabsArray) {
+                if (model.id == id) {
+                    return model;
+                }
             }
+        } catch (ConcurrentModificationException e) {
+            return findTabById(id); //try again
         }
         return null;
     }
