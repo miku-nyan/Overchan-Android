@@ -194,6 +194,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_delete_files">Стерти файли</string>
     <string name="context_menu_report">Поскаржитися</string>
     <string name="context_menu_share">Поділитися</string>
+    <string name="context_menu_share_link">Поділитися лінком</string>
     <string name="context_menu_search_google">Пошук Google</string>
     <string name="context_menu_delete_autohide_rule">Стерти правило</string>
     <string name="context_menu_quickaccess_add">До швидкого доступу</string>

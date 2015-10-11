@@ -184,6 +184,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_delete_files">Delete files</string>
     <string name="context_menu_report">Report abuse</string>
     <string name="context_menu_share">Share</string>
+    <string name="context_menu_share_link">Share link</string>
     <string name="context_menu_search_google">Search in Google</string>
     <string name="context_menu_delete_autohide_rule">Remove the rule</string>
     <string name="context_menu_quickaccess_add">Add to Quick Access</string>

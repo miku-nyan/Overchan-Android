@@ -233,14 +233,15 @@ public class MainActivity extends FragmentActivity {
             }
             if (model.webUrl != null) {
                 menu.add(Menu.NONE, R.id.context_menu_copy_url, 2, R.string.context_menu_copy_url);
+                menu.add(Menu.NONE, R.id.context_menu_share_link, 3, R.string.context_menu_share_link);
             }
             if (canFavorite(model)) {
-                menu.add(Menu.NONE, R.id.context_menu_favorites, 3,
+                menu.add(Menu.NONE, R.id.context_menu_favorites, 4,
                         isFavorite(model) ? R.string.context_menu_remove_favorites : R.string.context_menu_add_favorites);
             }
             if (MainApplication.getInstance().settings.isAutoupdateEnabled() && MainApplication.getInstance().settings.isAutoupdateBackground() &&
                     model.type == TabModel.TYPE_NORMAL && model.pageModel != null && model.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
-                menu.add(Menu.NONE, R.id.context_menu_autoupdate_background, 4, R.string.context_menu_autoupdate_background).
+                menu.add(Menu.NONE, R.id.context_menu_autoupdate_background, 5, R.string.context_menu_autoupdate_background).
                         setCheckable(true).setChecked(model.autoupdateBackground);
             }
         }
@@ -258,6 +259,16 @@ public class MainActivity extends FragmentActivity {
                 if (url != null) {
                     Clipboard.copyText(this, url);
                     Toast.makeText(this, getString(R.string.notification_url_copied, url), Toast.LENGTH_LONG).show();
+                }
+                return true;
+            case R.id.context_menu_share_link:
+                url = tabsAdapter.getItem(menuInfo.position).webUrl;
+                if (url != null) {
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, url);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share_via)));
                 }
                 return true;
             case R.id.context_menu_favorites:
