@@ -52,9 +52,6 @@ import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -63,22 +60,16 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookieHC4;
-import org.apache.http.message.BasicHeader;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceCategory;
@@ -105,22 +96,15 @@ public class MakabaModule extends AbstractChanModule {
     /** что-то типа 'https://2ch.hk/' */
     private String domainUrl;
     
-    private static final int CAPTCHA_YANDEX = 1;
-    private static final int CAPTCHA_RECAPTCHA = 2;
-    private static final int CAPTCHA_MAILRU = 3;
-    private static final int CAPTCHA_RECAPTCHAV1 = 4;
-    private static final int CAPTCHA_SIGNER = 5;
+    private static final int CAPTCHA_2CHAPTCHA = 1;
+    private static final int CAPTCHA_SIGNER = 2;
     
     private static final String HASHTAG_PREFIX = "\u00A0#";
     
     /** тип текущей капчи*/
     private int captchaType;
-    /** ключ текущей яндекс капчи*/
-    private String captchaKey;
-    /** id текущей mail.ru капчи*/
-    private String captchaMailRuId;
-    /** объект текущей рекапчи-v1 */
-    private Recaptcha recaptchaV1;
+    /** id текущей капчи*/
+    private String captchaId;
     
     /** карта досок из списка mobile.fcgi */
     private Map<String, BoardModel> boardsMap = null;
@@ -261,28 +245,10 @@ public class MakabaModule extends AbstractChanModule {
         captchaCategory.setTitle(R.string.makaba_prefs_captcha_category);
         group.addPreference(captchaCategory);
         
-        ListPreference captchaPreference = new ListPreference(context);
-        captchaPreference.setTitle(R.string.makaba_prefs_captcha_type);
-        captchaPreference.setDialogTitle(R.string.makaba_prefs_captcha_type);
-        captchaPreference.setKey(getSharedKey(PREF_KEY_CAPTCHA_TYPE));
-        captchaPreference.setEntryValues(CAPTCHA_TYPES_KEYS);
-        captchaPreference.setEntries(CAPTCHA_TYPES);
-        captchaPreference.setDefaultValue(CAPTCHA_TYPE_DEFAULT);
-        int i = Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT));
-        if (i >= 0) captchaPreference.setSummary(CAPTCHA_TYPES[i]);
-        captchaCategory.addPreference(captchaPreference);
-        
-        CheckBoxPreference googleFallbackPreference = new CheckBoxPreference(context);
-        googleFallbackPreference.setTitle(R.string.makaba_prefs_google_fallback);
-        googleFallbackPreference.setSummary(R.string.makaba_prefs_google_fallback_summary);
-        googleFallbackPreference.setKey(getSharedKey(PREF_KEY_GOOGLE_FALLBACK));
-        googleFallbackPreference.setDefaultValue(false);
-        captchaCategory.addPreference(googleFallbackPreference);
-        
         CheckBoxPreference skipCaptchaPreference = new CheckBoxPreference(context);
         skipCaptchaPreference.setTitle(R.string.makaba_prefs_skip_captcha);
         skipCaptchaPreference.setKey(getSharedKey(PREF_KEY_SKIP_CAPTCHA));
-        skipCaptchaPreference.setDefaultValue(true);
+        skipCaptchaPreference.setDefaultValue(false);
         captchaCategory.addPreference(skipCaptchaPreference);
     }
     
@@ -331,36 +297,6 @@ public class MakabaModule extends AbstractChanModule {
         addCaptchaPreference(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
-        
-        final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceScreen.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
-        final CheckBoxPreference fallbackPref = (CheckBoxPreference) preferenceScreen.findPreference(getSharedKey(PREF_KEY_GOOGLE_FALLBACK));
-        fallbackPref.setEnabled(!proxyPreference.isChecked());
-        proxyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {            
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                fallbackPref.setEnabled(!proxyPreference.isChecked());
-                return false;
-            }
-        });
-    }
-    
-    private int getUsingCaptchaType() {
-        String key = preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT);
-        if (Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(key) == -1) key = CAPTCHA_TYPE_DEFAULT;
-        switch (key) {
-            case "mailru":
-                return CAPTCHA_MAILRU;
-            case "recaptcha":
-                return CAPTCHA_RECAPTCHA;
-            case "recaptchav1":
-                return CAPTCHA_RECAPTCHAV1;
-        }
-        throw new IllegalStateException();
-    }
-    
-    private boolean fallbackGoogle() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) ||
-                preferences.getBoolean(getSharedKey(PREF_KEY_GOOGLE_FALLBACK), false);
     }
     
     @Override
@@ -602,7 +538,7 @@ public class MakabaModule extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        if (threadNumber != null && preferences.getBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), true)) {
+        if (threadNumber != null && preferences.getBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), false)) {
             String url = null;
             try {
                 url = domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY + "&check=1";
@@ -610,6 +546,7 @@ public class MakabaModule extends AbstractChanModule {
                         httpClient, listener, task, true);
                 if (check.equals("APP VALID")) {
                     captchaType = CAPTCHA_SIGNER;
+                    captchaId = null;
                     return null;
                 } else {
                     Logger.d(TAG, "(signer failed)response: "+check);
@@ -622,55 +559,38 @@ public class MakabaModule extends AbstractChanModule {
             }
         }
         
-        switch (getUsingCaptchaType()) {
-            case CAPTCHA_MAILRU:
-                UrlPageModel refererPage = new UrlPageModel();
-                refererPage.chanName = CHAN_NAME;
-                refererPage.boardName = boardName;
-                if (threadNumber == null) {
-                    refererPage.type = UrlPageModel.TYPE_BOARDPAGE;
-                    refererPage.boardPage = 0;
-                } else {
-                    refererPage.type = UrlPageModel.TYPE_THREADPAGE;
-                    refererPage.threadNumber = threadNumber;
-                }
-                String refererUrl = buildUrl(refererPage);
-                Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, refererUrl) };
-                
-                captchaType = CAPTCHA_MAILRU;
-                String jsUrl = MAILRU_JS_URL;
-                Bitmap captchaBitmap = null;
-                HttpRequestModel requestModel = HttpRequestModel.builder().setGET().setCustomHeaders(customHeaders).build();
-                String jsResponse = HttpStreamer.getInstance().getStringFromUrl(jsUrl, requestModel, httpClient, listener, task, true);
-                Matcher mailRuIdMatcher = MAILRU_ID_PATTERN.matcher(jsResponse);
-                if (!mailRuIdMatcher.find()) throw new Exception("Couldn't get Mail.Ru captcha ID");
-                captchaMailRuId = mailRuIdMatcher.group(1);
-                
-                Matcher mailRuUrlMatcher = MAILRU_URL_PATTERN.matcher(jsResponse);
-                String captchaUrl = mailRuUrlMatcher.find() ? mailRuUrlMatcher.group(1) : MAILRU_DEFAULT_CAPTCHA_URL;
-                HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-                try {
-                    InputStream imageStream = responseModel.stream;
-                    captchaBitmap = BitmapFactory.decodeStream(imageStream);
-                } finally {
-                    responseModel.release();
-                }
-                CaptchaModel captchaModel = new CaptchaModel();
-                captchaModel.type = CaptchaModel.TYPE_NORMAL;
-                captchaModel.bitmap = captchaBitmap;
-                return captchaModel;
-            case CAPTCHA_RECAPTCHA:
-                captchaType = CAPTCHA_RECAPTCHA;
+        String response;
+        String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "");
+        try {
+            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(),
+                    httpClient, null, task, false);
+            if (task != null && task.isCancelled()) throw new Exception("interrupted");
+            if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
+                captchaType = CAPTCHA_2CHAPTCHA;
+                captchaId = null;
                 return null;
-            case CAPTCHA_RECAPTCHAV1:
-                captchaType = CAPTCHA_RECAPTCHAV1;
-                recaptchaV1 = Recaptcha.obtain(RECAPTCHA_V1_KEY, task, httpClient, "http");
-                captchaModel = new CaptchaModel();
-                captchaModel.type = CaptchaModel.TYPE_NORMAL;
-                captchaModel.bitmap = recaptchaV1.bitmap;
-                return captchaModel;
-            default:
-                throw new Exception("failed to get captcha");
+            } else if (!response.startsWith("CHECK")) {
+                throw new Exception("Invalid captcha response");
+            }
+        } catch (HttpWrongStatusCodeException e) {
+            checkCloudflareError(e, url);
+            throw e;
+        }
+        
+        String id = response.substring(response.indexOf('\n') + 1);
+        url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
+        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(url, HttpRequestModel.builder().setGET().build(),
+                httpClient, listener, task);
+        try {
+            InputStream imageStream = responseModel.stream;
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
+            captchaModel.bitmap = BitmapFactory.decodeStream(imageStream);
+            captchaType = CAPTCHA_2CHAPTCHA;
+            captchaId = id;
+            return captchaModel;
+        } finally {
+            responseModel.release();
         }
     }
 
@@ -684,22 +604,9 @@ public class MakabaModule extends AbstractChanModule {
         
         postEntityBuilder.addString("comment", model.comment);
         
-        if (captchaType == CAPTCHA_YANDEX && captchaKey != null) {
-            postEntityBuilder.addString("captcha", captchaKey);
-            postEntityBuilder.addString("captcha_value", model.captchaAnswer);
-        } else if (captchaType == CAPTCHA_RECAPTCHA) {
-            String key = Recaptcha2solved.pop(RECAPTCHA_KEY);
-            if (key == null) throw Recaptcha2.obtain(RECAPTCHA_KEY, CHAN_NAME, fallbackGoogle());
-            postEntityBuilder.addString("captcha_type", "recaptcha");
-            postEntityBuilder.addString("g-recaptcha-response", key);
-        } else if (captchaType == CAPTCHA_MAILRU && captchaMailRuId != null) {
-            postEntityBuilder.addString("captcha_type", "mailru");
-            postEntityBuilder.addString("captcha_id", captchaMailRuId);
-            postEntityBuilder.addString("captcha_value", model.captchaAnswer);
-        } else if (captchaType == CAPTCHA_RECAPTCHAV1 && recaptchaV1 != null) {
-            postEntityBuilder.addString("captcha_type", "recaptchav1");
-            postEntityBuilder.addString("recaptcha_challenge_field", recaptchaV1.challenge);
-            postEntityBuilder.addString("recaptcha_response_field", model.captchaAnswer);
+        if (captchaType == CAPTCHA_2CHAPTCHA && captchaId != null) {
+            postEntityBuilder.addString("2chaptcha_id", captchaId);
+            postEntityBuilder.addString("2chaptcha_value", model.captchaAnswer);
         } else if (captchaType == CAPTCHA_SIGNER) {
             String response = HttpStreamer.getInstance().getStringFromUrl(domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY,
                     HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);

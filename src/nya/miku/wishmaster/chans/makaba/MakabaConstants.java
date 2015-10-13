@@ -20,7 +20,6 @@ package nya.miku.wishmaster.chans.makaba;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Константы, используемые в модуле 2ch.hk
@@ -67,16 +66,10 @@ public class MakabaConstants {
     
     public static final String[] CATALOG_TYPES = { "standart", "last_reply", "num", "image_size" };
     
-    public static final String[] CAPTCHA_TYPES = { "Google Recaptcha 2", "Google Recaptcha", "Mail.Ru" };
-    public static final String[] CAPTCHA_TYPES_KEYS = { "recaptcha", "recaptchav1", "mailru" };
-    public static final String CAPTCHA_TYPE_DEFAULT = "recaptcha";
-    
     public static final String PREF_KEY_MOBILE_API = "mobile_api";
-    public static final String PREF_KEY_CAPTCHA_TYPE = "captcha_type";
-    public static final String PREF_KEY_GOOGLE_FALLBACK = "google_fallback";
     public static final String PREF_KEY_USE_HTTPS = "use_https";
     public static final String PREF_KEY_DOMAIN = "domain";
-    public static final String PREF_KEY_SKIP_CAPTCHA = "skip_captcha";
+    public static final String PREF_KEY_SKIP_CAPTCHA = "skip_captcha1";
     public static final String PREF_KEY_USERCODE_COOKIE_DOMAIN = "usercode_domain";
     public static final String PREF_KEY_USERCODE_COOKIE_VALUE = "usercode_cookie";
     public static final String PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN = "cf_domain";
@@ -84,15 +77,6 @@ public class MakabaConstants {
     
     public static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
     public static final String USERCODE_COOKIE_NAME = "usercode_auth";
-    
-    public static final String YANDEX_CAPTCHA_URL = "://captcha.yandex.net/image?key=";
-    public static final String RECAPTCHA_KEY = "6LcM2P4SAAAAAD97nF449oigatS5hPCIgt8AQanz"; //https://2ch.hk/makaba/captcha.fcgi?type=recaptcha
-    public static final String RECAPTCHA_V1_KEY = "6LeSO-gSAAAAAAmubuzRwbWi3uFiPwGfdDZoKRS-"; //https://2ch.hk/makaba/captcha.fcgi?type=recaptchav1
-    public static final String MAILRU_KEY = "033bbbe453f794e3cb39f856277cd3ec"; //https://2ch.hk/makaba/captcha.fcgi?type=mailru
-    public static final String MAILRU_JS_URL = "https://api-nocaptcha.mail.ru/captcha?public_key=" + MAILRU_KEY;
-    public static final Pattern MAILRU_ID_PATTERN = Pattern.compile("id:\\s*\"([^\"]*)\"");
-    public static final Pattern MAILRU_URL_PATTERN = Pattern.compile("url:\\s*\"([^\"]*)\"");
-    public static final String MAILRU_DEFAULT_CAPTCHA_URL = "https://api-nocaptcha.mail.ru/c/1";
     
     public static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog";
     public static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
