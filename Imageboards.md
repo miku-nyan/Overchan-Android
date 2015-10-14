@@ -8,6 +8,7 @@
 * [Dobrochan](http://dobrochan.com)
 * [2-chru.net](https://2-chru.net/)
 * [7chan.org](https://7chan.org/)
+* [wakachan.org](http://www.wakachan.org/)
 * [nowere.net](http://nowere.net/)
 * [410chan.org](http://410chan.org/)
 * [420chan.org](http://420chan.org/)
