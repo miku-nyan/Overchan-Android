@@ -2,15 +2,13 @@
 *.ap_
 *.dex
 *.class
+*.so
 
 bin/
 obj/
 gen/
-*.so
-local.properties
-
 proguard/
-.settings/
+local.properties
 
 .gradle/*
 .idea/*
