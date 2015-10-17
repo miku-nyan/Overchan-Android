@@ -293,7 +293,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 try {
                     stream = new FileOutputStream(file);
                     if (!bmp.compress(Bitmap.CompressFormat.PNG, 100, stream)) throw new Exception("Couldn't compress bitmap");
-                    Toast.makeText(this, "captcha-" + (++i) + ".png", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "captcha-" + i + ".png", Toast.LENGTH_LONG).show();
                     return true;
                 } finally {
                     if (stream != null) stream.close();
