@@ -99,6 +99,8 @@ public class LocalHandler {
             model.webUrl = MainApplication.getInstance().getChanModule(pageModel.chanName).buildUrl(pageModel);
         } catch (IllegalArgumentException e) {
             model.webUrl = null;
+        } catch (NullPointerException e) {
+            return null;
         }
         model.localFilePath = filename;
         model.forceUpdate = true;

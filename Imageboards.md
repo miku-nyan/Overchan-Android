@@ -28,7 +28,6 @@
 * [lainchan.org](https://lainchan.org/)
 * [Tohno chan](http://tohno-chan.com)
 * [76chan](http://76chan.org)
-* [honeychan.net](http://honeychan.net)
 * [chuck.dfwk.ru](http://chuck.dfwk.ru/)
 * [2ch.hk](https://2ch.hk/)
 * [arhivach.org](http://arhivach.org)
