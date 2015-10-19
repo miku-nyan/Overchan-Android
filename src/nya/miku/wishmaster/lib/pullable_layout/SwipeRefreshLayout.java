@@ -4,7 +4,8 @@
  * 
  * в этой версии возможность обновлять свайпом с двух сторон (сверху и снизу),
  * помимо этого, исправлена ошибка со свайпом вниз (canChildScrollDown) на API < 14,
- * добавлен Callback-интерфейс, который вызывается, когда достигнут край скроллинга
+ * добавлен Callback-интерфейс, который вызывается, когда достигнут край скроллинга,
+ * не обрабатывается касание в правой части (20dp), чтобы не мешать работе fastScroll
  * 
  */
 
@@ -144,6 +145,9 @@ public class SwipeRefreshLayout extends ViewGroup {
     // Whether the client has set a custom starting position;
     private boolean mUsingCustomStart;
 
+    private static final int FAST_SCROLL_WIDTH_DP = 20; //добавлено
+    private int mFastScrollWidth; //добавлено
+
     private Animation.AnimationListener mRefreshListener = new Animation.AnimationListener() {
         @Override
         public void onAnimationStart(Animation animation) {
@@ -280,6 +284,8 @@ public class SwipeRefreshLayout extends ViewGroup {
         final DisplayMetrics metrics = getResources().getDisplayMetrics();
         mCircleWidth = (int) (CIRCLE_DIAMETER * metrics.density);
         mCircleHeight = (int) (CIRCLE_DIAMETER * metrics.density);
+
+        mFastScrollWidth = (int) (FAST_SCROLL_WIDTH_DP * metrics.density); //добавлено
 
         createProgressView();
         ViewCompat.setChildrenDrawingOrderEnabled(this, true);
@@ -618,6 +624,19 @@ public class SwipeRefreshLayout extends ViewGroup {
         }
     }
 
+    /**
+     * Этот метод добавлен
+     */
+    private boolean isFastScrollX(MotionEvent ev) {
+        if (android.os.Build.VERSION.SDK_INT <= 10) return false; //fast scroll работает не так на Android <= 2.3
+        
+        try {
+            return getWidth() - ev.getX() < mFastScrollWidth;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         ensureTarget();
@@ -628,7 +647,7 @@ public class SwipeRefreshLayout extends ViewGroup {
             mReturningToStart = false;
         }
 
-        if (!isEnabled() || mReturningToStart || (canChildScrollUp() && canChildScrollDown()) || mRefreshing) { //изменено
+        if (!isEnabled() || mReturningToStart || (canChildScrollUp() && canChildScrollDown()) || isFastScrollX(ev) || mRefreshing) { //изменено
             // Fail fast if we're not in a state where a swipe is possible
             return false;
         }
@@ -707,7 +726,7 @@ public class SwipeRefreshLayout extends ViewGroup {
             mReturningToStart = false;
         }
 
-        if (!isEnabled() || mReturningToStart || (canChildScrollUp() && canChildScrollDown())) { //изменено
+        if (!isEnabled() || mReturningToStart || (canChildScrollUp() && canChildScrollDown()) || isFastScrollX(ev)) { //изменено
             // Fail fast if we're not in a state where a swipe is possible
             return false;
         }
