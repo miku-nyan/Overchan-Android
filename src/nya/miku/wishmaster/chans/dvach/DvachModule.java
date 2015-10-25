@@ -80,7 +80,8 @@ public class DvachModule extends AbstractWakabaModule {
     static final String CHAN_NAME = "2-chru.net";
     private static final String DEFAULT_DOMAIN = "2-chru.net";
     private static final String ONION_DOMAIN = "dmirrgetyojz735v.onion";
-    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "mirror.2-chru.net", "bypass.2-chru.net", "2chru.net" };
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "mirror.2-chru.net", "bypass.2-chru.net", "2chru.net",
+            "2chru.cafe", "2-chru.cafe" };
     private static final String[] FORMATS = new String[] { "jpg", "jpeg", "png", "gif", "webm", "mp4", "ogv", "mp3", "ogg" };
     
     private static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
