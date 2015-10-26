@@ -853,6 +853,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     public void onPause() {
         super.onPause();
         activity.setDrawerLock(DrawerLayout.LOCK_MODE_UNLOCKED);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.showActionBar(activity);
     }
     
     @Override
@@ -1351,8 +1352,47 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                     adapter.setBusy(true);
                                 }
                             }
+                            
                             @Override
-                            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
+                            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                //скрытие actionbar
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ||
+                                        !staticSettings.hideActionBar || view.getChildCount() <= 0) return;
+                                
+                                int firstVisibleTop = view.getChildAt(0).getTop();
+                                int topDelta = firstVisibleTop - lastFirstVisibleTop;
+                                if (firstVisibleItem == lastFirstVisibleItem && Math.abs(topDelta) < maxTopDelta) {
+                                    if ((currentTopDelta < 0) == (topDelta < 0)) currentTopDelta += topDelta; else currentTopDelta = topDelta;
+                                } else if (firstVisibleItem != lastFirstVisibleItem && adapter.isBusy) {
+                                    currentTopDelta = Integer.signum(lastFirstVisibleItem - firstVisibleItem) * (maxTopDelta + 1);
+                                } else {
+                                    currentTopDelta = 0;
+                                }
+                                
+                                boolean top = firstVisibleItem == 0 && firstVisibleTop == 0;
+                                long currentTime = System.currentTimeMillis();
+                                if (top || currentTime - lastActionTime > 1000) {
+                                    if (currentTopDelta < -maxTopDelta) {
+                                        if (CompatibilityImpl.hideActionBar(activity)) {
+                                            lastActionTime = currentTime;
+                                            currentTopDelta = 0;
+                                        }
+                                    } else if (top || currentTopDelta > maxTopDelta) {
+                                        if (CompatibilityImpl.showActionBar(activity)) {
+                                            lastActionTime = currentTime;
+                                            currentTopDelta = 0;
+                                        }
+                                    }
+                                }
+                                
+                                lastFirstVisibleItem = firstVisibleItem;
+                                lastFirstVisibleTop = firstVisibleTop;
+                            }
+                            private int lastFirstVisibleItem = Integer.MAX_VALUE;
+                            private int lastFirstVisibleTop = Integer.MAX_VALUE;
+                            private int currentTopDelta = 0;
+                            private int maxTopDelta = (int) (resources.getDisplayMetrics().density * 24 + 0.5f);
+                            private long lastActionTime = System.currentTimeMillis();
                         });
                         pullableLayout.setOnEdgeReachedListener(new SwipeRefreshLayout.OnEdgeReachedListener() {
                             @Override

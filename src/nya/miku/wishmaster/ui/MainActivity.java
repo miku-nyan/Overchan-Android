@@ -113,6 +113,12 @@ public class MainActivity extends FragmentActivity {
                     super.onDrawerClosed(drawerView);
                     if (tabsAdapter != null) tabsAdapter.setDraggingItem(-1);
                 }
+                @SuppressWarnings("deprecation")
+                @Override
+                public void onDrawerSlide(View drawerView, float slideOffset) {
+                    super.onDrawerSlide(drawerView, slideOffset);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.showActionBar(MainActivity.this);
+                }
             };
         } else {
             drawerToggle = new ActionBarDrawerToogleV7(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
@@ -120,6 +126,11 @@ public class MainActivity extends FragmentActivity {
                 public void onDrawerClosed(View drawerView) {
                     super.onDrawerClosed(drawerView);
                     if (tabsAdapter != null) tabsAdapter.setDraggingItem(-1);
+                }
+                @Override
+                public void onDrawerSlide(View drawerView, float slideOffset) {
+                    super.onDrawerSlide(drawerView, slideOffset);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.showActionBar(MainActivity.this);
                 }
             };
         }

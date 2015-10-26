@@ -85,7 +85,24 @@ public class CompatibilityImpl {
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void setActionBarNoIcon(Activity activity) {
-        activity.getActionBar().setDisplayShowHomeEnabled(false);
+        ActionBar actionBar = activity.getActionBar();
+        if (actionBar != null) actionBar.setDisplayShowHomeEnabled(false);
+    }
+    
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static boolean hideActionBar(Activity activity) {
+        ActionBar actionBar = activity.getActionBar();
+        if (actionBar == null || !actionBar.isShowing()) return false;
+        actionBar.hide();
+        return true;
+    }
+    
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static boolean showActionBar(Activity activity) {
+        ActionBar actionBar = activity.getActionBar();
+        if (actionBar == null || actionBar.isShowing()) return false;
+        actionBar.show();
+        return true;
     }
     
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
