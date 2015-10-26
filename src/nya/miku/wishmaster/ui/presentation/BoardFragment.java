@@ -1189,14 +1189,14 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 if (adapter == null) return;
                                 if (nullAdapterIsSet) {
                                     listView.setAdapter(adapter);
-                                    listView.setSelectionFromTop(nullAdapterSavedPosition, nullAdapterSavedTop);
+                                    hackListViewSetPosition(listView, nullAdapterSavedPosition, nullAdapterSavedTop);
                                     nullAdapterIsSet = false;
                                 }
                                 adapter.notifyDataSetChanged();
                                 if (isThreadPage && adapter.getCount() != itemsCountBefore) resetSearchCache();
                                 setPullableNoRefreshing();
                                 if (startItemPosition != -1) {
-                                    listView.setSelectionFromTop(startItemPosition, startItemTop);
+                                    hackListViewSetPosition(listView, startItemPosition, startItemTop);
                                     startItemPosition = -1;
                                 }
                                 String notification;
@@ -1412,7 +1412,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         activity.tabsAdapter.notifyDataSetChanged();
                     }
                     if (startItemPosition != -1) {
-                        listView.setSelectionFromTop(startItemPosition, startItemTop);
+                        hackListViewSetPosition(listView, startItemPosition, startItemTop);
                         startItemPosition = -1;
                     }
                     if (needUpdateAfter) {
@@ -1425,6 +1425,28 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     }
                 }
             });
+        }
+    }
+    
+    private static void hackListViewSetPosition(final ListView listView, final int position, final int top) {
+        try {
+            listView.setSelectionFromTop(position, top);
+            AppearanceUtils.callWhenLoaded(listView, new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        int setPosition = listView.getFirstVisiblePosition();
+                        int setTop = listView.getChildAt(0).getTop();
+                        if (setPosition != position || setTop != top) {
+                            listView.setSelectionFromTop(position, top);
+                        }
+                    } catch(Exception e) {
+                        Logger.e(TAG, e);
+                    }
+                }
+            });
+        } catch(Exception e) {
+            Logger.e(TAG, e);
         }
     }
     
