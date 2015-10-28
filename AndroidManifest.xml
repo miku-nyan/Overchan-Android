@@ -99,6 +99,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="claire.ws" />
                 <data android:host="www.claire.ws" />
                 
+                <data android:host="haruhichan.ru" />
+                
                 <data android:host="chuck.dfwk.ru" />
                 
                 <data android:host="4chan.org" />
