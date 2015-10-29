@@ -53,7 +53,6 @@ import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
-import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.FastHtmlTagParser;
 import nya.miku.wishmaster.common.IOUtils;
@@ -253,13 +252,6 @@ public class InfinityModule extends AbstractVichanModule {
         model.catalogAllowed = true;
         model.catalogTypeDescriptions = CATALOG;
         boardsMap.put(shortName, model);
-        return model;
-    }
-    
-    @Override
-    protected ThreadModel mapThreadModel(JSONObject opPost, String boardName) {
-        ThreadModel model = super.mapThreadModel(opPost, boardName);
-        if (model.attachmentsCount >= 0) model.attachmentsCount += opPost.optInt("omitted_images", 0);
         return model;
     }
     

@@ -19,12 +19,14 @@
 package nya.miku.wishmaster.api;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,19 +37,30 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.CryptoUtils;
+import nya.miku.wishmaster.common.IOUtils;
+import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -66,6 +79,8 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     
     private static final Pattern ATTACHMENT_EMBEDDED_LINK = Pattern.compile("<a[^>]*href=\"([^\">]*)\"[^>]*>");
     private static final Pattern ATTACHMENT_EMBEDDED_THUMB = Pattern.compile("<img[^>]*src=\"([^\">]*)\"[^>]*>");
+    
+    private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
     
     public AbstractVichanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -115,6 +130,24 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel board = super.getBoard(shortName, listener, task);
+        board.timeZoneId = "UTC";
+        board.defaultUserName = "Anonymous";
+        board.readonlyBoard = false;
+        board.requiredFileForNewThread = true;
+        board.allowDeletePosts = true;
+        board.allowDeleteFiles = true;
+        board.allowReport = BoardModel.REPORT_WITH_COMMENT;
+        board.allowNames = true;
+        board.allowSubjects = true;
+        board.allowSage = true;
+        board.allowEmails = true;
+        board.ignoreEmailIfSage = true;
+        board.allowCustomMark = false;
+        board.allowRandomHash = true;
+        board.allowIcons = false;
+        board.attachmentsMaxCount = 1;
+        board.attachmentsFormatFilters = null;
+        board.markType = BoardModel.MARK_BBCODE;
         board.firstPage = 1;
         board.catalogAllowed = true;
         board.catalogTypeDescriptions = CATALOG;
@@ -182,11 +215,16 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         return threads.toArray(new ThreadModel[threads.size()]);
     }
     
+    protected boolean jsonImagesIncludeOmitted() {
+        return false;
+    }
+    
     protected ThreadModel mapThreadModel(JSONObject opPost, String boardName) {
         ThreadModel curThread = new ThreadModel();
         curThread.threadNumber = Long.toString(opPost.getLong("no"));
         curThread.postsCount = opPost.optInt("replies", -2) + 1;
         curThread.attachmentsCount = opPost.optInt("images", -2) + 1;
+        if (curThread.attachmentsCount >= 0) curThread.attachmentsCount += opPost.optInt("omitted_images", 0);
         curThread.isSticky = opPost.optInt("sticky") == 1;
         curThread.isClosed = opPost.optInt("closed") == 1;
         return curThread;
@@ -288,6 +326,157 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             }
         }
         return null;
+    }
+    
+    @Override
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        UrlPageModel urlModel = new UrlPageModel();
+        urlModel.chanName = getChanName();
+        urlModel.boardName = model.boardName;
+        if (model.threadNumber == null) {
+            urlModel.type = UrlPageModel.TYPE_BOARDPAGE;
+            urlModel.boardPage = UrlPageModel.DEFAULT_FIRST_PAGE;
+        } else {
+            urlModel.type = UrlPageModel.TYPE_THREADPAGE;
+            urlModel.threadNumber = model.threadNumber;
+        }
+        String referer = buildUrl(urlModel);
+        List<Pair<String, String>> fields = VichanAntiBot.getFormValues(referer, task, httpClient);
+        
+        if (task != null && task.isCancelled()) throw new Exception("interrupted");
+        
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().
+                setCharset(Charset.forName("UTF-8")).setDelegates(listener, task);
+        for (Pair<String, String> pair : fields) {
+            if (pair.getKey().equals("spoiler") && !model.custommark) continue;
+            String val;
+            switch (pair.getKey()) {
+                case "name": val = model.name; break;
+                case "email": val = getSendPostEmail(model); break;
+                case "subject": val = model.subject; break;
+                case "body": val = model.comment; break;
+                case "password": val = model.password; break;
+                case "spoiler": val = "on"; break;
+                default: val = pair.getValue();
+            }
+            if (pair.getKey().equals("file")) {
+                if (model.attachments != null && model.attachments.length > 0) {
+                    postEntityBuilder.addFile(pair.getKey(), model.attachments[0], model.randomHash);
+                } else {
+                    postEntityBuilder.addPart(pair.getKey(), new ByteArrayBody(new byte[0], ""));
+                }
+            } else {
+                postEntityBuilder.addString(pair.getKey(), val);
+            }
+        }
+        
+        String url = getUsingUrl() + "post.php";
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, referer) };
+        HttpRequestModel request =
+                HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, listener, task);
+            if (response.statusCode == 200 || response.statusCode == 400) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
+            } else if (response.statusCode == 303) {
+                for (Header header : response.headers) {
+                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
+                        return fixRelativeUrl(header.getValue());
+                    }
+                }
+            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
+    }
+    
+    @Override
+    public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "post.php";
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("delete_" + model.postNumber, "on"));
+        if (model.onlyFiles) pairs.add(new BasicNameValuePair("file", "on"));
+        pairs.add(new BasicNameValuePair("password", model.password));
+        pairs.add(new BasicNameValuePair("delete", getDeleteFormValue(model)));
+        pairs.add(new BasicNameValuePair("reason", ""));
+        
+        UrlPageModel refererPage = new UrlPageModel();
+        refererPage.type = UrlPageModel.TYPE_THREADPAGE;
+        refererPage.chanName = getChanName();
+        refererPage.boardName = model.boardName;
+        refererPage.threadNumber = model.threadNumber;
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
+        HttpRequestModel rqModel = HttpRequestModel.builder().
+                setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
+            if (response.statusCode == 200 || response.statusCode == 400 || response.statusCode == 303) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
+                return null;
+            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
+    }
+    
+    @Override
+    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "post.php";
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("delete_" + model.postNumber, "on"));
+        pairs.add(new BasicNameValuePair("password", ""));
+        pairs.add(new BasicNameValuePair("reason", model.reportReason));
+        pairs.add(new BasicNameValuePair("report", getReportFormValue(model)));
+        
+        UrlPageModel refererPage = new UrlPageModel();
+        refererPage.type = UrlPageModel.TYPE_THREADPAGE;
+        refererPage.chanName = getChanName();
+        refererPage.boardName = model.boardName;
+        refererPage.threadNumber = model.threadNumber;
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
+        HttpRequestModel rqModel = HttpRequestModel.builder().
+                setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
+            if (response.statusCode == 200 || response.statusCode == 400 || response.statusCode == 303) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
+                return null;
+            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
+    }
+    
+    protected String getSendPostEmail(SendPostModel model) {
+        return model.sage ? "sage" : model.email;
+    }
+    
+    protected String getDeleteFormValue(DeletePostModel model) {
+        return "Delete";
+    }
+    
+    protected String getReportFormValue(DeletePostModel model) {
+        return "Report";
     }
     
     @Override
