@@ -486,6 +486,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cut_posts_hint">0 – не зрізати; типово 400px</string>
     <string name="pref_open_spoilers_title">Антиспойлер</string>
     <string name="pref_open_spoilers_summary">Показувати текст спойлерів</string>
+    <string name="pref_hide_actionbar_on_scroll_title">Приховувати Action Bar</string>
+    <string name="pref_hide_actionbar_on_scroll_summary">Приховувати Action Bar при скролінгу</string>
     <string name="pref_replies_only_quantity_title">Тред у треді</string>
     <string name="pref_replies_only_quantity_summary">Альтернативний показ лінків на відповіді</string>
     <string name="pref_gallery_screen_title">Галерея</string>

@@ -215,6 +215,11 @@ public class PreferencesActivity extends PreferenceActivity {
             ((PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_gallery_screen))).removePreference(p);
         }
         
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            Preference p = getPreferenceManager().findPreference(getString(R.string.pref_key_hide_actionbar_on_scroll));
+            ((PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_appearance))).removePreference(p);
+        }
+        
         if (!MainApplication.getInstance().settings.isRealTablet()) {
             Preference pHide = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel_hide));
             Preference pWidth = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel_width));

@@ -483,6 +483,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cut_posts_hint">0 - не обрезать; 400px по умолчанию</string>
     <string name="pref_open_spoilers_title">Открывать спойлеры</string>
     <string name="pref_open_spoilers_summary">Открывать текстовые спойлеры по умолчанию</string>
+    <string name="pref_hide_actionbar_on_scroll_title">Скрывать Action Bar</string>
+    <string name="pref_hide_actionbar_on_scroll_summary">Скрывать Action Bar при скроллинге</string>
     <string name="pref_replies_only_quantity_title">Показывать ответы в виде списка</string>
     <string name="pref_replies_only_quantity_summary">Альтернативный способ отображения ссылок на посты</string>
     <string name="pref_gallery_screen_title">Галерея</string>

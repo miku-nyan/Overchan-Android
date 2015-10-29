@@ -131,7 +131,7 @@ public class ApplicationSettings {
     }
     
     public boolean hideActionBar() {
-        return true; //TODO
+        return preferences.getBoolean(resources.getString(R.string.pref_key_hide_actionbar_on_scroll), false);
     }
     
     public int getTheme() {

@@ -477,6 +477,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cut_posts_hint">0 - nicht kürzen; 400px standardmäßig</string>
     <string name="pref_open_spoilers_title">Spoiler öffnen</string>
     <string name="pref_open_spoilers_summary">Text Spoiler standardmäßig öffnen</string>
+    <string name="pref_hide_actionbar_on_scroll_title">Aktionsleiste ausblenden</string>
+    <string name="pref_hide_actionbar_on_scroll_summary">Aktionsleiste ausblenden beim Scrollen</string>
     <string name="pref_replies_only_quantity_title">Antworten als Liste anzeigen</string>
     <string name="pref_replies_only_quantity_summary">Alternative Verweise auf Posts anzeigen</string>
     <string name="pref_gallery_screen_title">Galerie</string>

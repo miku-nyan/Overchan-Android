@@ -80,6 +80,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         <CheckBoxPreference
             android:defaultValue="false"
+            android:key="@string/pref_key_hide_actionbar_on_scroll"
+            android:title="@string/pref_hide_actionbar_on_scroll_title"
+            android:summary="@string/pref_hide_actionbar_on_scroll_summary" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="@string/pref_key_replies_only_quantity"
             android:title="@string/pref_replies_only_quantity_title"
             android:summary="@string/pref_replies_only_quantity_summary" />

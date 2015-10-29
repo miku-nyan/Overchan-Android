@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_local_time">PREF_KEY_LOCAL_TIME</string>
     <string name="pref_key_cut_posts">PREF_KEY_CUT_POSTS</string>
     <string name="pref_key_open_spoilers">PREF_KEY_OPEN_SPOILERS</string>
+    <string name="pref_key_hide_actionbar_on_scroll">PREF_KEY_HIDE_ACTIONBAR_ON_SCROLL</string>
     <string name="pref_key_replies_only_quantity">PREF_KEY_REPLIES_ONLY_QUANTITY</string>
     <string name="pref_key_gallery_screen">PREF_KEY_GALLERY_SCREEN</string>
     <string name="pref_key_gallery_scroll_thread">PREF_KEY_GALLERY_SCROLL_THREAD</string>

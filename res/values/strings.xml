@@ -476,6 +476,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>
     <string name="pref_open_spoilers_title">Open spoilers</string>
     <string name="pref_open_spoilers_summary">Open text spoilers by default</string>
+    <string name="pref_hide_actionbar_on_scroll_title">Hide action bar</string>
+    <string name="pref_hide_actionbar_on_scroll_summary">Hide the action bar on scroll</string>
     <string name="pref_replies_only_quantity_title">Show replies as list</string>
     <string name="pref_replies_only_quantity_summary">Alternative way to display references to posts</string>
     <string name="pref_gallery_screen_title">Gallery</string>
