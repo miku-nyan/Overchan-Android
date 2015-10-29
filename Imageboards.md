@@ -24,6 +24,8 @@
 * [syn-ch](http://syn-ch.com/)
 * [Inach.org](http://inach.org/)
 * [claire.ws](http://claire.ws/)
+* [10ch.ru](http://10ch.ru/)
+* [haruhichan.ru](http://haruhichan.ru/)
 * [pl.vichan.net](https://pl.vichan.net/)
 * [lainchan.org](https://lainchan.org/)
 * [Tohno chan](http://tohno-chan.com)
