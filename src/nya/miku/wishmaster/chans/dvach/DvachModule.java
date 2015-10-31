@@ -88,7 +88,7 @@ public class DvachModule extends AbstractWakabaModule {
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2>(.*?)</h2>", Pattern.DOTALL);
-    private static final Pattern REDIRECT_PATTERN = Pattern.compile("url=res/\\d+\\.html");
+    private static final Pattern REDIRECT_PATTERN = Pattern.compile("url=res/(\\d+)\\.html");
     
     private final Handler handler;
     
