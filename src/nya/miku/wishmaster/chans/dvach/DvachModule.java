@@ -404,13 +404,18 @@ public class DvachModule extends AbstractWakabaModule {
             Thread.yield();
         }
         
-        try {
-            wv.webView.stopLoading();
-            wv.webView.clearCache(true);
-            wv.webView.destroy();
-        } catch (Exception e) {
-            Logger.e(TAG, e);
-        }
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    wv.webView.stopLoading();
+                    wv.webView.clearCache(true);
+                    wv.webView.destroy();
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                }
+            }
+        });
         
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
         String cssCode = holder.getCode();
