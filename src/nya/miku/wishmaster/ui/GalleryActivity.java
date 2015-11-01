@@ -54,6 +54,7 @@ import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.gallery.FixedSubsamplingScaleImageView;
 import nya.miku.wishmaster.lib.gallery.Jpeg;
 import nya.miku.wishmaster.lib.gallery.TouchGifView;
+import nya.miku.wishmaster.lib.gallery.ViewPagerFixed;
 import nya.miku.wishmaster.lib.gallery.WebViewFixed;
 import nya.miku.wishmaster.lib.gifdrawable.GifDrawable;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
@@ -81,6 +82,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
@@ -88,10 +90,12 @@ import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.SparseArray;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -106,25 +110,25 @@ import android.widget.VideoView;
 
 public class GalleryActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "GalleryActivity";
-    
+
     public static final String EXTRA_ATTACHMENT = "attachment";
     public static final String EXTRA_BOARDMODEL = "boardmodel";
     public static final String EXTRA_PAGEHASH = "pagehash";
     public static final String EXTRA_LOCALFILENAME = "localfilename";
-    
+
     private DownloadingLocker downloadingLocker;
     private LayoutInflater inflater;
     private CancellableTask tnDownloadingTask;
     private Executor tnDownloadingExecutor;
-    
+
     private BoardModel boardModel;
     private ReadableContainer localFile;
-    
+
     private ProgressBar progressBar;
     private ViewPager viewPager;
     private TextView navigationInfo;
     private SparseArray<View> instantiatedViews;
-    
+
     private ChanModule chan;
     private ApplicationSettings settings;
     private FileCache fileCache;
@@ -132,21 +136,23 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private List<Triple<AttachmentModel, String, String>> attachments = null;
     private int currentPosition = 0;
     private int previousPosition = -1;
-    
+
     private String customSubdir = null;
-    
+
     private boolean firstScroll = true;
-    
+
     private Menu menu;
     private boolean currentLoaded;
-    
+
+    private GestureDetectorCompat gestureDetector = null;
+
     private static class ProgressHandler extends Handler {
         private final WeakReference<GalleryActivity> reference;
-        
+
         public ProgressHandler(GalleryActivity activity) {
             reference = new WeakReference<GalleryActivity>(activity);
         }
-        
+
         @Override
         public void handleMessage(Message msg) {
             GalleryActivity activity = reference.get();
@@ -164,43 +170,43 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-    
+
     private ProgressListener progressListener = new ProgressListener() {
         private long maxValue = Window.PROGRESS_END;
         private Handler progressHandler = new ProgressHandler(GalleryActivity.this);
-        
+
         @Override
         public void setProgress(final long value) {
             progressHandler.obtainMessage(0, (int)(Window.PROGRESS_END * value / maxValue), 0).sendToTarget();
         }
-        
+
         @Override
         public void setMaxValue(long value) {
             if (value > 0) maxValue = value;
         }
-        
+
         @Override
         public void setIndeterminate() {
         }
-        
+
     };
-    
+
     private void hideProgress() {
         progressListener.setMaxValue(1);
         progressListener.setProgress(1);
     }
-    
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         settings = MainApplication.getInstance().settings;
         setTheme(settings.getTheme());
         getTheme().applyStyle(R.style.Transparent, true);
-        
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_PROGRESS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.setActionBarNoIcon(this);
-        
+
         downloadingLocker = MainApplication.getInstance().downloadingLocker;
         inflater = getLayoutInflater();
         instantiatedViews = new SparseArray<View>();
@@ -208,7 +214,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         tnDownloadingExecutor = Executors.newFixedThreadPool(4, PriorityThreadFactory.LOW_PRIORITY_FACTORY);
         fileCache = MainApplication.getInstance().fileCache;
         bitmapCache = MainApplication.getInstance().bitmapCache;
-        
+
         AttachmentModel attachment = (AttachmentModel) getIntent().getSerializableExtra(EXTRA_ATTACHMENT);
         boardModel = (BoardModel) getIntent().getSerializableExtra(EXTRA_BOARDMODEL);
         if (boardModel == null) return;
@@ -221,7 +227,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 Logger.e(TAG, "cannot open local file", e);
             }
         }
-        
+
         chan = MainApplication.getInstance().getChanModule(boardModel.chan);
         PresentationModel presentationModel = MainApplication.getInstance().pagesCache.getPresentationModel(pagehash);
         if (presentationModel != null) {
@@ -257,7 +263,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             attachments = Collections.singletonList(Triple.of(attachment, ChanModels.hashAttachmentModel(attachment), (String)null));
             currentPosition = 0;
         }
-        
+
         setContentView(R.layout.gallery_layout);
         progressBar = (ProgressBar) findViewById(android.R.id.progress);
         progressBar.setMax(Window.PROGRESS_END);
@@ -273,8 +279,35 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 updateItem();
             }
         });
+
+        GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if ((Math.abs(velocityY)>Math.abs(velocityX)) && (Math.abs(velocityY)>3000.0)){
+                    if (settings.swipeToCloseGallery()) {
+                        finish();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+
+        gestureDetector = new GestureDetectorCompat(this, onGestureListener);
+        if (viewPager instanceof ViewPagerFixed) {
+            ((ViewPagerFixed) viewPager).SetOnGestureListener(this, onGestureListener);
+        }
     }
-    
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev)
+    {
+        if ((gestureDetector!=null) && ((this.getCurrentTag().layout.getVisibility()!=View.VISIBLE) || ((this.getCurrentTag().attachmentModel.type!=AttachmentModel.TYPE_IMAGE_STATIC)&&(this.getCurrentTag().attachmentModel.type!=AttachmentModel.TYPE_IMAGE_GIF))))
+            if (gestureDetector.onTouchEvent(ev))
+                return true;
+        return super.dispatchTouchEvent(ev);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -298,7 +331,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-    
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -316,7 +349,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 break;
         }
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
@@ -337,10 +370,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         menu.add(Menu.NONE, R.id.menu_search_google, 6, R.string.menu_search_google).setIcon(android.R.drawable.ic_menu_search);
         menu.add(Menu.NONE, R.id.menu_open_browser, 7, R.string.menu_open_browser).setIcon(R.drawable.ic_menu_browser);
         updateMenu();
-        
+
         return true;
     }
-    
+
     private void updateMenu() {
         if (this.menu == null) return;
         View current = instantiatedViews.get(currentPosition);
@@ -361,7 +394,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         menu.findItem(R.id.menu_search_google).setVisible(
                 tag.attachmentModel.type == AttachmentModel.TYPE_IMAGE_STATIC || tag.attachmentModel.type == AttachmentModel.TYPE_IMAGE_GIF);
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -389,7 +422,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         }
         return false;
     }
-    
+
     private GalleryItemViewTag getCurrentTag() {
         View current = instantiatedViews.get(currentPosition);
         if (current == null) {
@@ -398,7 +431,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         }
         return (GalleryItemViewTag) current.getTag();
     }
-    
+
     private void downloadAttachment() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
@@ -417,7 +450,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-    
+
     private void openExternal() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
@@ -438,7 +471,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
-    
+
     private void share() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
@@ -501,7 +534,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tag.file));
         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_via)));
     }
-    
+
     private void shareLink() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
@@ -511,33 +544,33 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         shareIntent.putExtra(Intent.EXTRA_TEXT, chan.fixRelativeUrl(tag.attachmentModel.path));
         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_via)));
     }
-    
+
     private void openGoogle() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
         String googleUrl = "http://www.google.com/searchbyimage?image_url=" + chan.fixRelativeUrl(tag.attachmentModel.path);
         UrlHandler.launchExternalBrowser(this, googleUrl);
     }
-    
+
     private void openBrowser() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
         UrlHandler.launchExternalBrowser(this, chan.fixRelativeUrl(tag.attachmentModel.path));
     }
-    
+
     private class GalleryAdapter extends PagerAdapter {
         private boolean firstTime = true;
-        
+
         @Override
         public int getCount() {
             return attachments.size();
         }
-        
+
         @Override
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
-        
+
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             View v = inflater.inflate(R.layout.gallery_item, container, false);
@@ -545,10 +578,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             tag.attachmentModel = attachments.get(position).getLeft();
             tag.attachmentHash = attachments.get(position).getMiddle();
             tag.thumbnailView = (ImageView) v.findViewById(R.id.gallery_thumbnail_preview);
-            
+
             int tnWidth = Math.min(container.getMeasuredWidth(), tag.attachmentModel.width * 2);
             if (tnWidth > 0) tag.thumbnailView.getLayoutParams().width = tnWidth;
-            
+
             tag.layout = (FrameLayout) v.findViewById(R.id.gallery_item_layout);
             tag.errorView = v.findViewById(R.id.gallery_error);
             tag.errorText = (TextView) tag.errorView.findViewById(R.id.frame_error_text);
@@ -556,7 +589,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             tag.loadingView = v.findViewById(R.id.gallery_loading);
             v.setTag(tag);
             instantiatedViews.put(position, v);
-            
+
             String hash = tag.attachmentHash;
             Bitmap bmp = bitmapCache.getFromMemory(hash);
             if (bmp != null) {
@@ -571,7 +604,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
             return v;
         }
-        
+
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             View v = (View) object;
@@ -580,18 +613,18 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             container.removeView(v);
             instantiatedViews.delete(position);
         }
-        
+
         private class AsyncThumbnailDownloader implements Runnable {
             private final int position;
             private final String hash;
             private final String url;
-            
+
             public AsyncThumbnailDownloader(int position, String hash, String url) {
                 this.position = position;
                 this.hash = hash;
                 this.url = url;
             }
-            
+
             @Override
             public void run() {
                 Bitmap bmp = bitmapCache.getFromCache(hash);
@@ -620,7 +653,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-    
+
     private void tryScrollParent(String attachmentHash) {
         try {
             TabsState tabsState = MainApplication.getInstance().tabsState;
@@ -635,7 +668,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             Logger.e(TAG, e);
         }
     }
-    
+
     private void updateItem() {
         AttachmentModel attachment = attachments.get(currentPosition).getLeft();
         if (settings.scrollThreadFromGallery() && !firstScroll) tryScrollParent(attachments.get(currentPosition).getRight());
@@ -644,7 +677,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 (currentPosition + 1) + "/" + attachments.size() + " (" + Attachments.getAttachmentSizeString(attachment, getResources()) + ")";
         navigationInfo.setText(navText);
         setTitle(Attachments.getAttachmentDisplayName(attachment));
-        
+
         if (previousPosition != -1) {
             View previous = instantiatedViews.get(previousPosition);
             if (previous != null) {
@@ -657,7 +690,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         }
         previousPosition = currentPosition;
-        
+
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
         currentLoaded = false;
@@ -667,13 +700,13 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         hideProgress();
         PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread((Runnable) tag.downloadingTask).start();
     }
-    
+
     private class AttachmentGetter extends CancellableTask.BaseCancellableTask implements Runnable {
         private final GalleryItemViewTag tag;
         public AttachmentGetter(GalleryItemViewTag tag) {
             this.tag = tag;
         }
-        
+
         @Override
         public void run() {
             if (tag.attachmentModel.type == AttachmentModel.TYPE_OTHER_NOTFILE ||
@@ -826,9 +859,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     break;
             }
         }
-        
+
     }
-    
+
     private void showError(final GalleryItemViewTag tag, final String message) {
         if (tag.downloadingTask.isCancelled()) return;
         runOnUiThread(new Runnable() {
@@ -852,7 +885,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         });
     }
-    
+
     private void recycleTag(GalleryItemViewTag tag, boolean cancelTask) {
         if (tag.layout != null) {
             for (int i=0; i<tag.layout.getChildCount(); ++i) {
@@ -874,7 +907,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
             tag.layout.removeAllViews();
         }
-        
+
         if (cancelTask && tag.downloadingTask != null) tag.downloadingTask.cancel();
         if (tag.timer != null) tag.timer.cancel();
         if (tag.audioPlayer != null) {
@@ -886,10 +919,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 tag.audioPlayer = null;
             }
         }
-        
+
         System.gc();
     }
-    
+
     private void setStaticImage(final GalleryItemViewTag tag, final File file) {
         if (!settings.useScaleImageView() || Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD_MR1 || Jpeg.isNonStandardGrayscaleImage(file)) {
             setWebView(tag, file);
@@ -930,7 +963,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         });
     }
-    
+
     private void setGif(final GalleryItemViewTag tag, final File file) {
         if (!settings.useNativeGif()) {
             setWebView(tag, file);
@@ -952,18 +985,18 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     setWebView(tag, file);
                     return;
                 }
-                
+
                 if (tag.downloadingTask.isCancelled()) return;
-                
+
                 tag.thumbnailView.setVisibility(View.GONE);
                 tag.loadingView.setVisibility(View.GONE);
-                
+
                 tag.layout.setVisibility(View.VISIBLE);
                 tag.layout.addView(iv);
             }
         });
     }
-    
+
     private void setVideo(final GalleryItemViewTag tag, final File file) {
         runOnUiThread(new Runnable() {
             @Override
@@ -979,14 +1012,14 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                             View videoContainer = inflater.inflate(R.layout.gallery_videoplayer, tag.layout);
                             final VideoView videoView = (VideoView)videoContainer.findViewById(R.id.gallery_video_view);
                             final TextView durationView = (TextView)videoContainer.findViewById(R.id.gallery_video_duration);
-                            
+
                             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                 @Override
                                 public void onPrepared(final MediaPlayer mp) {
                                     mp.setLooping(true);
-                                    
+
                                     durationView.setText("00:00 / " + formatMediaPlayerTime(mp.getDuration()));
-                                    
+
                                     tag.timer = new Timer();
                                     tag.timer.schedule(new TimerTask() {
                                         @Override
@@ -1005,7 +1038,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                                             });
                                         }
                                     }, 1000, 1000);
-                                    
+
                                     videoView.start();
                                 }
                             });
@@ -1018,19 +1051,19 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                                     return true;
                                 }
                             });
-                            
+
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
                                 CompatibilityImpl.setVideoViewZOrderOnTop(videoView);
                             }
                             videoView.setVideoPath(file.getAbsolutePath());
                         }
                     }
-                    
+
                 });
             }
         });
     }
-    
+
     private void setAudio(final GalleryItemViewTag tag, final File file) {
         runOnUiThread(new Runnable() {
             @Override
@@ -1051,9 +1084,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                                 @Override
                                 public void onPrepared(final MediaPlayer mp) {
                                     mp.setLooping(true);
-                                    
+
                                     durationView.setText(getSpannedText("00:00 / " + formatMediaPlayerTime(mp.getDuration())));
-                                    
+
                                     tag.timer = new Timer();
                                     tag.timer.schedule(new TimerTask() {
                                         @Override
@@ -1072,7 +1105,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                                             });
                                         }
                                     }, 1000, 1000);
-                                    
+
                                     mp.start();
                                 }
                             });
@@ -1099,13 +1132,13 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         });
     }
-    
+
     private String formatMediaPlayerTime(int milliseconds) {
         int seconds = milliseconds / 1000 % 60;
         int minutes = milliseconds / 60000;
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
-    
+
     private void setOtherFile(final GalleryItemViewTag tag, final File file) {
         runOnUiThread(new Runnable() {
             @Override
@@ -1119,7 +1152,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         });
     }
-    
+
     private void setExternalLink(final GalleryItemViewTag tag) {
         runOnUiThread(new Runnable() {
             @Override
@@ -1138,7 +1171,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
         });
     }
-    
+
     private void setOnClickView(GalleryItemViewTag tag, String message, View.OnClickListener handler) {
         tag.thumbnailView.setVisibility(View.VISIBLE);
         tag.loadingView.setVisibility(View.GONE);
@@ -1149,23 +1182,23 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         tag.layout.addView(v);
         v.setOnClickListener(handler);
     }
-    
+
     private Spanned getSpannedText(String message) {
         message = " " + message + " ";
         SpannableStringBuilder spanned = new SpannableStringBuilder(message);
-        for (Object span : new Object[] { new ForegroundColorSpan(Color.WHITE), new BackgroundColorSpan(Color.parseColor("#88000000")) }) { 
+        for (Object span : new Object[] { new ForegroundColorSpan(Color.WHITE), new BackgroundColorSpan(Color.parseColor("#88000000")) }) {
             spanned.setSpan(span, 0, message.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         return spanned;
     }
-    
+
     private void setWebView(final GalleryItemViewTag tag, final File file) {
         runOnUiThread(new Runnable() {
             private boolean oomFlag = false;
-            
+
             private final ViewGroup.LayoutParams MATCH_PARAMS =
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            
+
             private void prepareWebView(WebView webView) {
                 webView.setBackgroundColor(Color.TRANSPARENT);
                 webView.setInitialScale(100);
@@ -1188,10 +1221,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
                     CompatibilityImpl.setBlockNetworkLoads(settings, true);
                 }
-                
+
                 setScaleWebView(webView);
             }
-            
+
             private void setScaleWebView(final WebView webView) {
                 Runnable callSetScaleWebView = new Runnable() {
                     @Override
@@ -1208,7 +1241,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     callSetScaleWebView.run();
                 }
             }
-            
+
             private void setPrivateScaleWebView(WebView webView) {
                 Point imageSize = getImageSize(file);
                 Point resolution = new Point(tag.layout.getWidth(), tag.layout.getHeight());
@@ -1229,18 +1262,18 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                         CompatibilityImpl.setDefaultZoomMEDIUM(webView.getSettings());
                     }
                 }
-                
+
                 webView.setInitialScale(scale);
                 webView.setPadding(0, 0, 0, 0);
             }
-            
+
             private Point getImageSize(File file) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
                 BitmapFactory.decodeFile(file.getAbsolutePath(), options);
                 return new Point(options.outWidth, options.outHeight);
             }
-            
+
             @Override
             public void run() {
                 try {
@@ -1262,10 +1295,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     } else showError(tag, getString(R.string.error_out_of_memory));
                 }
             }
-            
+
         });
     }
-    
+
     private class GalleryItemViewTag {
         public CancellableTask downloadingTask;
         public Timer timer;
@@ -1273,12 +1306,12 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         public AttachmentModel attachmentModel;
         public String attachmentHash;
         public File file;
-        
+
         public ImageView thumbnailView;
         public FrameLayout layout;
         public View errorView;
         public TextView errorText;
         public View loadingView;
     }
-    
+
 }
