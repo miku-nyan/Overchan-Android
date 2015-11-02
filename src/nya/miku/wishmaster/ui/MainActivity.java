@@ -182,7 +182,7 @@ public class MainActivity extends FragmentActivity {
             if (tab.webUrl != null) {
                 menu.add(Menu.NONE, R.id.menu_open_browser, 202, R.string.menu_open_browser).setIcon(R.drawable.ic_menu_browser);
                 if (tab.pageModel != null && tab.pageModel.type == UrlPageModel.TYPE_INDEXPAGE &&
-                        MainApplication.getInstance().isLocked(tab.pageModel.chanName))
+                        MainApplication.getInstance().sfw.isLocked(tab.pageModel.chanName))
                     menu.findItem(R.id.menu_open_browser).setVisible(false);
             }
         }

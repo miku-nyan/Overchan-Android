@@ -58,7 +58,6 @@ public class PreferencesActivity extends PreferenceActivity {
         setTitle(R.string.preferences);
         
         super.onCreate(savedInstanceState);
-        boolean sfw = MainApplication.getInstance().isSFW();
         PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(this);
         setPreferenceScreen(rootScreen);
         
@@ -124,7 +123,7 @@ public class PreferencesActivity extends PreferenceActivity {
             String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             aboutPreference.setSummary(versionName);
         } catch (Exception e) {}
-        if (!sfw) {
+        if (!MainApplication.getInstance().sfw.isSFW()) {
             aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -184,7 +183,8 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
         
-        if (sfw) getPreferenceManager().findPreference(getString(R.string.pref_key_show_nsfw_boards)).setEnabled(false);
+        if (MainApplication.getInstance().sfw.isLockedAll())
+            getPreferenceManager().findPreference(getString(R.string.pref_key_show_nsfw_boards)).setEnabled(false);
         
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override

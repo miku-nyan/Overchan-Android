@@ -351,7 +351,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             
             {
                 for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-                    if (!MainApplication.getInstance().isLocked(chan.getChanName()) || !isSingleboardChan(chan)) add(chan);
+                    if (!MainApplication.getInstance().sfw.isLocked(chan.getChanName()) || !isSingleboardChan(chan)) add(chan);
                 }
             }
             

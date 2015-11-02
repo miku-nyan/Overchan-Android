@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.common;
+package nya.miku.wishmaster.ui.settings;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,13 +25,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.content.Context;
 import android.os.Environment;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 
-public class NsfwUnlock {
-    public static Set<String> getUnlockedChans(List<ChanModule> chans) {
-        Set<String> set = new HashSet<>();
+public class SFW {
+    private final boolean sfw;
+    private final Set<String> unlockedChans;
+    
+    public SFW(Context context, List<ChanModule> chans) {
+        if (!context.getPackageName().endsWith(".sfw")) {
+            sfw = false;
+            unlockedChans = null;
+            return;
+        }
+        
+        sfw = true;
+        unlockedChans = new HashSet<>();
+        
         try {
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                 File unlock = new File(Environment.getExternalStorageDirectory(), ".overchan");
@@ -45,7 +57,7 @@ public class NsfwUnlock {
                             try {
                                 UrlPageModel page = chan.parseUrl(current);
                                 if (page.type == UrlPageModel.TYPE_INDEXPAGE) {
-                                    set.add(chan.getChanName());
+                                    unlockedChans.add(chan.getChanName());
                                     break;
                                 }
                                 
@@ -53,7 +65,7 @@ public class NsfwUnlock {
                                 UrlPageModel index = new UrlPageModel();
                                 index.type = UrlPageModel.TYPE_INDEXPAGE;
                                 index.chanName = chan.getChanName();
-                                if (page.type == chan.parseUrl(chan.buildUrl(index)).type) set.add(chan.getChanName());
+                                if (page.type == chan.parseUrl(chan.buildUrl(index)).type) unlockedChans.add(chan.getChanName());
                                 break;
                             } catch (Exception e) {}
                         }
@@ -62,6 +74,19 @@ public class NsfwUnlock {
                 }
             }
         } catch (Exception e) {}
-        return set;
+    }
+    
+    public boolean isSFW() {
+        return sfw;
+    }
+    
+    public boolean isLocked(String chanName) {
+        if (!sfw) return false;
+        return (!unlockedChans.contains(chanName));
+    }
+    
+    public boolean isLockedAll() {
+        if (!sfw) return false;
+        return unlockedChans.isEmpty();
     }
 }

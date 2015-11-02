@@ -40,6 +40,7 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.settings.SFW;
 import nya.miku.wishmaster.ui.settings.Wifi;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
@@ -129,15 +130,13 @@ public class MainApplication extends Application {
     public DraftsCache draftsCache;
     public Database database;
     public DownloadingLocker downloadingLocker;
+    public SFW sfw;
     
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
     
     public Map<String, Integer> chanModulesIndex;
     public List<ChanModule> chanModulesList;
-    
-    private boolean sfw;
-    private Set<String> unlockedChans;
     
     private void registerChanModules() {
         chanModulesIndex = new HashMap<String, Integer>();
@@ -172,7 +171,7 @@ public class MainApplication extends Application {
         }
     }
     
-    public void addChanModule(String className, List<ChanModule> list, Map<String, Integer> indexMap) {
+    private void addChanModule(String className, List<ChanModule> list, Map<String, Integer> indexMap) {
         try {
             Class<?> c = Class.forName(className);
             addChanModule((ChanModule) c.getConstructor(SharedPreferences.class, Resources.class).newInstance(preferences, resources),
@@ -180,7 +179,7 @@ public class MainApplication extends Application {
         } catch (Exception e) {}
     }
     
-    public void addChanModule(ChanModule module, List<ChanModule> list, Map<String, Integer> indexMap) {
+    private void addChanModule(ChanModule module, List<ChanModule> list, Map<String, Integer> indexMap) {
         indexMap.put(module.getChanName(), list.size());
         list.add(module);
     }
@@ -210,11 +209,9 @@ public class MainApplication extends Application {
         downloadingLocker = new DownloadingLocker();
         
         registerChanModules();
+        sfw = new SFW(this, chanModulesList);
         
         RecaptchaAjax.init();
-        sfw = getPackageName().endsWith(".sfw");
-        if (sfw) unlockedChans = NsfwUnlock.getUnlockedChans(chanModulesList);
-        
         Wifi.updateState(this);
     }
     
@@ -234,15 +231,6 @@ public class MainApplication extends Application {
         if (ACRAConstants.ACRA_ENABLED) ACRA.init(this);
         initObjects();
         instance = this;
-    }
-    
-    public boolean isSFW() {
-        return sfw;
-    }
-    
-    public boolean isLocked(String chanName) {
-        if (!sfw) return false;
-        return (!unlockedChans.contains(chanName));
     }
     
     @Override
