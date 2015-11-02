@@ -92,10 +92,9 @@ public class MakabaJsonMapper {
     }
     
     static BoardModel mapBoardModel(JSONObject source, boolean fromMobileBoardsList, Resources resources) throws JSONException {
-        BoardModel model = defaultBoardModel(null, resources);
+        BoardModel model = defaultBoardModel(source.getString(fromMobileBoardsList ? "id" : "Board"), resources);
         
         if (fromMobileBoardsList) {
-            model.boardName = source.getString("id");
             model.boardDescription = source.getString("name");
             model.boardCategory = source.getString("category");
             
@@ -103,7 +102,6 @@ public class MakabaJsonMapper {
             model.bumpLimit = getIntSafe(source, "bump_limit", 500);
             model.lastPage = getIntSafe(source, "pages", 10) - 1;
         } else {
-            model.boardName = source.getString("Board");
             model.boardDescription = source.getString("BoardName");
             model.boardCategory = null;
             
