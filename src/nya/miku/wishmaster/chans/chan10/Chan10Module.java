@@ -207,6 +207,12 @@ public class Chan10Module extends AbstractWakabaModule {
                 }
             }
             @Override
+            protected void parseAttachment(String html) {
+                int lastLinkIndex = html.lastIndexOf("href=\"");
+                if (lastLinkIndex < 0) return;
+                super.parseAttachment(html.substring(lastLinkIndex));
+            }
+            @Override
             protected void parseThumbnail(String imgTag) {
                 super.parseThumbnail(imgTag);
                 
