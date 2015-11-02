@@ -404,7 +404,7 @@ public class WakabaReader implements Closeable {
     }
     
     /**
-     * Метод для парсинга информации о вложении, принимает HTML-строку, содержимое тэга &lt;span class="filetitle"&gt;.
+     * Метод для парсинга информации о вложении, принимает HTML-строку, содержимое тэга &lt;span class="filesize"&gt;.
      * Если получен корректрый результат, вложение нужно добавить к списку {@link #currentAttachments}
      * и увеличивается значение {link {@link ThreadModel#attachmentsCount}) объекта {@link #currentThread}.<br>
      * Эта реализация обрабатывает вложение без ссылки на миниатюру
@@ -489,7 +489,7 @@ public class WakabaReader implements Closeable {
      * Метод для парсинга ссылки на миниатюру вложения (принимает аттрибуты тэга &lt;img (/)&gt;, вызывается, когда встречается тэг img).
      * В стандартной вакабе должен вызываться после обработки основной информации о вложении (уже распарсен методом {@link #parseAttachment(String)}).
      * Эта реализация сохраняет ссылку (содержимое) аттрибута src в последний объект объект списка {@link #currentAttachments}, если список не пуст
-     * и если ссылка в этом объекте ещё не сохранена (т.е. сохраняется только первая встретившаяся после тэга &lt;span class="filetitle"&gt;). 
+     * и если ссылка в этом объекте ещё не сохранена (т.е. сохраняется только первая встретившаяся после тэга &lt;span class="filesize"&gt;). 
      */
     protected void parseThumbnail(String imgTag) {
         int currentAttachmentsCount = currentAttachments.size();
