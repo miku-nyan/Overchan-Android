@@ -1924,38 +1924,36 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             if (popupWidth == null) {
                 if (fragment().pageType != TYPE_THREADSLIST) {
-                    if (fragment().staticSettings.itemHeight != 0) {
-                        if (!expanded.get(tag.position)) {
-                            tag.commentView.setMaxHeight(fragment().staticSettings.itemHeight);
-                            tag.commentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                                @Override
-                                public boolean onPreDraw() {
-                                    if (fragment() == null) return false;
-                                    if (hackListViewPosition != null) {
-                                        fragment().listView.setSelectionFromTop(hackListViewPosition[0], hackListViewPosition[1]);
-                                        hackListViewPosition = null;
-                                    }
-                                    tag.commentView.getViewTreeObserver().removeOnPreDrawListener(this);
-                                    if (tag.commentView.getHeight() < fragment().staticSettings.itemHeight) {
-                                        return true;
-                                    }
-                                    tag.showFullTextView.setVisibility(View.VISIBLE);
-                                    tag.showFullTextIsVisible = true;
-                                    tag.showFullTextView.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            expanded.put(tag.position, true);
-                                            tag.commentView.setMaxHeight(Integer.MAX_VALUE);
-                                            tag.showFullTextView.setVisibility(View.GONE);
-                                            tag.showFullTextIsVisible = false;
-                                        }
-                                    });
-                                    return false;
+                    if (fragment().staticSettings.itemHeight != 0 && !expanded.get(tag.position)) {
+                        tag.commentView.setMaxHeight(fragment().staticSettings.itemHeight);
+                        tag.commentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                            @Override
+                            public boolean onPreDraw() {
+                                if (fragment() == null) return false;
+                                if (hackListViewPosition != null) {
+                                    fragment().listView.setSelectionFromTop(hackListViewPosition[0], hackListViewPosition[1]);
+                                    hackListViewPosition = null;
                                 }
-                            });
-                        } else {
-                            tag.commentView.setMaxHeight(Integer.MAX_VALUE);
-                        }
+                                tag.commentView.getViewTreeObserver().removeOnPreDrawListener(this);
+                                if (tag.commentView.getHeight() < fragment().staticSettings.itemHeight) {
+                                    return true;
+                                }
+                                tag.showFullTextView.setVisibility(View.VISIBLE);
+                                tag.showFullTextIsVisible = true;
+                                tag.showFullTextView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        expanded.put(tag.position, true);
+                                        tag.commentView.setMaxHeight(Integer.MAX_VALUE);
+                                        tag.showFullTextView.setVisibility(View.GONE);
+                                        tag.showFullTextIsVisible = false;
+                                    }
+                                });
+                                return false;
+                            }
+                        });
+                    } else {
+                        tag.commentView.setMaxHeight(Integer.MAX_VALUE);
                     }
                 } else {
                     tag.commentView.setMaxLines(fragment().maxItemLines);
