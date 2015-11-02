@@ -50,6 +50,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -281,7 +282,7 @@ public class PonyachModule extends AbstractWakabaModule {
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
         return new WakabaReader(stream, DATE_FORMAT) {
             private final Pattern aHrefPattern = Pattern.compile("<a\\s+href=\"(.*?)\"", Pattern.DOTALL);
-            private final Pattern attachmentSizePattern = Pattern.compile("([\\d\\.]+)KB");
+            private final Pattern attachmentSizePattern = Pattern.compile("([\\d\\.]+)[KM]B");
             private final Pattern attachmentPxSizePattern = Pattern.compile("(\\d+)x(\\d+)");
             private final char[] dateFilter = "<span class=\"mobile_date dast-date\">".toCharArray();
             private final char[] attachmentFilter = "<span class=\"filesize fs_".toCharArray();
@@ -349,7 +350,8 @@ public class PonyachModule extends AbstractWakabaModule {
                     Matcher sizeMatcher = attachmentSizePattern.matcher(html);
                     if (sizeMatcher.find()) {
                         try {
-                            attachment.size = Math.round(Float.parseFloat(sizeMatcher.group(1)));
+                            int mul = sizeMatcher.group(0).endsWith("MB") ? 1024 : 1;
+                            attachment.size = Math.round(Float.parseFloat(sizeMatcher.group(1)) * mul);
                         } catch (Exception e) {
                             attachment.size = -1;
                         }
@@ -443,6 +445,7 @@ public class PonyachModule extends AbstractWakabaModule {
                 String htmlResponse = output.toString("UTF-8");
                 Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
                 if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
+                if (htmlResponse.contains("<strong>Вы забанены</strong>")) throw new Exception("Вы забанены");
             }
             throw new Exception(response.statusCode + " - " + response.statusReason);
         } finally {
@@ -560,6 +563,7 @@ public class PonyachModule extends AbstractWakabaModule {
                         for (int i=0; i<answersBmp.length; ++i) {
                             ImageView answer = new ImageView(activity);
                             answer.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                            answer.setBackgroundColor(Color.WHITE);
                             answer.setImageBitmap(answersBmp[i]);
                             answer.setTag(answers.get(i).getRight());
                             answer.setOnClickListener(new View.OnClickListener() {
