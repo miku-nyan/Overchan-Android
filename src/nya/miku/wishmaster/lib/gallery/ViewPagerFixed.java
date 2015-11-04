@@ -45,12 +45,15 @@ public class ViewPagerFixed extends ViewPager {
      */
     @Override
     protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
-        if (Build.VERSION.SDK_INT < 14 && v instanceof WebViewFixed) {
-            return ((WebViewFixed) v).canScrollHorizontallyOldAPI(-dx);
-        } else if (Build.VERSION.SDK_INT < 14 && v instanceof TouchGifView) {
-            return ((TouchGifView) v).canScrollHorizontallyOldAPI(-dx);
-        } else {
-            return super.canScroll(v, checkV, dx, x, y);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            if (v instanceof FixedSubsamplingScaleImageView) {
+                return ((FixedSubsamplingScaleImageView) v).canScrollHorizontallyOldAPI(-dx);
+            } else if (v instanceof WebViewFixed) {
+                return ((WebViewFixed) v).canScrollHorizontallyOldAPI(-dx);
+            } else if (v instanceof TouchGifView) {
+                return ((TouchGifView) v).canScrollHorizontallyOldAPI(-dx); 
+            }
         }
+        return super.canScroll(v, checkV, dx, x, y);
     }
 }

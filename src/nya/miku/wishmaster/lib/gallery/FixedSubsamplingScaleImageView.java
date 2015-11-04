@@ -10,6 +10,7 @@
  * - отлавливается OutOfMemoryError
  * - Callback-интерфейсы, когда картинка готова и в случае ошибки
  * - публичный метод recycle() для освободждения ресурсов
+ * - метод canScrollHorizontally() для определения возможности прокрутки
  * 
  */
 
@@ -462,7 +463,7 @@ public class FixedSubsamplingScaleImageView extends View {
         float vDistEnd;
         // During non-interruptible anims, ignore all touch events
         if (anim != null && !anim.interruptible) {
-            getParent().requestDisallowInterceptTouchEvent(true);
+            //getParent().requestDisallowInterceptTouchEvent(true);
             return true;
         } else {
             anim = null;
@@ -483,7 +484,7 @@ public class FixedSubsamplingScaleImageView extends View {
             case MotionEvent.ACTION_POINTER_1_DOWN:
             case MotionEvent.ACTION_POINTER_2_DOWN:
                 anim = null;
-                getParent().requestDisallowInterceptTouchEvent(true);
+                //getParent().requestDisallowInterceptTouchEvent(true);
                 maxTouchCount = Math.max(maxTouchCount, touchCount);
                 if (touchCount >= 2) {
                     if (zoomEnabled) {
@@ -570,13 +571,13 @@ public class FixedSubsamplingScaleImageView extends View {
                                 // Haven't panned the image, and we're at the left or right edge. Switch to page swipe.
                                 maxTouchCount = 0;
                                 handler.removeMessages(MESSAGE_LONG_CLICK);
-                                getParent().requestDisallowInterceptTouchEvent(false);
+                                //getParent().requestDisallowInterceptTouchEvent(false);
                             }
 
                             if (!panEnabled) {
                                 vTranslate.x = vTranslateStart.x;
                                 vTranslate.y = vTranslateStart.y;
-                                getParent().requestDisallowInterceptTouchEvent(false);
+                                //getParent().requestDisallowInterceptTouchEvent(false);
                             }
 
                             refreshRequiredTiles(false);
@@ -1936,6 +1937,25 @@ public class FixedSubsamplingScaleImageView extends View {
     
     public interface FailedCallback {
         public void onFail();
+    }
+    
+    @Override
+    public boolean canScrollHorizontally(int direction) {
+        int width = getWidth();
+        float x = vTranslate.x;
+        float imageWidth = scale * sWidth();
+        if (imageWidth < width) {
+            return false;
+        } else if (x >= -1 && direction < 0) {
+            return false;
+        } else if (Math.abs(x) + width + 1 >= imageWidth && direction > 0) {
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean canScrollHorizontallyOldAPI(int direction) {
+        return canScrollHorizontally(direction);
     }
     
 }
