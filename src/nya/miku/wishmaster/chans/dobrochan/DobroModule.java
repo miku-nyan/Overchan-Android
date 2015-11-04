@@ -367,7 +367,7 @@ public class DobroModule extends AbstractChanModule {
             try {
                 String userJsonUrl = getDomainUrl() + "api/user.json?new_format";
                 JSONObject userJson = downloadJSONObject(userJsonUrl, false, null, task);
-                JSONArray tokens = userJson.getJSONArray("tokens");
+                JSONArray tokens = userJson.getJSONObject("result").getJSONArray("tokens");
                 for (int i=0; i<tokens.length(); ++i) {
                     JSONObject token = tokens.getJSONObject(i);
                     if (token.getString("token").equals("no_user_captcha")) return null;
