@@ -252,7 +252,12 @@ public class DobroModule extends AbstractChanModule {
     @Override
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
-        boolean loadOnlyNewPosts = loadOnlyNewPosts();
+        return getPostsList(boardName, threadNumber, listener, task, oldList, true);
+    }
+    
+    private PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList,
+            boolean allowLoadOnlyNewPosts) throws Exception {
+        boolean loadOnlyNewPosts = allowLoadOnlyNewPosts && loadOnlyNewPosts();
         String lastPost = (loadOnlyNewPosts && oldList != null && oldList.length > 0) ? oldList[oldList.length-1].number : null;
         String url = getDomainUrl() + "api/thread/" + boardName + "/" + threadNumber +
                 (lastPost == null ? "/all.json?new_format&message_html" : ("/new.json?last_post=" + lastPost + "&new_format&message_html"));
@@ -260,6 +265,19 @@ public class DobroModule extends AbstractChanModule {
         if (response == null) return oldList;
         try {
             JSONObject object = response.getJSONObject("result");
+            if (lastPost != null) {
+                try {
+                    int oldPosts = oldList.length;
+                    for (PostModel post : oldList) if (post.deleted) --oldPosts;
+                    int newPosts = object.has("posts") ? object.getJSONArray("posts").length() : 0;
+                    int postsInThread = object.getInt("posts_count");
+                    boolean assertion = oldPosts + newPosts == postsInThread;
+                    //Logger.d(TAG, "assert: (" + oldList.length + " + " + newPosts + " == " + postsInThread + ") == " + assertion);
+                    if (!assertion) return getPostsList(boardName, threadNumber, listener, task, oldList, false);
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                }
+            }
             if (!object.has("posts")) {
                 if (oldList != null && oldList.length > 0) return oldList; else throw new Exception();
             }
