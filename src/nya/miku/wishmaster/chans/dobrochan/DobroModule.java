@@ -99,6 +99,8 @@ public class DobroModule extends AbstractChanModule {
     
     private String domain;
     
+    private boolean postingError = false;
+    
     public DobroModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
     }
@@ -361,6 +363,20 @@ public class DobroModule extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (!postingError) {
+            try {
+                String userJsonUrl = getDomainUrl() + "api/user.json?new_format";
+                JSONObject userJson = downloadJSONObject(userJsonUrl, false, null, task);
+                JSONArray tokens = userJson.getJSONArray("tokens");
+                for (int i=0; i<tokens.length(); ++i) {
+                    JSONObject token = tokens.getJSONObject(i);
+                    if (token.getString("token").equals("no_user_captcha")) return null;
+                }
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            }
+        }
+        
         String captchaUrl = getDomainUrl() + "captcha/" + boardName + "/" + System.currentTimeMillis() + ".png";
         
         Bitmap captchaBitmap = null;
@@ -391,7 +407,7 @@ public class DobroModule extends AbstractChanModule {
                 addString("subject", model.subject).
                 addString("new_post", "Отправить").
                 addString("message", model.comment).
-                addString("captcha", model.captchaAnswer).
+                addString("captcha", TextUtils.isEmpty(model.captchaAnswer) ? "" : model.captchaAnswer).
                 addString("password", model.password);
         
         String rating = (model.icon >= 0 && model.icon < DobroBoards.RATINGS.length) ? DobroBoards.RATINGS[model.icon] : "SFW";
@@ -411,14 +427,16 @@ public class DobroModule extends AbstractChanModule {
                     if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
                         String location = fixRelativeUrl(header.getValue());
                         if (location.contains("/error/")) {
+                            postingError = true;
                             String errorMessage = "";
                             String errorHtml = HttpStreamer.getInstance().
                                     getStringFromUrl(location, HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
                             Matcher errorMatcher = Pattern.compile("class='post-error'>([^<]*)<").matcher(errorHtml);
                             while (errorMatcher.find()) errorMessage += (errorMessage.equals("") ? "" : "; ") + errorMatcher.group(1);
-                            if (errorMessage.equals("")) errorMessage = "";
+                            if (errorMessage.equals("")) errorMessage = errorHtml.replaceAll("<[^>]*>", "").trim();
                             throw new Exception(errorMessage);
                         }
+                        postingError = false;
                         return location;
                     }
                 }
