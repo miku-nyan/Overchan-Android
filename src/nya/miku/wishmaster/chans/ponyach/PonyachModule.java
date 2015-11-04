@@ -436,7 +436,7 @@ public class PonyachModule extends AbstractWakabaModule {
             if (response.statusCode == 302) {
                 for (Header header : response.headers) {
                     if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
-                        return fixRelativeUrl(header.getValue());
+                        return fixRelativeUrl(header.getValue().replaceAll("res/0[05]{2}(\\d+)\\.html", "res/$1\\.html"));
                     }
                 }
             } else if (response.statusCode == 200) {
