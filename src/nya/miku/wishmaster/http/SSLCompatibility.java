@@ -40,7 +40,7 @@ public class SSLCompatibility {
                     Field field = classOpenSSLSocketImpl.getDeclaredField("supportedProtocols");
                     field.setAccessible(true);
                     field.set(null, new String[] { "SSLv3", "SSLv3", "TLSv1" });
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     Logger.d(TAG, "try to install security provider");
                     Context remote = c.createPackageContext("com.google.android.gms", Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
                     Method method = remote.getClassLoader().loadClass("com.google.android.gms.common.security.ProviderInstallerImpl").
