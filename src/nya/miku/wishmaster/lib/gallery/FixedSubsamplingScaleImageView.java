@@ -11,6 +11,7 @@
  * - Callback-интерфейсы, когда картинка готова и в случае ошибки
  * - публичный метод recycle() для освободждения ресурсов
  * - метод canScrollHorizontally() для определения возможности прокрутки
+ * - используется ориентация из EXIF по умолчанию
  * 
  */
 
@@ -126,7 +127,8 @@ public class FixedSubsamplingScaleImageView extends View {
     private boolean debug = false;
 
     // Image orientation setting
-    private int orientation = ORIENTATION_0;
+    //private int orientation = ORIENTATION_0;
+    private int orientation = ORIENTATION_USE_EXIF;
 
     // Max scale allowed (prevent infinite zoom)
     //private float maxScale = 2F;
@@ -1893,7 +1895,7 @@ public class FixedSubsamplingScaleImageView extends View {
      * Wraps the scale, center and orientation of a displayed image for easy restoration on screen rotate.
      */
     @SuppressWarnings("serial")
-    public class ImageViewState implements Serializable {
+    public static class ImageViewState implements Serializable {
 
         private float scale;
 
