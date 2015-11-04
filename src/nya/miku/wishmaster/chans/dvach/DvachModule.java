@@ -24,8 +24,10 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -186,6 +188,16 @@ public class DvachModule extends AbstractWakabaModule {
         } finally {
             IOUtils.closeQuietly(in);
             if (responseModel != null) responseModel.release();
+        }
+    }
+    
+    @Override
+    protected Map<String, SimpleBoardModel> getBoardsMap(ProgressListener listener, CancellableTask task) throws Exception {
+        try {
+            return super.getBoardsMap(listener, task);
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            return Collections.emptyMap();
         }
     }
     
