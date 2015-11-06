@@ -407,7 +407,7 @@ public class TouchGifView extends ImageView {
         public int getCurrY();
     }
     
-    private class OldScroller implements IScroller {
+    private static class OldScroller implements IScroller {
         private Scroller scroller;
         public void init(Context context) {
             scroller = new Scroller(context);
@@ -433,7 +433,7 @@ public class TouchGifView extends ImageView {
     }
     
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
-    private class NewScroller implements TouchGifView.IScroller {
+    private static class NewScroller implements TouchGifView.IScroller {
         private OverScroller overScroller;
         public void init(Context context) {
             overScroller = new OverScroller(context);
