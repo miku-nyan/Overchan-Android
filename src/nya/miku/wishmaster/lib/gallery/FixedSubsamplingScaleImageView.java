@@ -1956,8 +1956,27 @@ public class FixedSubsamplingScaleImageView extends View {
         return true;
     }
     
+    @Override
+    public boolean canScrollVertically(int direction) {
+        int height = getHeight();
+        float y = vTranslate.y;
+        float imageHeight = scale * sHeight();
+        if (imageHeight < height) {
+            return false;
+        } else if (y >= -1 && direction < 0) {
+            return false;
+        } else if (Math.abs(y) + height + 1 >= imageHeight && direction > 0) {
+            return false;
+        }
+        return true;
+    }
+    
     public boolean canScrollHorizontallyOldAPI(int direction) {
         return canScrollHorizontally(direction);
+    }
+    
+    public boolean canScrollVerticallyOldAPI(int direction) {
+        return canScrollVertically(direction);
     }
     
 }

@@ -566,8 +566,27 @@ public class TouchGifView extends ImageView {
         return true;
     }
     
+    @Override
+    public boolean canScrollVertically(int direction) {
+        matrix.getValues(m);
+        float y = m[Matrix.MTRANS_Y];
+        float imageHeight = bmHeight*saveScale/realScale;
+        if (imageHeight < height) {
+            return false;
+        } else if (y >= -1 && direction < 0) {
+            return false;
+        } else if (Math.abs(y) + height + 1 >= imageHeight && direction > 0) {
+            return false;
+        }
+        return true;
+    }
+    
     public boolean canScrollHorizontallyOldAPI(int direction) {
         return canScrollHorizontally(direction);
     }
-
+    
+    public boolean canScrollVerticallyOldAPI(int direction) {
+        return canScrollVertically(direction);
+    }
+    
 }
