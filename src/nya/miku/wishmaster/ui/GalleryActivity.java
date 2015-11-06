@@ -52,6 +52,7 @@ import nya.miku.wishmaster.containers.ReadableContainer;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.gallery.FixedSubsamplingScaleImageView;
+import nya.miku.wishmaster.lib.gallery.JSWebView;
 import nya.miku.wishmaster.lib.gallery.Jpeg;
 import nya.miku.wishmaster.lib.gallery.TouchGifView;
 import nya.miku.wishmaster.lib.gallery.WebViewFixed;
@@ -1248,8 +1249,12 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     WebView webView = new WebViewFixed(GalleryActivity.this);
                     webView.setLayoutParams(MATCH_PARAMS);
                     tag.layout.addView(webView);
-                    prepareWebView(webView);
-                    webView.loadUrl(Uri.fromFile(file).toString());
+                    if (settings.fallbackWebView()) {
+                        prepareWebView(webView);
+                        webView.loadUrl(Uri.fromFile(file).toString());
+                    } else {
+                        JSWebView.setImage(webView, file);
+                    }
                     tag.thumbnailView.setVisibility(View.GONE);
                     tag.loadingView.setVisibility(View.GONE);
                     tag.layout.setVisibility(View.VISIBLE);

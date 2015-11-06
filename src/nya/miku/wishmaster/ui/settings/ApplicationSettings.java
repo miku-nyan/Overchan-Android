@@ -298,6 +298,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_nativegif), true);
     }
     
+    public boolean fallbackWebView() {
+        return false; // TODO
+    }
+    
     public boolean useInternalVideoPlayer() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_videoplayer), true);
     }
