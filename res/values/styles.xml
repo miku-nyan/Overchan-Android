@@ -252,7 +252,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="postTripForeground">#228854</item>
         <item name="postTitleForeground">#000000</item>
         <item name="postQuoteForeground">#89B83F</item>
-        <item name="spoilerForeground">#000000</item>
+        <item name="spoilerForeground">#333333</item>
         <item name="spoilerBackground">#DDDDDD</item>
         <item name="urlLinkForeground">#418A8E</item>
         <item name="itemInfoForeground">#999999</item>
