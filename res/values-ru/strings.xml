@@ -565,4 +565,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>45\uff05</item>
         <item>50\uff05</item>
     </string-array>
+    <string name="pref_gallery_swipe_to_close_title">Закрывать галерею свайпом </string>
+    <string name="pref_gallery_swipe_to_close_summary">Закрывать галерею свайпом вверх или вниз</string>
 </resources>

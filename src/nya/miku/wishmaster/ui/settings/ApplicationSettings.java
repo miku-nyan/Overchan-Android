@@ -289,6 +289,10 @@ public class ApplicationSettings {
     public boolean scrollThreadFromGallery() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_scroll_thread), false);
     }
+
+    public boolean swipeToCloseGallery() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_swipe_to_close), false);
+    }
     
     public boolean useScaleImageView() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_scaleimageview), true);
