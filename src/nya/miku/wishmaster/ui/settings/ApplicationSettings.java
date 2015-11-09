@@ -299,7 +299,7 @@ public class ApplicationSettings {
     }
     
     public boolean fallbackWebView() {
-        return false; // TODO
+        return false;
     }
     
     public boolean useInternalVideoPlayer() {

@@ -116,18 +116,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             
             <CheckBoxPreference
                 android:defaultValue="true"
-                android:key="@string/pref_key_gallery_scaleimageview"
-                android:title="@string/pref_gallery_scaleimageview_title"
-                android:summary="@string/pref_gallery_scaleimageview_summary" />
-            
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="@string/pref_key_gallery_nativegif"
-                android:title="@string/pref_gallery_nativegif_title"
-                android:summary="@string/pref_gallery_nativegif_summary" />
-            
-            <CheckBoxPreference
-                android:defaultValue="true"
                 android:key="@string/pref_key_gallery_videoplayer"
                 android:title="@string/pref_gallery_videoplayer_title"
                 android:summary="@string/pref_gallery_videoplayer_summary"
@@ -145,6 +133,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:key="@string/pref_key_gallery_audioplayer"
                 android:title="@string/pref_gallery_audioplayer_title"
                 android:summary="@string/pref_gallery_audioplayer_summary" />
+            
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="@string/pref_key_gallery_scaleimageview"
+                android:title="@string/pref_gallery_scaleimageview_title"
+                android:summary="@string/pref_gallery_scaleimageview_summary" />
+            
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="@string/pref_key_gallery_nativegif"
+                android:title="@string/pref_gallery_nativegif_title"
+                android:summary="@string/pref_gallery_nativegif_summary" />
         </PreferenceScreen>
     </PreferenceCategory>
     

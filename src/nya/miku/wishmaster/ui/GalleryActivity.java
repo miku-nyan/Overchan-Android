@@ -1242,6 +1242,16 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 return new Point(options.outWidth, options.outHeight);
             }
             
+            private boolean useFallback(File file) {
+                String path = file.getPath().toLowerCase(Locale.US);
+                if (path.endsWith(".png")) return false;
+                if (path.endsWith(".jpg")) return false;
+                if (path.endsWith(".gif")) return false;
+                if (path.endsWith(".jpeg")) return false;
+                if (path.endsWith(".webp") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) return false;
+                return true;
+            }
+            
             @Override
             public void run() {
                 try {
@@ -1249,7 +1259,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     WebView webView = new WebViewFixed(GalleryActivity.this);
                     webView.setLayoutParams(MATCH_PARAMS);
                     tag.layout.addView(webView);
-                    if (settings.fallbackWebView()) {
+                    if (settings.fallbackWebView() || useFallback(file)) {
                         prepareWebView(webView);
                         webView.loadUrl(Uri.fromFile(file).toString());
                     } else {
