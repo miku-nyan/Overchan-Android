@@ -35,7 +35,7 @@ public class ClairewsModule extends NullchanccModule {
     private static final String CHAN_NAME = "claire.ws";
     private static final String DOMAIN = "claire.ws";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sg", "stains;gate", "Boards", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sg", "steins;gate", "Boards", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "video;games", "Boards", false)
     };
     
