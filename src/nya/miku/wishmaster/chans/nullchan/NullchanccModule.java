@@ -142,6 +142,11 @@ public class NullchanccModule extends AbstractWakabaModule {
         return true;
     }
     
+    @Override
+    protected boolean canCloudflare() {
+        return true;
+    }
+    
     private void addOnlyNewPostsPreference(PreferenceGroup group) {
         Context context = group.getContext();
         CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
@@ -196,7 +201,7 @@ public class NullchanccModule extends AbstractWakabaModule {
         if (urlModel != null && urlModel.chanName != null && urlModel.chanName.equals("expand")) {
             stream = new SequenceInputStream(new ByteArrayInputStream("<form id=\"delform\">".getBytes()), stream);
         }
-        return new WakabaReader(stream) {
+        return new WakabaReader(stream, null, true) {
             private final DateFormat dateFormat;
             {
                 DateFormatSymbols symbols = new DateFormatSymbols();
