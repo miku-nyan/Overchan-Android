@@ -11,7 +11,8 @@ import android.content.Context;
  * Костыль для установки прокси в WebView (рефлексивный).<br>
  * http://stackoverflow.com/questions/4488338/webview-android-proxy<br>
  * Изменения:<ul>
- * <li>в случае host == null происходит сброс настроек прокси</li></ul>
+ * <li>в случае host == null происходит сброс настроек прокси</li>
+ * <li>экземпляр org.apache.http.HttpHost создаётся рефлексивно</li></ul>
  */
 public class WebViewProxy {
     private static final String TAG = "WebViewProxy";
@@ -24,13 +25,24 @@ public class WebViewProxy {
      * @param port порт прокси сервера
      * @return true, если операция выполнена успешно
      */
-    @SuppressWarnings("all")
     public static boolean setProxy(Context сontext, String host, int port) {
         Logger.d(TAG, "Setting proxy with <= 3.2 API.");
 
-        org.apache.http.HttpHost proxyServer = host != null ? new org.apache.http.HttpHost(host, port) : null;
+        Object proxyServer = null;
+        if (host != null) {
+            try {
+                proxyServer = Class.forName("org.apache.http.HttpHost").getConstructor(String.class, int.class).newInstance(host, port);
+                if (proxyServer == null) {
+                    Logger.e(TAG, "failed to create instance of org.apache.http.HttpHost: null returned");
+                    return false;
+                }
+            } catch (Exception ex) {
+                Logger.e(TAG, "failed to create instance of org.apache.http.HttpHost", ex);
+                return false;
+            }
+        }
         // Getting network
-        Class networkClass = null;
+        Class<?> networkClass = null;
         Object network = null;
         try {
             networkClass = Class.forName("android.webkit.Network");
@@ -44,7 +56,7 @@ public class WebViewProxy {
             }
             network = getInstanceMethod.invoke(networkClass, new Object[]{сontext});
         } catch (Exception ex) {
-            Logger.e(TAG, "error getting network: " + ex);
+            Logger.e(TAG, "error getting network", ex);
             return false;
         }
         if (network == null) {
@@ -56,7 +68,7 @@ public class WebViewProxy {
             Field requestQueueField = networkClass.getDeclaredField("mRequestQueue");
             requestQueue = getFieldValueSafely(requestQueueField, network);
         } catch (Exception ex) {
-            Logger.e(TAG, "error getting field value");
+            Logger.e(TAG, "error getting field value", ex);
             return false;
         }
         if (requestQueue == null) {
@@ -65,10 +77,10 @@ public class WebViewProxy {
         }
         Field proxyHostField = null;
         try {
-            Class requestQueueClass = Class.forName("android.net.http.RequestQueue");
+            Class<?> requestQueueClass = Class.forName("android.net.http.RequestQueue");
             proxyHostField = requestQueueClass.getDeclaredField("mProxyHost");
         } catch (Exception ex) {
-            Logger.e(TAG, "error getting proxy host field");
+            Logger.e(TAG, "error getting proxy host field", ex);
             return false;
         }
 
@@ -77,7 +89,7 @@ public class WebViewProxy {
             proxyHostField.setAccessible(true);
             proxyHostField.set(requestQueue, proxyServer);
         } catch (Exception ex) {
-            Logger.e(TAG, "error setting proxy host");
+            Logger.e(TAG, "error setting proxy host", ex);
         } finally {
             proxyHostField.setAccessible(temp);
         }
