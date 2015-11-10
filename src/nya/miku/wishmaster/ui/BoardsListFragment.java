@@ -35,6 +35,7 @@ import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestException;
+import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import nya.miku.wishmaster.ui.tabs.TabModel;
@@ -55,7 +56,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -138,9 +138,16 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         setHasOptionsMenu(true);
         
         if (QuickAccess.getQuickAccessFromPreferences().isEmpty()) {
-            Toast toast = Toast.makeText(activity, R.string.boardslist_quickaccess_tip, Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.TOP, 0, (int) (resources.getDisplayMetrics().density * 5 + 0.5f));
-            toast.show();
+            ClickableToast.showText(activity, resources.getString(R.string.boardslist_quickaccess_tip), new ClickableToast.OnClickListener() {
+                @Override
+                public void onClick() {
+                    try {
+                        activity.openOptionsMenu();
+                    } catch (Exception e) {
+                        Logger.e(TAG, e);
+                    }
+                }
+            }, Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
         }
     }
     

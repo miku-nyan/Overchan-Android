@@ -37,6 +37,7 @@ public class ClickableToast extends FrameLayout {
     private Integer windowAnimation;
     
     private View container;
+    private boolean gravityTop;
 
     public ClickableToast(Context context) {
         super(context);
@@ -82,14 +83,22 @@ public class ClickableToast extends FrameLayout {
         }, duration);
     }
     
+    public void setGravityTop(boolean value) {
+        this.gravityTop = value;
+    }
+    
     public WindowManager.LayoutParams getWmParams(){
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.height = WindowManager.LayoutParams.WRAP_CONTENT;
         params.width = WindowManager.LayoutParams.WRAP_CONTENT;
         params.alpha = 1;
         params.format = PixelFormat.RGBA_8888;
-        params.gravity = Gravity.BOTTOM;
-        params.verticalMargin = isNarrow() ? 0.05f : 0.07f;
+        if (gravityTop) {
+            params.gravity = Gravity.TOP;
+        } else {
+            params.gravity = Gravity.BOTTOM;
+            params.verticalMargin = isNarrow() ? 0.05f : 0.07f;
+        }
         params.flags =  WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         //params.type = WindowManager.LayoutParams.LAST_SYSTEM_WINDOW + 30;
         try {
@@ -153,6 +162,10 @@ public class ClickableToast extends FrameLayout {
     }
     
     public static void showText(Context ctx, CharSequence text, OnClickListener listener) {
+        showText(ctx, text, listener, false);
+    }
+    
+    public static void showText(Context ctx, CharSequence text, OnClickListener listener, boolean gravityTop) {
         try {
             if (internalResources == null) internalResources = Resources.getSystem();
             LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -160,6 +173,7 @@ public class ClickableToast extends FrameLayout {
             TextView tv = (TextView) v.findViewById(internalResources.getIdentifier("message", "id", "android"));
             tv.setText(text);
             final ClickableToast toast = new ClickableToast(ctx);
+            if (gravityTop) toast.setGravityTop(true);
             toast.setOnClickListener(listener);
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -180,7 +194,9 @@ public class ClickableToast extends FrameLayout {
             toast.show(3500);
         } catch (Exception e) {
             Logger.e(TAG, e);
-            Toast.makeText(ctx, text, Toast.LENGTH_LONG).show();
+            Toast fallbackToast = Toast.makeText(ctx, text, Toast.LENGTH_LONG);
+            if (gravityTop) fallbackToast.setGravity(Gravity.TOP, 0, 0);
+            fallbackToast.show();
         }
     }
     
