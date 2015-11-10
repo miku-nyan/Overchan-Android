@@ -310,7 +310,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
     }
     
     private void openNewTab(String url) {
-        UrlHandler.open(url, activity);
+        UrlHandler.open(url, activity, MainApplication.getInstance().sfw);
     }
     
     private void showKeyboard(View v) {

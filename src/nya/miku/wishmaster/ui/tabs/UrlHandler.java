@@ -28,6 +28,7 @@ import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.ui.FakeBrowser;
 import nya.miku.wishmaster.ui.MainActivity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -42,9 +43,17 @@ public class UrlHandler {
     private UrlHandler() {}
     
     public static void open(final String url, final MainActivity activity) {
+        open(url, activity, false);
+    }
+    
+    public static void open(final String url, final MainActivity activity, boolean useFakeBrowserIfUrlNotHandled) {
         TabModel model = getTabModel(getPageModel(url), activity.getResources());
         if (model != null) {
             open(model, activity, true);
+            return;
+        }
+        if (useFakeBrowserIfUrlNotHandled) {
+            FakeBrowser.openFakeBrowser(activity, url);
             return;
         }
         boolean isEmail = url.toLowerCase(Locale.US).startsWith("mailto:");
