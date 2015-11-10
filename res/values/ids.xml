@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item name="menu_share" type="id"/>
     <item name="menu_share_link" type="id"/>
     <item name="menu_search_google" type="id"/>
+    <item name="menu_quickaccess_add" type="id"/>
     
     <item name="context_menu_move" type="id"/>
     <item name="context_menu_copy_url" type="id"/>

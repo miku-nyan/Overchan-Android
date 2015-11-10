@@ -40,7 +40,6 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
-import nya.miku.wishmaster.ui.settings.SFW;
 import nya.miku.wishmaster.ui.settings.Wifi;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
@@ -130,7 +129,7 @@ public class MainApplication extends Application {
     public DraftsCache draftsCache;
     public Database database;
     public DownloadingLocker downloadingLocker;
-    public SFW sfw;
+    public boolean sfw;
     
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
@@ -208,8 +207,8 @@ public class MainApplication extends Application {
         database = new Database(this);
         downloadingLocker = new DownloadingLocker();
         
+        sfw = getPackageName().endsWith(".sfw");
         registerChanModules();
-        sfw = new SFW(this, chanModulesList);
         
         RecaptchaAjax.init();
         Wifi.updateState(this);

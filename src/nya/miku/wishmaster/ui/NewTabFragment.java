@@ -195,10 +195,10 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
         super.onCreateContextMenu(menu, v, menuInfo);
         if (list.size() > 1) {
             menu.add(Menu.NONE, R.id.context_menu_quickaccess_move, 1, R.string.context_menu_move);
-            QuickAccess.Entry entry = adapter.getItem(((AdapterView.AdapterContextMenuInfo) menuInfo).position);
-            if (entry.chan == null) return;
-            menu.add(Menu.NONE, R.id.context_menu_quickaccess_remove, 2, R.string.context_menu_quickaccess_remove);
         }
+        QuickAccess.Entry entry = adapter.getItem(((AdapterView.AdapterContextMenuInfo) menuInfo).position);
+        if (entry.chan == null) return;
+        menu.add(Menu.NONE, R.id.context_menu_quickaccess_remove, 2, R.string.context_menu_quickaccess_remove);
     }
     
     @Override
@@ -350,9 +350,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             private int drawablePadding = (int) (resources.getDisplayMetrics().density * 5 + 0.5f);
             
             {
-                for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-                    if (!MainApplication.getInstance().sfw.isLocked(chan.getChanName()) || !isSingleboardChan(chan)) add(chan);
-                }
+                for (ChanModule chan : MainApplication.getInstance().chanModulesList) add(chan);
             }
             
             @Override

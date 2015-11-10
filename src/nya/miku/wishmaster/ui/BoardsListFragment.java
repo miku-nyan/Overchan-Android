@@ -55,6 +55,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -135,6 +136,12 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         
         chan = MainApplication.getInstance().getChanModule(tabModel.pageModel.chanName);
         setHasOptionsMenu(true);
+        
+        if (QuickAccess.getQuickAccessFromPreferences().isEmpty()) {
+            Toast toast = Toast.makeText(activity, R.string.boardslist_quickaccess_tip, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.TOP, 0, (int) (resources.getDisplayMetrics().density * 5 + 0.5f));
+            toast.show();
+        }
     }
     
     @Override
@@ -146,6 +153,13 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         } else {
             itemUpdate.setIcon(R.drawable.ic_menu_refresh);
         }
+        
+        List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
+        for (QuickAccess.Entry entry : quickAccess)
+            if (entry.boardName == null && entry.chan != null && entry.chan.getChanName().equals(chan.getChanName()))
+                return;
+        menu.add(Menu.NONE, R.id.menu_quickaccess_add, 102, resources.getString(R.string.menu_quickaccess_add)).
+                setIcon(R.drawable.ic_menu_add_bookmark);
     }
     
     @Override
@@ -154,6 +168,14 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         switch (id) {
             case R.id.menu_update:
                 update(true);
+                return true;
+            case R.id.menu_quickaccess_add:
+                List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
+                QuickAccess.Entry newEntry = new QuickAccess.Entry();
+                newEntry.chan = chan;
+                quickAccess.add(0, newEntry);
+                QuickAccess.saveQuickAccessToPreferences(quickAccess);
+                item.setVisible(false);
                 return true;
         }
         return super.onContextItemSelected(item);
@@ -516,8 +538,6 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
             this.resources = fragment.resources;
             String lastCategory = "";
             
-            boolean sfw = MainApplication.getInstance().sfw.isLocked(fragment.chan.getChanName());
-            
             LinkedHashMap<String, String> favBoards = new LinkedHashMap<>();
             for (String board : fragment.database.getFavoriteBoards(fragment.chan)) favBoards.put(board, "");
             if (!favBoards.isEmpty()) {
@@ -534,20 +554,15 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                     model.boardCategory = lastCategory;
                     add(new BoardsListEntry(model));
                 }
-            } else if (sfw) {
-                add(new BoardsListEntry(resources.getString(R.string.boardslist_empty_list)));
             }
-            
-            if (!sfw) {
-                for (int i=0; i<fragment.boardsList.length; ++i) {
-                    if (!fragment.settings.showNSFWBoards() && fragment.boardsList[i].nsfw) continue;
-                    String curCategory = fragment.boardsList[i].boardCategory != null ? fragment.boardsList[i].boardCategory : "";
-                    if (!curCategory.equals(lastCategory)) {
-                        add(new BoardsListEntry(curCategory));
-                        lastCategory = curCategory;
-                    }
-                    add(new BoardsListEntry(fragment.boardsList[i]));
+            for (int i=0; i<fragment.boardsList.length; ++i) {
+                if (!fragment.settings.showNSFWBoards() && fragment.boardsList[i].nsfw) continue;
+                String curCategory = fragment.boardsList[i].boardCategory != null ? fragment.boardsList[i].boardCategory : "";
+                if (!curCategory.equals(lastCategory)) {
+                    add(new BoardsListEntry(curCategory));
+                    lastCategory = curCategory;
                 }
+                add(new BoardsListEntry(fragment.boardsList[i]));
             }
         }
         

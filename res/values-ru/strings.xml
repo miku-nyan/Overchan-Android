@@ -135,6 +135,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="boardslist_btn_go">Перейти</string>
     <string name="boardslist_favorite_boards">Избранные</string>
     <string name="boardslist_empty_list">Список избранных досок пуст</string>
+    <string name="boardslist_quickaccess_tip">Вы можете добавить имиджборды в быстрый доступ (откройте меню)</string>
     
     <string name="search_bar_hint">Поиск</string>
     <string name="search_bar_in_thread_hint">Поиск по треду</string>
@@ -163,6 +164,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_search_google">Искать в Google</string>
     <string name="menu_open">Открыть</string>
     <string name="menu_open_player">Открыть в плеере</string>
+    <string name="menu_quickaccess_add">В быстрый доступ</string>
     
     <string name="context_menu_move">Переместить</string>
     <string name="context_menu_copy_url">Копировать ссылку</string>

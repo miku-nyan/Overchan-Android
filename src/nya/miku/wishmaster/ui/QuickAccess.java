@@ -56,6 +56,7 @@ public class QuickAccess {
                     }
                 } else {
                     ++allChansElCount;
+                    if (MainApplication.getInstance().sfw) continue;
                 }
                 result.add(current);
             }
@@ -64,13 +65,14 @@ public class QuickAccess {
         } catch (Exception e) {
             Logger.e(TAG, e);
             List<Entry> result = new ArrayList<>();
-            result.add(new Entry());
+            if (!MainApplication.getInstance().sfw) result.add(new Entry());
             return result;
         }
     }
     
     private static String saveQuickAccessListToJson(List<Entry> list) {
         JSONArray jsonArray = new JSONArray();
+        if (MainApplication.getInstance().sfw) jsonArray.put(new JSONObject());
         for (Entry entry : list) {
             JSONObject current = new JSONObject();
             if (entry.chan != null) current.put("chan", entry.chan.getChanName());

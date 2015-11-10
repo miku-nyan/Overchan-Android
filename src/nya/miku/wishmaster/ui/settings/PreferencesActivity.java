@@ -123,7 +123,7 @@ public class PreferencesActivity extends PreferenceActivity {
             String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             aboutPreference.setSummary(versionName);
         } catch (Exception e) {}
-        if (!MainApplication.getInstance().sfw.isSFW()) {
+        if (!MainApplication.getInstance().sfw) {
             aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -182,9 +182,6 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
             }
         });
-        
-        if (MainApplication.getInstance().sfw.isLockedAll())
-            getPreferenceManager().findPreference(getString(R.string.pref_key_show_nsfw_boards)).setEnabled(false);
         
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override

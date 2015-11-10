@@ -130,6 +130,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="boardslist_btn_go">GO</string>
     <string name="boardslist_favorite_boards">Favorites</string>
     <string name="boardslist_empty_list">The list of favorite boards is empty</string>
+    <string name="boardslist_quickaccess_tip">You can add imageboards to the Quick access (open the menu)</string>
     
     <string name="search_bar_hint">Search</string>
     <string name="search_bar_in_thread_hint">Search in thread</string>
@@ -158,6 +159,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_search_google">Search in Google</string>
     <string name="menu_open">Open</string>
     <string name="menu_open_player">Open external player</string>
+    <string name="menu_quickaccess_add">Add to Quick Access</string>
     
     <string name="context_menu_move">Move</string>
     <string name="context_menu_copy_url">Copy the link</string>
