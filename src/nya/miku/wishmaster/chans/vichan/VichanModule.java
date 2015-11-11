@@ -143,7 +143,7 @@ public class VichanModule extends AbstractVichanModule {
             }
         }
     }
-
+    
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         return super.parseUrl(url.replaceAll("-\\w+.*html", ".html"));
