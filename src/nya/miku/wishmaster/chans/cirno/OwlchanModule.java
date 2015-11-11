@@ -65,15 +65,16 @@ public class OwlchanModule extends AbstractWakabaModule {
     private static final String DOMAIN = "owlchan.ru";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Работа сайта", "Работа сайта", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аниме", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Клу/b/ы", "Общее", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "es", "Бесконечное лето", "Общее", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vn", "Визуальные новеллы", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "izd", "Графомания", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mod", "Уголок мододела", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "art", "Рисовач", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "o", "Оэкаки", "Общее", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ussr", "СССР", "На пробу", false)
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ussr", "СССР", "Общее", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аниме", "Японская культура", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vn", "Визуальные новеллы", "Японская культура", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ra", "OwlChan Radio", "Радио", false)
     };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
     
