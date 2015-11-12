@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import nya.miku.wishmaster.ui.tabs.UrlHandler;
 
 @SuppressLint("InlinedApi")
 public class FakeBrowser {
@@ -37,7 +38,7 @@ public class FakeBrowser {
         if (oldDialog != null) oldDialog.dismiss();
     }
     
-    public static void openFakeBrowser(Context context, String url) {
+    public static void openFakeBrowser(final Context context, String url) {
         dismiss();
         if (Uri.parse(url).getScheme() == null) url = "http://" + url;
         
@@ -46,7 +47,12 @@ public class FakeBrowser {
         webView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
+                if (context instanceof MainActivity && UrlHandler.getPageModel(url) != null) {
+                    dismiss();
+                    UrlHandler.open(url, (MainActivity)context, true);
+                } else {
+                    view.loadUrl(url);
+                }
                 return true;
             }
         });
@@ -54,7 +60,7 @@ public class FakeBrowser {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
-                dialog.setTitle(view.getTitle()); //TODO check not null
+                if (title != null) dialog.setTitle(title);
             }
         });
         
