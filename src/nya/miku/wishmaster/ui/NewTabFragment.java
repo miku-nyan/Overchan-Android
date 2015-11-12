@@ -142,6 +142,19 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
         return v;
     }
     
+    /**
+     * Обновить список (в случае изменения параметра отображения пункта-списка всех досок)
+     */
+    public void updateList() {
+        try {
+            list = QuickAccess.getQuickAccessFromPreferences();
+            adapter = new QuickAccessAdapter(activity, list);
+            listView.setAdapter(adapter);
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+    }
+    
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -310,7 +323,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
     }
     
     private void openNewTab(String url) {
-        UrlHandler.open(url, activity, MainApplication.getInstance().sfw);
+        UrlHandler.open(url, activity, MainApplication.getInstance().settings.useFakeBrowser());
     }
     
     private void showKeyboard(View v) {

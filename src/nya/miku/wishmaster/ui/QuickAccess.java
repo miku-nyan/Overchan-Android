@@ -39,6 +39,7 @@ public class QuickAccess {
     }
     
     private static List<Entry> getQuickAccessListFromJson(String json) {
+        boolean showAllChansList = MainApplication.getInstance().settings.showAllChansList();
         try {
             List<Entry> result = new ArrayList<>();
             int allChansElCount = 0;
@@ -56,7 +57,7 @@ public class QuickAccess {
                     }
                 } else {
                     ++allChansElCount;
-                    if (MainApplication.getInstance().sfw) continue;
+                    if (!showAllChansList) continue;
                 }
                 result.add(current);
             }
@@ -65,21 +66,26 @@ public class QuickAccess {
         } catch (Exception e) {
             Logger.e(TAG, e);
             List<Entry> result = new ArrayList<>();
-            if (!MainApplication.getInstance().sfw) result.add(new Entry());
+            if (showAllChansList) result.add(new Entry());
             return result;
         }
     }
     
     private static String saveQuickAccessListToJson(List<Entry> list) {
         JSONArray jsonArray = new JSONArray();
-        if (MainApplication.getInstance().sfw) jsonArray.put(new JSONObject());
+        int allChansElCount = 0;
         for (Entry entry : list) {
             JSONObject current = new JSONObject();
-            if (entry.chan != null) current.put("chan", entry.chan.getChanName());
-            if (entry.boardName != null) current.put("board", entry.boardName);
-            if (entry.boardDescription != null) current.put("description", entry.boardDescription);
+            if (entry.chan == null) {
+                ++allChansElCount;
+            } else {
+                current.put("chan", entry.chan.getChanName());
+                if (entry.boardName != null) current.put("board", entry.boardName);
+                if (entry.boardDescription != null) current.put("description", entry.boardDescription);
+            }
             jsonArray.put(current);
         }
+        if (allChansElCount == 0) jsonArray.put(new JSONObject());
         return jsonArray.toString();
     }
     

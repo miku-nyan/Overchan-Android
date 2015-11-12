@@ -129,7 +129,6 @@ public class MainApplication extends Application {
     public DraftsCache draftsCache;
     public Database database;
     public DownloadingLocker downloadingLocker;
-    public boolean sfw;
     
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
@@ -207,7 +206,6 @@ public class MainApplication extends Application {
         database = new Database(this);
         downloadingLocker = new DownloadingLocker();
         
-        sfw = getPackageName().endsWith(".sfw");
         registerChanModules();
         
         RecaptchaAjax.init();

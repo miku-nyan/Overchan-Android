@@ -728,14 +728,14 @@ public class MainActivity extends FragmentActivity {
     private void handleUriIntent(Intent intent) {
         TabsTrackerService.unread = false;
         if (intent != null) {
-            if (MainApplication.getInstance().sfw) FakeBrowser.dismiss();
+            if (MainApplication.getInstance().settings.useFakeBrowser()) FakeBrowser.dismiss();
             if (intent.getData() != null && URLUtil.isFileUrl(intent.getDataString())) {
                 LocalHandler.open(intent.getData().getPath(), this);
                 return;
             }
             String url = intent.getDataString();
             if (url != null && url.length() != 0) {
-                UrlHandler.open(url, this, MainApplication.getInstance().sfw);
+                UrlHandler.open(url, this, MainApplication.getInstance().settings.useFakeBrowser());
             }
         }
     }

@@ -23,6 +23,7 @@ import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.BoardsListFragment;
+import nya.miku.wishmaster.ui.NewTabFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import android.app.AlertDialog;
@@ -123,7 +124,7 @@ public class PreferencesActivity extends PreferenceActivity {
             String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             aboutPreference.setSummary(versionName);
         } catch (Exception e) {}
-        if (!MainApplication.getInstance().sfw) {
+        if (MainApplication.getInstance().settings.enableAppUpdateCheck()) {
             aboutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -202,10 +203,19 @@ public class PreferencesActivity extends PreferenceActivity {
                         if (MainApplication.getInstance().tabsSwitcher.currentFragment instanceof BoardsListFragment) {
                             ((BoardsListFragment) MainApplication.getInstance().tabsSwitcher.currentFragment).updateList();
                         }
+                    } else if (getString(R.string.pref_key_show_all_chans_list).equals(key)) {
+                        if (MainApplication.getInstance().tabsSwitcher.currentFragment instanceof NewTabFragment) {
+                            ((NewTabFragment) MainApplication.getInstance().tabsSwitcher.currentFragment).updateList();
+                        }
                     }
                 }
             }
         };
+        
+        if (MainApplication.getInstance().settings.isSFWRelease()) {
+            Preference p = getPreferenceManager().findPreference(getString(R.string.pref_key_show_all_chans_list));
+            ((PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_advanced))).removePreference(p);
+        }
         
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD_MR1) {
             Preference p = getPreferenceManager().findPreference(getString(R.string.pref_key_gallery_scaleimageview));

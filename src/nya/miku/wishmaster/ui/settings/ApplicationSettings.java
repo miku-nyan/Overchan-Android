@@ -34,11 +34,13 @@ public class ApplicationSettings {
     private final SharedPreferences preferences;
     private final Resources resources;
     private final boolean isTablet;
+    private final boolean isSFW;
     
     public ApplicationSettings(SharedPreferences preferences, Resources resources) {
         this.preferences = preferences;
         this.resources = resources;
         this.isTablet = (resources.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+        this.isSFW = R.class.getPackage().getName().endsWith(".sfw");
         
         if (preferences.getString(resources.getString(R.string.pref_key_download_dir), "").equals("")) {
             preferences.edit().putString(resources.getString(R.string.pref_key_download_dir), getDefaultDownloadDir().getAbsolutePath()).commit();
@@ -312,6 +314,23 @@ public class ApplicationSettings {
     
     public boolean useInternalAudioPlayer() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_audioplayer), true);
+    }
+    
+    public boolean isSFWRelease() {
+        return isSFW;
+    }
+    
+    public boolean useFakeBrowser() {
+        return isSFWRelease();
+    }
+    
+    public boolean enableAppUpdateCheck() {
+        return !isSFWRelease();
+    }
+    
+    public boolean showAllChansList() {
+        if (isSFWRelease()) return false;
+        return preferences.getBoolean(resources.getString(R.string.pref_key_show_all_chans_list), false);
     }
     
     public boolean showNSFWBoards() {
