@@ -106,6 +106,7 @@ public class LainModule extends AbstractVichanModule {
     
     @Override
     public String fixRelativeUrl(String url) {
+        if (url.startsWith("?/")) url = url.substring(1);
         return super.fixRelativeUrl(url.replace("\u00CE\u00BB", "%CE%BB")); 
     }
     
