@@ -95,6 +95,8 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
     private SimpleBoardModel[] boardsList;
     private BoardsListAdapter adapter;
     
+    private List<QuickAccess.Entry> quickAccessList;
+    
     public static BoardsListFragment newInstance(long tabId) {
         TabsState tabsState = MainApplication.getInstance().tabsState;
         if (tabsState == null) throw new IllegalStateException("tabsState was not initialized in the MainApplication singleton");
@@ -137,7 +139,8 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         chan = MainApplication.getInstance().getChanModule(tabModel.pageModel.chanName);
         setHasOptionsMenu(true);
         
-        if (QuickAccess.getQuickAccessFromPreferences().isEmpty()) {
+        quickAccessList = QuickAccess.getQuickAccessFromPreferences();
+        if (quickAccessList.isEmpty()) {
             ClickableToast.showText(activity, resources.getString(R.string.boardslist_quickaccess_tip), new ClickableToast.OnClickListener() {
                 @Override
                 public void onClick() {
@@ -161,8 +164,8 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
             itemUpdate.setIcon(R.drawable.ic_menu_refresh);
         }
         
-        List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
-        for (QuickAccess.Entry entry : quickAccess)
+        if (quickAccessList == null) return;
+        for (QuickAccess.Entry entry : quickAccessList)
             if (entry.boardName == null && entry.chan != null && entry.chan.getChanName().equals(chan.getChanName()))
                 return;
         menu.add(Menu.NONE, R.id.menu_quickaccess_add, 102, resources.getString(R.string.menu_quickaccess_add)).
@@ -177,11 +180,10 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                 update(true);
                 return true;
             case R.id.menu_quickaccess_add:
-                List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
                 QuickAccess.Entry newEntry = new QuickAccess.Entry();
                 newEntry.chan = chan;
-                quickAccess.add(0, newEntry);
-                QuickAccess.saveQuickAccessToPreferences(quickAccess);
+                quickAccessList.add(0, newEntry);
+                QuickAccess.saveQuickAccessToPreferences(quickAccessList);
                 item.setVisible(false);
                 return true;
         }
@@ -262,17 +264,17 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                 if (boardModel != null) {
                     UrlPageModel model = getUrlModel(boardModel.boardName);
                     model = UrlHandler.getPageModel(chan.buildUrl(model));
-                    if (model != null) { 
+                    if (model != null) {
                         boolean isFavorite = database.isFavorite(model.chanName, model.boardName, Integer.toString(model.boardPage), null);
                         menu.add(Menu.NONE, R.id.context_menu_favorites_from_fragment, 1,
                                 isFavorite ? R.string.context_menu_remove_favorites : R.string.context_menu_add_favorites);
+                        
+                        for (QuickAccess.Entry entry : quickAccessList)
+                            if (entry.boardName != null && entry.chan != null)
+                                if (entry.chan.getChanName().equals(model.chanName) && entry.boardName.equals(model.boardName))
+                                    return;
+                        menu.add(Menu.NONE, R.id.context_menu_quickaccess_add, 2, R.string.context_menu_quickaccess_add);
                     }
-                    List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
-                    for (QuickAccess.Entry entry : quickAccess)
-                        if (entry.boardName != null && entry.chan != null)
-                            if (entry.chan.getChanName().equals(model.chanName) && entry.boardName.equals(model.boardName))
-                                return;
-                    menu.add(Menu.NONE, R.id.context_menu_quickaccess_add, 2, R.string.context_menu_quickaccess_add);
                 }
             }
         } catch (Exception e) {
@@ -298,14 +300,13 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                     return true;
                 }
             } else if (item.getItemId() == R.id.context_menu_quickaccess_add) {
-                List<QuickAccess.Entry> quickAccess = QuickAccess.getQuickAccessFromPreferences();
                 QuickAccess.Entry newEntry = new QuickAccess.Entry();
                 newEntry.chan = chan;
                 SimpleBoardModel simleBoardModel = adapter.getItem(menuInfo.position).model;
                 newEntry.boardName = simleBoardModel.boardName;
                 newEntry.boardDescription = simleBoardModel.boardDescription;
-                quickAccess.add(0, newEntry);
-                QuickAccess.saveQuickAccessToPreferences(quickAccess);
+                quickAccessList.add(0, newEntry);
+                QuickAccess.saveQuickAccessToPreferences(quickAccessList);
                 return true;
             }
         } catch (Exception e) {
