@@ -60,6 +60,8 @@ public class TabsSwitcher {
                 if (currentId != null && currentId.equals(Long.valueOf(tabModel.id))) {
                     if (tabModel.forceUpdate && currentFragment != null && currentFragment instanceof BoardFragment) {
                         ((BoardFragment) currentFragment).update();
+                        tabModel.forceUpdate = false;
+                        MainApplication.getInstance().serializer.serializeTabsState(MainApplication.getInstance().tabsState);
                     }
                     return;
                 }
