@@ -427,6 +427,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="preferences">Опції</string>
     <string name="pref_cat_chans">Іміджборди</string>
     <string name="pref_chans_rearrange">Переставити</string>
+    <string name="pref_chans_enter_url">Ввести URL</string>
+    <string name="pref_chans_enter_url_hint">http://</string>
+    <string name="pref_chans_enter_url_incorrect">Ця іміджборда не підтримується</string>
     <string name="pref_cat_appearance">Вигляд</string>
     <string name="pref_cat_advanced">Різне</string>
     <string name="pref_cat_date_time">Дата й час</string>

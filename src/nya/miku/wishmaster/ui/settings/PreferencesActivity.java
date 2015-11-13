@@ -20,8 +20,11 @@ package nya.miku.wishmaster.ui.settings;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.CompatibilityImpl;
+import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.NewTabFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
@@ -38,12 +41,17 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.text.InputType;
+import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
 //отсутствует альтернатива, поддерживающая API 4 
 @SuppressWarnings("deprecation")
 
 public class PreferencesActivity extends PreferenceActivity {
+    private static final String TAG = "PreferencesActivity";
+    
     private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
     private SharedPreferences sharedPreferences;
     
@@ -59,37 +67,10 @@ public class PreferencesActivity extends PreferenceActivity {
         setTitle(R.string.preferences);
         
         super.onCreate(savedInstanceState);
-        PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(this);
-        setPreferenceScreen(rootScreen);
-        
-        PreferenceScreen chansCat = getPreferenceManager().createPreferenceScreen(this);
-        chansCat.setTitle(R.string.pref_cat_chans);
-        rootScreen.addPreference(chansCat);
-        for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-            PreferenceScreen curScreen = getPreferenceManager().createPreferenceScreen(this);
-            curScreen.setTitle(chan.getDisplayingName());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                CompatibilityImpl.setIcon(curScreen, chan.getChanFavicon());
-            }
-            chansCat.addPreference(curScreen);
-            chan.addPreferencesOnScreen(curScreen);
-        }
-        
-        Preference rearrange = new Preference(this);
-        rearrange.setTitle(R.string.pref_chans_rearrange);
-        rearrange.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                startActivity(new Intent(PreferencesActivity.this, ChansSortActivity.class));
-                return true;
-            }
-        });
-        chansCat.addPreference(rearrange);
-        
         addPreferencesFromResource(R.xml.preferences);
-        
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         
+        updateChansScreen((PreferenceScreen) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_chans)));
         updateListSummary(R.string.pref_key_theme);
         updateListSummary(R.string.pref_key_font_size);
         updateListSummary(R.string.pref_key_download_thumbs);
@@ -257,5 +238,108 @@ public class PreferencesActivity extends PreferenceActivity {
     private void updateListSummary(String prefKey) {
         ListPreference preference = (ListPreference) getPreferenceManager().findPreference(prefKey);
         preference.setSummary(preference.getEntry());
+    }
+    
+    private void updateChansScreen(final PreferenceScreen chansCat) {
+        chansCat.removeAll();
+        
+        Preference enterUrl = new Preference(this);
+        enterUrl.setTitle(R.string.pref_chans_enter_url);
+        enterUrl.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                final EditText inputField = new EditText(PreferencesActivity.this);
+                inputField.setSingleLine();
+                inputField.setHint(R.string.pref_chans_enter_url_hint);
+                inputField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+                
+                DialogInterface.OnClickListener dlgOnClick = new DialogInterface.OnClickListener() {
+                    private boolean openPreference(String key) {
+                        try {
+                            ListAdapter adapter = chansCat.getRootAdapter();
+                            for (int i=0, size=adapter.getCount(); i<size; ++i) {
+                                Object object = adapter.getItem(i);
+                                if (!(object instanceof Preference)) continue;
+                                Preference preference = (Preference) object;
+                                if (key.equals(preference.getKey())) {
+                                    chansCat.onItemClick(null, null, i, 0);
+                                    return true;
+                                }
+                            }
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                        }
+                        return false;
+                    }
+                    
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        String url = inputField.getText().toString();
+                        UrlPageModel model = UrlHandler.getPageModel(url);
+                        if (model == null || model.chanName == null) {
+                            Toast.makeText(PreferencesActivity.this, R.string.pref_chans_enter_url_incorrect, Toast.LENGTH_LONG).show();
+                        } else {
+                            final String key = "chan_preference_screen_" + model.chanName;
+                            if (openPreference(key)) return;
+                            updateChansScreen(chansCat);
+                            //need wait for Root Adapter synchronization (it will be called from UI thread)
+                            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep(200);
+                                        PreferencesActivity.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                openPreference(key);
+                                            }
+                                        });
+                                    } catch (Exception e) {
+                                        Logger.e(TAG, e);
+                                    }
+                                }
+                            }).start();
+                        }
+                    }
+                };
+                
+                new AlertDialog.Builder(PreferencesActivity.this).
+                        setTitle(R.string.pref_chans_enter_url).
+                        setView(inputField).
+                        setPositiveButton(android.R.string.ok, dlgOnClick).
+                        create().
+                        show();
+                return true;
+            }
+        });
+        chansCat.addPreference(enterUrl);
+        
+        ApplicationSettings settings = MainApplication.getInstance().settings;
+        int visibleChansCount = 0;
+        for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
+            if (!settings.isUnlockedChan(chan.getChanName())) continue;
+            PreferenceScreen curScreen = getPreferenceManager().createPreferenceScreen(this);
+            curScreen.setTitle(chan.getDisplayingName());
+            curScreen.setKey("chan_preference_screen_" + chan.getChanName());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                CompatibilityImpl.setIcon(curScreen, chan.getChanFavicon());
+            }
+            chansCat.addPreference(curScreen);
+            chan.addPreferencesOnScreen(curScreen);
+            ++visibleChansCount;
+        }
+        
+        if (visibleChansCount >= 2) {
+            Preference rearrange = new Preference(this);
+            rearrange.setTitle(R.string.pref_chans_rearrange);
+            rearrange.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    startActivity(new Intent(PreferencesActivity.this, ChansSortActivity.class));
+                    return true;
+                }
+            });
+            chansCat.addPreference(rearrange);
+        }
     }
 }

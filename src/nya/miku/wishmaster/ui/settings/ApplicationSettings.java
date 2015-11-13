@@ -337,6 +337,17 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_nsfw_boards), false);
     }
     
+    public boolean isUnlockedChan(String chanName) {
+        if (chanName == null) return false;
+        if (!isSFWRelease()) return true;
+        return preferences.getBoolean(resources.getString(R.string.pref_key_unlocked_chan_format, chanName), false);
+    }
+    
+    public void unlockChan(String chanName, boolean value) {
+        if (!isSFWRelease() || chanName == null) return;
+        preferences.edit().putBoolean(resources.getString(R.string.pref_key_unlocked_chan_format, chanName), value).commit();
+    }
+    
     public boolean askExternalLinks() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_external_links_confirmation), true);
     }

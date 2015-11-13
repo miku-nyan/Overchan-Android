@@ -164,6 +164,7 @@ public class UrlHandler {
                 pageModel = chan.parseUrl(url);
             } catch (Exception e) {/* url не распознался данным чаном, пробуем следующий */}
         }
+        if (pageModel != null) MainApplication.getInstance().settings.unlockChan(pageModel.chanName, true);
         return pageModel;
     }
     

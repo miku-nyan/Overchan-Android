@@ -424,6 +424,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="preferences">Настройки</string>
     <string name="pref_cat_chans">Настройки имиджборд</string>
     <string name="pref_chans_rearrange">Переставить</string>
+    <string name="pref_chans_enter_url">Ввести URL</string>
+    <string name="pref_chans_enter_url_hint">http://</string>
+    <string name="pref_chans_enter_url_incorrect">Эта имиджборда не поддерживается</string>
     <string name="pref_cat_appearance">Внешний вид</string>
     <string name="pref_cat_advanced">Дополнительные</string>
     <string name="pref_cat_date_time">Дата и время</string>

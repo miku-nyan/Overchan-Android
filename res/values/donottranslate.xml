@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <resources>
     <string name="empty"></string>
     
+    <string name="pref_key_cat_chans">PREF_KEY_CAT_CHANS</string>
     <string name="pref_key_cat_appearance">PREF_KEY_CAT_APPEARANCE</string>
     <string name="pref_key_cat_advanced">PREF_KEY_CAT_ADVANCED</string>
     <string name="pref_key_download_thread_mode">PREF_KEY_DOWNLOAD_THREAD_MODE</string>
@@ -30,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_random_hash">PREF_KEY_RANDOM_HASH</string>
     <string name="pref_key_show_all_chans_list">PREF_KEY_SHOW_ALL_CHANS_LIST</string>
     <string name="pref_key_show_nsfw_boards">PREF_KEY_SHOW_NSFW_BOARDS</string>
+    <string name="pref_key_unlocked_chan_format">PREF_KEY_UNLOCKED_CHAN_%s</string>
     <string name="pref_key_autohide">PREF_KEY_AUTOHIDE</string>
     <string name="pref_key_autohide_json">PREF_KEY_AUTOHIDE_JSON</string>
     <string name="pref_key_quickaccess_json">PREF_KEY_QUICKACCESS_JSON</string>
