@@ -386,6 +386,8 @@ public class MainActivity extends FragmentActivity {
         
         if (!TabsTrackerService.running && MainApplication.getInstance().settings.isAutoupdateEnabled())
             startService(new Intent(this, TabsTrackerService.class));
+        
+        if (MainApplication.getInstance().settings.isSFWRelease()) NewsReader.checkNews(this);
     }
     
     @Override
