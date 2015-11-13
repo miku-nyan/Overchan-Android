@@ -83,7 +83,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_download_format_value_mhtml</item>
     </string-array>
     <string name="pref_key_theme">PREF_KEY_THEME</string>
-    <string name="pref_theme_value_default">@string/pref_theme_value_photon</string>
+    <string name="pref_theme_value_default">@string/pref_theme_value_futaba</string>
     <string name="pref_theme_value_futaba">PREF_THEME_VALUE_FUTABA</string>
     <string name="pref_theme_value_photon">PREF_THEME_VALUE_PHOTON</string>
     <string name="pref_theme_value_neutron">PREF_THEME_VALUE_NEUTRON</string>

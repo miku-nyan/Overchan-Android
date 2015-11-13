@@ -358,7 +358,7 @@ public class ApplicationSettings {
     }
     
     public boolean isAutoupdateBackground() {
-        return preferences.getBoolean(resources.getString(R.string.pref_key_autoupdate_background), false);
+        return preferences.getBoolean(resources.getString(R.string.pref_key_autoupdate_background), true);
     }
     
     public boolean isAutoupdateNotification() {

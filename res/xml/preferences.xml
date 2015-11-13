@@ -271,7 +271,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:maxLength="4" />
         
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="@string/pref_key_autoupdate_background"
             android:title="@string/pref_autoupdate_background_title"
             android:summary="@string/pref_autoupdate_background_summary"
