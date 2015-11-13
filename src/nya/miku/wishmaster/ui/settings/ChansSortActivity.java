@@ -124,7 +124,7 @@ public class ChansSortActivity extends Activity {
             JSONArray jsonArray = new JSONArray();
             for (ChanModule chan : list) jsonArray.put(chan.getClass().getName());
             MainApplication.getInstance().settings.saveChansOrderJson(jsonArray.toString());
-            MainApplication.getInstance().updateChanModules();
+            MainApplication.getInstance().updateChanModulesOrder();
         }
     }
     

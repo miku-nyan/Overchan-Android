@@ -133,8 +133,8 @@ public class MainApplication extends Application {
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
     
-    public Map<String, Integer> chanModulesIndex;
     public List<ChanModule> chanModulesList;
+    private Map<String, Integer> chanModulesIndex;
     
     private void registerChanModules() {
         chanModulesIndex = new HashMap<String, Integer>();
@@ -142,15 +142,22 @@ public class MainApplication extends Application {
         registerChanModules(chanModulesList, chanModulesIndex);
     }
     
-    public void updateChanModules() {
+    public void updateChanModulesOrder() {
+        Map<String, ChanModule> instantiatedMap = new HashMap<>();
+        for (ChanModule chan : chanModulesList) instantiatedMap.put(chan.getClass().getName(), chan);
+        
         Map<String, Integer> indexMap = new HashMap<>();
         List<ChanModule> list = new ArrayList<>();
-        registerChanModules(list, indexMap);
+        registerChanModules(list, indexMap, instantiatedMap);
         chanModulesIndex = indexMap;
         chanModulesList = list;
     }
     
-    private void registerChanModules(List<ChanModule> list, Map<String, Integer> indexMap) {
+    private void registerChanModules(List<ChanModule> outList, Map<String, Integer> outIndexMap) {
+        registerChanModules(outList, outIndexMap, null);
+    }
+    
+    private void registerChanModules(List<ChanModule> outList, Map<String, Integer> outIndexMap, Map<String, ChanModule> instantiatedClassMap) {
         Set<String> added = new HashSet<>();
         JSONArray order;
         try {
@@ -160,11 +167,23 @@ public class MainApplication extends Application {
         }
         for (int i=0; i<order.length(); ++i) {
             String module = order.optString(i);
-            if (!added.contains(module)) addChanModule(module, list, indexMap);
+            if (!added.contains(module)) {
+                if (instantiatedClassMap != null && instantiatedClassMap.containsKey(module)) {
+                    addChanModule(instantiatedClassMap.get(module), outList, outIndexMap);
+                } else {
+                    addChanModule(module, outList, outIndexMap);
+                }
+            }
             added.add(module);
         }
         for (String module : MODULES) {
-            if (!added.contains(module)) addChanModule(module, list, indexMap);
+            if (!added.contains(module)) {
+                if (instantiatedClassMap != null && instantiatedClassMap.containsKey(module)) {
+                    addChanModule(instantiatedClassMap.get(module), outList, outIndexMap);
+                } else {
+                    addChanModule(module, outList, outIndexMap);
+                }
+            }
             added.add(module);
         }
     }
