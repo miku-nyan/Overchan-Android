@@ -275,6 +275,7 @@ public class PreferencesActivity extends PreferenceActivity {
                     @Override
                     public void onClick(final DialogInterface dialog, final int which) {
                         String url = inputField.getText().toString();
+                        if (url == null || url.length() == 0) return;
                         UrlPageModel model = UrlHandler.getPageModel(url);
                         if (model == null || model.chanName == null) {
                             Toast.makeText(PreferencesActivity.this, R.string.pref_chans_enter_url_incorrect, Toast.LENGTH_LONG).show();
