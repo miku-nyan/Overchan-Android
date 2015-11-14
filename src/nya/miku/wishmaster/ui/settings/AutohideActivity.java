@@ -74,7 +74,10 @@ public class AutohideActivity extends ListActivity {
         
         chans = new ArrayList<String>();
         chans.add(getString(R.string.autohide_all_chans));
-        for (ChanModule chan : MainApplication.getInstance().chanModulesList) chans.add(chan.getChanName());
+        for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
+            String chanName = chan.getChanName();
+            if (settings.isUnlockedChan(chanName)) chans.add(chanName);
+        }
         
         rulesJson = new JSONArray(settings.getAutohideRulesJson());
         setListAdapter(new AutohideAdapter(this));
