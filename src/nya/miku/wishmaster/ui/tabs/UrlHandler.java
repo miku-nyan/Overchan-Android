@@ -36,7 +36,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.provider.Browser;
 import android.widget.Toast;
 
 public class UrlHandler {
@@ -188,11 +187,11 @@ public class UrlHandler {
         
         Intent browser = new Intent(Intent.ACTION_VIEW, uri);
         browser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        browser.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
+        //browser.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
         try {
             context.startActivity(browser);
         } catch (Exception e) {
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();;
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }
