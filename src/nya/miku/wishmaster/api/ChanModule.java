@@ -197,6 +197,10 @@ public interface ChanModule {
      * {@link UrlPageModel#DEFAULT_FIRST_PAGE}. В этом случае необходимо подставить на это место номер первой страницы на этом доске.
      * @param model модель адреса
      * @return строка URL
+     * @throws IllegalArgumentException в случае, если модель адреса некорректна, не относится к данной имиджборде,
+     * или не существует доступного URL для данной страницы (например, в случае, если доступ осуществляется POST-запросом).<br>
+     * При этом, для моделей адресов типов {@link UrlPageModel#TYPE_INDEXPAGE} и {@link UrlPageModel#TYPE_BOARDPAGE},
+     * если модель корректна и принадлежит данной имиджборде, URL должен существовать обязательно!
      */
     String buildUrl(UrlPageModel model) throws IllegalArgumentException;
     
