@@ -42,17 +42,22 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 
 public class ChansSortActivity extends Activity {
     private List<ChanModule> list = new ArrayList<>();
+    private List<ChanModule> listBefore = null;
     private boolean changed = true;
     
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(MainApplication.getInstance().settings.getTheme());
+        ApplicationSettings settings = MainApplication.getInstance().settings;
+        setTheme(settings.getTheme());
         setTitle(R.string.pref_chans_rearrange);
+        boolean listNotFull = false;
         for (ChanModule chan : MainApplication.getInstance().chanModulesList) {
-            list.add(chan);
+            if (settings.isUnlockedChan(chan.getChanName())) list.add(chan); else listNotFull = true;
         }
+        if (listNotFull) listBefore = new ArrayList<>(list);
+        
         final DragSortListView listView = new DragSortListView(this, null);
         
         final ArrayAdapter<ChanModule> adapter = new ArrayAdapter<ChanModule>(this, 0, list) {
@@ -109,7 +114,7 @@ public class ChansSortActivity extends Activity {
         if (changed) {
             changed = false;
             
-            List<ChanModule> before = MainApplication.getInstance().chanModulesList;
+            List<ChanModule> before = listBefore == null ? MainApplication.getInstance().chanModulesList : listBefore;
             if (before.size() != list.size()) {
                 Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_LONG).show();
                 return;
