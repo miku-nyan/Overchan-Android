@@ -52,6 +52,8 @@ import android.widget.Toast;
 public class PreferencesActivity extends PreferenceActivity {
     private static final String TAG = "PreferencesActivity";
     
+    public static boolean needUpdateChansScreen = false;
+    
     private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
     private SharedPreferences sharedPreferences;
     
@@ -223,6 +225,9 @@ public class PreferencesActivity extends PreferenceActivity {
     protected void onResume() {
         super.onResume();
         sharedPreferences.registerOnSharedPreferenceChangeListener(this.sharedPreferenceChangeListener);
+        if (needUpdateChansScreen) {
+            updateChansScreen((PreferenceScreen) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_chans)));
+        }
     }
 
     @Override
@@ -241,6 +246,7 @@ public class PreferencesActivity extends PreferenceActivity {
     }
     
     private void updateChansScreen(final PreferenceScreen chansCat) {
+        needUpdateChansScreen = false;
         chansCat.removeAll();
         
         Preference enterUrl = new Preference(this);

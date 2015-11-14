@@ -130,6 +130,7 @@ public class ChansSortActivity extends Activity {
             for (ChanModule chan : list) jsonArray.put(chan.getClass().getName());
             MainApplication.getInstance().settings.saveChansOrderJson(jsonArray.toString());
             MainApplication.getInstance().updateChanModulesOrder();
+            PreferencesActivity.needUpdateChansScreen = true;
         }
     }
     
