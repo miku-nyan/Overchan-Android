@@ -19,7 +19,7 @@
 package nya.miku.wishmaster.ui.tabs;
 
 import java.net.URLDecoder;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -154,18 +154,32 @@ public class UrlHandler {
         return model;
     }
     
+    private static boolean checkUrlBelongsChanAndCorrect(String url, ChanModule chan) {
+        try {
+            chan.parseUrl(url);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
     public static UrlPageModel getPageModel(String url) {
         if (Uri.parse(url).getScheme() == null) url = "http://" + url;
-        UrlPageModel pageModel = null;
-        Iterator<ChanModule> chansIterator = MainApplication.getInstance().chanModulesList.iterator();
-        while (pageModel == null && chansIterator.hasNext()) {
-            ChanModule chan = chansIterator.next();
+        List<ChanModule> chans = MainApplication.getInstance().chanModulesList;
+        for (int i=0, size=chans.size(); i<size; ++i) {
+            ChanModule chan = chans.get(i);
             try {
-                pageModel = chan.parseUrl(url);
+                UrlPageModel pageModel = chan.parseUrl(url);
+                String redirectedUrl = chan.buildUrl(pageModel);
+                if (url.equals(redirectedUrl) || checkUrlBelongsChanAndCorrect(redirectedUrl, chan)) {
+                    MainApplication.getInstance().settings.unlockChan(pageModel.chanName, true);
+                    return pageModel;
+                } else {
+                    return getPageModel(redirectedUrl);
+                }
             } catch (Exception e) {/* url не распознался данным чаном, пробуем следующий */}
         }
-        if (pageModel != null) MainApplication.getInstance().settings.unlockChan(pageModel.chanName, true);
-        return pageModel;
+        return null;
     }
     
     public static void launchExternalBrowser(Context context, String url) {
