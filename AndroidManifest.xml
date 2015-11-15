@@ -21,8 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     package="nya.miku.wishmaster"
     android:installLocation="auto"
     tools:ignore="UnusedAttribute"
-    android:versionCode="39"
-    android:versionName="1.3.3">
+    android:versionCode="40"
+    android:versionName="1.3.4">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -164,6 +164,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="arhivach.org" />
                 <data android:host="www.arhivach.org" />
+                <!-- end of domains -->
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

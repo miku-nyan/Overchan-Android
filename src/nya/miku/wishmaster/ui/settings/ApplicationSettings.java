@@ -40,7 +40,7 @@ public class ApplicationSettings {
         this.preferences = preferences;
         this.resources = resources;
         this.isTablet = (resources.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-        this.isSFW = R.class.getPackage().getName().endsWith(".sfw");
+        this.isSFW = !R.class.getPackage().getName().endsWith(".wishmaster");
         
         if (preferences.getString(resources.getString(R.string.pref_key_download_dir), "").equals("")) {
             preferences.edit().putString(resources.getString(R.string.pref_key_download_dir), getDefaultDownloadDir().getAbsolutePath()).commit();
