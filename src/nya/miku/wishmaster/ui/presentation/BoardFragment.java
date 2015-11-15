@@ -66,6 +66,7 @@ import nya.miku.wishmaster.ui.Clipboard;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.GalleryActivity;
 import nya.miku.wishmaster.ui.MainActivity;
+import nya.miku.wishmaster.ui.QuickAccess;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.downloading.BackgroundThumbDownloader;
 import nya.miku.wishmaster.ui.posting.PostFormActivity;
@@ -187,6 +188,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private boolean nullAdapterIsSet = false;
     
     private Menu menu;
+    private Boolean enableQuickAccessMenu = null;
     
     private View rootView;
     private View loadingView;
@@ -443,6 +445,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         menu.add(Menu.NONE, R.id.menu_save_page, 105, resources.getString(R.string.menu_save_page)).setIcon(android.R.drawable.ic_menu_save);
         menu.add(Menu.NONE, R.id.menu_board_gallery, 106, resources.getString(R.string.menu_board_gallery)).setIcon(android.R.drawable.
                 ic_menu_slideshow);
+        menu.add(Menu.NONE, R.id.menu_quickaccess_add, 107, resources.getString(R.string.menu_quickaccess_add)).setIcon(R.drawable.
+                ic_menu_add_bookmark);
         this.menu = menu;
         updateMenu();
     }
@@ -456,6 +460,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             boolean searchMenuVisible = false;
             boolean savePageMenuVisible = false;
             boolean boardGallryMenuVisible = false;
+            boolean quickaccessAddMenuVisible = false;
             if (tabModel.type != TabModel.TYPE_LOCAL && pageType != TYPE_SEARCHLIST && listLoaded &&
                     !presentationModel.source.boardModel.readonlyBoard) {
                 addPostMenuVisible = true;
@@ -469,6 +474,21 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
                 if (presentationModel.source.boardModel.searchAllowed || tabModel.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE) {
                     searchMenuVisible = true;
+                }
+                if (enableQuickAccessMenu == null) {
+                    quickaccessAddMenuVisible = true;
+                    String chanName = tabModel.pageModel.chanName;
+                    String boardName = tabModel.pageModel.boardName;
+                    for (QuickAccess.Entry entry : QuickAccess.getQuickAccessFromPreferences()) {
+                        if (entry.boardName != null && entry.chan != null &&
+                                entry.chan.getChanName().equals(chanName) && entry.boardName.equals(boardName)) {
+                            quickaccessAddMenuVisible = false;
+                            break;
+                        }
+                    }
+                    enableQuickAccessMenu = Boolean.valueOf(quickaccessAddMenuVisible);
+                } else {
+                    quickaccessAddMenuVisible = enableQuickAccessMenu.booleanValue();
                 }
             }
             if (pageType == TYPE_POSTSLIST && listLoaded) {
@@ -484,6 +504,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             menu.findItem(R.id.menu_search).setVisible(searchMenuVisible);
             menu.findItem(R.id.menu_save_page).setVisible(savePageMenuVisible);
             menu.findItem(R.id.menu_board_gallery).setVisible(boardGallryMenuVisible);
+            menu.findItem(R.id.menu_quickaccess_add).setVisible(quickaccessAddMenuVisible);
         } catch (NullPointerException e) {
             Logger.e(TAG, e);
         }
@@ -520,6 +541,17 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 return true;
             case R.id.menu_board_gallery:
                 openGridGallery();
+                return true;
+            case R.id.menu_quickaccess_add:
+                QuickAccess.Entry newEntry = new QuickAccess.Entry();
+                newEntry.chan = chan;
+                newEntry.boardName = presentationModel.source.boardModel.boardName;
+                newEntry.boardDescription = presentationModel.source.boardModel.boardDescription;
+                List<QuickAccess.Entry> quickaccessList = QuickAccess.getQuickAccessFromPreferences();
+                quickaccessList.add(0, newEntry);
+                QuickAccess.saveQuickAccessToPreferences(quickaccessList);
+                enableQuickAccessMenu = Boolean.FALSE;
+                item.setVisible(false);
                 return true;
         }
         return super.onOptionsItemSelected(item);
