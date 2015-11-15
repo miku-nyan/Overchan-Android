@@ -29,7 +29,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
 
-@SuppressLint("InlinedApi")
+@SuppressLint({ "InlinedApi", "SetJavaScriptEnabled" })
 public class FakeBrowser {
     private static WeakReference<Dialog> reference;
     
@@ -44,6 +44,7 @@ public class FakeBrowser {
         
         final Dialog dialog = new Dialog(context);
         WebView webView = new WebView(context);
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
