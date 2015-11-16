@@ -186,14 +186,15 @@ public class BitmapCache {
             return null;
         }
         
-        for (;;) {
-            synchronized (currentDownloads) {
-                if (!currentDownloads.contains(hash)) {
-                    currentDownloads.add(hash);
-                    break;
+        synchronized (currentDownloads) {
+            while (currentDownloads.contains(hash)) {
+                try {
+                    currentDownloads.wait();
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
                 }
             }
-            Thread.yield();
+            currentDownloads.add(hash);
         }
         
         try {
@@ -269,6 +270,7 @@ public class BitmapCache {
         } finally {
             synchronized (currentDownloads) {
                 currentDownloads.remove(hash);
+                currentDownloads.notifyAll();
             }
         }
     }
