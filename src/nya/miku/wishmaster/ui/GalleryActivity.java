@@ -67,7 +67,6 @@ import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -191,7 +190,6 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         progressListener.setProgress(1);
     }
     
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         settings = MainApplication.getInstance().settings;
@@ -688,14 +686,14 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             File file = fileCache.get(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + Attachments.getAttachmentExtention(tag.attachmentModel));
             if (file != null) {
                 String filename = file.getAbsolutePath();
-                while (downloadingLocker.isLocked(filename)) Thread.yield();
+                while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
                 if (isCancelled()) return;
             }
             if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
                 File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
                 file = new File(dir, Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
                 String filename = file.getAbsolutePath();
-                while (downloadingLocker.isLocked(filename)) Thread.yield();
+                while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
                 if (isCancelled()) return;
             }
             if (customSubdir != null) {
@@ -704,7 +702,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     dir = new File(dir, customSubdir);
                     file = new File(dir, Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
                     String filename = file.getAbsolutePath();
-                    while (downloadingLocker.isLocked(filename)) Thread.yield();
+                    while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
                     if (isCancelled()) return;
                 }
             }
@@ -717,7 +715,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 });
                 file = fileCache.create(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + Attachments.getAttachmentExtention(tag.attachmentModel));
                 String filename = file.getAbsolutePath();
-                while (!downloadingLocker.lock(filename)) Thread.yield();
+                while (!downloadingLocker.lock(filename)) downloadingLocker.waitUnlock(filename);
                 InputStream fromLocal = null;
                 OutputStream out = null;
                 boolean success = false;

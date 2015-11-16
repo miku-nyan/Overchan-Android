@@ -335,7 +335,7 @@ public class DownloadingService extends Service {
                             Attachments.getAttachmentExtention(item.attachment));
                     if (fromCache != null) {
                         String fromCacheFilename = fromCache.getAbsolutePath();
-                        while (downloadingLocker.isLocked(fromCacheFilename)) Thread.yield();
+                        while (downloadingLocker.isLocked(fromCacheFilename)) downloadingLocker.waitUnlock(fromCacheFilename);
                         if (isCancelled()) continue;
                         boolean success = false;
                         InputStream is = null;
@@ -357,7 +357,7 @@ public class DownloadingService extends Service {
                         }
                     } else {
                         String targetFilename = target.getAbsolutePath();
-                        while (!downloadingLocker.lock(targetFilename)) Thread.yield();
+                        while (!downloadingLocker.lock(targetFilename)) downloadingLocker.waitUnlock(targetFilename);
                         if (isCancelled()) {
                             downloadingLocker.unlock(targetFilename);
                             continue;
@@ -603,14 +603,14 @@ public class DownloadingService extends Service {
                                             Attachments.getAttachmentExtention(attachment));
                                     if (cur != null) {
                                         String curFilename = cur.getAbsolutePath();
-                                        while (downloadingLocker.isLocked(curFilename)) Thread.yield();
+                                        while (downloadingLocker.isLocked(curFilename)) downloadingLocker.waitUnlock(curFilename);
                                         if (isCancelled()) throw new Exception();
                                     }
                                     if (cur == null && item.downloadingThreadMode == MODE_DOWNLOAD_ALL) {
                                         cur = fileCache.create(FileCache.PREFIX_ORIGINALS + ChanModels.hashAttachmentModel(attachment) +
                                                 Attachments.getAttachmentExtention(attachment));
                                         String curFilename = cur.getAbsolutePath();
-                                        while (!downloadingLocker.lock(curFilename)) Thread.yield();
+                                        while (!downloadingLocker.lock(curFilename)) downloadingLocker.waitUnlock(curFilename);
                                         if (isCancelled()) {
                                             downloadingLocker.unlock(curFilename);
                                             throw new Exception();

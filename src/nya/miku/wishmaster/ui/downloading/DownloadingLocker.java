@@ -44,12 +44,24 @@ public class DownloadingLocker {
     public void unlock(String filename) {
         synchronized (currentDownloads) {
             currentDownloads.remove(filename);
+            currentDownloads.notifyAll();
         }
     }
     
     public boolean isLocked(String filename) {
         synchronized (currentDownloads) {
             return currentDownloads.contains(filename);
+        }
+    }
+    
+    public void waitUnlock(String filename) {
+        synchronized (currentDownloads) {
+            while (currentDownloads.contains(filename)) {
+                try {
+                    currentDownloads.wait();
+                } catch (Exception e) {
+                }
+            }
         }
     }
     
