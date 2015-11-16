@@ -64,11 +64,11 @@ public class JSWebView {
                                 "var wScale = img.clientWidth / w;"  +
                                 "var hScale = img.clientHeight / h; " +
                                 "if (wScale >= hScale) { " +
-                                    "img.style.width = w; " +
+                                    "img.style.width = img.clientWidth > 0 ? Math.min(w, img.clientWidth * 2) : w; " +
                                     "img.style.height = ''; " +
                                 "} else { " +
                                     "img.style.width = ''; " +
-                                    "img.style.height = h; " +
+                                    "img.style.height = img.clientHeight > 0 ? Math.min(h, img.clientHeight * 2) : h; " +
                                 "} " +
                             "} " +
                         "} " +
