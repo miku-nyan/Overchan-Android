@@ -243,6 +243,9 @@ public class PresentationModel {
         
         if (task.isCancelled()) return;
         
+        boolean headersRebuilding = false;
+        int indexCounter = 0;
+        
         boolean rebuild = false;
         if (posts.length < presentationList.size()) {
             rebuild = true;
@@ -255,7 +258,16 @@ public class PresentationModel {
                     Logger.d(TAG, "rebuild: changed item "+i);
                     break;
                 }
-                presentationList.get(i).sourceModel.deleted = posts[i].deleted;
+                if (showIndex) {
+                    if (!posts[i].deleted) ++indexCounter;
+                    if (headersRebuilding |= presentationList.get(i).isDeleted != posts[i].deleted) {
+                        presentationList.get(i).buildSpannedHeader(!posts[i].deleted ? indexCounter : -1,
+                                source.boardModel.bumpLimit,
+                                reduceNames ? source.boardModel.defaultUserName : null,
+                                source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? posts[i].parentThread : null);
+                    }
+                }
+                presentationList.get(i).isDeleted = posts[i].deleted;
             }
         }
         
@@ -266,6 +278,7 @@ public class PresentationModel {
             presentationList.clear();
             postNumbersMap.clear();
             attachments.clear();
+            indexCounter = 0;
         }
         
         final boolean openSpoilers = MainApplication.getInstance().settings.openSpoilers();
@@ -297,8 +310,9 @@ public class PresentationModel {
                 attachments.add(Triple.of(posts[i].attachments[j], model.attachmentHashes[j], posts[i].number));
             }
             
-            //отсюда и до конца for - переместить в создание модели, распараллелить
-            model.buildSpannedHeader(showIndex ? i+1 : -1, source.boardModel.bumpLimit, reduceNames ? source.boardModel.defaultUserName : null,
+            model.buildSpannedHeader(showIndex && !posts[i].deleted ? ++indexCounter : -1,
+                    source.boardModel.bumpLimit,
+                    reduceNames ? source.boardModel.defaultUserName : null,
                     source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? posts[i].parentThread : null);
             
             if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {

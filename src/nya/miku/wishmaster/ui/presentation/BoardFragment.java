@@ -651,14 +651,14 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 menu.findItem(R.id.context_menu_reply).setVisible(false);
                 menu.findItem(R.id.context_menu_reply_with_quote).setVisible(false);
             }
-            if (model.sourceModel.deleted || !presentationModel.source.boardModel.allowDeletePosts || tabModel.type == TabModel.TYPE_LOCAL) {
+            if (model.isDeleted || !presentationModel.source.boardModel.allowDeletePosts || tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_delete).setVisible(false);
             }
-            if (model.sourceModel.deleted || !presentationModel.source.boardModel.allowDeleteFiles ||
+            if (model.isDeleted || !presentationModel.source.boardModel.allowDeleteFiles ||
                     model.sourceModel.attachments == null || model.sourceModel.attachments.length == 0 || tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_delete_files).setVisible(false);
             }
-            if (model.sourceModel.deleted || presentationModel.source.boardModel.allowReport == BoardModel.REPORT_NOT_ALLOWED ||
+            if (model.isDeleted || presentationModel.source.boardModel.allowReport == BoardModel.REPORT_NOT_ALLOWED ||
                     tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_report).setVisible(false);
             }
@@ -1937,7 +1937,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
             }
             //отметка удалённого поста
-            if (model.sourceModel.deleted) {
+            if (model.isDeleted) {
                 if (!tag.deletedPostViewIsVisible) {
                     tag.deletedPostView.setVisibility(View.VISIBLE);
                     tag.deletedPostViewIsVisible = true;

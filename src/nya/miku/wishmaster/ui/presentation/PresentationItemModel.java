@@ -74,6 +74,8 @@ public class PresentationItemModel {
     public PostModel sourceModel;
     /** Хэш исходной модели поста */
     public int sourceModelHash;
+    /** Удален ли пост */
+    public boolean isDeleted;
     /** Дата и время поста (строковое представление) */
     public String dateString;
     /** Строка с количеством постов и вложений (для заголовка треда).
@@ -137,6 +139,7 @@ public class PresentationItemModel {
             FloatingModel[] floatingModels) {
         this.sourceModel = source;
         this.sourceModelHash = ChanModels.hashPostModel(source);
+        this.isDeleted = source.deleted;
         this.chanName = chanName;
         this.chanModule = MainApplication.getInstance().getChanModule(chanName);
         this.boardName = boardName;
