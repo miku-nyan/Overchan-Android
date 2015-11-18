@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/activityRootBackground"
@@ -166,7 +167,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         <EditText 
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            tools:ignore="InefficientWeight"
             android:layout_weight="1"
             android:gravity="top|start"
             android:hint="@string/postform_comment"
