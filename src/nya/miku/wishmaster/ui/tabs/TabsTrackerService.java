@@ -81,7 +81,6 @@ public class TabsTrackerService extends Service {
     private boolean backgroundTabs;
     
     private CancellableTask task = null;
-    private CancellableTask updatingTask = null;
     
     private void notifyForeground(int id, Notification notification) {
         if (!isForeground) {
@@ -188,7 +187,7 @@ public class TabsTrackerService extends Service {
                     }
                     
                     final int oldCount = serializablePage.posts != null ? serializablePage.posts.length : 0;
-                    updatingTask = new PageLoaderFromChan(serializablePage, new PageLoaderFromChan.PageLoaderCallback() {
+                    new PageLoaderFromChan(serializablePage, new PageLoaderFromChan.PageLoaderCallback() {
                         @Override
                         public void onSuccess() {
                             BackgroundThumbDownloader.download(serializablePage, task);
@@ -213,12 +212,10 @@ public class TabsTrackerService extends Service {
                         public void onError(String message) {
                             tab.autoupdateError = true;
                         }
-                    }, chan);
-                    ((PageLoaderFromChan) updatingTask).run();
+                    }, chan, task).run();
                 }
             }
             currentUpdatingTabId = -1;
-            updatingTask = null;
         }
         if (task.isCancelled()) return;
         if (tabsSwitcher.currentFragment instanceof BoardFragment) {
@@ -278,13 +275,6 @@ public class TabsTrackerService extends Service {
                 LockSupport.parkNanos(1000000000);
             }
         }
-        
-        @Override
-        public void cancel() {
-            if (updatingTask != null) updatingTask.cancel();
-            super.cancel();
-        }
-        
     }
     
     @Override

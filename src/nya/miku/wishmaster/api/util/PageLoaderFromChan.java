@@ -33,21 +33,20 @@ import nya.miku.wishmaster.lib.org_json.JSONException;
 import android.content.res.Resources;
 
 /**
- * Задача-загрузчик АИБ-страниц, загружает или обновляет объект {@link SerializablePage} с чана напрямую.
- * Имплементирует {@link Runnable} и {@link CancellableTask}, может вызываться асинхронно.
+ * Загрузчик АИБ-страниц, загружает или обновляет объект {@link SerializablePage} с чана напрямую.
+ * Имплементирует {@link Runnable}, может вызываться асинхронно.
  * @author miku-nyan
  *
  */
-public class PageLoaderFromChan implements Runnable, CancellableTask {
+public class PageLoaderFromChan implements Runnable {
     private static final String TAG = "PageLoaderFromChan";
-    
-    private volatile boolean cancelled = false;
     
     private boolean oomFlag = false;
     
     private final SerializablePage page;
     private final PageLoaderCallback callback;
     private final ChanModule chan;
+    private final CancellableTask task;
     
     /**
      * Конструктор
@@ -55,54 +54,47 @@ public class PageLoaderFromChan implements Runnable, CancellableTask {
      * Для загрузки страницы с нуля, нужно создать новый объект типа {@link SerializablePage},
      * заполнить поле {@link SerializablePage#pageModel} и передать этот объект.
      * @param callback реализация интерфейса {@link PageLoaderCallback},
-     * его методы будут вызваны после завершения загрузки или в случае ошибки 
+     * его методы будут вызваны после завершения загрузки или в случае ошибки
+     * @param chan объект модуля имиджборды
+     * @param task интерфейс отменяемой задачи
      */
-    public PageLoaderFromChan(SerializablePage page, PageLoaderCallback callback, ChanModule chan) {
+    public PageLoaderFromChan(SerializablePage page, PageLoaderCallback callback, ChanModule chan, CancellableTask task) {
         this.page = page;
         this.callback = callback;
         this.chan = chan;
+        this.task = task != null ? task : new CancellableTask.BaseCancellableTask();
     }
     
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-    
-    @Override
-    public void cancel() {
-        cancelled = true;
-    }
-
     @Override
     public void run() {
         try {
             UrlPageModel urlPage = page.pageModel;
             switch (urlPage.type) {
                 case UrlPageModel.TYPE_BOARDPAGE:
-                    ThreadModel[] threads = chan.getThreadsList(urlPage.boardName, urlPage.boardPage, null, this, page.threads);
+                    ThreadModel[] threads = chan.getThreadsList(urlPage.boardName, urlPage.boardPage, null, task, page.threads);
                     page.threads = threads;
                     break;
                 case UrlPageModel.TYPE_THREADPAGE:
-                    PostModel[] posts = chan.getPostsList(urlPage.boardName, urlPage.threadNumber, null, this, page.posts);
+                    PostModel[] posts = chan.getPostsList(urlPage.boardName, urlPage.threadNumber, null, task, page.posts);
                     page.posts = posts;
                     break;
                 case UrlPageModel.TYPE_CATALOGPAGE:
-                    ThreadModel[] catalog = chan.getCatalog(urlPage.boardName, urlPage.catalogType, null, this, page.threads);
+                    ThreadModel[] catalog = chan.getCatalog(urlPage.boardName, urlPage.catalogType, null, task, page.threads);
                     page.threads = catalog;
                     break;
                 case UrlPageModel.TYPE_SEARCHPAGE:
-                    PostModel[] searchResult = chan.search(urlPage.boardName, urlPage.searchRequest, null, this);
+                    PostModel[] searchResult = chan.search(urlPage.boardName, urlPage.searchRequest, null, task);
                     page.posts = searchResult;
                     break;
                 default:
                     throw new Exception("wrong type of board page");
             }
-            if (cancelled) return;
-            page.boardModel = chan.getBoard(urlPage.boardName, null, this);
+            if (task.isCancelled()) return;
+            page.boardModel = chan.getBoard(urlPage.boardName, null, task);
             if (callback != null) callback.onSuccess();
         } catch (Exception e) {
             Logger.e(TAG, e);
-            if (cancelled) return;
+            if (task.isCancelled()) return;
             if (callback != null) {
                 if (e instanceof InteractiveException) {
                     callback.onInteractiveException((InteractiveException) e);
@@ -122,7 +114,7 @@ public class PageLoaderFromChan implements Runnable, CancellableTask {
         } catch (OutOfMemoryError oom) {
             MainApplication.freeMemory();
             Logger.e(TAG, oom);
-            if (cancelled) return;
+            if (task.isCancelled()) return;
             if (!oomFlag) {
                 oomFlag = true;
                 run();

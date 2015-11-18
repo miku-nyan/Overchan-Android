@@ -770,29 +770,22 @@ public class DownloadingService extends Service {
                 page = new SerializablePage();
                 page.pageModel = item.threadUrlPage;
                 class LoaderCallback implements PageLoaderFromChan.PageLoaderCallback {
-                    public volatile boolean finished = false;
                     public volatile String reason = null;
                     @Override
                     public void onSuccess() {
-                        finished = true;
+                        reason = null;
                     }
                     @Override
                     public void onError(String message) {
                         reason = message;
-                        finished = true;
                     }
                     @Override
                     public void onInteractiveException(InteractiveException e) {
                         reason = getString(R.string.downloading_error_interactive_format, e.getServiceName());
-                        finished = true;
                     }
                 }
                 LoaderCallback cb = new LoaderCallback();
-                PageLoaderFromChan loader = new PageLoaderFromChan(page, cb, MainApplication.getInstance().getChanModule(item.chanName));
-                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(loader).start();
-                while (!isCancelled() && !cb.finished) {
-                    Thread.yield();
-                }
+                new PageLoaderFromChan(page, cb, MainApplication.getInstance().getChanModule(item.chanName), this).run();
                 if (isCancelled()) {
                     throw new Exception();
                 }

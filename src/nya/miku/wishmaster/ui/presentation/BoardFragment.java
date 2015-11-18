@@ -44,7 +44,6 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.PageLoaderFromChan;
-import nya.miku.wishmaster.api.util.PageLoaderFromChan.PageLoaderCallback;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.SerializablePage;
@@ -1176,7 +1175,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             final int itemsCountBefore =
                     pageFromChan.posts != null ? pageFromChan.posts.length :
                         (pageFromChan.threads != null ? pageFromChan.threads.length : 0);
-            pageLoader = new PageLoaderFromChan(pageFromChan, new PageLoaderCallback() {
+            pageLoader = new PageLoaderFromChan(pageFromChan, new PageLoaderFromChan.PageLoaderCallback() {
                 @Override
                 public void onSuccess() {
                     if (isCancelled()) return;
@@ -1289,7 +1288,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         @Override public void onError(String message) { switchToErrorView(message); }
                     });
                 }
-            }, chan);
+            }, chan, this);
             if (isCancelled()) return;
             pageLoader.run();
         }
