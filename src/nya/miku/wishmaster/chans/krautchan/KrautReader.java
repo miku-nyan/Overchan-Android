@@ -279,7 +279,8 @@ public class KrautReader implements Closeable {
         int buflen = commentBuffer.length();
         if (buflen > len) {
             commentBuffer.setLength(buflen - len);
-            return CryptoUtils.fixCloudflareEmails(commentBuffer.toString());
+            String comment = commentBuffer.toString().replaceAll("<span class=\"ban_mark\">([^<]*)</span>", "<b><font color=\"red\">$1</font></b>");
+            return CryptoUtils.fixCloudflareEmails(comment);
         } else {
             return "";
         }
