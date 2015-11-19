@@ -83,7 +83,9 @@ public class FourchanJsonMapper {
         model.number = Long.toString(object.getLong("no"));
         model.name = StringEscapeUtils.unescapeHtml4(object.optString("name", "Anonymous").replaceAll("</?span[^>]*?>", ""));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
-        model.comment = object.optString("com", "");
+        model.comment = object.optString("com", "").
+                replaceAll("(^|\\s|<br/?>)(https?://(?:[^<>\\s]*(?:<wbr/?>)?)*)", "$1<a href=\"$2\">$2</a>").
+                replaceAll("(<a href=\"[^\"]*?)<wbr/?>([^\"]*\")", "$1$2");
         model.email = null;
         model.trip = object.optString("trip", "");
         String capcode = object.optString("capcode", "none");
