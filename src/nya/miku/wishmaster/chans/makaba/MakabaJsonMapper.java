@@ -190,10 +190,10 @@ public class MakabaJsonMapper {
         int banned = getIntSafe(source, "banned", 0);
         switch (banned) {
             case 1:
-                model.comment = model.comment + "<br/><em>(Автор этого поста был забанен. Помянем.)</em>";
+                model.comment = model.comment + "<br/><em><font color=\"red\">(Автор этого поста был забанен. Помянем.)</font></em>";
                 break;
             case 2:
-                model.comment = model.comment + "<br/><em>(Автор этого поста был предупрежден.)</em>";
+                model.comment = model.comment + "<br/><em><font color=\"red\">(Автор этого поста был предупрежден.)</font></em>";
                 break;
         }
         
