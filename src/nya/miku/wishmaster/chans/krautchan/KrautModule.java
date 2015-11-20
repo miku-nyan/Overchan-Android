@@ -64,6 +64,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -424,7 +425,7 @@ public class KrautModule extends AbstractChanModule {
                     String errorMessage = htmlResponse.substring(p2 + 1);
                     int p3 = errorMessage.indexOf("</tr>");
                     if (p3 != -1) errorMessage = errorMessage.substring(0, p3);
-                    errorMessage = StringEscapeUtils.unescapeHtml4(errorMessage.replaceAll("<[^>]*>", "")).trim().replaceAll("\\s+", " ");
+                    errorMessage = RegexUtils.trimToSpace(StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(errorMessage)).trim());
                     throw new Exception(errorMessage);
                 }
             }
@@ -468,7 +469,7 @@ public class KrautModule extends AbstractChanModule {
                     String errorMessage = htmlResponse.substring(p2 + 1);
                     int p3 = errorMessage.indexOf("</tr>");
                     if (p3 != -1) errorMessage = errorMessage.substring(0, p3);
-                    errorMessage = StringEscapeUtils.unescapeHtml4(errorMessage.replaceAll("<[^>]*>", "")).trim().replaceAll("\\s+", " ");
+                    errorMessage = RegexUtils.trimToSpace(StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(errorMessage)).trim());
                     throw new Exception(errorMessage);
                 }
             }

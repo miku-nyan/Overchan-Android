@@ -26,6 +26,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
@@ -81,11 +82,9 @@ public class FourchanJsonMapper {
     static PostModel mapPostModel(JSONObject object, String boardName) {
         PostModel model = new PostModel();
         model.number = Long.toString(object.getLong("no"));
-        model.name = StringEscapeUtils.unescapeHtml4(object.optString("name", "Anonymous").replaceAll("</?span[^>]*?>", ""));
+        model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous")));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
-        model.comment = object.optString("com", "").
-                replaceAll("(^|\\s|<br/?>)(https?://(?:[^<>\\s]*(?:<wbr/?>)?)*)", "$1<a href=\"$2\">$2</a>").
-                replaceAll("(<a href=\"[^\"]*?)<wbr/?>([^\"]*\")", "$1$2");
+        model.comment = RegexUtils.linkify(object.optString("com", ""));
         model.email = null;
         model.trip = object.optString("trip", "");
         String capcode = object.optString("capcode", "none");

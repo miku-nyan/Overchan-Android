@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.ui;
 
 import java.net.URLDecoder;
+import java.util.regex.Pattern;
 
 import android.content.res.Resources;
 import nya.miku.wishmaster.R;
@@ -26,6 +27,7 @@ import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 
 public class Attachments {
     /**
@@ -154,7 +156,7 @@ public class Attachments {
         try {
             filename = URLDecoder.decode(filename, "UTF-8");
         } catch (Exception e) {}
-        filename = filename.replaceAll("[\\n\\r\\t\\f\\?\\*\\|\\\\\"\0<>:`]", "_");
+        filename = RegexUtils.replaceAll(filename, INCORRECT_CHARACTERS, "_");
         
         if (suffix == null) suffix = "";
         int dotLastPos = filename.lastIndexOf('.');
@@ -170,5 +172,6 @@ public class Attachments {
         return filenameMain + filenameSuff;
     }
     
+    private static final Pattern INCORRECT_CHARACTERS = Pattern.compile("[\\n\\r\\t\\f\\?\\*\\|\\\\\"\0<>:`]");
     private static final int MAX_FILENAME_LENGTH = 255;
 }

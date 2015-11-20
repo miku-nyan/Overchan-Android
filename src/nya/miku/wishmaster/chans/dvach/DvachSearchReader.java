@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 
 public class DvachSearchReader implements Closeable {
     private final ChanModule _chan;
@@ -85,7 +86,7 @@ public class DvachSearchReader implements Closeable {
                 postModel.parentThread = url.threadNumber;
                 postModel.name = "";
                 Matcher mSubj = SUBJ_PATTERN.matcher(post);
-                if (mSubj.find()) postModel.subject = mSubj.group(1).replaceAll("\\s+", " "); else postModel.subject = "";
+                if (mSubj.find()) postModel.subject = RegexUtils.trimToSpace(mSubj.group(1)); else postModel.subject = "";
                 if (post.contains("<p>")) postModel.comment = post.substring(post.indexOf("<p>")); else postModel.comment = "";
                 result.add(postModel);
             } catch (Exception e) {}

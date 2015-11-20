@@ -48,6 +48,7 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -267,8 +268,8 @@ public class WakachanModule extends AbstractWakabaModule {
     @Override
     public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String url = getUsingUrl() + "banned/report.pl?url=/" + model.boardName + "/res/" + model.threadNumber + "%23" + model.postNumber;
-        String response = HttpStreamer.getInstance().getStringFromUrl(
-                url, HttpRequestModel.builder().setGET().build(), getHttpClient(), listener, task, false).replaceAll("<[^>]*>", "").trim();
+        String response = RegexUtils.removeHtmlTags(HttpStreamer.getInstance().getStringFromUrl(
+                url, HttpRequestModel.builder().setGET().build(), getHttpClient(), listener, task, false)).trim();
         if (response.startsWith("Post reported.")) return null;
         throw new Exception(response);
     }

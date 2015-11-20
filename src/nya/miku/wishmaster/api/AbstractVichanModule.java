@@ -57,6 +57,7 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.IOUtils;
@@ -233,7 +234,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     protected PostModel mapPostModel(JSONObject object, String boardName) {
         PostModel model = new PostModel();
         model.number = Long.toString(object.getLong("no"));
-        model.name = StringEscapeUtils.unescapeHtml4(object.optString("name", "Anonymous").replaceAll("</?span[^>]*?>", ""));
+        model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous")));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
         model.comment = object.optString("com", "");
         model.email = object.optString("email", "");

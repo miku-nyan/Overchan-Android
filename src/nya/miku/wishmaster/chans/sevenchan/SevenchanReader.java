@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import nya.miku.wishmaster.api.models.AttachmentModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.CryptoUtils;
 
@@ -57,6 +58,8 @@ public class SevenchanReader extends WakabaReader {
     private static final Pattern ATTACHMENT_SIZE_PATTERN = Pattern.compile("([\\.\\d]+) ?([km])?b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern ATTACHMENT_PX_SIZE_PATTERN = Pattern.compile("(\\d+)[x×](\\d+)"); // \u0078 \u00D7
     private static final Pattern ATTACHMENT_ORIGINAL_NAME_PATTERN = Pattern.compile("\\s*,?([^<\\)]*)");
+    private static final Pattern EMBEDDED_PATTERN =
+            Pattern.compile("<a href=\"javascript:;\" onmousedown=\"if\\(document.getElementById\\('(.*?)'\\)(?:[^\"]*?)\">");
     
     private static final char[] NUMBER_FILTER = "<input type=\"checkbox\" name=\"post[]\" value=\"".toCharArray();
     private static final char[] SUBJECT_FILTER = "<span class=\"subject\">".toCharArray();    
@@ -318,9 +321,8 @@ public class SevenchanReader extends WakabaReader {
         int buflen = commentBuffer.length();
         if (buflen > len2) {
             commentBuffer.setLength(buflen - len2); 
-            return CryptoUtils.fixCloudflareEmails(commentBuffer.toString()).
-                    replaceAll("<a href=\"javascript:;\" onmousedown=\"if\\(document.getElementById\\('(.*?)'\\)(?:[^\"]*?)\">",
-                            "<a href=\"http://youtube\\.com/watch?v=$1\">");
+            return RegexUtils.replaceAll(CryptoUtils.fixCloudflareEmails(commentBuffer.toString()),
+                    EMBEDDED_PATTERN, "<a href=\"http://youtube\\.com/watch?v=$1\">");
         } else {
             return "";
         }

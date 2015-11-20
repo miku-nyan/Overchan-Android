@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
@@ -117,7 +118,7 @@ public class Recaptcha2fallback extends InteractiveException {
                     
                     final String message;
                     Matcher messageMatcher = Pattern.compile("imageselect-message(?:.*?)>(.*?)</div>").matcher(htmlChallenge);
-                    if (messageMatcher.find()) message = messageMatcher.group(1).replaceAll("<[^>]*>", ""); else message = null;
+                    if (messageMatcher.find()) message = RegexUtils.removeHtmlTags(messageMatcher.group(1)); else message = null;
                     
                     final Bitmap candidateBitmap;
                     Matcher candidateMatcher = Pattern.compile("fbc-imageselect-candidates(?:.*?)src=\"data:image/(?:.*?);base64,([^\"]*)\"").

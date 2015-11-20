@@ -37,6 +37,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 
@@ -61,6 +62,8 @@ public class KrautReader implements Closeable {
     private static final Pattern ATTACHMENT_SIZE_PATTERN = Pattern.compile("([,\\.\\d]+) ?([km])?b", Pattern.CASE_INSENSITIVE);
     
     private static final Pattern ICON_DESCRIPTION_PATTERN = Pattern.compile("helpTip\\('([^']*)'");
+    
+    private static final Pattern BAN_MARK_PATTERN = Pattern.compile("<span class=\"ban_mark\">([^<]*)</span>");
     
     private static final char[] THREAD_START = "id=\"thread_".toCharArray();
     private static final char[] BLOCKQUOTE_CLOSE = "</blockquote>".toCharArray();
@@ -279,7 +282,7 @@ public class KrautReader implements Closeable {
         int buflen = commentBuffer.length();
         if (buflen > len) {
             commentBuffer.setLength(buflen - len);
-            String comment = commentBuffer.toString().replaceAll("<span class=\"ban_mark\">([^<]*)</span>", "<b><font color=\"red\">$1</font></b>");
+            String comment = RegexUtils.replaceAll(commentBuffer, BAN_MARK_PATTERN, "<b><font color=\"red\">$1</font></b>");
             return CryptoUtils.fixCloudflareEmails(comment);
         } else {
             return "";
@@ -327,7 +330,7 @@ public class KrautReader implements Closeable {
             else if (ext.equals("mp3") || ext.equals("ogg")) model.type = AttachmentModel.TYPE_AUDIO;
             Matcher origFilenameMatcher = ATTACHMENT_FILENAME_PATTERN.matcher(html);
             if (origFilenameMatcher.find()) {
-                model.originalName = StringEscapeUtils.unescapeHtml4(origFilenameMatcher.group(1).replaceAll("<[^>]*>", "").trim());
+                model.originalName = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(origFilenameMatcher.group(1)).trim());
             }
             Matcher infoMatcher = ATTACHMENT_INFO_PATTERN.matcher(html);
             if (infoMatcher.find()) {

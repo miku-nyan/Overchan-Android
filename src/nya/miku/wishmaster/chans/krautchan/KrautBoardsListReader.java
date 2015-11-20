@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 
 /**
  * parse boards list page: krautchan.net/nav
@@ -109,7 +110,7 @@ public class KrautBoardsListReader implements Closeable {
                 break;
             case FILTER_BOARD:
                 skipUntilSequence(CLOSE);
-                String board = readUntilSequence(LI_CLOSE).replaceAll("<[^>]*>", "").trim();
+                String board = RegexUtils.removeHtmlTags(readUntilSequence(LI_CLOSE)).trim();
                 Matcher boardMatcher = BOARD_PATTERN.matcher(board);
                 if (boardMatcher.matches()) {
                     SimpleBoardModel model = new SimpleBoardModel();

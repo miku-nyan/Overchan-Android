@@ -32,6 +32,7 @@ import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
@@ -160,7 +161,7 @@ public class MakabaJsonMapper {
         } catch (JSONException e) {
             model.number = Long.toString(source.getLong("num"));
         }
-        model.name = StringEscapeUtils.unescapeHtml4(getStringSafe(source, "name", "").replaceAll("</?span[^>]*?>", ""));
+        model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(getStringSafe(source, "name", "")));
         model.subject = StringEscapeUtils.unescapeHtml4(getStringSafe(source, "subject", ""));
         model.comment = getStringSafe(source, "comment", "");
         model.email = getStringSafe(source, "email", "");

@@ -304,7 +304,7 @@ public class WakabaReader implements Closeable {
                 inDate = true;
                 break;
             case FILTER_TRIPCODE:
-                currentPost.trip = StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTERS_CLOSE[filterIndex]).replaceAll("<[^>]*>", "")).trim();
+                currentPost.trip = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(readUntilSequence(FILTERS_CLOSE[filterIndex]))).trim();
                 inDate = true;
                 break;
             case FILTER_ENDDATE:
@@ -519,7 +519,7 @@ public class WakabaReader implements Closeable {
             currentPost.name = StringEscapeUtils.unescapeHtml4(raw).trim();
         }
         if (currentPost.name.contains("<span class=\"adminname\">")) currentPost.color = Color.RED;
-        if (currentPost.name.startsWith("<")) currentPost.name = currentPost.name.replaceAll("<[^>]*>", "");
+        if (currentPost.name.startsWith("<")) currentPost.name = RegexUtils.removeHtmlTags(currentPost.name);
     }
     
     /**
@@ -532,7 +532,7 @@ public class WakabaReader implements Closeable {
      * @param date строка с датой
      */
     protected void parseDate(String date) {
-        date = date.replaceAll("<[^>]*>", "").trim();
+        date = RegexUtils.removeHtmlTags(date).trim();
         if (date.length() > 0) {
             try {
                 currentPost.timestamp = dateFormat.parse(date).getTime();

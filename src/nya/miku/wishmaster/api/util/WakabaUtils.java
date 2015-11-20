@@ -27,8 +27,13 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 public class WakabaUtils {
     private WakabaUtils() {}
     
+    private static final Pattern BOARDNAME_PATTERN = Pattern.compile("[^/\\s]+(/arch)?");
+    private static final Pattern URL_PATTERN = Pattern.compile("https?://(?:www\\.)?(.+)");
+    private static final Pattern PATH_PATTERN = Pattern.compile("(.+?)(?:/(.*))");
+    private static final Pattern THREADPAGE_PATTERN = Pattern.compile("(.+?)/res/([0-9]+?)\\.html(.*)");
+    
     public static String buildUrl(UrlPageModel model, String rootUrl) {
-        if (model.boardName != null && !model.boardName.matches("[^/\\s]+(/arch)?")) throw new IllegalArgumentException("wrong board name");
+        if (model.boardName != null && !BOARDNAME_PATTERN.matcher(model.boardName).matches()) throw new IllegalArgumentException("wrong board name");
         StringBuilder url = new StringBuilder(rootUrl);
         switch (model.type) {
             case UrlPageModel.TYPE_INDEXPAGE:
@@ -54,9 +59,9 @@ public class WakabaUtils {
     public static UrlPageModel parseUrl(String url, String chanName, String... domains) {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)").matcher(url);
+        Matcher parseUrl = URL_PATTERN.matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
+        Matcher parsePath = PATH_PATTERN.matcher(parseUrl.group(1));
         if (parsePath.find()) {
             domain = parsePath.group(1).toLowerCase(Locale.US);
             path = parsePath.group(2);
@@ -81,7 +86,7 @@ public class WakabaUtils {
                 model.type = UrlPageModel.TYPE_INDEXPAGE;
             } else if (path.contains("/res/")) {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
-                Matcher matcher = Pattern.compile("(.+?)/res/([0-9]+?)\\.html(.*)").matcher(path);
+                Matcher matcher = THREADPAGE_PATTERN.matcher(path);
                 if (!matcher.find()) throw new Exception();
                 model.boardName = matcher.group(1);
                 model.threadNumber = matcher.group(2);

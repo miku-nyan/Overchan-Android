@@ -33,6 +33,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 
 public class KrautCatalogReader implements Closeable {
     private static final char[] CATALOG_START = "<article".toCharArray();
@@ -151,7 +152,7 @@ public class KrautCatalogReader implements Closeable {
                         currentThread.posts[0].icons = new BadgeIconModel[] { icon };
                     }
                 }
-                currentThread.posts[0].subject = StringEscapeUtils.unescapeHtml4(headerHtml.replaceAll("<[^>]*>", "")).trim();
+                currentThread.posts[0].subject = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(headerHtml)).trim();
                 break;
             case FILTER_THUMBNAIL:
                 AttachmentModel attachment = new AttachmentModel();

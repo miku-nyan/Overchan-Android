@@ -67,6 +67,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -451,7 +452,7 @@ public class DobroModule extends AbstractChanModule {
                                     getStringFromUrl(location, HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
                             Matcher errorMatcher = Pattern.compile("class='post-error'>([^<]*)<").matcher(errorHtml);
                             while (errorMatcher.find()) errorMessage += (errorMessage.equals("") ? "" : "; ") + errorMatcher.group(1);
-                            if (errorMessage.equals("")) errorMessage = errorHtml.replaceAll("<[^>]*>", "").trim();
+                            if (errorMessage.equals("")) errorMessage = RegexUtils.removeHtmlTags(errorHtml).trim();
                             throw new Exception(errorMessage);
                         }
                         postingError = false;

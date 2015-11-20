@@ -36,12 +36,14 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 
 @SuppressLint("SimpleDateFormat")
 public class DvachReader extends WakabaReader {
     
     private static final Pattern COUNTRYBALL_PATTERN = Pattern.compile("url\\('(.*?)'");
+    private static final Pattern ADMIN_MARK_PATTERN = Pattern.compile("<span class=\"red italic\">(.*?)</span>");
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d+ \\w+ \\d+ \\d\\d:\\d\\d:\\d\\d)$");
     private static final DateFormat DATE_FORMAT;
     static {
@@ -76,7 +78,7 @@ public class DvachReader extends WakabaReader {
         if (ch == TRIP_FILTER[curTripPos]) {
             ++curTripPos;
             if (curTripPos == TRIP_FILTER.length) {
-                currentPost.trip = StringEscapeUtils.unescapeHtml4(readUntilSequence("</span>".toCharArray()).replaceAll("<[^>]*>", "")).trim();
+                currentPost.trip = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(readUntilSequence("</span>".toCharArray()))).trim();
                 curTripPos = 0;
             }
         } else {
@@ -87,7 +89,7 @@ public class DvachReader extends WakabaReader {
             ++curTinaTripPos;
             if (curTinaTripPos == TINATRIP_FILTER.length) {
                 currentPost.trip =
-                        StringEscapeUtils.unescapeHtml4(readUntilSequence("</span>".toCharArray()).replaceAll("<[^>]*>", "")).trim() + '\u2655';
+                        StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(readUntilSequence("</span>".toCharArray()))).trim() + '\u2655';
                 curTinaTripPos = 0;
             }
         } else {
@@ -163,7 +165,7 @@ public class DvachReader extends WakabaReader {
     
     @Override
     protected void postprocessPost(PostModel post) {
-        post.comment = post.comment.replaceAll("<span class=\"red italic\">(.*?)</span>", "<font color=\"red\"><em>$1</em></font>");
+        post.comment = RegexUtils.replaceAll(post.comment, ADMIN_MARK_PATTERN, "<font color=\"red\"><em>$1</em></font>");
         if (post.attachments != null)
             for (AttachmentModel attachment : post.attachments)
                 attachment.originalName = null;
