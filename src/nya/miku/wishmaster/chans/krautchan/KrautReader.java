@@ -45,6 +45,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class KrautReader implements Closeable {
     private static final String TAG = "KrautReader";
+    private static final boolean LINKIFY = true;
     
     private static final DateFormat KRAUT_DATEFORMAT;
     static {
@@ -283,6 +284,7 @@ public class KrautReader implements Closeable {
         if (buflen > len) {
             commentBuffer.setLength(buflen - len);
             String comment = RegexUtils.replaceAll(commentBuffer, BAN_MARK_PATTERN, "<b><font color=\"red\">$1</font></b>");
+            if (LINKIFY) comment = RegexUtils.linkify(comment);
             return CryptoUtils.fixCloudflareEmails(comment);
         } else {
             return "";
