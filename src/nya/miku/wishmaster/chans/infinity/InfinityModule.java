@@ -53,6 +53,7 @@ import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.FastHtmlTagParser;
 import nya.miku.wishmaster.common.IOUtils;
@@ -63,6 +64,7 @@ import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.base64.Base64;
+import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 /* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
@@ -262,6 +264,17 @@ public class InfinityModule extends AbstractVichanModule {
             model.comment = FastHtmlTagParser.getPTagParser().replace(model.comment, QUOTE_REPLACER);
         } catch (Exception e) {}
         return model;
+    }
+    
+    @Override
+    public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
+            throws Exception {
+        try {
+            return super.getThreadsList(boardName, page, listener, task, oldList);
+        } catch (JSONException e) {
+            if (page >= 3) throw new Exception("Back pages are disabled. Use the catalog to find threads on pages greater than 3.", e);
+            throw e;
+        }
     }
     
     @Override
