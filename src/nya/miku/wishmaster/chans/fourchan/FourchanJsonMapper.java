@@ -31,6 +31,7 @@ import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class FourchanJsonMapper {
+    private static final boolean LINKIFY = true;
     private static final String[] CATALOG = new String[] { "Catalog" };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "png", "gif", "webm" };
     
@@ -84,7 +85,8 @@ public class FourchanJsonMapper {
         model.number = Long.toString(object.getLong("no"));
         model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous")));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
-        model.comment = RegexUtils.linkify(object.optString("com", ""));
+        String comment = object.optString("com", "");
+        model.comment = LINKIFY ? RegexUtils.linkify(comment) : comment;
         model.email = null;
         model.trip = object.optString("trip", "");
         String capcode = object.optString("capcode", "none");
