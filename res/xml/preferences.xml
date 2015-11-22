@@ -114,6 +114,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:summary="@string/pref_gallery_screen_summary" >
             <CheckBoxPreference
                 android:defaultValue="false"
+                android:key="@string/pref_key_gallery_fullscreen"
+                android:title="@string/pref_gallery_fullscreen_title" />
+            
+            <CheckBoxPreference
+                android:defaultValue="false"
                 android:key="@string/pref_key_gallery_scroll_thread"
                 android:title="@string/pref_gallery_scroll_thread_title"
                 android:summary="@string/pref_gallery_scroll_thread_summary" />

@@ -495,6 +495,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_replies_only_quantity_summary">Альтернативный способ отображения ссылок на посты</string>
     <string name="pref_gallery_screen_title">Галерея</string>
     <string name="pref_gallery_screen_summary">Дополнительные настройки галереи</string>
+    <string name="pref_gallery_fullscreen_title">Полноэкранный режим</string>
     <string name="pref_gallery_scroll_thread_title">Прокручивать к вложениям</string>
     <string name="pref_gallery_scroll_thread_summary">Прокручивать тред к постам с вложениями из галереи</string>
     <string name="pref_gallery_scaleimageview_title">Просмотрщик изображений</string>

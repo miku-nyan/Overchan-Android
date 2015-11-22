@@ -488,6 +488,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_replies_only_quantity_summary">Alternative way to display references to posts</string>
     <string name="pref_gallery_screen_title">Gallery</string>
     <string name="pref_gallery_screen_summary">Gallery advanced preferences</string>
+    <string name="pref_gallery_fullscreen_title">Fullscreen mode</string>
     <string name="pref_gallery_scroll_thread_title">Scroll to attachments</string>
     <string name="pref_gallery_scroll_thread_summary">Scroll the thread to posts with attachments from gallery</string>
     <string name="pref_gallery_scaleimageview_title">Image Viewer</string>
