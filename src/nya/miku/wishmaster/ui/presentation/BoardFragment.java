@@ -763,29 +763,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 adapter.notifyDataSetChanged();
                 return true;
             case R.id.context_menu_reply:
-                SendPostModel sendReplyModel = getSendPostModel();
-                int sendReplyModelPos = sendReplyModel.commentPosition;
-                if (sendReplyModelPos > sendReplyModel.comment.length()) sendReplyModelPos = -1;
-                if (sendReplyModelPos < 0) sendReplyModelPos = sendReplyModel.comment.length();
-                String insertion = ">>" + adapter.getItem(position).sourceModel.number + "\n";
-                sendReplyModel.comment = sendReplyModel.comment.substring(0, sendReplyModelPos) +
-                        insertion + sendReplyModel.comment.substring(sendReplyModelPos);
-                sendReplyModel.commentPosition = sendReplyModelPos + insertion.length();
-                openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyModel);
+                openReply(position, false, null);
                 return true;
             case R.id.context_menu_reply_with_quote:
-                SendPostModel sendReplyWithQuoteModel = getSendPostModel();
-                int sendReplyWithQuoteModelPos = sendReplyWithQuoteModel.commentPosition;
-                if (sendReplyWithQuoteModelPos > sendReplyWithQuoteModel.comment.length()) sendReplyWithQuoteModelPos = -1;
-                if (sendReplyWithQuoteModelPos < 0) sendReplyWithQuoteModelPos = sendReplyWithQuoteModel.comment.length();
-                String quotedComment = adapter.getItem(position).spannedComment.toString().
-                        replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1").replaceAll("(\n+)", "$1>");
-                String insertionWithQuote = ">>" + adapter.getItem(position).sourceModel.number + "\n" +
-                        (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
-                sendReplyWithQuoteModel.comment = sendReplyWithQuoteModel.comment.substring(0, sendReplyWithQuoteModelPos) +
-                        insertionWithQuote + sendReplyWithQuoteModel.comment.substring(sendReplyWithQuoteModelPos);
-                sendReplyWithQuoteModel.commentPosition = sendReplyWithQuoteModelPos + insertionWithQuote.length();
-                openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyWithQuoteModel);
+                openReply(position, true, null);
                 return true;
             case R.id.context_menu_select_text:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && lastContextMenuPosition == -1) {
@@ -1775,6 +1756,24 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 tag.showFullTextView = (TextView) view.findViewById(R.id.post_show_full_text);
                 tag.repliesView = (JellyBeanSpanFixTextView) view.findViewById(R.id.post_replies);
                 tag.postsCountView = (TextView) view.findViewById(R.id.post_posts_count);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && fragment().pageType == TYPE_POSTSLIST) {
+                    CompatibilityImpl.setCustomSelectionActionModeMenuCallback(tag.commentView,
+                            R.string.context_menu_reply_with_quote,
+                            ThemeUtils.getThemeResId(fragment().activity.getTheme(), R.attr.actionAddPost),
+                            new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                int start = tag.commentView.getSelectionStart();
+                                int end = tag.commentView.getSelectionEnd();
+                                String quote = tag.commentView.getText().subSequence(start, end).toString();
+                                fragment().openReply(tag.position, true, quote);
+                            } catch (Exception e) {
+                                Logger.e(TAG, e);
+                            }
+                        }
+                    });
+                }
                 view.setTag(tag);
             }
             tag.position = position;
@@ -2645,6 +2644,26 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         addPostIntent.putExtra(PostingService.EXTRA_BOARD_MODEL, boardModel);
         addPostIntent.putExtra(PostingService.EXTRA_SEND_POST_MODEL, sendPostModel);
         startActivity(addPostIntent);
+    }
+    
+    private void openReply(int position, boolean withQuote, String quote) {
+        PresentationItemModel item = adapter.getItem(position);
+        SendPostModel sendReplyModel = getSendPostModel();
+        int sendReplyModelPos = sendReplyModel.commentPosition;
+        if (sendReplyModelPos > sendReplyModel.comment.length()) sendReplyModelPos = -1;
+        if (sendReplyModelPos < 0) sendReplyModelPos = sendReplyModel.comment.length();
+        String insertion;
+        if (withQuote) {
+            String quotedComment = (quote != null ? quote : item.spannedComment.toString().replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1")).
+                    replaceAll("(\n+)", "$1>");
+            insertion = ">>" + item.sourceModel.number + "\n" + (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
+        } else {
+            insertion = ">>" + item.sourceModel.number + "\n";
+        }
+        sendReplyModel.comment = sendReplyModel.comment.substring(0, sendReplyModelPos) +
+                insertion + sendReplyModel.comment.substring(sendReplyModelPos);
+        sendReplyModel.commentPosition = sendReplyModelPos + insertion.length();
+        openPostForm(tabModel.hash, presentationModel.source.boardModel, sendReplyModel);
     }
     
     private SendPostModel getSendPostModel() {

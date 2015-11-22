@@ -35,7 +35,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.preference.Preference;
 import android.provider.DocumentsContract;
+import android.view.ActionMode;
 import android.view.Display;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -84,6 +86,11 @@ public class CompatibilityImpl {
     }
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static void setShowAsActionAlways(MenuItem item) {
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    }
+    
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void setActionBarNoIcon(Activity activity) {
         ActionBar actionBar = activity.getActionBar();
         if (actionBar != null) actionBar.setDisplayShowHomeEnabled(false);
@@ -122,6 +129,34 @@ public class CompatibilityImpl {
         } else {
             activity.getActionBar().setIcon(R.drawable.ic_launcher);
         }
+    }
+    
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static void setCustomSelectionActionModeMenuCallback(TextView textView, final int titleRes, final int iconRes, final Runnable callback) {
+        textView.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                setShowAsActionAlways(menu.add(Menu.NONE, 1, Menu.FIRST, titleRes).setIcon(iconRes));
+                menu.removeItem(android.R.id.selectAll);
+                return true;
+            }
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                if (item.getItemId() == 1) {
+                    callback.run();
+                    mode.finish();
+                    return true;
+                }
+                return false;
+            }
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+            }
+        });
     }
     
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
