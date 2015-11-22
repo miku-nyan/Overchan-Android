@@ -81,6 +81,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
@@ -92,6 +93,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -257,7 +259,12 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             currentPosition = 0;
         }
         
-        setContentView(R.layout.gallery_layout);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && settings.fullscreenGallery()) {
+            setContentView(R.layout.gallery_layout_fullscreen);
+            GalleryFullscreen.initFullscreen(this);
+        } else {
+            setContentView(R.layout.gallery_layout);
+        }
         progressBar = (ProgressBar) findViewById(android.R.id.progress);
         progressBar.setMax(Window.PROGRESS_END);
         viewPager = (ViewPager) findViewById(R.id.gallery_viewpager);
@@ -1277,6 +1284,34 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
             
         });
+    }
+    
+    public static interface FullscreenCallback {
+        void showUI(boolean hideAfterDelay);
+    }
+    
+    private FullscreenCallback fullscreenCallback;
+    
+    public void setFullscreenCallback(FullscreenCallback fullscreenCallback) {
+        this.fullscreenCallback = fullscreenCallback;
+    }
+    
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (fullscreenCallback != null) fullscreenCallback.showUI(MotionEventCompat.getActionMasked(ev) == MotionEvent.ACTION_UP);
+        return super.dispatchTouchEvent(ev);
+    }
+    
+    @Override
+    public void onPanelClosed(int featureId, Menu menu) {
+        if (fullscreenCallback != null) fullscreenCallback.showUI(true);
+        super.onPanelClosed(featureId, menu);
+    }
+    
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (fullscreenCallback != null) fullscreenCallback.showUI(false);
+        return super.onMenuOpened(featureId, menu);
     }
     
     private class GalleryItemViewTag {

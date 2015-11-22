@@ -288,6 +288,11 @@ public class ApplicationSettings {
         }
     }
     
+    public boolean fullscreenGallery() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) return false;
+        return true; //TODO
+    }
+    
     public boolean scrollThreadFromGallery() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_scroll_thread), false);
     }
