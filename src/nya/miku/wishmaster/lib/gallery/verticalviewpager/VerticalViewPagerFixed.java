@@ -36,6 +36,7 @@ public class VerticalViewPagerFixed extends VerticalViewPager {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         try {
+            if (isImmersiveSwipe(ev)) return false;
             return super.onInterceptTouchEvent(ev);
         } catch (Exception e) {
             Logger.e("VerticalViewPager", e);
@@ -57,7 +58,23 @@ public class VerticalViewPagerFixed extends VerticalViewPager {
         return super.canScroll(v, checkV, dx, x, y);
     }
     
+    private boolean helpImmersiveSwipe = false;
+    private int immersiveSwipeHeight;
+    private boolean isImmersiveSwipe(MotionEvent ev) {
+        if (!helpImmersiveSwipe || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return false;
+        return Math.min(ev.getY(), getHeight() - ev.getY()) < immersiveSwipeHeight;
+    }
+    
+    public void setHelpImmersiveSwipe(int pxHeight) {
+        helpImmersiveSwipe = pxHeight > 0;
+        immersiveSwipeHeight = pxHeight;
+    }
+    
     public static View wrap(final View view, final Runnable callback) {
+        return wrap(view, callback, false);
+    }
+    
+    public static View wrap(final View view, final Runnable callback, boolean helpImmersiveSwipe) {
         VerticalViewPagerFixed viewPager = new VerticalViewPagerFixed(view.getContext());
         viewPager.setAdapter(new PagerAdapter() {
             @Override
@@ -87,6 +104,7 @@ public class VerticalViewPagerFixed extends VerticalViewPager {
         });
         viewPager.setCurrentItem(1);
         viewPager.setTag(view);
+        if (helpImmersiveSwipe) viewPager.setHelpImmersiveSwipe((int) (20 * view.getResources().getDisplayMetrics().density + 0.5f));
         return viewPager;
     }
     

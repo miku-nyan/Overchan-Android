@@ -577,7 +577,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             } else {
                 tnDownloadingExecutor.execute(new AsyncThumbnailDownloader(position, hash, tag.attachmentModel.thumbnail));
             }
-            if (settings.swipeToCloseGallery()) v = VerticalViewPagerFixed.wrap(v, finishCallback);
+            if (settings.swipeToCloseGallery()) v = VerticalViewPagerFixed.wrap(v, finishCallback, settings.fullscreenGallery());
             container.addView(v);
             if (firstTime) {
                 updateItem();
