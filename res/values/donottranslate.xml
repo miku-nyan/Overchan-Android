@@ -48,6 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_replies_only_quantity">PREF_KEY_REPLIES_ONLY_QUANTITY</string>
     <string name="pref_key_gallery_screen">PREF_KEY_GALLERY_SCREEN</string>
     <string name="pref_key_gallery_fullscreen">PREF_KEY_GALLERY_FULLSCREEN</string>
+    <string name="pref_key_gallery_swipe_to_close">PREF_KEY_GALLERY_SWIPE_TO_CLOSE</string>
     <string name="pref_key_gallery_scroll_thread">PREF_KEY_GALLERY_SCROLL_THREAD</string>
     <string name="pref_key_gallery_scaleimageview">PREF_KEY_GALLERY_SCALEIMAGEVIEW</string>
     <string name="pref_key_gallery_nativegif">PREF_KEY_GALLERY_NATIVEGIF</string>

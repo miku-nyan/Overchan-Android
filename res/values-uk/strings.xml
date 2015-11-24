@@ -499,6 +499,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_gallery_screen_title">Галерея</string>
     <string name="pref_gallery_screen_summary">Додаткові опції галереї</string>
     <string name="pref_gallery_fullscreen_title">Повноекранний режим</string>
+    <string name="pref_gallery_swipe_to_close_title">Закривати свайпом</string>
+    <string name="pref_gallery_swipe_to_close_summary">Закривати галерею свайпом вгору або вниз</string>
     <string name="pref_gallery_scroll_thread_title">Скрол до поточного додатку</string>
     <string name="pref_gallery_scroll_thread_summary">Прокручувати тред до постів із додатками з галереї</string>
     <string name="pref_gallery_scaleimageview_title">Переглядач картинок</string>
