@@ -43,7 +43,6 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.FileCache;
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;

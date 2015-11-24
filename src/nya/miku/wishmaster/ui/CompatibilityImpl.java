@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.common;
+package nya.miku.wishmaster.ui;
 
 import java.io.File;
 

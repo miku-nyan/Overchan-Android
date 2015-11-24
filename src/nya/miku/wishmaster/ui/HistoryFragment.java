@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;

@@ -42,7 +42,6 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.HtmlBuilder;
 import nya.miku.wishmaster.api.util.PageLoaderFromChan;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.FileCache;
@@ -372,7 +371,7 @@ public class DownloadingService extends Service {
                             Logger.e(TAG, e);
                             if (!isCancelled()) addError(elementName, e instanceof InteractiveException ?
                                     getString(R.string.downloading_error_interactive_format, ((InteractiveException) e).getServiceName()) :
-                                        e.getMessage());
+                                        getMessageOrENOSPC(e));
                         } finally {
                             IOUtils.closeQuietly(out);
                             if (!success) target.delete();
@@ -629,7 +628,7 @@ public class DownloadingService extends Service {
                                                 } else {
                                                     addError(curElementName, e instanceof InteractiveException ?
                                                             getString(R.string.downloading_error_interactive_format,
-                                                                    ((InteractiveException) e).getServiceName()) : e.getMessage());
+                                                                    ((InteractiveException) e).getServiceName()) : getMessageOrENOSPC(e));
                                                 }
                                             }
                                             success = false;
@@ -708,7 +707,7 @@ public class DownloadingService extends Service {
                         
                     } catch (Exception e) {
                         Logger.e(TAG, e);
-                        if (!isCancelled()) addError(elementName, e.getMessage());
+                        if (!isCancelled()) addError(elementName, getMessageOrENOSPC(e));
                         if (zip != null) zip.cancel();
                     } finally {
                         try {
@@ -798,8 +797,12 @@ public class DownloadingService extends Service {
         
         private void addError(String element, String error) {
             if (error == null) error = getString(R.string.downloading_error_unknown);
-            if (IOUtils.isENOSPC(error)) error = getString(R.string.error_no_space);
             errorReport.append(element).append('\n').append(error).append("\n\n");
+        }
+        
+        private String getMessageOrENOSPC(Exception e) {
+            if (IOUtils.isENOSPC(e)) return getString(R.string.error_no_space);
+            return e.getMessage();
         }
     }
     

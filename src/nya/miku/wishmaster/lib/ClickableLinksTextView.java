@@ -3,8 +3,8 @@ package nya.miku.wishmaster.lib;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;

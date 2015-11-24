@@ -22,7 +22,6 @@ import java.io.Serializable;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;

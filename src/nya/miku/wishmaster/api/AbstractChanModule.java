@@ -29,7 +29,7 @@ import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.common.CryptoUtils;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;

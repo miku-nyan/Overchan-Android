@@ -10,7 +10,6 @@ package nya.miku.wishmaster.lib;
 
 import java.io.File;
 
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -20,6 +19,7 @@ import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 
 public class UriFileUtils {
     /**

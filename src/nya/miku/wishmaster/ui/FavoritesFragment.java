@@ -23,7 +23,6 @@ import java.util.List;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.Database.FavoritesEntry;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;

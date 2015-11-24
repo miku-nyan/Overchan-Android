@@ -37,6 +37,7 @@ import nya.miku.wishmaster.http.SSLCompatibility;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;

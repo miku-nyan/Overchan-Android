@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.HttpConstants;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
@@ -34,6 +33,7 @@ import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.WebViewProxy;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;

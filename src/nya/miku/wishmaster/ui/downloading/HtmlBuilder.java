@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.api.util;
+package nya.miku.wishmaster.ui.downloading;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -39,6 +39,7 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.MainApplication;
 import org.apache.commons.lang3.StringEscapeUtils;

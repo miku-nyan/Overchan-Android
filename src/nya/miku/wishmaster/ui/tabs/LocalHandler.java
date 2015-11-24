@@ -27,7 +27,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.common.CryptoUtils;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.containers.ReadableContainer;

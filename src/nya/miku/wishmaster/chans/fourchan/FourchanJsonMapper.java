@@ -26,8 +26,8 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.RegexUtils;
-import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class FourchanJsonMapper {

@@ -21,7 +21,7 @@ package nya.miku.wishmaster.ui.settings;
 import java.io.File;
 
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.common.CompatibilityImpl;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.FavoritesFragment;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import android.content.SharedPreferences;

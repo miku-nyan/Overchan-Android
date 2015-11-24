@@ -48,7 +48,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.common.CryptoUtils;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;

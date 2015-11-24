@@ -23,8 +23,8 @@ import java.util.concurrent.Executor;
 
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.cache.BitmapCache;
-import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
 import nya.miku.wishmaster.ui.settings.Wifi;

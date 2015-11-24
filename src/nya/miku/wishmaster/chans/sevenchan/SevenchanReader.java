@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import nya.miku.wishmaster.api.models.AttachmentModel;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
-import nya.miku.wishmaster.common.CryptoUtils;
 
 public class SevenchanReader extends WakabaReader {
     

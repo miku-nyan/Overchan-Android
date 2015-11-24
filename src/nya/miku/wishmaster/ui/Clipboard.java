@@ -18,7 +18,6 @@
 
 package nya.miku.wishmaster.ui;
 
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;

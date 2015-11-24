@@ -39,7 +39,6 @@ import android.graphics.Color;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
-import nya.miku.wishmaster.common.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 
 /**

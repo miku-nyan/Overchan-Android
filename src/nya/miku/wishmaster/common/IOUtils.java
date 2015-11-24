@@ -71,7 +71,7 @@ public class IOUtils {
      * Проверить, если исключение возникло по причине отсутствия свободного места на диске
      * @param exMessage сообщение исключения ({@link Exception#getMessage()})
      */
-    public static boolean isENOSPC(String exMessage) {
+    private static boolean isENOSPC(String exMessage) {
         return (exMessage != null && (exMessage.toUpperCase(Locale.US).contains("ENOSPC") || exMessage.equals("No space left on device")));
     }
     

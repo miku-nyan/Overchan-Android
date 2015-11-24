@@ -32,7 +32,6 @@ import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.cache.SerializablePage;
-import nya.miku.wishmaster.common.CryptoUtils;
 
 public class ChanModels {
     private static final String NULL_KEY = null;

@@ -17,8 +17,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import nya.miku.wishmaster.common.CompatibilityImpl;
 import nya.miku.wishmaster.ui.AppearanceUtils;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 
 public class JSWebView {
     private static final String TEMPLATE =
