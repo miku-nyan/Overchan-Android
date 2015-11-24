@@ -69,42 +69,48 @@ public class GalleryFullscreen {
             
             setTranscluentPanels();
             showUI(true);
-            
-            AppearanceUtils.callWhenLoaded(decorView, new Runnable() {
-                @Override
-                public void run() {
-                    fixNavbarOverlay();
-                }
-            });
+            fixNavbarOverlay(true);
         }
         
-        private void fixNavbarOverlay() {
-            Rect rect = new Rect();
-            decorView.getWindowVisibleDisplayFrame(rect);
-            int overlayHeight = decorView.getHeight() - rect.bottom;
-            if (overlayHeight > 0) {
-                if (navbarOverlay != null) {
-                    if (!Integer.valueOf(overlayHeight).equals(navbarOverlay.getTag())) {
+        private final Runnable fixNavbarOverlayRunnable = new Runnable() {
+            @Override
+            public void run() {
+                Rect rect = new Rect();
+                decorView.getWindowVisibleDisplayFrame(rect);
+                int overlayHeight = decorView.getHeight() - rect.bottom;
+                if (overlayHeight > 0) {
+                    if (navbarOverlay != null) {
+                        if (!Integer.valueOf(overlayHeight).equals(navbarOverlay.getTag())) {
+                            navbarOverlay.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, overlayHeight));
+                            navbarOverlay.setTag(overlayHeight);
+                        }
+                        navbarOverlay.setVisibility(View.VISIBLE);
+                    } else {
+                        navbarOverlay = new View(galleryNavbarView.getContext());
                         navbarOverlay.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, overlayHeight));
                         navbarOverlay.setTag(overlayHeight);
+                        galleryNavbarView.addView(navbarOverlay);
                     }
-                    navbarOverlay.setVisibility(View.VISIBLE);
                 } else {
-                    navbarOverlay = new View(galleryNavbarView.getContext());
-                    navbarOverlay.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, overlayHeight));
-                    navbarOverlay.setTag(overlayHeight);
-                    galleryNavbarView.addView(navbarOverlay);
-                }
-            } else {
-                if (navbarOverlay != null) {
-                    navbarOverlay.setVisibility(View.GONE);
+                    if (navbarOverlay != null) {
+                        navbarOverlay.setVisibility(View.GONE);
+                    }
                 }
             }
+        };
+        
+        private void fixNavbarOverlay(boolean whenLoaded) {
+            if (whenLoaded) {
+                AppearanceUtils.callWhenLoaded(decorView, fixNavbarOverlayRunnable);
+            } else {
+                fixNavbarOverlayRunnable.run();
+            }
+            
         }
         
         @Override
         public void onSystemUiVisibilityChange(int visibility) {
-            fixNavbarOverlay();
+            fixNavbarOverlay(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT);
             boolean visible = (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
             
             if (visible) {
@@ -136,7 +142,16 @@ public class GalleryFullscreen {
         
         @Override
         public void showUI(boolean hideAfterDelay) {
-            setSystemUiVisible();
+            showUI(hideAfterDelay, false);
+        }
+        
+        @Override
+        public void keepUI(boolean hideAfterDelay) {
+            showUI(hideAfterDelay, true);
+        }
+        
+        public void showUI(boolean hideAfterDelay, boolean onlyKeep) {
+            if (!onlyKeep) setSystemUiVisible();
             if (hideAfterDelay) {
                 isLocked = false;
                 lastTouchEvent = System.currentTimeMillis();

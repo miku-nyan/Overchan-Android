@@ -1288,6 +1288,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     
     public static interface FullscreenCallback {
         void showUI(boolean hideAfterDelay);
+        void keepUI(boolean hideAfterDelay);
     }
     
     private FullscreenCallback fullscreenCallback;
@@ -1298,7 +1299,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (fullscreenCallback != null) fullscreenCallback.showUI(MotionEventCompat.getActionMasked(ev) == MotionEvent.ACTION_UP);
+        if (fullscreenCallback != null) fullscreenCallback.keepUI(MotionEventCompat.getActionMasked(ev) == MotionEvent.ACTION_UP);
         return super.dispatchTouchEvent(ev);
     }
     
