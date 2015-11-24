@@ -56,6 +56,7 @@ import nya.miku.wishmaster.lib.gallery.JSWebView;
 import nya.miku.wishmaster.lib.gallery.Jpeg;
 import nya.miku.wishmaster.lib.gallery.TouchGifView;
 import nya.miku.wishmaster.lib.gallery.WebViewFixed;
+import nya.miku.wishmaster.lib.gallery.verticalviewpager.VerticalViewPagerFixed;
 import nya.miku.wishmaster.lib.gifdrawable.GifDrawable;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
@@ -533,6 +534,12 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     
     private class GalleryAdapter extends PagerAdapter {
         private boolean firstTime = true;
+        private final Runnable finishCallback = new Runnable() {
+            @Override
+            public void run() {
+                GalleryActivity.this.finish();
+            }
+        };
         
         @Override
         public int getCount() {
@@ -570,6 +577,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             } else {
                 tnDownloadingExecutor.execute(new AsyncThumbnailDownloader(position, hash, tag.attachmentModel.thumbnail));
             }
+            v = VerticalViewPagerFixed.wrap(v, finishCallback);
             container.addView(v);
             if (firstTime) {
                 updateItem();
@@ -581,8 +589,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             View v = (View) object;
-            GalleryItemViewTag tag = (GalleryItemViewTag) v.getTag();
-            if (tag != null) recycleTag(tag, true);
+            Object tag = v.getTag();
+            if (tag != null && tag instanceof View) tag = ((View) tag).getTag();
+            if (tag != null && tag instanceof GalleryItemViewTag) recycleTag((GalleryItemViewTag) tag, true);
             container.removeView(v);
             instantiatedViews.delete(position);
         }
