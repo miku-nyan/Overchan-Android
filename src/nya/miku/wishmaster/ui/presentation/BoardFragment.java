@@ -431,8 +431,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         MenuItem itemUpdate = menu.add(Menu.NONE, R.id.menu_update, 102, 
                 resources.getString(tabModel.type != TabModel.TYPE_LOCAL ? R.string.menu_update : R.string.menu_from_internet));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            itemAddPost.setIcon(ThemeUtils.getThemeResId(activity.getTheme(), R.attr.actionAddPost));
-            itemUpdate.setIcon(ThemeUtils.getThemeResId(activity.getTheme(), R.attr.actionRefresh));
+            itemAddPost.setIcon(ThemeUtils.getActionbarIcon(activity.getTheme(), resources, R.attr.actionAddPost));
+            itemUpdate.setIcon(ThemeUtils.getActionbarIcon(activity.getTheme(), resources, R.attr.actionRefresh));
             CompatibilityImpl.setShowAsActionIfRoom(itemAddPost);
             CompatibilityImpl.setShowAsActionIfRoom(itemUpdate);
         } else {
@@ -1759,7 +1759,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && fragment().pageType == TYPE_POSTSLIST) {
                     CompatibilityImpl.setCustomSelectionActionModeMenuCallback(tag.commentView,
                             R.string.context_menu_reply_with_quote,
-                            ThemeUtils.getThemeResId(fragment().activity.getTheme(), R.attr.actionAddPost),
+                            ThemeUtils.getActionbarIcon(fragment().activity.getTheme(), fragment().resources, R.attr.actionAddPost),
                             new Runnable() {
                         @Override
                         public void run() {

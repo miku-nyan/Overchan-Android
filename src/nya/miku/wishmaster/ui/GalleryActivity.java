@@ -329,8 +329,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         MenuItem itemUpdate = menu.add(Menu.NONE, R.id.menu_update, 1, R.string.menu_update);
         MenuItem itemSave = menu.add(Menu.NONE, R.id.menu_save_attachment, 2, R.string.menu_save_attachment);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            itemUpdate.setIcon(ThemeUtils.getThemeResId(getTheme(), R.attr.actionRefresh));
-            itemSave.setIcon(ThemeUtils.getThemeResId(getTheme(), R.attr.actionSave));
+            itemUpdate.setIcon(ThemeUtils.getActionbarIcon(getTheme(), getResources(), R.attr.actionRefresh));
+            itemSave.setIcon(ThemeUtils.getActionbarIcon(getTheme(), getResources(), R.attr.actionSave));
             CompatibilityImpl.setShowAsActionIfRoom(itemUpdate);
             CompatibilityImpl.setShowAsActionIfRoom(itemSave);
         } else {

@@ -313,8 +313,8 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         MenuItem itemAttach = menu.add(Menu.NONE, R.id.menu_attach_file, 1, R.string.menu_attach_file);
         MenuItem itemGallery = menu.add(Menu.NONE, R.id.menu_attach_gallery, 2, R.string.menu_attach_gallery);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            itemAttach.setIcon(ThemeUtils.getThemeResId(getTheme(), R.attr.actionAddAttachment));
-            itemGallery.setIcon(ThemeUtils.getThemeResId(getTheme(), R.attr.actionAddGallery));
+            itemAttach.setIcon(ThemeUtils.getActionbarIcon(getTheme(), getResources(), R.attr.actionAddAttachment));
+            itemGallery.setIcon(ThemeUtils.getActionbarIcon(getTheme(), getResources(), R.attr.actionAddGallery));
             CompatibilityImpl.setShowAsActionIfRoom(itemAttach);
             CompatibilityImpl.setShowAsActionIfRoom(itemGallery);
         } else {

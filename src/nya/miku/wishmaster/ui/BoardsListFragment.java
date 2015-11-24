@@ -158,7 +158,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         MenuItem itemUpdate = menu.add(Menu.NONE, R.id.menu_update, 101, resources.getString(R.string.menu_update));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            itemUpdate.setIcon(ThemeUtils.getThemeResId(activity.getTheme(), R.attr.actionRefresh));
+            itemUpdate.setIcon(ThemeUtils.getActionbarIcon(activity.getTheme(), resources, R.attr.actionRefresh));
             CompatibilityImpl.setShowAsActionIfRoom(itemUpdate);
         } else {
             itemUpdate.setIcon(R.drawable.ic_menu_refresh);

@@ -19,9 +19,14 @@
 package nya.miku.wishmaster.ui.presentation;
 
 import nya.miku.wishmaster.R;
+import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.TypedValue;
 
 public class ThemeUtils {
@@ -31,7 +36,7 @@ public class ThemeUtils {
     /**
      * Получить ID ресурса для данной темы из аттрибута
      * @param theme тема
-     * @param attrId id аттрибута (R.attr.[...])
+     * @param attrId id атрибута (R.attr.[...])
      * @return ID ресурса
      */
     public static int getThemeResId(Theme theme, int attrId) {
@@ -52,6 +57,29 @@ public class ThemeUtils {
         int color = typedArray.getColor(styleableId, defaultValue);
         typedArray.recycle();
         return color;
+    }
+    
+    /**
+     * Получить значок (drawable) для Action Bar. В случае Android 5.0 и выше значок перекрашивается в цвет android:attr/textColorPrimary
+     * @param theme тема
+     * @param resources ресурсы
+     * @param attrId id атрибута (R.attr.[...])
+     * @return объект Drawable со значком, или null, если не удалось получить
+     */
+    public static Drawable getActionbarIcon(Theme theme, Resources resources, int attrId) {
+        try {
+            int id = getThemeResId(theme, attrId);
+            Drawable drawable = ResourcesCompat.getDrawable(resources, id, theme);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                TypedValue typedValue = new TypedValue();
+                theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true);
+                if (typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT)
+                    drawable.setColorFilter(typedValue.data, PorterDuff.Mode.SRC_ATOP);
+            }
+            return drawable;
+        } catch (Exception e) {
+            return null;
+        }
     }
     
     /**

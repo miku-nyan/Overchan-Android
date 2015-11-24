@@ -132,11 +132,11 @@ public class CompatibilityImpl {
     }
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static void setCustomSelectionActionModeMenuCallback(TextView textView, final int titleRes, final int iconRes, final Runnable callback) {
+    public static void setCustomSelectionActionModeMenuCallback(TextView textView, final int titleRes, final Drawable icon, final Runnable callback) {
         textView.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                setShowAsActionAlways(menu.add(Menu.NONE, 1, Menu.FIRST, titleRes).setIcon(iconRes));
+                setShowAsActionAlways(menu.add(Menu.NONE, 1, Menu.FIRST, titleRes).setIcon(icon));
                 menu.removeItem(android.R.id.selectAll);
                 return true;
             }
