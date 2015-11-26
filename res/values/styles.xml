@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="Theme_Dialog_Switch" parent="@android:style/Theme.Dialog" />
     <style name="Theme_Light_Switch" parent="@android:style/Theme.Light" />
     <style name="Theme_Dark_Switch" parent="@android:style/Theme" />
@@ -33,15 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.8</item>
     </style>
-
-
-    <style name="Futaba_Base_Action_Bar" parent="@android:style/Widget.DeviceDefault.Light.ActionBar.Solid" tools:targetApi="ice_cream_sandwich">
-        <item name="android:background"  tools:ignore="NewApi">#FFFFEE</item>
-        <item name="android:textColor"  tools:ignore="NewApi">#800000</item>
-    </style>
-
+    
     <style name="Futaba_Base" parent="@style/Theme_Light_Switch">
-        <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Futaba_Base_Action_Bar</item>
         <item name="materialPrimary">#FFFFEE</item>
         <item name="materialPrimaryDark">#7F7F75</item>
         <item name="android:textColorPrimary">#800000</item>
@@ -81,14 +74,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
         <item name="actionSave">@drawable/ic_action_save_light</item>
     </style>
-
-    <style name="Photon_Base_Action_Bar" parent="@android:style/Widget.DeviceDefault.Light.ActionBar.Solid" tools:targetApi="ice_cream_sandwich">
-        <item name="android:background"  tools:ignore="NewApi">#EEEEEE</item>
-        <item name="android:textColor"  tools:ignore="NewApi">#333333</item>
-    </style>
     
     <style name="Photon_Base" parent="@style/Theme_Light_Switch">
-        <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Photon_Base_Action_Bar</item>
         <item name="materialPrimary">#EEEEEE</item>
         <item name="materialPrimaryDark">#757575</item>
         <item name="android:textColorPrimary">#333333</item>
@@ -127,14 +114,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
         <item name="actionSave">@drawable/ic_action_save_light</item>
     </style>
-
-    <style name="Neutron_Base_Action_Bar" parent="@android:style/Widget.DeviceDefault.Light.ActionBar.Solid" tools:targetApi="ice_cream_sandwich">
-        <item name="android:background"  tools:ignore="NewApi">#FF212121</item>
-        <item name="android:textColor"  tools:ignore="NewApi">#698CC0</item>
-    </style>
-
+    
     <style name="Neutron_Base" parent="@style/Theme_Dark_Switch">
-        <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Neutron_Base_Action_Bar</item>
         <item name="android:textColorPrimary">#698CC0</item>
         <item name="activityRootBackground">#212121</item>
         <item name="sidebarBackground">#CC212121</item>
@@ -171,14 +152,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="actionAddGallery">@drawable/ic_action_new_picture_dark</item>
         <item name="actionSave">@drawable/ic_action_save_dark</item>
     </style>
-
-    <style name="Gurochan_Base_Action_Bar" parent="@android:style/Widget.DeviceDefault.Light.ActionBar.Solid" tools:targetApi="ice_cream_sandwich">
-        <item name="android:background"  tools:ignore="NewApi">#EDDAD2</item>
-        <item name="android:textColor"  tools:ignore="NewApi">#000000</item>
-    </style>
-
+    
     <style name="Gurochan_Base" parent="@style/Theme_Light_Switch">
-        <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Gurochan_Base_Action_Bar</item>
         <item name="materialPrimary">#EDDAD2</item>
         <item name="materialPrimaryDark">#766D69</item>
         <item name="android:textColorPrimary">#000000</item>
@@ -217,14 +192,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
         <item name="actionSave">@drawable/ic_action_save_light</item>
     </style>
-
-    <style name="Tomorrow_Base_Action_Bar" parent="@android:style/Widget.DeviceDefault.Light.ActionBar.Solid" tools:targetApi="ice_cream_sandwich">
-        <item name="android:background"  tools:ignore="NewApi">#1D1F21</item>
-        <item name="android:textColor"  tools:ignore="NewApi">#C5C8C6</item>
-    </style>
-
+    
     <style name="Tomorrow_Base" parent="@style/Theme_Dark_Switch">
-        <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Tomorrow_Base_Action_Bar</item>
         <item name="materialPrimary">#1D1F21</item>
         <item name="materialPrimaryDark">#141619</item>
         <item name="android:textColorPrimary">#C5C8C6</item>
@@ -263,14 +232,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="actionAddGallery">@drawable/ic_action_new_picture_dark</item>
         <item name="actionSave">@drawable/ic_action_save_dark</item>
     </style>
-
-    <style name="Mikuba_Base_Action_Bar" parent="@android:style/Widget.DeviceDefault.Light.ActionBar.Solid" tools:targetApi="ice_cream_sandwich">
-        <item name="android:background"  tools:ignore="NewApi">#66EEFF</item>
-        <item name="android:textColor"  tools:ignore="NewApi">#000000</item>
-    </style>
-
+    
     <style name="Mikuba_Base" parent="@style/Theme_Light_Switch">
-        <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Mikuba_Base_Action_Bar</item>
         <item name="materialPrimary">#66EEFF</item>
         <item name="materialPrimaryDark">#408090</item>
         <item name="android:textColorPrimary">#000000</item>
