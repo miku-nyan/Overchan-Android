@@ -18,8 +18,7 @@
 
 package nya.miku.wishmaster.ui;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -36,7 +35,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 
 public class GalleryFullscreen {
-    private static final int DELAY = 2000;
+    public static final int DELAY = 2000;
     
     public static void initFullscreen(GalleryActivity activity) {
         activity.setFullscreenCallback(new GalleryFullscreenImpl(activity));
@@ -44,6 +43,24 @@ public class GalleryFullscreen {
     
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static class GalleryFullscreenImpl implements View.OnSystemUiVisibilityChangeListener, GalleryActivity.FullscreenCallback {
+        @SuppressLint("InlinedApi")
+        private static final int SYSTEM_UI_VISIBLE = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ?
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN :
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        
+        @SuppressLint("InlinedApi")
+        private static final int SYSTEM_UI_HIDDEN = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ?
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_IMMERSIVE |
+                View.SYSTEM_UI_FLAG_LOW_PROFILE :
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LOW_PROFILE;
+        
         private final Handler handler;
         private final Window window;
         private final View decorView;
@@ -60,16 +77,16 @@ public class GalleryFullscreen {
             decorView = activity.getWindow().getDecorView();
             decorView.setOnSystemUiVisibilityChangeListener(this);
             actionBar = activity.getActionBar();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 int color = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_materialPrimary, Color.WHITE);
                 actionBar.setBackgroundDrawable(new ColorDrawable(color & Color.argb(192, 255, 255, 255)));
             }
             galleryNavbarView = (ViewGroup) activity.findViewById(R.id.gallery_navigation_bar_container);
             galleryNavbarView.setAlpha(0.75f);
             
-            setTranscluentPanels();
+            setTranslucentPanels();
             showUI(true);
-            fixNavbarOverlay(true);
+            fixNavbarOverlay();
         }
         
         private final Runnable fixNavbarOverlayRunnable = new Runnable() {
@@ -99,21 +116,17 @@ public class GalleryFullscreen {
             }
         };
         
-        private void fixNavbarOverlay(boolean whenLoaded) {
-            if (whenLoaded) {
-                AppearanceUtils.callWhenLoaded(decorView, fixNavbarOverlayRunnable);
-            } else {
-                fixNavbarOverlayRunnable.run();
-            }
-            
+        private void fixNavbarOverlay() {
+            AppearanceUtils.callWhenLoaded(decorView, fixNavbarOverlayRunnable);
         }
         
         @Override
         public void onSystemUiVisibilityChange(int visibility) {
-            fixNavbarOverlay(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT);
+            fixNavbarOverlay();
             boolean visible = (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
             
             if (visible) {
+                setSystemUiVisible();
                 actionBar.show();
                 hideUIdelayed();
             } else {
@@ -122,22 +135,7 @@ public class GalleryFullscreen {
             
             galleryNavbarView.animate().
                     alpha(visible ? 0.75f : 0).
-                    translationY(visible ? 0 : galleryNavbarView.getHeight()).
-                    setListener(visible ? animatorListener : null);
-        }
-        
-        private final AnimatorListenerAdapter animatorListener = new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                setSystemUiVisible();
-            }
-        };
-        
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-        public void setSystemUiVisible() {
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+                    translationY(visible ? 0 : galleryNavbarView.getHeight());
         }
         
         @Override
@@ -150,7 +148,7 @@ public class GalleryFullscreen {
             showUI(hideAfterDelay, true);
         }
         
-        public void showUI(boolean hideAfterDelay, boolean onlyKeep) {
+        private void showUI(boolean hideAfterDelay, boolean onlyKeep) {
             if (!onlyKeep) setSystemUiVisible();
             if (hideAfterDelay) {
                 isLocked = false;
@@ -172,7 +170,7 @@ public class GalleryFullscreen {
                 if (time < DELAY) {
                     handler.postDelayed(this, DELAY - time);
                 } else {
-                    hideUI();
+                    setSystemUiHidden();
                     delayedTask = false;
                 }
             }
@@ -186,26 +184,16 @@ public class GalleryFullscreen {
             handler.postDelayed(delayedHideUI, DELAY);
         }
         
-        private void hideUI() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) setImmersive(); else setNonImmersive();
+        private void setSystemUiVisible() {
+            decorView.setSystemUiVisibility(SYSTEM_UI_VISIBLE);
+        }
+        
+        private void setSystemUiHidden() {
+            decorView.setSystemUiVisibility(SYSTEM_UI_HIDDEN);
         }
         
         @TargetApi(Build.VERSION_CODES.KITKAT)
-        private void setImmersive() {
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE
-                    | View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        }
-        
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-        private void setNonImmersive() {
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        }
-        
-        @TargetApi(Build.VERSION_CODES.KITKAT)
-        private void setTranscluentPanels() {
+        private void setTranslucentPanels() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             }
