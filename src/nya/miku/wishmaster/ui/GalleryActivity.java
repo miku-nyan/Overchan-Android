@@ -89,6 +89,7 @@ import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.SparseArray;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -1300,14 +1301,28 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     }
     
     private FullscreenCallback fullscreenCallback;
+    private GestureDetector fullscreenGestureDetector;
     
     public void setFullscreenCallback(FullscreenCallback fullscreenCallback) {
+        if (fullscreenGestureDetector == null) {
+            fullscreenGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    FullscreenCallback fullscreenCallback = GalleryActivity.this.fullscreenCallback;
+                    if (fullscreenCallback != null) fullscreenCallback.showUI(true);
+                    return true;
+                }
+            });
+        }
         this.fullscreenCallback = fullscreenCallback;
     }
     
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (fullscreenCallback != null) fullscreenCallback.keepUI(MotionEventCompat.getActionMasked(ev) == MotionEvent.ACTION_UP);
+        if (fullscreenCallback != null) {
+            fullscreenCallback.keepUI(MotionEventCompat.getActionMasked(ev) == MotionEvent.ACTION_UP);
+            fullscreenGestureDetector.onTouchEvent(ev);
+        }
         return super.dispatchTouchEvent(ev);
     }
     
