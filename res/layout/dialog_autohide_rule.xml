@@ -17,63 +17,66 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:orientation="vertical" >
-    
-    <EditText
-        android:id="@+id/dialog_autohide_regex"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/autohide_regex_hint"
-        android:singleLine="true" />
-    
-   <Spinner
-        android:id="@+id/dialog_autohide_chan_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    
+    android:layout_height="wrap_content" >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:padding="8dp"
+        android:orientation="vertical" >
+        
         <EditText
-            android:id="@+id/dialog_autohide_boardname"
-            android:layout_width="0dp"
+            android:id="@+id/dialog_autohide_regex"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:hint="@string/autohide_board_hint"
+            android:hint="@string/autohide_regex_hint"
             android:singleLine="true" />
-        <EditText
-            android:id="@+id/dialog_autohide_threadnum"
-            android:layout_width="0dp"
+        
+        <Spinner
+            android:id="@+id/dialog_autohide_chan_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:hint="@string/autohide_thread_hint"
-            android:singleLine="true" />
+            android:orientation="horizontal" >
+            <EditText
+                android:id="@+id/dialog_autohide_boardname"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:hint="@string/autohide_board_hint"
+                android:singleLine="true" />
+            <EditText
+                android:id="@+id/dialog_autohide_threadnum"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:hint="@string/autohide_thread_hint"
+                android:singleLine="true" />
+        </LinearLayout>
+        
+        <CheckBox
+            android:id="@+id/dialog_autohide_in_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/autohide_in_comment"
+            android:checked="true" />
+        
+        <CheckBox
+            android:id="@+id/dialog_autohide_in_subject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/autohide_in_subject"
+            android:checked="true" />
+        
+        <CheckBox
+            android:id="@+id/dialog_autohide_in_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/autohide_in_name"
+            android:checked="true" />
     </LinearLayout>
-    
-    <CheckBox
-        android:id="@+id/dialog_autohide_in_comment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/autohide_in_comment"
-        android:checked="true" />
-    
-    <CheckBox
-        android:id="@+id/dialog_autohide_in_subject"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/autohide_in_subject"
-        android:checked="true" />
-    
-    <CheckBox
-        android:id="@+id/dialog_autohide_in_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/autohide_in_name"
-        android:checked="true" />
-    
-</LinearLayout>
+</ScrollView>
