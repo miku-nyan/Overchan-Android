@@ -2511,7 +2511,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         model.searchRequest = field.getText().toString();
                         UrlHandler.open(model, activity);
                     } else {
-                        int highlightColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_searchHighlightBackground, Color.RED);
+                        int highlightColor = ThemeUtils.getThemeColor(activity.getTheme(), R.attr.searchHighlightBackground, Color.RED);
                         String request = field.getText().toString().toLowerCase(Locale.US);
                         
                         if (cachedSearchRequest == null || !request.equals(cachedSearchRequest)) {
@@ -2768,7 +2768,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
      */
     private void showPostPopupDialog(final int itemPosition, final boolean isTablet, final Point coordinates, final String refererPost) {
         final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
-        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
+        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.attr.activityRootBackground, Color.BLACK);
         final int measuredWidth = isTablet ? adapter.measureViewWidth(itemPosition) : -1; //измерять требуется только для планшета
         final View tmpV = new View(activity);
         final Dialog tmpDlg = new Dialog(activity);
@@ -2859,7 +2859,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private void showThreadPreviewDialog(final int position) {
         final List<PresentationItemModel> items = new ArrayList<>();
         final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
-        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
+        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.attr.activityRootBackground, Color.BLACK);
         final View tmpV = new View(activity);
         final Dialog tmpDlg = new Dialog(activity);
         tmpDlg.getWindow().setBackgroundDrawableResource(bgShadowResource);
@@ -3000,7 +3000,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         final int bgShadowResource = ThemeUtils.getThemeResId(activity.getTheme(), R.attr.dialogBackgroundShadow);
-        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_activityRootBackground, Color.BLACK);
+        final int bgColor = ThemeUtils.getThemeColor(activity.getTheme(), R.attr.activityRootBackground, Color.BLACK);
         final View tmpV = new View(activity);
         final Dialog tmpDlg = new Dialog(activity);
         tmpDlg.getWindow().setBackgroundDrawableResource(bgShadowResource);

@@ -35,6 +35,7 @@ import nya.miku.wishmaster.ui.posting.PostFormActivity;
 import nya.miku.wishmaster.ui.posting.PostingService;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.presentation.FlowTextHelper;
+import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import nya.miku.wishmaster.ui.settings.PreferencesActivity;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
 import nya.miku.wishmaster.ui.tabs.LocalHandler;
@@ -103,9 +104,8 @@ public class MainActivity extends FragmentActivity {
         if (drawerLayout == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) return;
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            TypedValue typedValue = new TypedValue();
-            getTheme().resolveAttribute(R.attr.iconDrawer, typedValue, true);
-            drawerToggle = new ActionBarDrawerToogleV4(this, drawerLayout, typedValue.resourceId, R.string.drawer_open, R.string.drawer_close) {
+            int drawerResId = ThemeUtils.getThemeResId(getTheme(), R.attr.iconDrawer);
+            drawerToggle = new ActionBarDrawerToogleV4(this, drawerLayout, drawerResId, R.string.drawer_open, R.string.drawer_close) {
                 @SuppressWarnings("deprecation")
                 @Override
                 public void onDrawerClosed(View drawerView) {
@@ -540,10 +540,11 @@ public class MainActivity extends FragmentActivity {
         }
         
         private void setSelectedBackground(View view, boolean selected) {
-            TypedValue typedValue = new TypedValue();
+            TypedValue typedValue;
             if (selected) {
-                getTheme().resolveAttribute(R.attr.sidebarSelectedItem, typedValue, true);
+                typedValue = ThemeUtils.resolveAttribute(getTheme(), R.attr.sidebarSelectedItem, true);
             } else {
+                typedValue = new TypedValue();
                 TypedArray typedArray = obtainStyledAttributes(R.style.SelectableItem, new int[] { android.R.attr.background });
                 typedArray.getValue(0, typedValue);
                 typedArray.recycle();

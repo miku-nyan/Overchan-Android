@@ -22,6 +22,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.HistoryFragment;
+import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -194,8 +195,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
         dragHandler.setLayoutParams(dragHandler.getLayoutParams());
                 
         if (position == selectedItem) {
-            TypedValue typedValue = new TypedValue();
-            context.getTheme().resolveAttribute(R.attr.sidebarSelectedItem, typedValue, true);
+            TypedValue typedValue = ThemeUtils.resolveAttribute(context.getTheme(), R.attr.sidebarSelectedItem, true);
             if (typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT) {
                 view.setBackgroundColor(typedValue.data);
             } else {

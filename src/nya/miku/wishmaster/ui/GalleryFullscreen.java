@@ -78,7 +78,7 @@ public class GalleryFullscreen {
             decorView.setOnSystemUiVisibilityChangeListener(this);
             actionBar = activity.getActionBar();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                int color = ThemeUtils.getThemeColor(activity.getTheme(), R.styleable.Theme_materialPrimary, Color.WHITE);
+                int color = ThemeUtils.getThemeColor(activity.getTheme(), R.attr.materialPrimary, Color.WHITE);
                 actionBar.setBackgroundDrawable(new ColorDrawable(color & Color.argb(192, 255, 255, 255)));
             }
             galleryNavbarView = (ViewGroup) activity.findViewById(R.id.gallery_navigation_bar_container);

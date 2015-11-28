@@ -21,7 +21,6 @@ package nya.miku.wishmaster.ui.presentation;
 import nya.miku.wishmaster.R;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -33,6 +32,34 @@ public class ThemeUtils {
     
     private ThemeUtils() {}
     
+    private static void resolveAttribute(Theme theme, int attrId, TypedValue outValue, boolean resolveRefs) {
+        theme.resolveAttribute(attrId, outValue, resolveRefs);
+    }
+    
+    private static int getThemeColor(TypedValue tmp, Theme theme, int attrId, int defaultValue) {
+        if (tmp == null) tmp = new TypedValue();
+        resolveAttribute(theme, attrId, tmp, true);
+        if (tmp.type >= TypedValue.TYPE_FIRST_COLOR_INT && tmp.type <= TypedValue.TYPE_LAST_COLOR_INT) {
+            return tmp.data;
+        } else {
+            return defaultValue;
+        }
+    }
+    
+    /**
+     * Получить значение атрибута в теме (создаётся объект TypedValue)
+     * @param theme тема
+     * @param attrId id атрибута (R.attr.[...])
+     * @param resolveRefs если true, ссылки (ресурсы) будут разрешены; если false, значение может быть типа TYPE_REFERENCE.
+     * В любом случае оно не будет типа TYPE_ATTRIBUTE.
+     * @return объект TypedValue
+     */
+    public static TypedValue resolveAttribute(Theme theme, int attrId, boolean resolveRefs) {
+        TypedValue typedValue = new TypedValue();
+        resolveAttribute(theme, attrId, typedValue, resolveRefs);
+        return typedValue;
+    }
+    
     /**
      * Получить ID ресурса для данной темы из аттрибута
      * @param theme тема
@@ -40,23 +67,18 @@ public class ThemeUtils {
      * @return ID ресурса
      */
     public static int getThemeResId(Theme theme, int attrId) {
-        TypedValue typedValue = new TypedValue();
-        theme.resolveAttribute(attrId, typedValue, true);
-        return typedValue.resourceId;
+        return resolveAttribute(theme, attrId, true).resourceId;
     }
     
     /**
      * Получить цвет данной темы из атрибута
      * @param theme тема
-     * @param styleableId id (R.styleable.[...])
+     * @param attrId id атрибута (R.attr.[...])
      * @param defaultValue значение по умолчанию, если получить не удалось
      * @return цвет в виде int
      */
-    public static int getThemeColor(Theme theme, int styleableId, int defaultValue) {
-        TypedArray typedArray = theme.obtainStyledAttributes(R.styleable.Theme);
-        int color = typedArray.getColor(styleableId, defaultValue);
-        typedArray.recycle();
-        return color;
+    public static int getThemeColor(Theme theme, int attrId, int defaultValue) {
+        return getThemeColor(null, theme, attrId, defaultValue);
     }
     
     /**
@@ -71,10 +93,10 @@ public class ThemeUtils {
             int id = getThemeResId(theme, attrId);
             Drawable drawable = ResourcesCompat.getDrawable(resources, id, theme);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                TypedValue typedValue = new TypedValue();
-                theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true);
-                if (typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT)
-                    drawable.setColorFilter(typedValue.data, PorterDuff.Mode.SRC_ATOP);
+                int color = getThemeColor(theme, android.R.attr.textColorPrimary, Color.TRANSPARENT);
+                if (color != Color.TRANSPARENT) {
+                    drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                }
             }
             return drawable;
         } catch (Exception e) {
@@ -131,19 +153,20 @@ public class ThemeUtils {
         public static ThemeColors getInstance(Theme theme) {
             if (instance == null || currentTheme != theme) {
                 currentTheme = theme;
-                int indexColor = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postIndexForeground, Color.parseColor("#4F7942"));
-                int overBumpLimitColor = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postIndexOverBumpLimit, Color.parseColor("#C41E3A"));
-                int numberColor = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postNumberForeground, Color.BLACK);
-                int nameColor = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postNameForeground, Color.BLACK);
-                int opColor = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postOpForeground, Color.parseColor("#008000"));
-                int sageColor = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postSageForeground, Color.parseColor("#993333"));
-                int tripColor = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postTripForeground, Color.parseColor("#228854"));
-                int quoteForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postQuoteForeground, Color.parseColor("#789922"));
-                int spoilerForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_spoilerForeground, Color.BLACK);
-                int spoilerBackground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_spoilerBackground, Color.parseColor("#BBBBBB"));
-                int urlLinkForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_urlLinkForeground, Color.parseColor("#0000EE"));
-                int refererForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_refererForeground, Color.parseColor("#FF0000"));
-                int subjectForeground = ThemeUtils.getThemeColor(theme, R.styleable.Theme_postTitleForeground, Color.BLACK);
+                TypedValue tmp = new TypedValue();
+                int indexColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postIndexForeground, Color.parseColor("#4F7942"));
+                int overBumpLimitColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postIndexOverBumpLimit, Color.parseColor("#C41E3A"));
+                int numberColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postNumberForeground, Color.BLACK);
+                int nameColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postNameForeground, Color.BLACK);
+                int opColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postOpForeground, Color.parseColor("#008000"));
+                int sageColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postSageForeground, Color.parseColor("#993333"));
+                int tripColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postTripForeground, Color.parseColor("#228854"));
+                int quoteForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.postQuoteForeground, Color.parseColor("#789922"));
+                int spoilerForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.spoilerForeground, Color.BLACK);
+                int spoilerBackground = ThemeUtils.getThemeColor(tmp, theme, R.attr.spoilerBackground, Color.parseColor("#BBBBBB"));
+                int urlLinkForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.urlLinkForeground, Color.parseColor("#0000EE"));
+                int refererForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.refererForeground, Color.parseColor("#FF0000"));
+                int subjectForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.postTitleForeground, Color.BLACK);
                 instance = new ThemeColors(
                         indexColor,
                         overBumpLimitColor,
