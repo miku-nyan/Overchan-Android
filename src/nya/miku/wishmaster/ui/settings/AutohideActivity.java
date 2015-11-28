@@ -68,7 +68,8 @@ public class AutohideActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         settings = MainApplication.getInstance().settings;
         setTheme(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2 || Build.VERSION.SDK_INT < Build.VERSION_CODES.ECLAIR_0_1 ?
-                settings.getTheme() : R.style.Neutron_Medium);
+                settings.getTheme() : R.style.Theme_Neutron);
+        getTheme().applyStyle(settings.getFontSizeStyle(), true);
         super.onCreate(savedInstanceState);
         setTitle(R.string.autohide_title);
         
@@ -96,7 +97,7 @@ public class AutohideActivity extends ListActivity {
             changeId = -1; //-1 - создать новое правило
         }
         
-        Context dialogContext = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new ContextThemeWrapper(this, R.style.Neutron_Medium) : this;
+        Context dialogContext = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new ContextThemeWrapper(this, R.style.Theme_Neutron) : this;
         View dialogView = LayoutInflater.from(dialogContext).inflate(R.layout.dialog_autohide_rule, null);
         final EditText regexEditText = (EditText) dialogView.findViewById(R.id.dialog_autohide_regex);
         final Spinner chanSpinner = (Spinner) dialogView.findViewById(R.id.dialog_autohide_chan_spinner);

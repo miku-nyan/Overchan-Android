@@ -65,7 +65,8 @@ public class PreferencesActivity extends PreferenceActivity {
     
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2 || Build.VERSION.SDK_INT < Build.VERSION_CODES.ECLAIR_0_1 ?
-                MainApplication.getInstance().settings.getTheme() : R.style.Neutron_Medium);
+                MainApplication.getInstance().settings.getTheme() : R.style.Theme_Neutron);
+        getTheme().applyStyle(MainApplication.getInstance().settings.getFontSizeStyle(), true);
         setTitle(R.string.preferences);
         
         super.onCreate(savedInstanceState);

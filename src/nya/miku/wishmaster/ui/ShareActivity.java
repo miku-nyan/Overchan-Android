@@ -56,6 +56,7 @@ public class ShareActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(MainApplication.getInstance().settings.getTheme());
+        getTheme().applyStyle(MainApplication.getInstance().settings.getFontSizeStyle(), true);
         handleIntent(getIntent());
     }
     

@@ -125,7 +125,7 @@ import android.widget.ImageView;
                 @Override
                 public void run() {
                     Context dialogContext = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ?
-                            new ContextThemeWrapper(activity, R.style.Neutron_Medium) : activity;
+                            new ContextThemeWrapper(activity, R.style.Theme_Neutron) : activity;
                     View view = LayoutInflater.from(dialogContext).inflate(R.layout.dialog_cloudflare_captcha, null);
                     ImageView captchaView = (ImageView) view.findViewById(R.id.dialog_captcha_view);
                     final EditText captchaField = (EditText) view.findViewById(R.id.dialog_captcha_field);

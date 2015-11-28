@@ -235,6 +235,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         settings = MainApplication.getInstance().settings;
         setTheme(settings.getTheme());
+        getTheme().applyStyle(settings.getFontSizeStyle(), true);
         super.onCreate(savedInstanceState);
         handler = new Handler();
         attachments = new ArrayList<File>();

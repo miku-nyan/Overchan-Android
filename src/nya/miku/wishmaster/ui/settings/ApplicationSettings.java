@@ -136,50 +136,33 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_hide_actionbar_on_scroll), false);
     }
     
+    /**
+     * При установке темы не забывайте установить размер шрифта:
+     * <pre>
+     * setTheme(settings.getTheme());
+     * getTheme().applyStyle(settings.getFontSizeStyle());
+     * </pre>
+     */
     public int getTheme() {
         String defaultThemeValue = resources.getString(R.string.pref_theme_value_default);
-        String defaultFontSizeValue = resources.getString(R.string.pref_font_size_value_default);
         String theme = preferences.getString(resources.getString(R.string.pref_key_theme), defaultThemeValue);
+        if (theme.equals(resources.getString(R.string.pref_theme_value_futaba))) return R.style.Theme_Futaba;
+        if (theme.equals(resources.getString(R.string.pref_theme_value_photon))) return R.style.Theme_Photon;
+        if (theme.equals(resources.getString(R.string.pref_theme_value_neutron))) return R.style.Theme_Neutron;
+        if (theme.equals(resources.getString(R.string.pref_theme_value_gurochan))) return R.style.Theme_Gurochan;
+        if (theme.equals(resources.getString(R.string.pref_theme_value_tomorrow))) return R.style.Theme_Tomorrow;
+        if (theme.equals(resources.getString(R.string.pref_theme_value_mikuba))) return R.style.Theme_Mikuba;
+        return R.style.Theme_Futaba;
+    }
+    
+    public int getFontSizeStyle() {
+        String defaultFontSizeValue = resources.getString(R.string.pref_font_size_value_default);
         String fontSize = preferences.getString(resources.getString(R.string.pref_key_font_size), defaultFontSizeValue);
-        if (theme.equals(resources.getString(R.string.pref_theme_value_futaba))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Futaba_Small;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Futaba_Medium;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Futaba_Large;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Futaba_Huge;
-            else return R.style.Futaba_Small;
-        } else if (theme.equals(resources.getString(R.string.pref_theme_value_photon))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Photon_Small;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Photon_Medium;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Photon_Large;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Photon_Huge;
-            else return R.style.Photon_Small;
-        } else if (theme.equals(resources.getString(R.string.pref_theme_value_neutron))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Neutron_Small;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Neutron_Medium;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Neutron_Large;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Neutron_Huge;
-            else return R.style.Neutron_Small;
-        } else if (theme.equals(resources.getString(R.string.pref_theme_value_gurochan))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Gurochan_Small;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Gurochan_Medium;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Gurochan_Large;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Gurochan_Huge;
-            else return R.style.Gurochan_Small;
-        } else if (theme.equals(resources.getString(R.string.pref_theme_value_tomorrow))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Tomorrow_Small;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Tomorrow_Medium;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Tomorrow_Large;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Tomorrow_Huge;
-            else return R.style.Tomorrow_Small;
-        } else if (theme.equals(resources.getString(R.string.pref_theme_value_mikuba))) {
-            if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.Mikuba_Small;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.Mikuba_Medium;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.Mikuba_Large;
-            else if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.Mikuba_Huge;
-            else return R.style.Mikuba_Small;
-        } else {
-            return R.style.Futaba_Small;
-        }
+        if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.FontSize_Small;
+        if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.FontSize_Medium;
+        if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.FontSize_Large;
+        if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.FontSize_Huge;
+        return R.style.FontSize_Small;
     }
     
     public long getMaxCacheSize() {
@@ -406,6 +389,7 @@ public class ApplicationSettings {
     
     public class StaticSettingsContainer {
         public int theme;
+        public int fontSizeStyle;
         public int itemHeight;
         public DownloadThumbnailsMode downloadThumbnails;
         public boolean isDisplayDate;
@@ -417,6 +401,7 @@ public class ApplicationSettings {
 
     public void updateStaticSettings(StaticSettingsContainer container) {
         container.theme = getTheme();
+        container.fontSizeStyle = getFontSizeStyle();
         container.itemHeight = getItemHeight();
         container.downloadThumbnails = isDownloadThumbnails();
         container.isDisplayDate = isDisplayDate();

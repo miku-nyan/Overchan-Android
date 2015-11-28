@@ -3095,7 +3095,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             Toast.makeText(activity, resources.getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
         } else {
             Context dialogContext = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ?
-                    new ContextThemeWrapper(activity, R.style.Neutron_Medium) : activity;
+                    new ContextThemeWrapper(activity, R.style.Theme_Neutron) : activity;
             View saveThreadDialogView = LayoutInflater.from(dialogContext).inflate(R.layout.dialog_save_thread, null);
             final CheckBox saveThumbsChkbox = (CheckBox) saveThreadDialogView.findViewById(R.id.dialog_save_thread_thumbs);
             final CheckBox saveAllChkbox = (CheckBox) saveThreadDialogView.findViewById(R.id.dialog_save_thread_all);

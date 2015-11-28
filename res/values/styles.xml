@@ -34,7 +34,81 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:backgroundDimAmount">0.8</item>
     </style>
     
-    <style name="Futaba_Base" parent="@style/Theme_Light_Switch">
+    <style name="Theme_Light_Base" parent="@style/Theme_Light_Switch">
+        <item name="iconDrawer">@drawable/ic_drawer_light</item>
+        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
+        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
+        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
+        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
+        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
+        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
+        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
+        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
+        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
+        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
+        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
+        <item name="actionSave">@drawable/ic_action_save_light</item>
+    </style>
+    
+    <style name="Theme_Dark_Base" parent="@style/Theme_Dark_Switch">
+        <item name="iconDrawer">@drawable/ic_drawer_dark</item>
+        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_dark</item>
+        <item name="iconItemPrevious">@drawable/ic_action_previous_item_dark</item>
+        <item name="iconItemNext">@drawable/ic_action_next_item_dark</item>
+        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_dark</item>
+        <item name="sidebarBtnHistory">@drawable/sidebar_history_dark</item>
+        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_dark</item>
+        <item name="iconBtnClose">@drawable/ic_action_remove_dark</item>
+        <item name="actionRefresh">@drawable/ic_action_refresh_dark</item>
+        <item name="actionAddPost">@drawable/ic_action_edit_dark</item>
+        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_dark</item>
+        <item name="actionAddGallery">@drawable/ic_action_new_picture_dark</item>
+        <item name="actionSave">@drawable/ic_action_save_dark</item>
+    </style>
+    
+    <style name="TextAppearance_Small.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">11sp</item> </style>
+    <style name="TextAppearance_Small.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">13sp</item> </style>
+    <style name="TextAppearance_Small.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">16sp</item> </style>
+    
+    <style name="TextAppearance_Medium.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">13sp</item> </style>
+    <style name="TextAppearance_Medium.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">15sp</item> </style>
+    <style name="TextAppearance_Medium.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">18sp</item> </style>
+    
+    <style name="TextAppearance_Large.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">15sp</item> </style>
+    <style name="TextAppearance_Large.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">17sp</item> </style>
+    <style name="TextAppearance_Large.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">20sp</item> </style>
+    
+    <style name="TextAppearance_Huge.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">17sp</item> </style>
+    <style name="TextAppearance_Huge.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">19sp</item> </style>
+    <style name="TextAppearance_Huge.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">22sp</item> </style>
+    
+    <style name="FontSize_Small">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
+    </style>
+    
+    <style name="FontSize_Medium">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    </style>
+    
+    <style name="FontSize_Large">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    </style>
+    
+    <style name="FontSize_Huge">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    </style>
+    
+    <!-- Themes -->
+    
+    <style name="Theme_Futaba" parent="@style/Theme_Light_Base">
         <item name="materialPrimary">#FFFFEE</item>
         <item name="materialPrimaryDark">#7F7F75</item>
         <item name="android:textColorPrimary">#800000</item>
@@ -59,23 +133,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="refererForeground">#EE0000</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
-        
-        <item name="iconDrawer">@drawable/ic_drawer_light</item>
-        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
-        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
-        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
-        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
-        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
-        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
-        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
-        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
-        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
-        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
-        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
-        <item name="actionSave">@drawable/ic_action_save_light</item>
     </style>
     
-    <style name="Photon_Base" parent="@style/Theme_Light_Switch">
+    <style name="Theme_Photon" parent="@style/Theme_Light_Base">
         <item name="materialPrimary">#EEEEEE</item>
         <item name="materialPrimaryDark">#757575</item>
         <item name="android:textColorPrimary">#333333</item>
@@ -96,26 +156,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="postQuoteForeground">#789922</item>
         <item name="spoilerForeground">#333333</item>
         <item name="spoilerBackground">#BBBBBB</item>
-        <item name="urlLinkForeground">#ff6600</item>
+        <item name="urlLinkForeground">#FF6600</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
-        
-        <item name="iconDrawer">@drawable/ic_drawer_light</item>
-        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
-        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
-        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
-        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
-        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
-        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
-        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
-        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
-        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
-        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
-        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
-        <item name="actionSave">@drawable/ic_action_save_light</item>
     </style>
     
-    <style name="Neutron_Base" parent="@style/Theme_Dark_Switch">
+    <style name="Theme_Neutron" parent="@style/Theme_Dark_Base">
+        <item name="materialPrimary">#212121</item>
+        <item name="materialPrimaryDark">#000000</item>
         <item name="android:textColorPrimary">#698CC0</item>
         <item name="activityRootBackground">#212121</item>
         <item name="sidebarBackground">#CC212121</item>
@@ -137,23 +185,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#C9BE89</item>
         <item name="itemInfoForeground">#999999</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
-        
-        <item name="iconDrawer">@drawable/ic_drawer_dark</item>
-        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_dark</item>
-        <item name="iconItemPrevious">@drawable/ic_action_previous_item_dark</item>
-        <item name="iconItemNext">@drawable/ic_action_next_item_dark</item>
-        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_dark</item>
-        <item name="sidebarBtnHistory">@drawable/sidebar_history_dark</item>
-        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_dark</item>
-        <item name="iconBtnClose">@drawable/ic_action_remove_dark</item>
-        <item name="actionRefresh">@drawable/ic_action_refresh_dark</item>
-        <item name="actionAddPost">@drawable/ic_action_edit_dark</item>
-        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_dark</item>
-        <item name="actionAddGallery">@drawable/ic_action_new_picture_dark</item>
-        <item name="actionSave">@drawable/ic_action_save_dark</item>
     </style>
     
-    <style name="Gurochan_Base" parent="@style/Theme_Light_Switch">
+    <style name="Theme_Gurochan" parent="@style/Theme_Light_Base">
         <item name="materialPrimary">#EDDAD2</item>
         <item name="materialPrimaryDark">#766D69</item>
         <item name="android:textColorPrimary">#000000</item>
@@ -177,23 +211,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#34345C</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
-        
-        <item name="iconDrawer">@drawable/ic_drawer_light</item>
-        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
-        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
-        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
-        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
-        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
-        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
-        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
-        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
-        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
-        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
-        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
-        <item name="actionSave">@drawable/ic_action_save_light</item>
     </style>
     
-    <style name="Tomorrow_Base" parent="@style/Theme_Dark_Switch">
+    <style name="Theme_Tomorrow" parent="@style/Theme_Dark_Base">
         <item name="materialPrimary">#1D1F21</item>
         <item name="materialPrimaryDark">#141619</item>
         <item name="android:textColorPrimary">#C5C8C6</item>
@@ -217,23 +237,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#81A2BE</item>
         <item name="itemInfoForeground">#707070</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
-        
-        <item name="iconDrawer">@drawable/ic_drawer_dark</item>
-        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_dark</item>
-        <item name="iconItemPrevious">@drawable/ic_action_previous_item_dark</item>
-        <item name="iconItemNext">@drawable/ic_action_next_item_dark</item>
-        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_dark</item>
-        <item name="sidebarBtnHistory">@drawable/sidebar_history_dark</item>
-        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_dark</item>
-        <item name="iconBtnClose">@drawable/ic_action_remove_dark</item>
-        <item name="actionRefresh">@drawable/ic_action_refresh_dark</item>
-        <item name="actionAddPost">@drawable/ic_action_edit_dark</item>
-        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_dark</item>
-        <item name="actionAddGallery">@drawable/ic_action_new_picture_dark</item>
-        <item name="actionSave">@drawable/ic_action_save_dark</item>
     </style>
     
-    <style name="Mikuba_Base" parent="@style/Theme_Light_Switch">
+    <style name="Theme_Mikuba" parent="@style/Theme_Light_Base">
         <item name="materialPrimary">#66EEFF</item>
         <item name="materialPrimaryDark">#408090</item>
         <item name="android:textColorPrimary">#000000</item>
@@ -257,180 +263,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#418A8E</item>
         <item name="itemInfoForeground">#999999</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
-        
-        <item name="iconDrawer">@drawable/ic_drawer_light</item>
-        <item name="dialogBackgroundShadow">@drawable/dialog_full_holo_light</item>
-        <item name="iconItemPrevious">@drawable/ic_action_previous_item_light</item>
-        <item name="iconItemNext">@drawable/ic_action_next_item_light</item>
-        <item name="sidebarBtnNewTab">@drawable/sidebar_newtab_light</item>
-        <item name="sidebarBtnHistory">@drawable/sidebar_history_light</item>
-        <item name="sidebarBtnFavorites">@drawable/sidebar_favorites_light</item>
-        <item name="iconBtnClose">@drawable/ic_action_remove_light</item>
-        <item name="actionRefresh">@drawable/ic_action_refresh_light</item>
-        <item name="actionAddPost">@drawable/ic_action_edit_light</item>
-        <item name="actionAddAttachment">@drawable/ic_action_new_attachment_light</item>
-        <item name="actionAddGallery">@drawable/ic_action_new_picture_light</item>
-        <item name="actionSave">@drawable/ic_action_save_light</item>
-    </style>
-    
-    <style name="TextAppearance_Small.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">11sp</item> </style>
-    <style name="TextAppearance_Small.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">13sp</item> </style>
-    <style name="TextAppearance_Small.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">16sp</item> </style>
-    
-    <style name="TextAppearance_Medium.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">13sp</item> </style>
-    <style name="TextAppearance_Medium.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">15sp</item> </style>
-    <style name="TextAppearance_Medium.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">18sp</item> </style>
-    
-    <style name="TextAppearance_Large.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">15sp</item> </style>
-    <style name="TextAppearance_Large.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">17sp</item> </style>
-    <style name="TextAppearance_Large.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">20sp</item> </style>
-    
-    <style name="TextAppearance_Huge.Small" parent="@android:style/TextAppearance.Small"> <item name="android:textSize">17sp</item> </style>
-    <style name="TextAppearance_Huge.Medium" parent="@android:style/TextAppearance.Medium"> <item name="android:textSize">19sp</item> </style>
-    <style name="TextAppearance_Huge.Large" parent="@android:style/TextAppearance.Large"> <item name="android:textSize">22sp</item> </style>
-    
-    <style name="Futaba_Small" parent="@style/Futaba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
-    </style>
-    
-    <style name="Futaba_Medium" parent="@style/Futaba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
-    </style>
-    
-    <style name="Futaba_Large" parent="@style/Futaba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
-    </style>
-    
-    <style name="Futaba_Huge" parent="@style/Futaba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
-    </style>
-    
-    <style name="Photon_Small" parent="@style/Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
-    </style>
-    
-    <style name="Photon_Medium" parent="@style/Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
-    </style>
-    
-    <style name="Photon_Large" parent="@style/Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
-    </style>
-    
-    <style name="Photon_Huge" parent="@style/Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
-    </style>
-    
-    <style name="Neutron_Small" parent="@style/Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
-    </style>
-    
-    <style name="Neutron_Medium" parent="@style/Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
-    </style>
-    
-    <style name="Neutron_Large" parent="@style/Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
-    </style>
-    
-    <style name="Neutron_Huge" parent="@style/Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
-    </style>
-    
-    <style name="Gurochan_Small" parent="@style/Gurochan_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
-    </style>
-    
-    <style name="Gurochan_Medium" parent="@style/Gurochan_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
-    </style>
-    
-    <style name="Gurochan_Large" parent="@style/Gurochan_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
-    </style>
-    
-    <style name="Gurochan_Huge" parent="@style/Gurochan_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
-    </style>
-    
-    <style name="Tomorrow_Small" parent="@style/Tomorrow_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
-    </style>
-    
-    <style name="Tomorrow_Medium" parent="@style/Tomorrow_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
-    </style>
-    
-    <style name="Tomorrow_Large" parent="@style/Tomorrow_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
-    </style>
-    
-    <style name="Tomorrow_Huge" parent="@style/Tomorrow_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
-    </style>
-    
-    <style name="Mikuba_Small" parent="@style/Mikuba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Small.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Small.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Small.Large</item>
-    </style>
-    
-    <style name="Mikuba_Medium" parent="@style/Mikuba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
-    </style>
-    
-    <style name="Mikuba_Large" parent="@style/Mikuba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
-    </style>
-    
-    <style name="Mikuba_Huge" parent="@style/Mikuba_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
     </style>
     
 </resources>

@@ -197,6 +197,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         settings = MainApplication.getInstance().settings;
         setTheme(settings.getTheme());
+        getTheme().applyStyle(settings.getFontSizeStyle(), true);
         getTheme().applyStyle(R.style.Transparent, true);
         
         super.onCreate(savedInstanceState);

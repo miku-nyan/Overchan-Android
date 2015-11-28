@@ -310,6 +310,7 @@ public class MainActivity extends FragmentActivity {
         openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         setTheme(settings.theme);
+        getTheme().applyStyle(settings.fontSizeStyle, true);
         super.onCreate(savedInstanceState);
         if (MainApplication.getInstance().settings.showSidePanel()) {
             setContentView(R.layout.main_activity_tablet);
@@ -422,7 +423,8 @@ public class MainActivity extends FragmentActivity {
         isPaused = false;
         TabsTrackerService.unread = false;
         StaticSettingsContainer newSettings = MainApplication.getInstance().settings.getStaticSettings();
-        if (settings.theme != newSettings.theme || settings.isDisplayDate != newSettings.isDisplayDate ||
+        if (settings.theme != newSettings.theme || settings.fontSizeStyle != newSettings.fontSizeStyle ||
+                settings.isDisplayDate != newSettings.isDisplayDate ||
                 (settings.isDisplayDate && (settings.isLocalTime != newSettings.isLocalTime)) ||
                 MainApplication.getInstance().settings.getAutohideRulesJson().hashCode() != autohideRulesHash ||
                 MainApplication.getInstance().settings.getRootViewWeight() != rootViewWeight ||
