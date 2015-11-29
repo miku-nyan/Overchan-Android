@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexUtils {
+    private static final Pattern URL_PATTERN = Pattern.compile("https?://(?:www\\.)?(.+)");
     private static final Pattern HTML_TAGS = Pattern.compile("<[^>]*>");
     private static final Pattern HTML_SPAN_TAGS = Pattern.compile("</?span[^>]*?>");
     private static final Pattern SPACES = Pattern.compile("\\s+");
@@ -61,6 +62,12 @@ public class RegexUtils {
             matcher.appendReplacement(buffer, "$1<a href=\"" + replaceAll(matcher.group(2), WBR, "") + "\">$2</a>");
         } while (matcher.find());
         return matcher.appendTail(buffer).toString();
+    }
+    
+    public static String getUrlDomainPath(CharSequence url) {
+        Matcher parseUrl = URL_PATTERN.matcher(url);
+        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
+        return parseUrl.group(1);
     }
     
 }
