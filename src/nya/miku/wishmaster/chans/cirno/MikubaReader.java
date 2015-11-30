@@ -308,9 +308,21 @@ public class MikubaReader implements Closeable {
                     AttachmentModel attachment = new AttachmentModel();
                     attachment.size = -1;
                     attachment.thumbnail = html.substring(start, end);
-                    attachment.path = attachment.thumbnail.replace("/thu/", "/src/");
-                    attachment.type = attachment.path.toLowerCase(Locale.US).endsWith(".gif") ?
-                            AttachmentModel.TYPE_IMAGE_GIF : AttachmentModel.TYPE_IMAGE_STATIC;
+                    if (attachment.thumbnail.contains("/thu/")) {
+                        attachment.path = attachment.thumbnail.replace("/thu/", "/src/");
+                        attachment.type = attachment.path.toLowerCase(Locale.US).endsWith(".gif") ?
+                                AttachmentModel.TYPE_IMAGE_GIF : AttachmentModel.TYPE_IMAGE_STATIC;
+                    } else {
+                        attachment.path = attachment.thumbnail;
+                        attachment.type = AttachmentModel.TYPE_OTHER_FILE;
+                        int startHref, endHref;
+                        if ((startHref = html.indexOf("href=\"")) != -1 && (endHref = html.indexOf('\"', startHref + 6)) != -1) {
+                            attachment.path = html.substring(startHref + 6, endHref);
+                            String pathLower = attachment.path.toLowerCase(Locale.US);
+                            if (pathLower.endsWith(".mp3") || pathLower.endsWith(".ogg"))
+                                attachment.type = AttachmentModel.TYPE_AUDIO;
+                        }
+                    }
                     currentAttachments.add(attachment);
                     return;
                 }
