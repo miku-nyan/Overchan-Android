@@ -88,6 +88,8 @@ public class DobroModule extends AbstractChanModule {
     
     static final String CHAN_NAME = "dobrochan";
     
+    private static final Pattern URL_THREADPAGE_PATTERN = Pattern.compile("(.+?)/res/([0-9]+?)\\.xhtml(.*)");
+    
     private static final List<String> DOMAINS_LIST = Arrays.asList(new String[] { "dobrochan.ru", "dobrochan.com", "dobrochan.org" });
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
@@ -521,28 +523,21 @@ public class DobroModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String domain;
-        String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)").matcher(url);
-        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
-        if (parsePath.find()) {
-            domain = parsePath.group(1).toLowerCase(Locale.US);
-            path = parsePath.group(2);
-        } else {
-            domain = parseUrl.group(1).toLowerCase(Locale.US);
-        }
-        
-        if ((!getDomain().equals(domain)) && (DOMAINS_LIST.indexOf(domain) == -1)) {
-            throw new IllegalArgumentException("wrong domain");
-        }
+        String path = RegexUtils.getUrlPath(url, new RegexUtils.DomainChecker() {
+            @Override
+            public void checkDomain(String domain) throws IllegalArgumentException {
+                if ((!getDomain().equals(domain)) && (DOMAINS_LIST.indexOf(domain) == -1)) {
+                    throw new IllegalArgumentException("wrong domain");
+                }
+            }
+        }).toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;
         try {
             if (path.contains("/res/")) {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
-                Matcher matcher = Pattern.compile("(.+?)/res/([0-9]+?)\\.xhtml(.*)").matcher(path);
+                Matcher matcher = URL_THREADPAGE_PATTERN.matcher(path);
                 if (!matcher.find()) throw new Exception();
                 model.boardName = matcher.group(1);
                 model.threadNumber = matcher.group(2);

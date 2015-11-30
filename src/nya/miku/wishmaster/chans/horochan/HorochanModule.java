@@ -54,6 +54,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
@@ -69,6 +70,9 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class HorochanModule extends AbstractChanModule {
     private static final String CHAN_NAME = "horochan.ru";
     private static final String DOMAIN = "horochan.ru";
+    
+    private static final Pattern URL_PATH_BOARDPAGE_PATTERN = Pattern.compile("([^/]+)/res/(\\d+)[^#]*(?:#(\\d+))?");
+    private static final Pattern URL_PATH_THREADPAGE_PATTERN = Pattern.compile("([^/]+)(?:/(\\d+)?)?");
     
     private static final String[] ATTACHMENT_FORMATS = new String[] { "gif", "jpg", "jpeg", "png", "bmp" };
     
@@ -427,20 +431,7 @@ public class HorochanModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String domain;
-        String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
-        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        String urlPath = parseUrl.group(1);
-        Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(urlPath);
-        if (parsePath.find()) {
-            domain = parsePath.group(1).toLowerCase(Locale.US);
-            path = parsePath.group(2);
-        } else {
-            domain = parseUrl.group(1).toLowerCase(Locale.US);
-        }
-        
-        if (!domain.equals(DOMAIN)) throw new IllegalArgumentException("wrong chan");
+        String path = RegexUtils.getUrlPath(url, DOMAIN).toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;
@@ -450,7 +441,7 @@ public class HorochanModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher threadPage = Pattern.compile("([^/]+)/res/(\\d+)[^#]*(?:#(\\d+))?").matcher(path);
+        Matcher threadPage = URL_PATH_BOARDPAGE_PATTERN.matcher(path);
         if (threadPage.find()) {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.boardName = threadPage.group(1);
@@ -459,7 +450,7 @@ public class HorochanModule extends AbstractChanModule {
             return model;
         }
         
-        Matcher boardPage = Pattern.compile("([^/]+)(?:/(\\d+)?)?").matcher(path);
+        Matcher boardPage = URL_PATH_THREADPAGE_PATTERN.matcher(path);
         if (boardPage.find()) {
             model.type = UrlPageModel.TYPE_BOARDPAGE;
             model.boardName = boardPage.group(1);

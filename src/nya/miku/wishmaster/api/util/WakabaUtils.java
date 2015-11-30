@@ -28,7 +28,6 @@ public class WakabaUtils {
     private WakabaUtils() {}
     
     private static final Pattern BOARDNAME_PATTERN = Pattern.compile("[^/\\s]+(/arch)?");
-    private static final Pattern PATH_PATTERN = Pattern.compile("(.+?)(?:/(.*))");
     private static final Pattern THREADPAGE_PATTERN = Pattern.compile("(.+?)/res/([0-9]+?)\\.html(.*)");
     
     public static String buildUrl(UrlPageModel model, String rootUrl) {
@@ -56,25 +55,7 @@ public class WakabaUtils {
     }
     
     public static UrlPageModel parseUrl(String url, String chanName, String... domains) {
-        String domain;
-        String path = "";
-        String urlDomainPath = RegexUtils.getUrlDomainPath(url);
-        Matcher parsePath = PATH_PATTERN.matcher(urlDomainPath);
-        if (parsePath.find()) {
-            domain = parsePath.group(1).toLowerCase(Locale.US);
-            path = parsePath.group(2);
-        } else {
-            domain = urlDomainPath.toLowerCase(Locale.US);
-        }
-        
-        boolean matchDomain = false;
-        for (String d : domains) {
-            if (d.equalsIgnoreCase(domain)) {
-                matchDomain = true;
-                break;
-            }
-        }
-        if (!matchDomain) throw new IllegalArgumentException("wrong chan");
+        String path = RegexUtils.getUrlPath(url, domains).toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = chanName;

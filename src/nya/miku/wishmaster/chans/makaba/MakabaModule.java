@@ -49,6 +49,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.CryptoUtils;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
@@ -744,22 +745,15 @@ public class MakabaModule extends AbstractChanModule {
 
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String domain;
-        String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)").matcher(url);
-        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
-        if (parsePath.find()) {
-            domain = parsePath.group(1).toLowerCase(Locale.US);
-            path = parsePath.group(2);
-        } else {
-            domain = parseUrl.group(1).toLowerCase(Locale.US);
-        }
-        
-        //проверка домена
-        if ((!this.domain.equals(domain)) && (DOMAINS_LIST.indexOf(domain) == -1)) {
-            throw new IllegalArgumentException("wrong domain");
-        }
+        String path = RegexUtils.getUrlPath(url, new RegexUtils.DomainChecker() {
+            @Override
+            public void checkDomain(String domain) throws IllegalArgumentException {
+                //проверка домена
+                if ((!MakabaModule.this.domain.equals(domain)) && (DOMAINS_LIST.indexOf(domain) == -1)) {
+                    throw new IllegalArgumentException("wrong domain");
+                }
+            }
+        }).toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;

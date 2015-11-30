@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexUtils {
-    private static final Pattern URL_PATTERN = Pattern.compile("https?://(?:www\\.)?(.+)");
+    private static final Pattern URL_PATTERN = Pattern.compile("^https?://(?:www\\.)?([^/]+)/?(.*)", Pattern.CASE_INSENSITIVE);
     private static final Pattern HTML_TAGS = Pattern.compile("<[^>]*>");
     private static final Pattern HTML_SPAN_TAGS = Pattern.compile("</?span[^>]*?>");
     private static final Pattern SPACES = Pattern.compile("\\s+");
@@ -64,10 +64,40 @@ public class RegexUtils {
         return matcher.appendTail(buffer).toString();
     }
     
-    public static String getUrlDomainPath(CharSequence url) {
-        Matcher parseUrl = URL_PATTERN.matcher(url);
-        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        return parseUrl.group(1);
+    public interface DomainChecker {
+        void checkDomain(String domain) throws IllegalArgumentException;
+    }
+    
+    public static String getUrlPath(CharSequence url, DomainChecker checker) {
+        Matcher matcher = URL_PATTERN.matcher(url);
+        if (!matcher.find()) throw new IllegalArgumentException("incorrect url");
+        if (checker != null) checker.checkDomain(matcher.group(1));
+        return matcher.group(2);
+    }
+    
+    public static String getUrlPath(CharSequence url, final String... possibleDomains) {
+        if (possibleDomains.length == 1) return getUrlPath(url, possibleDomains[0]);
+        return getUrlPath(url, new DomainChecker() {
+            @Override
+            public void checkDomain(String domain) throws IllegalArgumentException {
+                boolean matchDomain = false;
+                for (String d : possibleDomains) {
+                    if (d.equalsIgnoreCase(domain)) {
+                        matchDomain = true;
+                        break;
+                    }
+                }
+                if (!matchDomain) throw new IllegalArgumentException("wrong domain");
+            }
+        });
+    }
+    
+    public static String getUrlPath(CharSequence url, String possibleDomain) {
+        Matcher matcher = URL_PATTERN.matcher(url);
+        if (!matcher.find()) throw new IllegalArgumentException("incorrect url");
+        if (possibleDomain != null && !matcher.group(1).equalsIgnoreCase(possibleDomain))
+            throw new IllegalArgumentException("wrong domain");
+        return matcher.group(2);
     }
     
 }

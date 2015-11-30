@@ -51,6 +51,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -76,6 +77,9 @@ public class MikubaModule extends AbstractChanModule {
     
     private static final String MIKUBA_NAME = "hatsune.ru";
     private static final String MIKUBA_DOMAIN = "hatsune.ru";
+    
+    private static final Pattern URL_PATH_BOARDPAGE_PATTERN = Pattern.compile("(?:b(?:/(\\d+)?)?)?");
+    private static final Pattern URL_PATH_THREADPAGE_PATTERN = Pattern.compile("reply/(\\d+)(?:#r(\\d+))?");
     
     private static final Pattern YOUTUBE_PATTERN = Pattern.compile("(?:\\s|^)(?:https?://)?(?:www\\.)?youtube.com/watch\\?v=(\\w+)(?:.*?)(?:\\s|$)",
             Pattern.CASE_INSENSITIVE);
@@ -377,30 +381,19 @@ public class MikubaModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String domain;
-        String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
-        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
-        if (parsePath.find()) {
-            domain = parsePath.group(1).toLowerCase(Locale.US);
-            path = parsePath.group(2);
-        } else {
-            domain = parseUrl.group(1).toLowerCase(Locale.US);
-        }
-        if (!domain.equals(MIKUBA_DOMAIN)) throw new IllegalArgumentException("wrong chan");
+        String path = RegexUtils.getUrlPath(url, MIKUBA_DOMAIN).toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = MIKUBA_NAME;
         model.boardName = "vo";
-        Matcher boardPageMatcher = Pattern.compile("(?:b(?:/(\\d+)?)?)?").matcher(path);
+        Matcher boardPageMatcher = URL_PATH_BOARDPAGE_PATTERN.matcher(path);
         if (boardPageMatcher.matches()) {
             model.type = UrlPageModel.TYPE_BOARDPAGE;
             String found = boardPageMatcher.group(1);
             model.boardPage = found == null ? 0 : Integer.parseInt(found);
             return model;
         }
-        Matcher threadPageMatcher = Pattern.compile("reply/(\\d+)(?:#r(\\d+))?").matcher(path);
+        Matcher threadPageMatcher = URL_PATH_THREADPAGE_PATTERN.matcher(path);
         if (threadPageMatcher.matches()) {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.threadNumber = threadPageMatcher.group(1);
