@@ -22,18 +22,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:id="@android:id/progress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-    
-    <nya.miku.wishmaster.lib.gallery.ViewPagerFixed
-        android:id="@+id/gallery_viewpager"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1" >
+        <nya.miku.wishmaster.lib.gallery.ViewPagerFixed
+            android:id="@+id/gallery_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@android:id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </FrameLayout>
     
     <FrameLayout
         android:layout_width="match_parent"
