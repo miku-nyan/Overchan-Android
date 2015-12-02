@@ -33,7 +33,7 @@ public class ThemeUtils {
     private ThemeUtils() {}
     
     private static void resolveAttribute(Theme theme, int attrId, TypedValue outValue, boolean resolveRefs) {
-        theme.resolveAttribute(attrId, outValue, resolveRefs);
+        if (!theme.resolveAttribute(attrId, outValue, resolveRefs)) outValue.type = TypedValue.TYPE_NULL;
     }
     
     private static int getThemeColor(TypedValue tmp, Theme theme, int attrId, int defaultValue) {
