@@ -1,5 +1,6 @@
 /*
  * Исходная версия https://github.com/bauerca/drag-sort-listview
+ * Изменение: в DragScrollProfile по умолчанию используется квадратичная интерполяция
  * 
  */
 
@@ -256,7 +257,8 @@ public class DragSortListView extends ListView {
     private DragScrollProfile mScrollProfile = new DragScrollProfile() {
         @Override
         public float getSpeed(float w, long t) {
-            return mMaxScrollSpeed * w;
+            //return mMaxScrollSpeed * w;
+            return mMaxScrollSpeed * w * w * 10;
         }
     };
 
