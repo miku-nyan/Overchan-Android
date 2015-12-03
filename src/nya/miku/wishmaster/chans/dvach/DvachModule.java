@@ -20,13 +20,11 @@ package nya.miku.wishmaster.chans.dvach;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +61,7 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
@@ -451,26 +450,16 @@ public class DvachModule extends AbstractWakabaModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         if (url.contains("/search?q=")) {
             try {
-                String domain = URI.create(url).getHost();
-                if (domain.toLowerCase(Locale.US).startsWith("www.")) domain = domain.substring(4);
-                boolean matchDomain = false;
-                for (String d : getAllDomains()) {
-                    if (d.equalsIgnoreCase(domain)) {
-                        matchDomain = true;
-                        break;
-                    }
-                }
-                if (matchDomain) {
-                    int index = url.indexOf("/search?q=");
-                    String left = url.substring(0, index);
-                    UrlPageModel model = new UrlPageModel();
-                    model.chanName = CHAN_NAME;
-                    model.type = UrlPageModel.TYPE_SEARCHPAGE;
-                    model.boardName = left.substring(left.lastIndexOf('/') + 1);
-                    model.searchRequest = url.substring(index + 10);
-                    model.searchRequest = URLDecoder.decode(model.searchRequest, "UTF-8");
-                    return model;
-                }
+                RegexUtils.getUrlPath(url, getAllDomains());
+                int index = url.indexOf("/search?q=");
+                String left = url.substring(0, index);
+                UrlPageModel model = new UrlPageModel();
+                model.chanName = CHAN_NAME;
+                model.type = UrlPageModel.TYPE_SEARCHPAGE;
+                model.boardName = left.substring(left.lastIndexOf('/') + 1);
+                model.searchRequest = url.substring(index + 10);
+                model.searchRequest = URLDecoder.decode(model.searchRequest, "UTF-8");
+                return model;
             } catch (Exception e) {}
         }
         return WakabaUtils.parseUrl(url, getChanName(), getAllDomains());

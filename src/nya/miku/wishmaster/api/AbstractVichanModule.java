@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -483,10 +482,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(getChanName())) throw new IllegalArgumentException("wrong chan");
-        try {
-            if (model.type == UrlPageModel.TYPE_CATALOGPAGE)
-                return getUsingUrl() + model.boardName + "/catalog.html";
-        } catch (Exception e) {}
+        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return getUsingUrl() + model.boardName + "/catalog.html";
         if (model.type == UrlPageModel.TYPE_BOARDPAGE && model.boardPage == 1) return (getUsingUrl() + model.boardName + "/");
         return WakabaUtils.buildUrl(model, getUsingUrl());
     }
@@ -495,25 +491,15 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         if (url.contains("/catalog.html")) {
             try {
-                String domain = URI.create(url).getHost();
-                if (domain.toLowerCase(Locale.US).startsWith("www.")) domain = domain.substring(4);
-                boolean matchDomain = false;
-                for (String d : getAllDomains()) {
-                    if (d.equalsIgnoreCase(domain)) {
-                        matchDomain = true;
-                        break;
-                    }
-                }
-                if (matchDomain) {
-                    int index = url.indexOf("/catalog.html");
-                    String left = url.substring(0, index);
-                    UrlPageModel model = new UrlPageModel();
-                    model.chanName = getChanName();
-                    model.type = UrlPageModel.TYPE_CATALOGPAGE;
-                    model.boardName = left.substring(left.lastIndexOf('/') + 1);
-                    model.catalogType = 0;
-                    return model;
-                }
+                RegexUtils.getUrlPath(url, getAllDomains());
+                int index = url.indexOf("/catalog.html");
+                String left = url.substring(0, index);
+                UrlPageModel model = new UrlPageModel();
+                model.chanName = getChanName();
+                model.type = UrlPageModel.TYPE_CATALOGPAGE;
+                model.boardName = left.substring(left.lastIndexOf('/') + 1);
+                model.catalogType = 0;
+                return model;
             } catch (Exception e) {}
         }
         UrlPageModel model = WakabaUtils.parseUrl(url, getChanName(), getAllDomains());

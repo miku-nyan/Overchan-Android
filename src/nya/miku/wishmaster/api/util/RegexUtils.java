@@ -68,14 +68,14 @@ public class RegexUtils {
         void checkDomain(String domain) throws IllegalArgumentException;
     }
     
-    public static String getUrlPath(CharSequence url, DomainChecker checker) {
+    public static String getUrlPath(CharSequence url, DomainChecker checker) throws IllegalArgumentException {
         Matcher matcher = URL_PATTERN.matcher(url);
         if (!matcher.find()) throw new IllegalArgumentException("incorrect url");
         if (checker != null) checker.checkDomain(matcher.group(1));
         return matcher.group(2);
     }
     
-    public static String getUrlPath(CharSequence url, final String... possibleDomains) {
+    public static String getUrlPath(CharSequence url, final String... possibleDomains) throws IllegalArgumentException {
         if (possibleDomains.length == 1) return getUrlPath(url, possibleDomains[0]);
         return getUrlPath(url, new DomainChecker() {
             @Override
@@ -92,7 +92,7 @@ public class RegexUtils {
         });
     }
     
-    public static String getUrlPath(CharSequence url, String possibleDomain) {
+    public static String getUrlPath(CharSequence url, String possibleDomain) throws IllegalArgumentException {
         Matcher matcher = URL_PATTERN.matcher(url);
         if (!matcher.find()) throw new IllegalArgumentException("incorrect url");
         if (possibleDomain != null && !matcher.group(1).equalsIgnoreCase(possibleDomain))
