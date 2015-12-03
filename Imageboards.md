@@ -14,6 +14,7 @@
 * [420chan.org](http://420chan.org/)
 * [Owlchan.ru](http://owlchan.ru/)
 * [Horochan](http://horochan.ru/)
+* [AllChan](https://allchan.su/)
 * [Ponyach](https://ponyach.ru/)
 * [uchan](http://uchan.to/)
 * [sich](https://sich.co.ua/)
