@@ -453,7 +453,19 @@ public class MainActivity extends FragmentActivity {
         MainApplication.getInstance().tabsSwitcher.currentFragment = null;
         if (clearCache) MainApplication.getInstance().pagesCache.clearLru();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            CompatibilityImpl.recreateActivity(this);
+            // https://code.google.com/p/android/issues/detail?id=93731
+            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                @Override
+                public void run() {
+                    try { Thread.sleep(10); } catch (Exception e) {}
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            CompatibilityImpl.recreateActivity(MainActivity.this);
+                        }
+                    });
+                }
+            }).start();
         } else {
             final Intent i = new Intent(this.getIntent());
             this.finish();
@@ -477,17 +489,21 @@ public class MainActivity extends FragmentActivity {
     private void handleOrientationChange(Configuration configuration) {
         boolean newOrientation = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (newOrientation != isHorizontalOrientation) {
-            if (FlowTextHelper.IS_AVAILABLE) {
-                Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
-                if (currentFragment instanceof BoardFragment) {
-                    Long id = MainApplication.getInstance().tabsSwitcher.currentId;
-                    if (id != null) {
-                        TabModel tab = MainApplication.getInstance().tabsState.findTabById(id);
-                        MainApplication.getInstance().tabsSwitcher.switchTo(tab, getSupportFragmentManager(), true);
+            if (rootViewWeight != 1.0f) {
+                restartActivityClearCache();
+            } else {
+                if (FlowTextHelper.IS_AVAILABLE) {
+                    Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                    if (currentFragment instanceof BoardFragment) {
+                        Long id = MainApplication.getInstance().tabsSwitcher.currentId;
+                        if (id != null) {
+                            TabModel tab = MainApplication.getInstance().tabsState.findTabById(id);
+                            MainApplication.getInstance().tabsSwitcher.switchTo(tab, getSupportFragmentManager(), true);
+                        }
                     }
                 }
+                isHorizontalOrientation = newOrientation;
             }
-            isHorizontalOrientation = newOrientation;
         }
     }
     
@@ -736,6 +752,7 @@ public class MainActivity extends FragmentActivity {
             if (url != null && url.length() != 0) {
                 UrlHandler.open(url, this, MainApplication.getInstance().settings.useFakeBrowser());
             }
+            intent.setData(null);
         }
     }
 }
