@@ -383,9 +383,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_no_icon">Kein Symbol</string>
     <string name="makaba_prefs_mobile_api">Mobile API</string>
     <string name="makaba_prefs_captcha_category">Captcha</string>
-    <string name="makaba_prefs_captcha_type">Captcha-Typ</string>
-    <string name="makaba_prefs_google_fallback">Recaptcha 2.0 Fallback</string>
-    <string name="makaba_prefs_google_fallback_summary">Den Kompatibilitätsmodus verwenden</string>
     <string name="makaba_prefs_domain_category">Domain</string>
     <string name="makaba_prefs_domain">Domain</string>
     <string name="makaba_prefs_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
@@ -444,10 +441,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_ignore_ssl_errors_summary">Hostname und Certificate Validation deaktivieren</string>
     <string name="pref_only_new_posts">Nur neue Posts</string>
     <string name="pref_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
-    <string name="pref_cat_connection_extended">Erweiterte Einstellungen</string>
-    <string name="pref_okhttp">OkHttp</string>
-    <string name="pref_okhttp_summary">Alternativer HTTP-Client mit SPDY (kann instabil sein!)</string>
-    <string name="pref_okhttp_unlocked">OkHttp Einstellung ist entriegelt</string>
+    <string name="pref_captcha_type">Captcha-Typ</string>
     <string name="pref_password_title">Passwort</string>
     <string name="pref_password_summary">Passwort zum Löschen von Posts standardmäßig</string>
     <string name="pref_name_title">Name</string>

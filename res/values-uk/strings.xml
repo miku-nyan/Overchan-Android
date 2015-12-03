@@ -392,9 +392,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_no_icon">Іконки немає</string>
     <string name="makaba_prefs_mobile_api">Мобільний API</string>
     <string name="makaba_prefs_captcha_category">Капча</string>
-    <string name="makaba_prefs_captcha_type">Тип капчі</string>
-    <string name="makaba_prefs_google_fallback">Recaptcha 2.0 fallback</string>
-    <string name="makaba_prefs_google_fallback_summary">Використовувати Google Recaptcha 2 в режимі сумісності</string>
     <string name="makaba_prefs_domain_category">Домен</string>
     <string name="makaba_prefs_domain">Домен</string>
     <string name="makaba_prefs_domain_summary">Резервні адреси: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
@@ -422,7 +419,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Використовувати нову версію Recaptcha</string>
     <string name="fourchan_prefs_new_recaptcha_fallback">Recaptcha 2.0 fallback</string>
-    <string name="fourchan_prefs_new_recaptcha_fallback_summary">Використовувати Recaptcha 2.0 в режимі сумісності</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback_summary">Використовувати Google Recaptcha 2 в режимі сумісності</string>
     
     <string name="preferences">Опції</string>
     <string name="pref_cat_chans">Іміджборди</string>
@@ -453,10 +450,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_ignore_ssl_errors_summary">Не зважати на хостнейм і сертифікат</string>
     <string name="pref_only_new_posts">Лише нові пости</string>
     <string name="pref_only_new_posts_summary">Запитувати лише нові пости, а не цілий тред</string>
-    <string name="pref_cat_connection_extended">Додаткові опції</string>
-    <string name="pref_okhttp">OkHttp</string>
-    <string name="pref_okhttp_summary">HTTP-клієнт із SPDY (стабільність під питанням!)</string>
-    <string name="pref_okhttp_unlocked">Опцію OkHttp розблоковано</string>
+    <string name="pref_captcha_type">Тип капчі</string>
     <string name="pref_password_title">Пароль</string>
     <string name="pref_password_summary">Типовий пароль видалення постів</string>
     <string name="pref_name_title">Ім’я</string>

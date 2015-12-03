@@ -66,6 +66,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="horochan.ru" />
                 
+                <data android:host="allchan.su" />
+                <data android:host="www.allchan.su" />
+                
                 <data android:host="ponyach.ru" />
                 <data android:host="ponychan.ru" />
                 <data android:host="ponya.ch" />

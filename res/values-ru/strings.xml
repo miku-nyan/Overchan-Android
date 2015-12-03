@@ -389,9 +389,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_no_icon">Нет иконки</string>
     <string name="makaba_prefs_mobile_api">Мобильный API</string>
     <string name="makaba_prefs_captcha_category">Капча</string>
-    <string name="makaba_prefs_captcha_type">Тип капчи</string>
-    <string name="makaba_prefs_google_fallback">Recaptcha 2.0 fallback</string>
-    <string name="makaba_prefs_google_fallback_summary">Использовать Google Recaptcha 2 в режиме совместимости</string>
     <string name="makaba_prefs_domain_category">Настройки домена</string>
     <string name="makaba_prefs_domain">Домен</string>
     <string name="makaba_prefs_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
@@ -419,7 +416,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Использовать новую версию Recaptcha</string>
     <string name="fourchan_prefs_new_recaptcha_fallback">Recaptcha 2.0 fallback</string>
-    <string name="fourchan_prefs_new_recaptcha_fallback_summary">Использовать Recaptcha 2.0 в режиме совместимости</string>
+    <string name="fourchan_prefs_new_recaptcha_fallback_summary">Использовать Google Recaptcha 2 в режиме совместимости</string>
     
     <string name="preferences">Настройки</string>
     <string name="pref_cat_chans">Настройки имиджборд</string>
@@ -450,10 +447,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_ignore_ssl_errors_summary">Отключить проверку имени и сертификата</string>
     <string name="pref_only_new_posts">Только новые посты</string>
     <string name="pref_only_new_posts_summary">Загружать только новые посты вместо обновления всего треда</string>
-    <string name="pref_cat_connection_extended">Дополнительные настройки</string>
-    <string name="pref_okhttp">OkHttp</string>
-    <string name="pref_okhttp_summary">Альтернативный HTTP-клиент с поддержкой SPDY (может работать нестабильно!)</string>
-    <string name="pref_okhttp_unlocked">Настройка OkHttp разблокирована</string>
+    <string name="pref_captcha_type">Тип капчи</string>
     <string name="pref_password_title">Пароль</string>
     <string name="pref_password_summary">Пароль для удаления постов по умолчанию</string>
     <string name="pref_name_title">Имя</string>
