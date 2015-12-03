@@ -32,7 +32,6 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class FourchanJsonMapper {
     private static final boolean LINKIFY = true;
-    private static final String[] CATALOG = new String[] { "Catalog" };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "png", "gif", "webm" };
     
     static BoardModel mapBoardModel(JSONObject object) {
@@ -76,7 +75,6 @@ public class FourchanJsonMapper {
         model.lastPage = 10;
         model.searchAllowed = false;
         model.catalogAllowed = true;
-        model.catalogTypeDescriptions = CATALOG;
         return model;
     }
     

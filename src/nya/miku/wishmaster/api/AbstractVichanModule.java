@@ -74,9 +74,6 @@ import android.content.res.Resources;
 @SuppressWarnings("deprecation") // https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 
 public abstract class AbstractVichanModule extends AbstractWakabaModule {
-    
-    private static final String[] CATALOG = new String[] { "Catalog" };
-    
     private static final Pattern ATTACHMENT_EMBEDDED_LINK = Pattern.compile("<a[^>]*href=\"([^\">]*)\"[^>]*>");
     private static final Pattern ATTACHMENT_EMBEDDED_THUMB = Pattern.compile("<img[^>]*src=\"([^\">]*)\"[^>]*>");
     
@@ -150,7 +147,6 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         board.markType = BoardModel.MARK_BBCODE;
         board.firstPage = 1;
         board.catalogAllowed = true;
-        board.catalogTypeDescriptions = CATALOG;
         return board;
     }
     

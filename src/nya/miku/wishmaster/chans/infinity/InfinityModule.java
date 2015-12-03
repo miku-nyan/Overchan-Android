@@ -80,7 +80,6 @@ public class InfinityModule extends AbstractVichanModule {
     private static final String ONION_DOMAIN = "oxwugzccvk3dk6tj.onion";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "8chan.co" };
     
-    private static final String[] CATALOG = new String[] { "Catalog" };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "gif", "png", "webm", "mp4", "swf" };
     private static final FastHtmlTagParser.TagReplaceHandler QUOTE_REPLACER = new FastHtmlTagParser.TagReplaceHandler() {
         @Override
@@ -252,7 +251,6 @@ public class InfinityModule extends AbstractVichanModule {
         model.lastPage = json.optInt("max_pages", BoardModel.LAST_PAGE_UNDEFINED);
         model.searchAllowed = false;
         model.catalogAllowed = true;
-        model.catalogTypeDescriptions = CATALOG;
         boardsMap.put(shortName, model);
         return model;
     }
