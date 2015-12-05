@@ -18,7 +18,6 @@
 
 package nya.miku.wishmaster.http;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,13 +33,7 @@ public class SSLCompatibility {
     public static void fixSSLs(Context c) {
         if (fixed.compareAndSet(false, true)) {
             try {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.FROYO) {
-                    Logger.d(TAG, "fix 'supportedProtocol' value of SSL socket factory");
-                    Class<?> classOpenSSLSocketImpl = Class.forName("org.apache.harmony.xnet.provider.jsse.OpenSSLSocketImpl");
-                    Field field = classOpenSSLSocketImpl.getDeclaredField("supportedProtocols");
-                    field.setAccessible(true);
-                    field.set(null, new String[] { "SSLv3", "SSLv3", "TLSv1" });
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     Logger.d(TAG, "try to install security provider");
                     Context remote = c.createPackageContext("com.google.android.gms", Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
                     Method method = remote.getClassLoader().loadClass("com.google.android.gms.common.security.ProviderInstallerImpl").

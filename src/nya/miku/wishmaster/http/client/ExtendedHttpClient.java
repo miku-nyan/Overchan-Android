@@ -18,11 +18,6 @@
 
 package nya.miku.wishmaster.http.client;
 
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import javax.net.ssl.SSLContext;
-
-import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.HttpConstants;
 
 import cz.msebera.android.httpclient.HttpHost;
@@ -30,10 +25,6 @@ import cz.msebera.android.httpclient.client.CookieStore;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.config.CookieSpecs;
 import cz.msebera.android.httpclient.client.config.RequestConfig;
-import cz.msebera.android.httpclient.conn.socket.LayeredConnectionSocketFactory;
-import cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory;
-import cz.msebera.android.httpclient.conn.ssl.SSLContexts;
-import cz.msebera.android.httpclient.conn.ssl.TrustStrategy;
 import cz.msebera.android.httpclient.impl.client.BasicCookieStore;
 import cz.msebera.android.httpclient.impl.client.HttpClients;
 
@@ -46,8 +37,6 @@ import cz.msebera.android.httpclient.impl.client.HttpClients;
  */
 
 public class ExtendedHttpClient extends HttpClientWrapper {
-    private static final String TAG = "ExtendedHttpClient";
-    
     private final CookieStore cookieStore;
     private final HttpHost proxy;
     
@@ -96,35 +85,7 @@ public class ExtendedHttpClient extends HttpClientWrapper {
                 setUserAgent(HttpConstants.USER_AGENT_STRING).
                 setProxy(proxy).
                 setDefaultCookieStore(cookieStore).
-                setSSLSocketFactory(obtainSSLSocketFactory(safe)).
+                setSSLSocketFactory(safe ? ExtendedSSLSocketFactory.getSocketFactory() : ExtendedSSLSocketFactory.getUnsafeSocketFactory()).
                 build();
     }
-    
-    /**
-     * Получить фабрику сокетов SSL
-     * @param safe безопасность, если false, проверка имени и сертификата будет отключена
-     */
-    private static LayeredConnectionSocketFactory obtainSSLSocketFactory(boolean safe) {
-        if (safe) {
-            return SSLConnectionSocketFactory.getSocketFactory();
-        } else {
-            try {
-                if (unsafe_ssl_context == null) unsafe_ssl_context = SSLContexts.custom().loadTrustMaterial(null, TRUST_ALL).build();
-                return new SSLConnectionSocketFactory(unsafe_ssl_context, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            } catch (Exception e) {
-                Logger.e(TAG, "cannot instantiate the unsafe SSL socket factory", e);
-                return SSLConnectionSocketFactory.getSocketFactory();
-            }
-        }
-    }
-    
-    private static SSLContext unsafe_ssl_context = null;
-    
-    /** стратегия доверять всем без проверки сертификата */
-    private static final TrustStrategy TRUST_ALL = new TrustStrategy() {
-        @Override
-        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            return true;
-        }
-    };
 }
