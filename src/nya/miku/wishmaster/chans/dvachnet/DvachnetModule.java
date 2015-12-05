@@ -26,11 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -60,7 +60,6 @@ import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-@SuppressWarnings("deprecation") // https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class DvachnetModule extends AbstractWakabaModule {
     
     static final String CHAN_NAME = "dva-ch.net";
@@ -348,7 +347,7 @@ public class DvachnetModule extends AbstractWakabaModule {
         pairs.add(new BasicNameValuePair("task", "delete"));
         pairs.add(new BasicNameValuePair("password", model.password));
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
         HttpResponseModel response = null;
         try {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);

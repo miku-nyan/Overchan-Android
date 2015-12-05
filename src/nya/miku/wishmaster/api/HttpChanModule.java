@@ -18,19 +18,14 @@
 
 package nya.miku.wishmaster.api;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.cookie.Cookie;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.cookie.Cookie;
 
 /**
  * Интерфейс модуля чана, работающего через HTTP и использующего интерфейс Apache {@link HttpClient}
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public interface HttpChanModule extends ChanModule {
     

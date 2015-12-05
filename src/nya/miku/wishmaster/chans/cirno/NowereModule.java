@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -59,10 +59,6 @@ import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 public class NowereModule extends AbstractChanModule {
     
     static final String NOWERE_NAME = "nowere.net";
@@ -252,7 +248,7 @@ public class NowereModule extends AbstractChanModule {
         if (model.onlyFiles) pairs.add(new BasicNameValuePair("fileonly", "on"));
         pairs.add(new BasicNameValuePair("password", model.password));
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
         HttpResponseModel response = null;
         try {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);

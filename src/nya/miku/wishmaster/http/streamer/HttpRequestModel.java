@@ -20,8 +20,8 @@ package nya.miku.wishmaster.http.streamer;
 
 import nya.miku.wishmaster.http.HttpConstants;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpEntity;
 
 /**
  * Модель HTTP запроса для работы с синглтоном {@link HttpStreamer}.
@@ -29,11 +29,6 @@ import org.apache.http.HttpEntity;
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class HttpRequestModel {
     //константы

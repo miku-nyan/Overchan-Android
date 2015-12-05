@@ -31,12 +31,12 @@ import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.params.ConnRouteParams;
-import org.apache.http.message.BasicHeader;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.HttpHost;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.conn.params.ConnRouteParams;
+import cz.msebera.android.httpclient.message.BasicHeader;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -49,11 +49,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
 @SuppressWarnings("deprecation")
-
 public class RecaptchaAjax {
     private static final String TAG = "RecaptchaAjax";
     

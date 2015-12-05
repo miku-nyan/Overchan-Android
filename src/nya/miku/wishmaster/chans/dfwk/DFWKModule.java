@@ -29,11 +29,11 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -61,7 +61,6 @@ import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
-@SuppressWarnings("deprecation") //https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class DFWKModule extends AbstractWakabaModule {
     
     private static final String CHAN_NAME = "chuck.dfwk.ru";
@@ -263,7 +262,7 @@ public class DFWKModule extends AbstractWakabaModule {
         pairs.add(new BasicNameValuePair("postpassword", model.password));
         pairs.add(new BasicNameValuePair("deletepost", "Удалить"));
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
         if (result.contains("Неправильный пароль")) throw new Exception("Неправильный пароль");
         return null;

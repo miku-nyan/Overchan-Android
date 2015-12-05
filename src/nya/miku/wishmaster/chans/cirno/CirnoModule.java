@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractChanModule;
@@ -64,11 +64,6 @@ import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputFilter;
 import android.text.InputType;
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 /**
  * Основной модуль для iichan.hk
@@ -323,7 +318,7 @@ public class CirnoModule extends AbstractChanModule {
         if (model.onlyFiles) pairs.add(new BasicNameValuePair("fileonly", "on"));
         pairs.add(new BasicNameValuePair("password", model.password));
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
         HttpResponseModel response = null;
         try {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);

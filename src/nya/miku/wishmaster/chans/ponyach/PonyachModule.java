@@ -32,13 +32,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -90,7 +90,6 @@ import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
 @SuppressLint("SimpleDateFormat")
-@SuppressWarnings("deprecation") //https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class PonyachModule extends AbstractWakabaModule {
     private static final String TAG = "PonyachModule";
     private static final String CHAN_NAME = "ponyach";
@@ -174,7 +173,7 @@ public class PonyachModule extends AbstractWakabaModule {
     private void loadPhpCookies(String usingDomain) {
         String phpSessionCookie = preferences.getString(getSharedKey(PREF_KEY_PHPSESSION_COOKIE), null);
         if (phpSessionCookie != null) {
-            BasicClientCookieHC4 c = new BasicClientCookieHC4(PHPSESSION_COOKIE_NAME, phpSessionCookie);
+            BasicClientCookie c = new BasicClientCookie(PHPSESSION_COOKIE_NAME, phpSessionCookie);
             c.setDomain(usingDomain);
             httpClient.getCookieStore().addCookie(c);
         }
@@ -226,7 +225,7 @@ public class PonyachModule extends AbstractWakabaModule {
                             if (passAuthTask.isCancelled()) return;
                             String url = getUsingUrl() + "passcode.php";
                             List<BasicNameValuePair> pairs = Collections.singletonList(new BasicNameValuePair("passcode_just_set", newPasscode));
-                            HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).build();
+                            HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).build();
                             HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, null, passAuthTask, false);
                             savePhpCookies();
                         } catch (final Exception e) {
@@ -484,7 +483,7 @@ public class PonyachModule extends AbstractWakabaModule {
         private void setCaptchaTypeCookie() {
             PonyachModule thisModule = ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME));
             String level = thisModule.preferences.getString(thisModule.getSharedKey(PREF_KEY_CAPTCHA_LEVEL), "1");
-            BasicClientCookieHC4 cookie = new BasicClientCookieHC4(CAPTCHATYPE_COOKIE_NAME, level);
+            BasicClientCookie cookie = new BasicClientCookie(CAPTCHATYPE_COOKIE_NAME, level);
             cookie.setDomain(thisModule.getUsingDomain());
             thisModule.httpClient.getCookieStore().addCookie(cookie);
         }

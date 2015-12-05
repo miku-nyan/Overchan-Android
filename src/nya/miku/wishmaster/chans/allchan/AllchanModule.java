@@ -28,8 +28,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -74,7 +74,6 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-@SuppressWarnings("deprecation") //https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class AllchanModule extends AbstractChanModule {
     private static final String TAG = "AllchanModule";
     private static final String CHAN_NAME = "allchan.su";
@@ -155,7 +154,7 @@ public class AllchanModule extends AbstractChanModule {
     protected void initHttpClient() {
         String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
         if (cloudflareCookie != null) {
-            BasicClientCookieHC4 c = new BasicClientCookieHC4(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
+            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
             c.setDomain(DOMAIN);
             httpClient.getCookieStore().addCookie(c);
         }

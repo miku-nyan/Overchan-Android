@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -59,11 +59,6 @@ import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class Chan410Module extends AbstractChanModule {
     
@@ -98,7 +93,7 @@ public class Chan410Module extends AbstractChanModule {
         for (String board : Chan410Boards.ALL_BOARDS_SET) {
             String value = savedCookies.optString(board);
             if (value != null && value.length() > 0) {
-                BasicClientCookieHC4 c = new BasicClientCookieHC4(board, value);
+                BasicClientCookie c = new BasicClientCookie(board, value);
                 c.setDomain("." + CHAN410_DOMAIN);
                 c.setPath("/");
                 httpClient.getCookieStore().addCookie(c);
@@ -270,7 +265,7 @@ public class Chan410Module extends AbstractChanModule {
         pairs.add(new BasicNameValuePair("postpassword", model.password));
         pairs.add(new BasicNameValuePair("deletepost", "Удалить"));
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
         if (result.contains("Неверный пароль")) throw new Exception("Неверный пароль");
         return null;
@@ -285,7 +280,7 @@ public class Chan410Module extends AbstractChanModule {
         pairs.add(new BasicNameValuePair("delete[]", model.postNumber));
         pairs.add(new BasicNameValuePair("reportpost", "Пожаловаться"));
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
         String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
         if (result.contains("Post successfully reported")) return null;
         throw new Exception(result);

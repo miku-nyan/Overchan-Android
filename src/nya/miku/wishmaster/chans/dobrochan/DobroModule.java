@@ -32,13 +32,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -77,11 +77,6 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class DobroModule extends AbstractChanModule {
     private static final String TAG = "DobroModule";
@@ -155,7 +150,7 @@ public class DobroModule extends AbstractChanModule {
     private void loadHanabiraCookie() {
         String hanabiraCookie = preferences.getString(getSharedKey(PREF_KEY_HANABIRA_COOKIE), null);
         if (hanabiraCookie != null) {
-            BasicClientCookieHC4 c = new BasicClientCookieHC4(HANABIRA_COOKIE_NAME, hanabiraCookie);
+            BasicClientCookie c = new BasicClientCookie(HANABIRA_COOKIE_NAME, hanabiraCookie);
             c.setDomain(getDomain());
             httpClient.getCookieStore().addCookie(c);
         }
@@ -480,7 +475,7 @@ public class DobroModule extends AbstractChanModule {
         pairs.add(new BasicNameValuePair("task", "delete"));
         pairs.add(new BasicNameValuePair("password", model.password));
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setNoRedirect(true).build();
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
         HttpResponseModel response = null;
         try {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);

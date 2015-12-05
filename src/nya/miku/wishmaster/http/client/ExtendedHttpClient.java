@@ -25,17 +25,17 @@ import javax.net.ssl.SSLContext;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.HttpConstants;
 
-import org.apache.http.HttpHost;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.BasicCookieStoreHC4;
-import org.apache.http.impl.client.HttpClients;
+import cz.msebera.android.httpclient.HttpHost;
+import cz.msebera.android.httpclient.client.CookieStore;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.config.CookieSpecs;
+import cz.msebera.android.httpclient.client.config.RequestConfig;
+import cz.msebera.android.httpclient.conn.socket.LayeredConnectionSocketFactory;
+import cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory;
+import cz.msebera.android.httpclient.conn.ssl.SSLContexts;
+import cz.msebera.android.httpclient.conn.ssl.TrustStrategy;
+import cz.msebera.android.httpclient.impl.client.BasicCookieStore;
+import cz.msebera.android.httpclient.impl.client.HttpClients;
 
 /**
  * Основной HTTP-клиент, используемый в проекте.<br>
@@ -44,11 +44,6 @@ import org.apache.http.impl.client.HttpClients;
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class ExtendedHttpClient extends HttpClientWrapper {
     private static final String TAG = "ExtendedHttpClient";
@@ -77,7 +72,7 @@ public class ExtendedHttpClient extends HttpClientWrapper {
      */
     public ExtendedHttpClient(boolean safe, HttpHost proxy) {
         super();
-        this.cookieStore = new BasicCookieStoreHC4();
+        this.cookieStore = new BasicCookieStore();
         this.proxy = proxy;
         setClient(build(safe, proxy, cookieStore));
     }

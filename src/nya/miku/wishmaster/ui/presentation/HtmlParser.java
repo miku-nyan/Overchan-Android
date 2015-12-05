@@ -64,6 +64,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -697,7 +698,7 @@ class HtmlToSpannedConverter implements ContentHandler {
         for (String s : cssStyle) {
             int color = parseColor(s);
             if (color != 0) {
-                if (s.toLowerCase().indexOf("background") != -1) backgroundColor = color; else foregroundColor = color;
+                if (s.toLowerCase(Locale.US).indexOf("background") != -1) backgroundColor = color; else foregroundColor = color;
             }
         }
         if (foregroundColor == 0 && backgroundColor == 0) {
@@ -882,7 +883,7 @@ class ColorHidden {
      * @return A color value, or {@code -1} if the color string could not be interpreted.
      */
     public static int getHtmlColor(String color) {
-        Integer i = sColorNameMap.get(color.toLowerCase());
+        Integer i = sColorNameMap.get(color.toLowerCase(Locale.US));
         if (i != null) {
             return i;
         } else {

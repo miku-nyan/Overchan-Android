@@ -27,7 +27,7 @@ import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaException;
 
-import org.apache.http.cookie.Cookie;
+import cz.msebera.android.httpclient.cookie.Cookie;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -47,11 +47,6 @@ import android.widget.ImageView;
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 /*package*/ class CloudflareUIHandler {
     private CloudflareUIHandler() {}

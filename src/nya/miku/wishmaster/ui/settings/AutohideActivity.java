@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.http.util.TextUtils;
+import cz.msebera.android.httpclient.util.TextUtils;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;

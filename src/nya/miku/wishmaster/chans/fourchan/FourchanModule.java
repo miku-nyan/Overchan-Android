@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -79,8 +79,6 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-@SuppressWarnings("deprecation")
-//https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class FourchanModule extends AbstractChanModule {
     
     static final String CHAN_NAME = "4chan.org";
@@ -195,7 +193,7 @@ public class FourchanModule extends AbstractChanModule {
                             pairs.add(new BasicNameValuePair("act", "do_login"));
                             pairs.add(new BasicNameValuePair("id", token));
                             pairs.add(new BasicNameValuePair("pin", pin));
-                            HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).build();
+                            HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).build();
                             String response = HttpStreamer.getInstance().getStringFromUrl(authUrl, request, httpClient, null, passAuthTask, false);
                             if (passAuthTask.isCancelled()) return;
                             if (response.contains("Your device is now authorized")) {
@@ -283,21 +281,21 @@ public class FourchanModule extends AbstractChanModule {
         if (saveToPreferences) preferences.edit().putString(getSharedKey(PREF_KEY_PASS_COOKIE), cookie).commit();
         if (cookie.length() > 0) {
             usingPasscode = true;
-            BasicClientCookieHC4 c1 = new BasicClientCookieHC4("pass_id", cookie);
+            BasicClientCookie c1 = new BasicClientCookie("pass_id", cookie);
             c1.setDomain(".4chan.org");
             c1.setPath("/");
             httpClient.getCookieStore().addCookie(c1);
-            BasicClientCookieHC4 c2 = new BasicClientCookieHC4("pass_enabled", "1");
+            BasicClientCookie c2 = new BasicClientCookie("pass_enabled", "1");
             c2.setDomain(".4chan.org");
             c2.setPath("/");
             httpClient.getCookieStore().addCookie(c2);
         } else {
             usingPasscode = false;
-            BasicClientCookieHC4 c = new BasicClientCookieHC4("pass_id", "0");
+            BasicClientCookie c = new BasicClientCookie("pass_id", "0");
             c.setDomain(".4chan.org");
             c.setPath("/");
             httpClient.getCookieStore().addCookie(c);
-            BasicClientCookieHC4 c2 = new BasicClientCookieHC4("pass_enabled", "0");
+            BasicClientCookie c2 = new BasicClientCookie("pass_enabled", "0");
             c2.setDomain(".4chan.org");
             c2.setPath("/");
             httpClient.getCookieStore().addCookie(c2);

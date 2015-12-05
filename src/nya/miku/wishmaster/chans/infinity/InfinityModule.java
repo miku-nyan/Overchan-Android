@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.TextUtils;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.util.TextUtils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -66,11 +66,6 @@ import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class InfinityModule extends AbstractVichanModule {
     private static final String TAG = "InfinityModule";
@@ -129,7 +124,7 @@ public class InfinityModule extends AbstractVichanModule {
     protected void initHttpClient() {
         String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
         if (cloudflareCookie != null) {
-            BasicClientCookieHC4 c = new BasicClientCookieHC4(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
+            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
             c.setDomain(DEFAULT_DOMAIN);
             httpClient.getCookieStore().addCookie(c);
         }
@@ -318,7 +313,7 @@ public class InfinityModule extends AbstractVichanModule {
             List<NameValuePair> pairs = new ArrayList<NameValuePair>();
             pairs.add(new BasicNameValuePair("captcha_text", answer));
             pairs.add(new BasicNameValuePair("captcha_cookie", torCaptchaCookie));
-            HttpRequestModel rqModel = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setTimeout(30000).build();
+            HttpRequestModel rqModel = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setTimeout(30000).build();
             String response = HttpStreamer.getInstance().getStringFromUrl(url, rqModel, httpClient, null, task, true);
             if (response.contains("Error") && !response.contains("Success")) throw new HttpWrongStatusCodeException(400, "400");
             needTorCaptcha = false;
@@ -437,7 +432,7 @@ public class InfinityModule extends AbstractVichanModule {
         refererPage.threadNumber = model.threadNumber;
         Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
         HttpRequestModel rqModel = HttpRequestModel.builder().
-                setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+                setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setCustomHeaders(customHeaders).setNoRedirect(true).build();
         HttpResponseModel response = null;
         try {
             response = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);

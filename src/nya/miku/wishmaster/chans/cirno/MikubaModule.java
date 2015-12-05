@@ -25,9 +25,9 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.entity.mime.content.ByteArrayBody;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -66,11 +66,6 @@ import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class MikubaModule extends AbstractChanModule {
     private static final String TAG = "MikubaModule";
@@ -149,12 +144,12 @@ public class MikubaModule extends AbstractChanModule {
         String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
         String sessionCookie = preferences.getString(getSharedKey(PREF_KEY_SESSION_COOKIE), null);
         if (cloudflareCookie != null) {
-            BasicClientCookieHC4 c = new BasicClientCookieHC4(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
+            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
             c.setDomain(MIKUBA_DOMAIN);
             httpClient.getCookieStore().addCookie(c);
         }
         if (sessionCookie != null) {
-            BasicClientCookieHC4 c = new BasicClientCookieHC4(SESSION_COOKIE_NAME, sessionCookie);
+            BasicClientCookie c = new BasicClientCookie(SESSION_COOKIE_NAME, sessionCookie);
             c.setDomain(MIKUBA_DOMAIN);
             httpClient.getCookieStore().addCookie(c);
         }

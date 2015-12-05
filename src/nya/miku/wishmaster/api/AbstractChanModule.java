@@ -35,9 +35,9 @@ import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
-import org.apache.http.HttpHost;
-import org.apache.http.client.HttpClient;
-import org.apache.http.cookie.Cookie;
+import cz.msebera.android.httpclient.HttpHost;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.cookie.Cookie;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -51,11 +51,6 @@ import android.preference.PreferenceGroup;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.text.InputFilter;
 import android.text.InputType;
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public abstract class AbstractChanModule implements HttpChanModule {
     private static final String TAG = "AbstractChanModule";

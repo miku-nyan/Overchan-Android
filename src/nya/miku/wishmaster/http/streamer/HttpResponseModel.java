@@ -23,22 +23,17 @@ import java.io.InputStream;
 
 import nya.miku.wishmaster.common.Logger;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.util.EntityUtilsHC4;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpEntity;
+import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.client.methods.HttpUriRequest;
+import cz.msebera.android.httpclient.util.EntityUtils;
 
 /**
  * Модель HTTP ответа, содержит поток полученных данных и другую информацию
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class HttpResponseModel {
     private static final String TAG = "HttpResponseModel";
@@ -84,7 +79,7 @@ public class HttpResponseModel {
         try {
             if (response != null) {
                 HttpEntity entity = response.getEntity();
-                EntityUtilsHC4.consume(entity);
+                EntityUtils.consume(entity);
             }
         } catch (Exception e) {
             Logger.e(TAG, e);

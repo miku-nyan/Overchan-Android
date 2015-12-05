@@ -61,9 +61,9 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
+import cz.msebera.android.httpclient.HttpEntity;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -83,11 +83,6 @@ import android.text.InputType;
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 public class MakabaModule extends AbstractChanModule {
     private static final String TAG = "MakabaModule"; 
@@ -157,7 +152,7 @@ public class MakabaModule extends AbstractChanModule {
     /** Установить cookie к текущему клиенту */
     private void setCookie(String domain, String name, String value) {
         if (value == null || value.equals("")) return;
-        BasicClientCookieHC4 c = new BasicClientCookieHC4(name, value);
+        BasicClientCookie c = new BasicClientCookie(name, value);
         c.setDomain(domain == null || domain.equals("") ? ("." + this.domain) : domain);
         c.setPath("/");
         httpClient.getCookieStore().addCookie(c);

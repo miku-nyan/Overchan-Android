@@ -38,13 +38,13 @@ import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.ui.AppearanceUtils;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -61,8 +61,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-@SuppressWarnings("deprecation") // https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 
 public class Recaptcha2fallback extends InteractiveException {
     private static final long serialVersionUID = 1L;
@@ -249,7 +247,7 @@ public class Recaptcha2fallback extends InteractiveException {
                                                     if (isSelected[i]) pairs.add(new BasicNameValuePair("response", Integer.toString(i)));
                                                 
                                                 HttpRequestModel request = HttpRequestModel.builder().
-                                                        setPOST(new UrlEncodedFormEntityHC4(pairs, "UTF-8")).
+                                                        setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).
                                                         setCustomHeaders(new Header[] {
                                                                 new BasicHeader(HttpHeaders.REFERER, usingURL)
                                                         }).build();

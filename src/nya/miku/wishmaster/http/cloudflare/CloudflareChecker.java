@@ -35,13 +35,13 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.WebViewProxy;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
 
-import org.apache.http.HttpHost;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.params.ConnRouteParams;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.cookie.SetCookie;
-import org.apache.http.impl.cookie.BasicClientCookieHC4;
+import cz.msebera.android.httpclient.HttpHost;
+import cz.msebera.android.httpclient.client.CookieStore;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.conn.params.ConnRouteParams;
+import cz.msebera.android.httpclient.cookie.Cookie;
+import cz.msebera.android.httpclient.cookie.SetCookie;
+import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -63,11 +63,7 @@ import android.webkit.WebViewClient;
  *
  */
 
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
 @SuppressWarnings("deprecation")
-
 public class CloudflareChecker {
     private static final String TAG = "CloudflareChecker";
     
@@ -163,7 +159,7 @@ public class CloudflareChecker {
                     Logger.e(TAG, e);
                 }
                 if (value != null) {
-                    BasicClientCookieHC4 cf_cookie = new BasicClientCookieHC4(exception.getRequiredCookieName(), value);
+                    BasicClientCookie cf_cookie = new BasicClientCookie(exception.getRequiredCookieName(), value);
                     cf_cookie.setDomain("." + Uri.parse(url).getHost());
                     cf_cookie.setPath("/");
                     currentCookie = cf_cookie;

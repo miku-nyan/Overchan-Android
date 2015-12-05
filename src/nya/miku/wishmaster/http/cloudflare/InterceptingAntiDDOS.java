@@ -31,8 +31,8 @@ import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
-import org.apache.http.client.CookieStore;
-import org.apache.http.cookie.Cookie;
+import cz.msebera.android.httpclient.client.CookieStore;
+import cz.msebera.android.httpclient.cookie.Cookie;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -51,11 +51,6 @@ import android.webkit.WebViewClient;
  * @author miku-nyan
  *
  */
-
-/* Google пометила все классы и интерфейсы пакета org.apache.http как "deprecated" в API 22 (Android 5.1)
- * На самом деле используется актуальная версия apache-hc httpclient 4.3.5.1-android
- * Подробности: https://issues.apache.org/jira/browse/HTTPCLIENT-1632 */
-@SuppressWarnings("deprecation")
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 /*package*/ class InterceptingAntiDDOS {

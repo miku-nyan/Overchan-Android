@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.Header;
-import org.apache.http.client.entity.UrlEncodedFormEntityHC4;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -60,7 +60,6 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-@SuppressWarnings("deprecation") //https://issues.apache.org/jira/browse/HTTPCLIENT-1632
 public class Chan420Module extends AbstractChanModule {
     
     static final String CHAN_NAME = "420chan.org";
@@ -194,7 +193,7 @@ public class Chan420Module extends AbstractChanModule {
         int bVal = (int) (Math.random() * 10000);
         String banana = HttpStreamer.getInstance().getJSONObjectFromUrl((useHttps() ? "https://" : "http://") + "boards.420chan.org/bunker/",
                 HttpRequestModel.builder().
-                setPOST(new UrlEncodedFormEntityHC4(Collections.singletonList(new BasicNameValuePair("b", Integer.toString(bVal))), "UTF-8")).
+                setPOST(new UrlEncodedFormEntity(Collections.singletonList(new BasicNameValuePair("b", Integer.toString(bVal))), "UTF-8")).
                 setCustomHeaders(new Header[] { new BasicHeader("X-Requested-With", "XMLHttpRequest") }).
                 build(), httpClient, null, task, false).optString("response");
         
@@ -242,8 +241,8 @@ public class Chan420Module extends AbstractChanModule {
         pageModel.threadNumber = model.threadNumber;
         String location = buildUrl(pageModel);
         String url = (useHttps() ? "https://" : "http://") + "420chan.org:8080/narcbot/ajaxReport.jsp?postId=" + model.postNumber +
-                "&reason=RULE_VIOLATION&note=" + URLEncoder.encode(model.reportReason).replace("+", "%20") +
-                "&location=" + URLEncoder.encode(location).replace("+", "%20") + "&parentId=" + model.threadNumber;
+                "&reason=RULE_VIOLATION&note=" + URLEncoder.encode(model.reportReason, "UTF-8").replace("+", "%20") +
+                "&location=" + URLEncoder.encode(location, "UTF-8").replace("+", "%20") + "&parentId=" + model.threadNumber;
         String response =
                 HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false);
         Matcher matcher = REPORT_PATTERN.matcher(response);

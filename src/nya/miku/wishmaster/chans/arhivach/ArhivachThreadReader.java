@@ -1,5 +1,6 @@
 package nya.miku.wishmaster.chans.arhivach;
 
+import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import nya.miku.wishmaster.common.Logger;
 /**
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 03.07.2015.
  */
+@SuppressLint("SimpleDateFormat")
 public class ArhivachThreadReader  implements Closeable {
     private static final String TAG = "ArhivachThreadReader";
 
