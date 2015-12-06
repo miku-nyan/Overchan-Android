@@ -19,7 +19,7 @@
 package nya.miku.wishmaster.http.client;
 
 import nya.miku.wishmaster.http.HttpConstants;
-
+import nya.miku.wishmaster.http.SSLCompatibility;
 import cz.msebera.android.httpclient.HttpHost;
 import cz.msebera.android.httpclient.client.CookieStore;
 import cz.msebera.android.httpclient.client.HttpClient;
@@ -94,6 +94,7 @@ public class ExtendedHttpClient extends HttpClientWrapper {
     }
     
     private static HttpClient build(boolean safe, final HttpHost proxy, CookieStore cookieStore) {
+        SSLCompatibility.waitIfInstallingAsync();
         return HttpClients.custom().
                 setDefaultRequestConfig(getDefaultRequestConfigBuilder(HttpConstants.DEFAULT_HTTP_TIMEOUT).build()).
                 setUserAgent(HttpConstants.USER_AGENT_STRING).

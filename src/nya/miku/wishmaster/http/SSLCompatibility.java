@@ -19,30 +19,60 @@
 package nya.miku.wishmaster.http;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.common.PriorityThreadFactory;
 
 public class SSLCompatibility {
     private static final String TAG = "SSLCompatibility";
     
-    private static AtomicBoolean fixed = new AtomicBoolean(false);
+    private static volatile Thread workingThread = null;
     
-    public static void fixSSLs(Context c) {
-        if (fixed.compareAndSet(false, true)) {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    Logger.d(TAG, "try to install security provider");
-                    Context remote = c.createPackageContext("com.google.android.gms", Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
-                    Method method = remote.getClassLoader().loadClass("com.google.android.gms.common.security.ProviderInstallerImpl").
-                            getMethod("insertProvider", Context.class);
-                    method.invoke(null, remote);
+    /**
+     * Вызывается один раз в начале работы приложения (из {@link android.app.Application#onCreate()})
+     */
+    public static void fixSSLs(final Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            workingThread = PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                @Override
+                public void run() {
+                    installProviderImpl(context);
+                    workingThread = null;
                 }
+            });
+            workingThread.start();
+        }
+    }
+    
+    public static void waitIfInstallingAsync() {
+        if (workingThread == null) return;
+        synchronized (SSLCompatibility.class) {
+            try {
+                Thread thread = workingThread;
+                if (thread == null) return;
+                thread.join(5000);
+                if (thread.isAlive()) Logger.e(TAG, "security provider installation timeout");
+                workingThread = null;
             } catch (Exception e) {
                 Logger.e(TAG, e);
             }
+        }
+    }
+    
+    private static void installProviderImpl(Context c) {
+        try {
+            Logger.d(TAG, "trying to install security provider");
+            Context remote = c.createPackageContext("com.google.android.gms", Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
+            Method method = remote.getClassLoader().loadClass("com.google.android.gms.common.security.ProviderInstallerImpl").
+                    getMethod("insertProvider", Context.class);
+            method.invoke(null, remote);
+            Logger.d(TAG, "security provider installed");
+        } catch (PackageManager.NameNotFoundException e) {
+            Logger.d(TAG, "package not found");
+        } catch (Exception e) {
+            Logger.e(TAG, e);
         }
     }
 }
