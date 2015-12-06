@@ -37,8 +37,10 @@ import cz.msebera.android.httpclient.impl.client.HttpClients;
  */
 
 public class ExtendedHttpClient extends HttpClientWrapper {
+    private final boolean safe;
     private final CookieStore cookieStore;
     private final HttpHost proxy;
+    private volatile HttpClient httpClient;
     
     /**
      * Получить хранилище Cookies данного экземпляра
@@ -54,6 +56,18 @@ public class ExtendedHttpClient extends HttpClientWrapper {
         return proxy;
     }
     
+    @Override
+    protected HttpClient getClient() {
+        if (httpClient == null) {
+            synchronized (this) {
+                if (httpClient == null) {
+                    httpClient = build(safe, proxy, getCookieStore());
+                }
+            }
+        }
+        return httpClient;
+    }
+    
     /**
      * Конструктор
      * @param safe включить проверку сертификата и имени хоста для SSL
@@ -61,9 +75,9 @@ public class ExtendedHttpClient extends HttpClientWrapper {
      */
     public ExtendedHttpClient(boolean safe, HttpHost proxy) {
         super();
+        this.safe = safe;
         this.cookieStore = new BasicCookieStore();
         this.proxy = proxy;
-        setClient(build(safe, proxy, cookieStore));
     }
     
     /**

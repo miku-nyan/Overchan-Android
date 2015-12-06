@@ -39,73 +39,68 @@ import cz.msebera.android.httpclient.protocol.HttpContext;
  */
 
 @SuppressWarnings("deprecation")
-public class HttpClientWrapper implements HttpClient, Closeable {
+public abstract class HttpClientWrapper implements HttpClient, Closeable {
     
-    private HttpClient client;
+    protected abstract HttpClient getClient();
     
-    protected HttpClientWrapper() {}
-    
-    protected void setClient(HttpClient client) {
-        this.client = client;
-    }
-
     @Override
     public HttpResponse execute(HttpUriRequest request) throws IOException, ClientProtocolException {
-        return client.execute(request);
+        return getClient().execute(request);
     }
     
     @Override
     public HttpResponse execute(HttpUriRequest request, HttpContext context) throws IOException, ClientProtocolException {
-        return client.execute(request, context);
+        return getClient().execute(request, context);
     }
     
     @Override
     public HttpResponse execute(HttpHost target, HttpRequest request) throws IOException, ClientProtocolException {
-        return client.execute(target, request);
+        return getClient().execute(target, request);
     }
     
     @Override
     public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler) throws IOException, ClientProtocolException {
-        return client.execute(request, responseHandler);
+        return getClient().execute(request, responseHandler);
     }
+    
     @Override
     public HttpResponse execute(HttpHost target, HttpRequest request, HttpContext context) throws IOException, ClientProtocolException {
-        return client.execute(target, request, context);
+        return getClient().execute(target, request, context);
     }
     
     @Override
     public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler, HttpContext context)
             throws IOException, ClientProtocolException {
-        return client.execute(request, responseHandler, context);
+        return getClient().execute(request, responseHandler, context);
     }
     
     @Override
     public <T> T execute(HttpHost target, HttpRequest request, ResponseHandler<? extends T> responseHandler)
             throws IOException, ClientProtocolException {
-        return client.execute(target, request, responseHandler);
+        return getClient().execute(target, request, responseHandler);
     }
     
     @Override
     public <T> T execute(HttpHost target, HttpRequest request, ResponseHandler<? extends T> responseHandler, HttpContext context)
             throws IOException, ClientProtocolException {
-        return client.execute(target, request, responseHandler, context);
+        return getClient().execute(target, request, responseHandler, context);
     }
     
     @Override
     public ClientConnectionManager getConnectionManager() {
-        return client.getConnectionManager();
+        return getClient().getConnectionManager();
     }
     
     @Override
     public HttpParams getParams() {
-        return client.getParams();
+        return getClient().getParams();
     }
-
+    
     @Override
     public void close() throws IOException {
+        HttpClient client = getClient();
         if (client instanceof Closeable) {
             ((Closeable) client).close();
         }
     }
-
 }
