@@ -143,6 +143,9 @@ public class KrautCatalogReader implements Closeable {
             case FILTER_THREAD_TITLE:
                 String headerHtml = readUntilSequence(FILTERS_CLOSE[filterIndex]);
                 int countryBallIndex = headerHtml.indexOf("<img class=\"post_country\" src=\"/images/balls/");
+                if (countryBallIndex == -1) {
+                    countryBallIndex = headerHtml.indexOf("<img class=\"post_country\" src=\"/images/warballs/");
+                }
                 if (countryBallIndex != -1) {
                     int start = countryBallIndex + 31;
                     int end = headerHtml.indexOf('\"', start);

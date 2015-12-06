@@ -72,22 +72,24 @@ public class KrautReader implements Closeable {
     private static final int FILTER_THREAD_END = 0;
     private static final int FILTER_POSTNUMBER = 1;
     private static final int FILTER_COUNTRYBALL = 2;
-    private static final int FILTER_SUBJECT = 3;
-    private static final int FILTER_POSTERNAME = 4;
-    private static final int FILTER_TRIPCODE = 5;
-    private static final int FILTER_ADMINMARK = 6;
-    private static final int FILTER_DATE = 7;
-    private static final int FILTER_SAGE = 8;
-    private static final int FILTER_ATTACHMENT = 9;
-    private static final int FILTER_ATTACHMENT_OP = 10;
-    private static final int FILTER_START_COMMENT = 11;
-    private static final int FILTER_OMITTEDPOSTS = 12;
+    private static final int FILTER_COUNTRYBALL_WAR = 3;
+    private static final int FILTER_SUBJECT = 4;
+    private static final int FILTER_POSTERNAME = 5;
+    private static final int FILTER_TRIPCODE = 6;
+    private static final int FILTER_ADMINMARK = 7;
+    private static final int FILTER_DATE = 8;
+    private static final int FILTER_SAGE = 9;
+    private static final int FILTER_ATTACHMENT = 10;
+    private static final int FILTER_ATTACHMENT_OP = 11;
+    private static final int FILTER_START_COMMENT = 12;
+    private static final int FILTER_OMITTEDPOSTS = 13;
     
     public static final char[][] FILTERS_OPEN = {
         "class=\"thread\"".toCharArray(),
         //"<div class=\"postheader\">".toCharArray(),
         "<input name=\"post_".toCharArray(),
         "<img src=\"/images/balls/".toCharArray(),
+        "<img src=\"/images/warballs/".toCharArray(),
         "<span class=\"postsubject\">".toCharArray(),
         "<span class=\"postername\">".toCharArray(),
         "<span class=\"tripcode\">".toCharArray(),
@@ -104,6 +106,7 @@ public class KrautReader implements Closeable {
     private static final char[][] FILTERS_CLOSE = {
         null,
         "\"".toCharArray(),
+        ">".toCharArray(),
         ">".toCharArray(),
         "</span>".toCharArray(),
         "</span>".toCharArray(),
@@ -215,7 +218,8 @@ public class KrautReader implements Closeable {
                 currentPost.number = readUntilSequence(FILTERS_CLOSE[filterIndex]).trim();
                 break;
             case FILTER_COUNTRYBALL:
-                parseIcon(readUntilSequence(FILTERS_CLOSE[filterIndex]));
+            case FILTER_COUNTRYBALL_WAR:
+                parseIcon(readUntilSequence(FILTERS_CLOSE[filterIndex]), filterIndex == FILTER_COUNTRYBALL_WAR);
                 break;
             case FILTER_SUBJECT:
                 currentPost.subject = StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTERS_CLOSE[filterIndex])).trim();
@@ -365,11 +369,11 @@ public class KrautReader implements Closeable {
         }
     }
     
-    private void parseIcon(String html) {
+    private void parseIcon(String html, boolean warball) {
         int fqp = html.indexOf('\"');
         if (fqp != -1) {
             BadgeIconModel model = new BadgeIconModel();
-            model.source = "/images/balls/" + html.substring(0, fqp);
+            model.source = (warball ? "/images/warballs/" : "/images/balls/") + html.substring(0, fqp);
             Matcher descMatcher = ICON_DESCRIPTION_PATTERN.matcher(html);
             if (descMatcher.find()) model.description = descMatcher.group(1);
             currentPost.icons = new BadgeIconModel[] { model };
