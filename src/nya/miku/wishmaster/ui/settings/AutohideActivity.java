@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import cz.msebera.android.httpclient.util.TextUtils;
-
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.MainApplication;
@@ -40,6 +38,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
 import android.view.ContextMenu;
 import android.view.ContextThemeWrapper;
