@@ -202,7 +202,7 @@ public class AllchanModule extends AbstractChanModule {
         proxyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {            
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (proxyPreference.isChecked() && !captchaPreference.getKey().equals("recaptcha")) {
+                if (proxyPreference.isChecked() && captchaPreference.getValue().equals("recaptcha")) {
                     captchaPreference.setValue("recaptcha-fallback");
                 }
                 return false;
