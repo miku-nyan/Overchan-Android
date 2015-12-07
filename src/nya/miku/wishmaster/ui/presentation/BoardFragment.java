@@ -3054,6 +3054,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     private boolean downloadFile(AttachmentModel attachment, boolean fromGridGallery) {
+        if (!CompatibilityUtils.hasAccessStorage(activity)) return true;
         if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return true;
         String subdir = (fromGridGallery && tabModel.pageModel.type == UrlPageModel.TYPE_THREADPAGE) ? getCustomSubdir(tabModel.pageModel) : null;
         DownloadingService.DownloadingQueueItem item = (subdir != null) ?
@@ -3084,6 +3085,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     @SuppressLint("InflateParams")
     private void saveThisPage() {
+        if (!CompatibilityUtils.hasAccessStorage(activity)) return;
         DownloadingService.DownloadingQueueItem check = new DownloadingService.DownloadingQueueItem(
                 tabModel.pageModel, presentationModel.source.boardModel, DownloadingService.MODE_DOWNLOAD_ALL);
         String itemName = resources.getString(R.string.downloading_thread_format, tabModel.pageModel.boardName, tabModel.pageModel.threadNumber);

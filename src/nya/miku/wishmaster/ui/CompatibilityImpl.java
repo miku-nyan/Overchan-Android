@@ -21,6 +21,7 @@ package nya.miku.wishmaster.ui;
 import java.io.File;
 
 import nya.miku.wishmaster.R;
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -28,6 +29,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -286,6 +288,16 @@ public class CompatibilityImpl {
     @TargetApi(Build.VERSION_CODES.M)
     public static void setTextAppearance(TextView textView, int resId) {
         textView.setTextAppearance(resId);
+    }
+    
+    @TargetApi(Build.VERSION_CODES.M)
+    public static boolean hasAccessStorage(Activity activity) {
+        if (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
+            return false;
+        } else {
+            return true;
+        }
     }
     
 }

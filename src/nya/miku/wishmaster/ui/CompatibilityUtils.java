@@ -18,15 +18,18 @@
 
 package nya.miku.wishmaster.ui;
 
+import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Environment;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class CompatibilityUtils {
     
@@ -81,6 +84,21 @@ public class CompatibilityUtils {
             textView.setTextAppearance(textView.getContext(), resId);
         } else {
             CompatibilityImpl.setTextAppearance(textView, resId);
+        }
+    }
+    
+    public static boolean hasAccessStorage(Activity activity) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        } else {
+            if (!CompatibilityImpl.hasAccessStorage(activity)) return false;
+            
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) && !Environment.getExternalStorageDirectory().canRead()) {
+                //https://code.google.com/p/android-developer-preview/issues/detail?id=2982
+                Toast.makeText(activity, "You should restart the application", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            return true;
         }
     }
 }

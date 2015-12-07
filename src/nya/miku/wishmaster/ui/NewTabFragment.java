@@ -230,6 +230,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
     }
     
     private void openLocal() {
+        if (!CompatibilityUtils.hasAccessStorage(activity)) return;
         final ListAdapter savedThreadsAdapter = new ArrayAdapter<Object>(activity, 0) {
             private static final int HEAD_ITEM = 0;
             private static final int NORMAL_ITEM = 1;

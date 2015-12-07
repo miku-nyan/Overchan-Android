@@ -37,6 +37,7 @@ import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.lib.UriFileUtils;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
+import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import android.annotation.SuppressLint;
@@ -334,6 +335,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     Toast.makeText(this, getString(R.string.postform_max_attachments), Toast.LENGTH_LONG).show();
                     return true;
                 }
+                if (!CompatibilityUtils.hasAccessStorage(this)) return true;
                 Intent selectFile = new Intent(this, FileDialogActivity.class);
                 selectFile.putExtra(FileDialogActivity.CAN_SELECT_DIR, false);
                 selectFile.putExtra(FileDialogActivity.START_PATH, currentPath);
@@ -348,6 +350,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     Toast.makeText(this, getString(R.string.postform_max_attachments), Toast.LENGTH_LONG).show();
                     return true;
                 }
+                if (!CompatibilityUtils.hasAccessStorage(this)) return true;
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
                 startActivityForResult(i, REQUEST_CODE_ATTACH_GALLERY);
