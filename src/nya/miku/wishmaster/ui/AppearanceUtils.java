@@ -19,7 +19,6 @@
 package nya.miku.wishmaster.ui;
 
 import android.graphics.Point;
-import android.os.Build;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -29,25 +28,17 @@ public class AppearanceUtils {
     
     public static void callWhenLoaded(final View view, final Runnable runnable) {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
-                    CompatibilityImpl.removeOnGlobalLayoutListener(view, this);
-                }
-                
+                CompatibilityUtils.removeOnGlobalLayoutListener(view, this);
                 runnable.run();
             }
         });
     }
     
-    @SuppressWarnings("deprecation")
     public static Point getDisplaySize(Display display) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            return CompatibilityImpl.getDisplaySize(display);
-        }
-        return new Point(display.getWidth(), display.getWidth());
+        Point size = new Point();
+        CompatibilityUtils.getDisplaySize(display, size);
+        return size;
     }
 }

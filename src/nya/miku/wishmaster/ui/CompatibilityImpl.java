@@ -181,10 +181,8 @@ public class CompatibilityImpl {
     }
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    public static Point getDisplaySize(Display display) {
-        Point size = new Point();
-        display.getSize(size);
-        return size;
+    public static void getDisplaySize(Display display, Point outSize) {
+        display.getSize(outSize);
     }
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -201,7 +199,7 @@ public class CompatibilityImpl {
     public static void clearCookies(CookieManager cookieManager) {
         cookieManager.removeAllCookies(null);
     }
-
+    
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static void removeOnGlobalLayoutListener(View view, OnGlobalLayoutListener onGlobalLayoutListener) {
         view.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
@@ -259,7 +257,7 @@ public class CompatibilityImpl {
     public static void setBlockNetworkLoads(WebSettings settings, boolean flag) {
         settings.setBlockNetworkLoads(flag);
     }
-
+    
     @TargetApi(Build.VERSION_CODES.ECLAIR)
     public static void setVideoViewZOrderOnTop(VideoView videoView) {
         videoView.setZOrderOnTop(true);
@@ -269,7 +267,7 @@ public class CompatibilityImpl {
     public static void recreateActivity(Activity activity) {
         activity.recreate();
     }
-
+    
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static void setImageAlpha(ImageView imageView, int alpha) {
         imageView.setImageAlpha(alpha);
