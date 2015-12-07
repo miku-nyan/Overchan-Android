@@ -5,7 +5,7 @@
 -dontwarn sun.nio.ch.**
 -dontwarn sun.misc.**
 -keep,allowshrinking class ** { *; }
--keep class nya.miku.wishmaster.** { *; }
+-keep class nya.miku.** { *; }
 -keep class org.acra.** { *; }
 -keep class com.esotericsoftware.** { *; }
 -keep class sun.reflect.** { *; }
