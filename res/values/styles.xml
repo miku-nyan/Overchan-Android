@@ -118,6 +118,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="listSeparatorBackground">#F0E0D6</item>
         <item name="postUnreadOverlay">#7FFFBF3F</item>
         <item name="postBackground">#F0E0D6</item>
+        <item name="postForeground">#800000</item>
         <item name="postIndexForeground">#789922</item>
         <item name="postIndexOverBumpLimit">#C41E3A</item>
         <item name="postNumberForeground">#800000</item>
@@ -145,6 +146,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="listSeparatorBackground">#DDDDDD</item>
         <item name="postUnreadOverlay">#7FFF7F7F</item>
         <item name="postBackground">#DDDDDD</item>
+        <item name="postForeground">#333333</item>
         <item name="postIndexForeground">#789922</item>
         <item name="postIndexOverBumpLimit">#C41E3A</item>
         <item name="postNumberForeground">#333333</item>
@@ -171,6 +173,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="listSeparatorBackground">#191919</item>
         <item name="postUnreadOverlay">#7F7F3F3F</item>
         <item name="postBackground">#2C2C2C</item>
+        <item name="postForeground">#698CC0</item>
         <item name="postIndexForeground">#789922</item>
         <item name="postIndexOverBumpLimit">#C41E3A</item>
         <item name="postNumberForeground">#C9BE89</item>
@@ -197,6 +200,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="listSeparatorBackground">#D9AF9E</item>
         <item name="postUnreadOverlay">#7FFF623F</item>
         <item name="postBackground">#D9AF9E</item>
+        <item name="postForeground">#000000</item>
         <item name="postIndexForeground">#789922</item>
         <item name="postIndexOverBumpLimit">#C41E3A</item>
         <item name="postNumberForeground">#000000</item>
@@ -223,6 +227,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="listSeparatorBackground">#282A2E</item>
         <item name="postUnreadOverlay">#7F3A3A42</item>
         <item name="postBackground">#282A2E</item>
+        <item name="postForeground">#C5C8C6</item>
         <item name="postIndexForeground">#B5BD68</item>
         <item name="postIndexOverBumpLimit">#C41E3A</item>
         <item name="postNumberForeground">#5F89AC</item>
@@ -249,6 +254,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="listSeparatorBackground">#EAEFEF</item>
         <item name="postUnreadOverlay">#7FFF623F</item>
         <item name="postBackground">#EEEEEE</item>
+        <item name="postForeground">#000000</item>
         <item name="postIndexForeground">#789922</item>
         <item name="postIndexOverBumpLimit">#C41E3A</item>
         <item name="postNumberForeground">#418A8E</item>

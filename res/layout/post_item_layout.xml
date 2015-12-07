@@ -60,6 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_alignParentTop="true"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/postForeground"
             android:visibility="gone" />
         
         <nya.miku.wishmaster.lib.JellyBeanSpanFixTextView
@@ -75,6 +76,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_toLeftOf="@id/post_date"
             android:layout_toStartOf="@id/post_date"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/postForeground"
             android:visibility="visible" />
     </RelativeLayout>
     
@@ -92,6 +94,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_gravity="center_vertical"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/postForeground"
             android:visibility="visible" />
     </LinearLayout>
 
@@ -135,6 +138,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_toRightOf="@id/post_thumbnail"
             android:layout_toEndOf="@id/post_thumbnail"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/postForeground"
             android:visibility="visible" />
     </RelativeLayout>
     
@@ -164,7 +168,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textColor="?attr/postForeground"
         android:visibility="gone" />
     
     <TextView

@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <attr name="listSeparatorBackground" format="color|reference" />
         <attr name="postUnreadOverlay" format="color|reference" />
         <attr name="postBackground" format="color|reference" />
+        <attr name="postForeground" format="color|reference" />
         <attr name="postNumberForeground" format="color|reference" />
         <attr name="postNameForeground" format="color|reference" />
         <attr name="postQuoteForeground" format="color|reference" />
