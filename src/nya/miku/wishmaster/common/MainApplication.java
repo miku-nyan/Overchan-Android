@@ -63,7 +63,6 @@ import android.preference.PreferenceManager;
  */
 
 @ReportsCrashes(
-        formKey = "",
         formUri = ACRAConstants.ACRA_FORM_URL,
         reportType = org.acra.sender.HttpSender.Type.JSON,
         httpMethod = org.acra.sender.HttpSender.Method.PUT,
