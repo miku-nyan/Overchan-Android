@@ -36,6 +36,7 @@ import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.ui.AppearanceUtils;
+import nya.miku.wishmaster.ui.ResourcesCompat23;
 
 import org.apache.commons.lang3.tuple.Pair;
 import cz.msebera.android.httpclient.Header;
@@ -153,7 +154,7 @@ public class Recaptcha2fallback extends InteractiveException {
                             if (message != null) {
                                 TextView textView = new TextView(activity);
                                 textView.setText(message);
-                                textView.setTextAppearance(activity, android.R.style.TextAppearance);
+                                ResourcesCompat23.setTextAppearance(textView, android.R.style.TextAppearance);
                                 textView.setLayoutParams(new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                                 rootLayout.addView(textView);

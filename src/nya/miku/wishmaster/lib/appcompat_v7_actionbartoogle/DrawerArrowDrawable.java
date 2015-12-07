@@ -18,6 +18,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 //import android.support.v7.appcompat.R;
+import nya.miku.wishmaster.ui.ResourcesCompat23;
 
 /**
  * A drawable that can draw a "Drawer hamburger" menu or an Arrow and animate between them.
@@ -77,7 +78,7 @@ abstract class DrawerArrowDrawable extends Drawable {
             color = typedValue.data;
         } else {
             try {
-                color = context.getResources().getColor(typedValue.resourceId);
+                color = ResourcesCompat23.getColor(context.getResources(), typedValue.resourceId);
             } catch (Exception e) {
                 color = 0;
             }

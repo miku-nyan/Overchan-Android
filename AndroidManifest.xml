@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <uses-sdk
         android:minSdkVersion="4"
-        android:targetSdkVersion="22" />
+        android:targetSdkVersion="23" />
 
     <application
         android:name="nya.miku.wishmaster.common.MainApplication"

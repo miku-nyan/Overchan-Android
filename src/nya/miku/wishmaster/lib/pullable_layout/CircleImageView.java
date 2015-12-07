@@ -17,6 +17,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.view.ViewCompat;
 import android.view.animation.Animation;
 import android.widget.ImageView;
+import nya.miku.wishmaster.ui.ResourcesCompat23;
 
 /**
  * Private class created to work around issues with AnimationListeners being
@@ -105,7 +106,7 @@ class CircleImageView extends ImageView {
     public void setBackgroundColor(int colorRes) {
         if (getBackground() instanceof ShapeDrawable) {
             final Resources res = getResources();
-            ((ShapeDrawable) getBackground()).getPaint().setColor(res.getColor(colorRes));
+            ((ShapeDrawable) getBackground()).getPaint().setColor(ResourcesCompat23.getColor(res, colorRes));
         }
     }
 

@@ -66,6 +66,7 @@ import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.GalleryActivity;
 import nya.miku.wishmaster.ui.MainActivity;
 import nya.miku.wishmaster.ui.QuickAccess;
+import nya.miku.wishmaster.ui.ResourcesCompat23;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.downloading.BackgroundThumbDownloader;
 import nya.miku.wishmaster.ui.posting.PostFormActivity;
@@ -3303,7 +3304,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             
             final Button btnToSelecting = new Button(activity);
             btnToSelecting.setText(R.string.grid_gallery_select);
-            btnToSelecting.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            ResourcesCompat23.setTextAppearance(btnToSelecting, android.R.style.TextAppearance_Small);
             btnToSelecting.setSingleLine();
             btnToSelecting.setVisibility(View.VISIBLE);
             btnToSelecting.setLayoutParams(
@@ -3315,17 +3316,17 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             Button btnDownload = new Button(activity);
             btnDownload.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 3.25f));
             btnDownload.setText(R.string.grid_gallery_download);
-            btnDownload.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            ResourcesCompat23.setTextAppearance(btnDownload, android.R.style.TextAppearance_Small);
             btnDownload.setSingleLine();
             Button btnSelectAll = new Button(activity);
             btnSelectAll.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 3.75f));
             btnSelectAll.setText(android.R.string.selectAll);
-            btnSelectAll.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            ResourcesCompat23.setTextAppearance(btnSelectAll, android.R.style.TextAppearance_Small);
             btnSelectAll.setSingleLine();
             Button btnCancel = new Button(activity);
             btnCancel.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 3f));
             btnCancel.setText(android.R.string.cancel);
-            btnCancel.setTextAppearance(activity, android.R.style.TextAppearance_Small);
+            ResourcesCompat23.setTextAppearance(btnCancel, android.R.style.TextAppearance_Small);
             btnCancel.setSingleLine();
             layoutSelectingButtons.addView(btnDownload);
             layoutSelectingButtons.addView(btnSelectAll);

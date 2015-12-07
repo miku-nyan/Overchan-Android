@@ -21,6 +21,7 @@
 package nya.miku.wishmaster.ui.presentation;
 
 import android.graphics.Color;
+import nya.miku.wishmaster.ui.ResourcesCompat23;
 import nya.miku.wishmaster.ui.presentation.ClickableURLSpan.URLSpanClickListener;
 import nya.miku.wishmaster.ui.presentation.ThemeUtils.ThemeColors;
 
@@ -537,7 +538,7 @@ class HtmlToSpannedConverter implements ContentHandler {
                     String name = f.mColor.substring(1);
                     int colorRes = res.getIdentifier(name, "color", "android");
                     if (colorRes != 0) {
-                        ColorStateList colors = res.getColorStateList(colorRes);
+                        ColorStateList colors = ResourcesCompat23.getColorStateList(res, colorRes);
                         text.setSpan(new TextAppearanceSpan(null, 0, 0, colors, null), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 } else {

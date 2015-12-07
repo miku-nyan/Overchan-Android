@@ -1278,11 +1278,10 @@ public class FixedSubsamplingScaleImageView extends View {
     /**
      * Pythagoras distance between two points.
      */
-    @SuppressWarnings("deprecation")
     private float distance(float x0, float x1, float y0, float y1) {
         float x = x0 - x1;
         float y = y0 - y1;
-        return android.util.FloatMath.sqrt(x * x + y * y);
+        return (float) Math.sqrt(x * x + y * y);
     }
 
     /**

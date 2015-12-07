@@ -30,6 +30,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import android.widget.ScrollView;
+import nya.miku.wishmaster.ui.ResourcesCompat23;
 
 /**
  * The SwipeRefreshLayout should be used whenever the user can refresh the
@@ -460,7 +461,7 @@ public class SwipeRefreshLayout extends ViewGroup {
      */
     public void setProgressBackgroundColor(int colorRes) {
         mCircleView.setBackgroundColor(colorRes);
-        mProgress.setBackgroundColor(getResources().getColor(colorRes));
+        mProgress.setBackgroundColor(ResourcesCompat23.getColor(getResources(), colorRes));
     }
 
     /**
@@ -482,7 +483,7 @@ public class SwipeRefreshLayout extends ViewGroup {
         final Resources res = getResources();
         int[] colorRes = new int[colorResIds.length];
         for (int i = 0; i < colorResIds.length; i++) {
-            colorRes[i] = res.getColor(colorResIds[i]);
+            colorRes[i] = ResourcesCompat23.getColor(res, colorResIds[i]);
         }
         setColorSchemeColors(colorRes);
     }

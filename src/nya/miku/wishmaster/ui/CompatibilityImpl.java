@@ -28,6 +28,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -271,6 +273,21 @@ public class CompatibilityImpl {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static void setImageAlpha(ImageView imageView, int alpha) {
         imageView.setImageAlpha(alpha);
+    }
+    
+    @TargetApi(Build.VERSION_CODES.M)
+    public static int getColor(Resources resources, int id) {
+        return resources.getColor(id, null);
+    }
+    
+    @TargetApi(Build.VERSION_CODES.M)
+    public static ColorStateList getColorStateList(Resources resources, int id) {
+        return resources.getColorStateList(id, null);
+    }
+    
+    @TargetApi(Build.VERSION_CODES.M)
+    public static void setTextAppearance(TextView textView, int resId) {
+        textView.setTextAppearance(resId);
     }
     
 }
