@@ -274,7 +274,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         for (int id : new int[] { R.id.gallery_navigation_previous, R.id.gallery_navigation_next }) findViewById(id).setOnClickListener(this);
         viewPager.setAdapter(new GalleryAdapter());
         viewPager.setCurrentItem(currentPosition);
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 currentPosition = position;

@@ -148,7 +148,8 @@ public class FavoritesFragment extends Fragment implements AdapterView.OnItemCli
             break;
         }
         if (current != -1) viewPager.setCurrentItem(current);
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        viewPager.clearOnPageChangeListeners();
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 String title = listViews.get(position).getRight();
