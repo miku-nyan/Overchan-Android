@@ -41,9 +41,11 @@ import android.preference.Preference;
 import android.provider.DocumentsContract;
 import android.view.ActionMode;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.Window;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.webkit.CookieManager;
@@ -163,11 +165,9 @@ public class CompatibilityImpl {
         });
     }
     
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void setActionBarNoBackground(Activity activity) {
-        try {
-            activity.getActionBar().setBackgroundDrawable(null);
-        } catch (Exception e) {}
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public static void setLayoutInflater(ViewStub view, LayoutInflater inflater) {
+        view.setLayoutInflater(inflater);
     }
     
     @TargetApi(Build.VERSION_CODES.FROYO)

@@ -32,7 +32,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.ui.presentation.ThemeUtils;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
 
 public class GalleryFullscreen {
     public static final int DELAY = 2000;

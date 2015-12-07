@@ -61,12 +61,12 @@ import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.presentation.PresentationModel;
-import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -195,13 +195,11 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) requestWindowFeature(Window.FEATURE_PROGRESS);
         settings = MainApplication.getInstance().settings;
-        setTheme(settings.getTheme());
-        getTheme().applyStyle(settings.getFontSizeStyle(), true);
-        getTheme().applyStyle(R.style.Transparent, true);
+        settings.getTheme().setTo(this, R.style.Transparent);
         
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.setActionBarNoIcon(this);
         
         downloadingLocker = MainApplication.getInstance().downloadingLocker;

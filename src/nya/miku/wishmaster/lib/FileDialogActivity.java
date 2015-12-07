@@ -126,8 +126,7 @@ public class FileDialogActivity extends ListActivity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(MainApplication.getInstance().settings.getTheme());
-        getTheme().applyStyle(MainApplication.getInstance().settings.getFontSizeStyle(), true);
+        MainApplication.getInstance().settings.getTheme().setTo(this);
         super.onCreate(savedInstanceState);
         setResult(RESULT_CANCELED, getIntent());
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.ui.presentation;
+package nya.miku.wishmaster.ui.theme;
 
 import nya.miku.wishmaster.R;
 import android.content.res.Resources;
@@ -33,6 +33,7 @@ public class ThemeUtils {
     private ThemeUtils() {}
     
     private static void resolveAttribute(Theme theme, int attrId, TypedValue outValue, boolean resolveRefs) {
+        if (CustomThemeHelper.resolveAttribute(attrId, outValue)) return;
         if (!theme.resolveAttribute(attrId, outValue, resolveRefs)) outValue.type = TypedValue.TYPE_NULL;
     }
     

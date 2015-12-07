@@ -22,7 +22,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.ui.HistoryFragment;
-import nya.miku.wishmaster.ui.presentation.ThemeUtils;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;

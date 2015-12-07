@@ -24,6 +24,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.FavoritesFragment;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
+import nya.miku.wishmaster.ui.theme.GenericThemeEntry;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -136,14 +137,11 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_hide_actionbar_on_scroll), false);
     }
     
-    /**
-     * При установке темы не забывайте установить размер шрифта:
-     * <pre>
-     * setTheme(settings.getTheme());
-     * getTheme().applyStyle(settings.getFontSizeStyle());
-     * </pre>
-     */
-    public int getTheme() {
+    public GenericThemeEntry getTheme() {
+        return GenericThemeEntry.standartTheme(getThemeId(), getFontSizeStyle());
+    }
+    
+    private int getThemeId() {
         String defaultThemeValue = resources.getString(R.string.pref_theme_value_default);
         String theme = preferences.getString(resources.getString(R.string.pref_key_theme), defaultThemeValue);
         if (theme.equals(resources.getString(R.string.pref_theme_value_futaba))) return R.style.Theme_Futaba;
@@ -155,7 +153,7 @@ public class ApplicationSettings {
         return R.style.Theme_Futaba;
     }
     
-    public int getFontSizeStyle() {
+    private int getFontSizeStyle() {
         String defaultFontSizeValue = resources.getString(R.string.pref_font_size_value_default);
         String fontSize = preferences.getString(resources.getString(R.string.pref_key_font_size), defaultFontSizeValue);
         if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.FontSize_Small;
@@ -388,8 +386,6 @@ public class ApplicationSettings {
     }
     
     public class StaticSettingsContainer {
-        public int theme;
-        public int fontSizeStyle;
         public int itemHeight;
         public DownloadThumbnailsMode downloadThumbnails;
         public boolean isDisplayDate;
@@ -400,8 +396,6 @@ public class ApplicationSettings {
     }
 
     public void updateStaticSettings(StaticSettingsContainer container) {
-        container.theme = getTheme();
-        container.fontSizeStyle = getFontSizeStyle();
         container.itemHeight = getItemHeight();
         container.downloadThumbnails = isDownloadThumbnails();
         container.isDisplayDate = isDisplayDate();

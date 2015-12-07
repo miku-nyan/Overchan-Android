@@ -23,7 +23,8 @@ package nya.miku.wishmaster.ui.presentation;
 import android.graphics.Color;
 import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.presentation.ClickableURLSpan.URLSpanClickListener;
-import nya.miku.wishmaster.ui.presentation.ThemeUtils.ThemeColors;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
+import nya.miku.wishmaster.ui.theme.ThemeUtils.ThemeColors;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;

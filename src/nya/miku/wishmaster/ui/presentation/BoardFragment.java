@@ -81,6 +81,7 @@ import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;

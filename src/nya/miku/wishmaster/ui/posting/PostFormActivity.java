@@ -38,8 +38,8 @@ import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.lib.UriFileUtils;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.CompatibilityUtils;
-import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -235,8 +235,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         settings = MainApplication.getInstance().settings;
-        setTheme(settings.getTheme());
-        getTheme().applyStyle(settings.getFontSizeStyle(), true);
+        settings.getTheme().setTo(this);
         super.onCreate(savedInstanceState);
         handler = new Handler();
         attachments = new ArrayList<File>();

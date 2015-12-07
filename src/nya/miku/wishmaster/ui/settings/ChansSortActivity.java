@@ -50,8 +50,7 @@ public class ChansSortActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationSettings settings = MainApplication.getInstance().settings;
-        setTheme(settings.getTheme());
-        getTheme().applyStyle(settings.getFontSizeStyle(), true);
+        settings.getTheme().setToPreferencesActivity(this);
         setTitle(R.string.pref_chans_rearrange);
         boolean listNotFull = false;
         for (ChanModule chan : MainApplication.getInstance().chanModulesList) {

@@ -35,7 +35,6 @@ import nya.miku.wishmaster.ui.posting.PostFormActivity;
 import nya.miku.wishmaster.ui.posting.PostingService;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.presentation.FlowTextHelper;
-import nya.miku.wishmaster.ui.presentation.ThemeUtils;
 import nya.miku.wishmaster.ui.settings.PreferencesActivity;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings.StaticSettingsContainer;
 import nya.miku.wishmaster.ui.tabs.LocalHandler;
@@ -44,6 +43,8 @@ import nya.miku.wishmaster.ui.tabs.TabsAdapter;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
+import nya.miku.wishmaster.ui.theme.GenericThemeEntry;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import nya.miku.wishmaster.ui.tabs.TabsAdapter.TabSelectListener;
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
@@ -87,6 +88,7 @@ public class MainActivity extends FragmentActivity {
     
     public TabsAdapter tabsAdapter = null;
     public StaticSettingsContainer settings;
+    private GenericThemeEntry theme;
     private int autohideRulesHash;
     private float rootViewWeight = 0;
     private boolean openSpoilers;
@@ -309,8 +311,7 @@ public class MainActivity extends FragmentActivity {
         rootViewWeight = MainApplication.getInstance().settings.getRootViewWeight();
         openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-        setTheme(settings.theme);
-        getTheme().applyStyle(settings.fontSizeStyle, true);
+        (theme = MainApplication.getInstance().settings.getTheme()).setTo(this);
         super.onCreate(savedInstanceState);
         if (MainApplication.getInstance().settings.showSidePanel()) {
             setContentView(R.layout.main_activity_tablet);
@@ -423,7 +424,7 @@ public class MainActivity extends FragmentActivity {
         isPaused = false;
         TabsTrackerService.unread = false;
         StaticSettingsContainer newSettings = MainApplication.getInstance().settings.getStaticSettings();
-        if (settings.theme != newSettings.theme || settings.fontSizeStyle != newSettings.fontSizeStyle ||
+        if (!MainApplication.getInstance().settings.getTheme().equals(theme) ||
                 settings.isDisplayDate != newSettings.isDisplayDate ||
                 (settings.isDisplayDate && (settings.isLocalTime != newSettings.isLocalTime)) ||
                 MainApplication.getInstance().settings.getAutohideRulesJson().hashCode() != autohideRulesHash ||

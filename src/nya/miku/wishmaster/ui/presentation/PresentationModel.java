@@ -44,6 +44,7 @@ import nya.miku.wishmaster.ui.presentation.ClickableURLSpan.URLSpanClickListener
 import nya.miku.wishmaster.ui.presentation.FlowTextHelper.FloatingModel;
 import nya.miku.wishmaster.ui.presentation.HtmlParser.ImageGetter;
 import nya.miku.wishmaster.ui.settings.AutohideActivity;
+import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import android.content.res.Resources.Theme;
 
 /**

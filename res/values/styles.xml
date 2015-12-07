@@ -106,6 +106,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
     </style>
     
+    <style name="Custom_Theme_Light">
+        <item name="android:textColorPrimary">#000001</item>
+    </style>
+    
+    <style name="Custom_Theme_Dark">
+        <item name="android:textColorPrimary">#FFFFFE</item>
+    </style>
+    
     <!-- Themes -->
     
     <style name="Theme_Futaba" parent="@style/Theme_Light_Base">

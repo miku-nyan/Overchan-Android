@@ -66,9 +66,7 @@ public class AutohideActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         settings = MainApplication.getInstance().settings;
-        setTheme(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2 || Build.VERSION.SDK_INT < Build.VERSION_CODES.ECLAIR_0_1 ?
-                settings.getTheme() : R.style.Theme_Neutron);
-        getTheme().applyStyle(settings.getFontSizeStyle(), true);
+        settings.getTheme().setToPreferencesActivity(this);
         super.onCreate(savedInstanceState);
         setTitle(R.string.autohide_title);
         
