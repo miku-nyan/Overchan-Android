@@ -2586,6 +2586,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
         });
         field.addTextChangedListener(new OnSearchTextChangedListener(this));
+        field.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        if (resources.getDimensionPixelSize(R.dimen.panel_height) < field.getMeasuredHeight())
+            searchBarView.getLayoutParams().height = field.getMeasuredHeight();
         searchBarInitialized = true;
     }
     
