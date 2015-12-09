@@ -30,9 +30,9 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 public class CirnoBoards {
     private static final String[] ATTACHMENT_FILTERS = new String[] { "jpg", "jpeg", "png", "gif" };
     
-    private static final List<String> IICHAN_BOARDS_410 = Arrays.asList(new String[] { "gnx", "int", "ts", "cu", "dev" });
+    private static final List<String> IICHAN_BOARDS_410 = Arrays.asList("gnx", "int", "ts", "cu", "dev");
     
-    private static final List<String> IICHAN_SPOILER_MARK_BOARDS = Arrays.asList(new String[] { "bro", "maid", "med", "tv", "a", "fi", "to", "vn" });
+    private static final List<String> IICHAN_SPOILER_MARK_BOARDS = Arrays.asList("bro", "maid", "med", "tv", "a", "fi", "to", "vn", "vg");
     
     private static final List<BoardModel> LIST_IICHAN = new ArrayList<BoardModel>();
     private static final Map<String, BoardModel> MAP_IICHAN = new HashMap<String, BoardModel>();
