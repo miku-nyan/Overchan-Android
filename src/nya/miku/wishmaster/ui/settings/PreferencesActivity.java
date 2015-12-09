@@ -21,20 +21,27 @@ package nya.miku.wishmaster.ui.settings;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
+import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
+import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.NewTabFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
+
+import java.io.FileInputStream;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -51,6 +58,8 @@ import android.widget.Toast;
 
 public class PreferencesActivity extends PreferenceActivity {
     private static final String TAG = "PreferencesActivity";
+    
+    private static final int REQUEST_CODE_SELECT_CUSTOM_THEME = 1;
     
     public static boolean needUpdateChansScreen = false;
     
@@ -166,6 +175,24 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
         
+        getPreferenceManager().findPreference(getString(R.string.pref_key_theme)).setOnPreferenceChangeListener(
+                new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (getString(R.string.pref_theme_value_custom).equals(newValue)) {
+                    if (!CompatibilityUtils.hasAccessStorage(PreferencesActivity.this)) return false;
+                    Intent selectFile = new Intent(PreferencesActivity.this, FileDialogActivity.class);
+                    selectFile.putExtra(FileDialogActivity.CAN_SELECT_DIR, false);
+                    selectFile.putExtra(FileDialogActivity.START_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
+                    selectFile.putExtra(FileDialogActivity.SELECTION_MODE, FileDialogActivity.SELECTION_MODE_OPEN);
+                    selectFile.putExtra(FileDialogActivity.FORMAT_FILTER, new String[] { "json" });
+                    startActivityForResult(selectFile, REQUEST_CODE_SELECT_CUSTOM_THEME);
+                    return false;
+                }
+                return true;
+            }
+        });
+        
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -222,6 +249,35 @@ public class PreferencesActivity extends PreferenceActivity {
             appearanceGroup.removePreference(pWidth);
         } else {
             updateListSummary(R.string.pref_key_sidepanel_width);
+        }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SELECT_CUSTOM_THEME) {
+            String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
+            if (path != null) {
+                FileInputStream is = null;
+                try {
+                    is = new FileInputStream(path);
+                    byte[] buf = new byte[8192];
+                    int size = 0;
+                    while (size < buf.length) {
+                        int count = is.read(buf, size, buf.length - size);
+                        if (count == -1) break;
+                        size += count;
+                    }
+                    MainApplication.getInstance().settings.setCustomTheme(new String(buf, 0, size, "UTF-8"));
+                    ((ListPreference) getPreferenceManager().findPreference(getString(R.string.pref_key_theme))).
+                            setValue(getString(R.string.pref_theme_value_custom));
+                    updateListSummary(R.string.pref_key_theme);
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                    IOUtils.closeQuietly(is);
+                    Toast.makeText(this, e.getMessage() != null ? e.getMessage() : e.toString(), Toast.LENGTH_LONG).show();
+                }
+            }
         }
     }
     
@@ -353,4 +409,5 @@ public class PreferencesActivity extends PreferenceActivity {
             chansCat.addPreference(rearrange);
         }
     }
+    
 }

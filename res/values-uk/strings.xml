@@ -552,6 +552,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Gurochan</item>
         <item>Tomorrow</item>
         <item>Mikuba</item>
+        <item>Користувацька</item>
     </string-array>
     <string name="pref_font_size_title">Розмір літер</string>
     <string-array name="pref_font_size_choices">

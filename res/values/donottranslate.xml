@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_autohide_json">PREF_KEY_AUTOHIDE_JSON</string>
     <string name="pref_key_quickaccess_json">PREF_KEY_QUICKACCESS_JSON</string>
     <string name="pref_key_chans_order_json">PREF_KEY_CHANS_ORDER_JSON</string>
+    <string name="pref_key_custom_theme_json">PREF_KEY_CUSTOM_THEME_JSON</string>
     <string name="pref_key_hide_completely">PREF_KEY_HIDE_COMPLETELY</string>
     <string name="pref_key_external_links_confirmation">PREF_KEY_EXTERNAL_LINKS_CONFIRMATION</string>
     <string name="pref_key_do_not_close_tabs">PREF_KEY_DO_NOT_CLOSE_TABS</string>
@@ -94,6 +95,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_theme_value_gurochan">PREF_THEME_VALUE_GUROCHAN</string>
     <string name="pref_theme_value_tomorrow">PREF_THEME_VALUE_TOMORROW</string>
     <string name="pref_theme_value_mikuba">PREF_THEME_VALUE_MIKUBA</string>
+    <string name="pref_theme_value_custom">PREF_THEME_VALUE_CUSTOM</string>
     <string-array name="pref_theme_values" translatable="false">
         <item>@string/pref_theme_value_futaba</item>
         <item>@string/pref_theme_value_photon</item>
@@ -101,6 +103,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_theme_value_gurochan</item>
         <item>@string/pref_theme_value_tomorrow</item>
         <item>@string/pref_theme_value_mikuba</item>
+        <item>@string/pref_theme_value_custom</item>
     </string-array>
     <string name="pref_key_font_size">PREF_KEY_FONT_SIZE</string>
     <string name="pref_font_size_value_default">@string/pref_font_size_value_small</string>

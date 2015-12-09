@@ -138,7 +138,28 @@ public class ApplicationSettings {
     }
     
     public GenericThemeEntry getTheme() {
+        if (isCustomTheme()) {
+            try {
+                String jsonData = preferences.getString(resources.getString(R.string.pref_key_custom_theme_json), null);
+                if (jsonData != null) return GenericThemeEntry.customTheme(jsonData, getFontSizeStyle());
+            } catch (Exception e) {
+            }
+        }
         return GenericThemeEntry.standartTheme(getThemeId(), getFontSizeStyle());
+    }
+    
+    public void setCustomTheme(String jsonData) {
+        String normalized = GenericThemeEntry.customTheme(jsonData, getFontSizeStyle()).toJsonString();
+        preferences.edit().
+                putString(resources.getString(R.string.pref_key_theme), resources.getString(R.string.pref_theme_value_custom)).
+                putString(resources.getString(R.string.pref_key_custom_theme_json), normalized).
+                commit();
+    }
+    
+    private boolean isCustomTheme() {
+        String defaultThemeValue = resources.getString(R.string.pref_theme_value_default);
+        String theme = preferences.getString(resources.getString(R.string.pref_key_theme), defaultThemeValue);
+        return theme.equals(resources.getString(R.string.pref_theme_value_custom));
     }
     
     private int getThemeId() {

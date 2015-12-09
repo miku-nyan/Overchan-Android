@@ -543,6 +543,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Gurochan</item>
         <item>Tomorrow</item>
         <item>Mikuba</item>
+        <item>Benutzerdefinierten</item>
     </string-array>
     <string name="pref_font_size_title">Textgröße</string>
     <string-array name="pref_font_size_choices">
