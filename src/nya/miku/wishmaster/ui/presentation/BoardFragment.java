@@ -958,7 +958,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             } catch (Exception e) {}
                         }
                     }
-                    showPostPopupDialog(itemPosition, settings.isRealTablet(), getSpanCoordinates(v, span), refererPost);
+                    boolean tabletMode = settings.isRealTablet() && !staticSettings.repliesOnlyQuantity;
+                    showPostPopupDialog(itemPosition, tabletMode, getSpanCoordinates(v, span), refererPost);
                 } else {
                     listView.setSelection(itemPosition);
                 }
