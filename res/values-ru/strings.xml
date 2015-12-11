@@ -460,8 +460,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_hide_personal_summary">Всегда использовать значения по умолчанию</string>
     <string name="pref_random_hash_title">Произвольный хэш</string>
     <string name="pref_random_hash_summary">Добавлять несколько байт в конец прикрепляемых файлов</string>
-    <string name="pref_show_all_chans_list_title">Список имиджбордов</string>
-    <string name="pref_show_all_chans_list_summary">Показывать список всех поддерживаемых имиджбордов на новой вкладке</string>
+    <string name="pref_show_all_chans_list_title">Список имиджборд</string>
+    <string name="pref_show_all_chans_list_summary">Показывать список всех поддерживаемых имиджборд на новой вкладке</string>
     <string name="pref_show_nsfw_boards_title">Все форумы</string>
     <string name="pref_show_nsfw_boards_summary">Отображать доски с немодерируемым содержимым</string>
     <string name="pref_autohide_title">Автоскрытие</string>
