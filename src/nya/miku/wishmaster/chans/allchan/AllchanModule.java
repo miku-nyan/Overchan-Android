@@ -436,38 +436,29 @@ public class AllchanModule extends AbstractChanModule {
             throws Exception {
         boolean reloadDeleted = lastDeleted != null && boardName.equals(lastDeleted[0]) && threadNumber.equals(lastDeleted[1]);
         if (reloadDeleted) oldList = null;
-        
+
+        String url = getUsingUrl() + "api/threadLastPostNumber.json?"
+            + "boardName=" + boardName + "&threadNumber=" + threadNumber;
+        JSONObject json = downloadJSONObject(url, oldList != null, listener, task);
+        if (null == json) return oldList;
+        int newLastPostNumber = json.getInt("lastPostNumber");
+        if (0 == newLastPostNumber) return oldList; //Thread does not exist (maybe it was deleted)
+
         if (loadOnlyNewPosts()) {
-            int oldLength = oldList != null ? oldList.length : 0;
-            String lastPost = oldLength > 0 ? oldList[oldLength-1].number : null;
-            String url = getUsingUrl() + "api/lastPosts.json?boardName=" + boardName + "&threadNumber=" + threadNumber +
-                    (lastPost != null ? ("&lastPostNumber=" + lastPost) : "");
-            JSONArray posts = downloadJSONArray(url, oldList != null, listener, task);
-            if (posts == null) return oldList;
-            
-            PostModel[] result = new PostModel[posts.length() + oldLength];
-            for (int i=0; i<oldLength; ++i) result[i] = oldList[i];
-            for (int i=0; i<posts.length(); ++i) result[i+oldLength] = mapPostModel(posts.getJSONObject(i), oldLength > 0 ? result[0].number : null);
+            int lastPostNumber = (null != oldList) ? oldList[oldList.length].number : 0;
+            if (lastPostNumber <= newLastPostNumber) return oldList; //Nothing new here
+        }
+
+        //Yep, downloading entire thread. This is for the sake of caching
+        url = getUsingUrl() + boardName + "/res/" + threadNumber + ".json";
+        json = downloadJSONObject(url, oldList != null, listener, task);
+        if (json == null) return oldList;
+        try {
+            PostModel[] newList = mapThreadModel(json.getJSONObject("thread")).posts;
             if (reloadDeleted) lastDeleted = null;
-            return result;
-        } else {
-            String url = getUsingUrl() + boardName + "/res/" + threadNumber + ".json";
-            JSONObject json = downloadJSONObject(url, oldList != null, listener, task);
-            if (json == null) return oldList;
-            try {
-                try {
-                    BoardModel board = mapBoardModel(json.getJSONObject("board"));
-                    addToMap(board);
-                } catch (Exception e) {
-                    Logger.e(TAG, e);
-                }
-                PostModel[] newList = mapThreadModel(json.getJSONObject("thread")).posts;
-                if (reloadDeleted) lastDeleted = null;
-                if (oldList == null) return newList;
-                return ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(newList));
-            } catch (JSONException e) {
-                throw new Exception(json.getString("errorDescription"));
-            }
+            return newList;
+        } catch (JSONException e) {
+            throw new Exception(json.getString("errorDescription"));
         }
     }
     
@@ -571,7 +562,7 @@ public class AllchanModule extends AbstractChanModule {
             checkCloudflareError(e, quotaUrl);
         }
         
-        CaptchaModel captchaModel;
+        CaptchaModel captchaModel;la
         int captchaType = getUsingCaptchaType();
         switch (captchaType) {
             case CAPTCHA_YANDEX_ELATM:
