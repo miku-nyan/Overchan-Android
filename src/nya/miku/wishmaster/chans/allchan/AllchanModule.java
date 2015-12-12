@@ -555,14 +555,13 @@ public class AllchanModule extends AbstractChanModule {
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String quotaUrl = getUsingUrl() + "api/captchaQuota.json?boardName=" + boardName;
         try {
-            HttpRequestModel get = HttpRequestModel.builder().setGET().build();
-            int quota = Integer.parseInt(HttpStreamer.getInstance().getStringFromUrl(quotaUrl, get, httpClient, null, task, false));
+            int quota = downloadJSONObject(quotaUrl, false, listener, task).getInt("quota");
             if (quota > 0) return null;
         } catch (HttpWrongStatusCodeException e) {
             checkCloudflareError(e, quotaUrl);
         }
         
-        CaptchaModel captchaModel;la
+        CaptchaModel captchaModel;
         int captchaType = getUsingCaptchaType();
         switch (captchaType) {
             case CAPTCHA_YANDEX_ELATM:
