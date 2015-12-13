@@ -94,7 +94,6 @@ public class AllchanModule extends AbstractChanModule {
     
     private static final String RECAPTCHA_PUBLIC_KEY = "6LfKRgcTAAAAAIe-bmV_pCbMzvKvBZGbZNRsfmED";
     
-    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_CAPTCHA_TYPE = "PREF_KEY_CAPTCHA_TYPE";
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
@@ -120,8 +119,6 @@ public class AllchanModule extends AbstractChanModule {
     private int captchaType;
     private String yandexCaptchaKey;
     private Recaptcha recaptchaV1;
-    
-    private String[] lastDeleted; // { boardName, threadNumber }
     
     public AllchanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -173,12 +170,6 @@ public class AllchanModule extends AbstractChanModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
-        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context); //only_new_posts
-        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
-        onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
-        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
-        onlyNewPostsPreference.setDefaultValue(true);
-        preferenceGroup.addPreference(onlyNewPostsPreference);
         final ListPreference captchaPreference = new ListPreference(context); //captcha_type
         captchaPreference.setTitle(R.string.pref_captcha_type);
         captchaPreference.setDialogTitle(R.string.pref_captcha_type);
@@ -220,11 +211,6 @@ public class AllchanModule extends AbstractChanModule {
         });
     }
     
-    
-    private boolean loadOnlyNewPosts() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
-    }
-    
     private int getUsingCaptchaType() {
         String key = preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT);
         if (Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(key) == -1) key = CAPTCHA_TYPE_DEFAULT;
@@ -252,20 +238,6 @@ public class AllchanModule extends AbstractChanModule {
         HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
         try {
             response = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, true);
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, url);
-            throw e;
-        }
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return response;
-    }
-    
-    private JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        JSONArray response = null;
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        try {
-            response = HttpStreamer.getInstance().getJSONArrayFromUrl(url, rqModel, httpClient, listener, task, true);
         } catch (HttpWrongStatusCodeException e) {
             checkCloudflareError(e, url);
             throw e;
@@ -434,29 +406,19 @@ public class AllchanModule extends AbstractChanModule {
     @Override
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
-        boolean reloadDeleted = lastDeleted != null && boardName.equals(lastDeleted[0]) && threadNumber.equals(lastDeleted[1]);
-        if (reloadDeleted) oldList = null;
-
-        String url = getUsingUrl() + "api/threadLastPostNumber.json?"
-            + "boardName=" + boardName + "&threadNumber=" + threadNumber;
+        String url = getUsingUrl() + boardName + "/res/" + threadNumber + ".json";
         JSONObject json = downloadJSONObject(url, oldList != null, listener, task);
-        if (null == json) return oldList;
-        int newLastPostNumber = json.getInt("lastPostNumber");
-        if (0 == newLastPostNumber) return oldList; //Thread does not exist (maybe it was deleted)
-
-        if (loadOnlyNewPosts()) {
-            int lastPostNumber = (null != oldList) ? oldList[oldList.length].number : 0;
-            if (lastPostNumber <= newLastPostNumber) return oldList; //Nothing new here
-        }
-
-        //Yep, downloading entire thread. This is for the sake of caching
-        url = getUsingUrl() + boardName + "/res/" + threadNumber + ".json";
-        json = downloadJSONObject(url, oldList != null, listener, task);
         if (json == null) return oldList;
         try {
+            try {
+                BoardModel board = mapBoardModel(json.getJSONObject("board"));
+                addToMap(board);
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            }
             PostModel[] newList = mapThreadModel(json.getJSONObject("thread")).posts;
-            if (reloadDeleted) lastDeleted = null;
-            return newList;
+            if (oldList == null) return newList;
+            return ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(newList));
         } catch (JSONException e) {
             throw new Exception(json.getString("errorDescription"));
         }
@@ -554,12 +516,8 @@ public class AllchanModule extends AbstractChanModule {
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String quotaUrl = getUsingUrl() + "api/captchaQuota.json?boardName=" + boardName;
-        try {
-            int quota = downloadJSONObject(quotaUrl, false, listener, task).getInt("quota");
-            if (quota > 0) return null;
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, quotaUrl);
-        }
+        int quota = downloadJSONObject(quotaUrl, false, null, task).optInt("quota");
+        if (quota > 0) return null;
         
         CaptchaModel captchaModel;
         int captchaType = getUsingCaptchaType();
@@ -573,13 +531,7 @@ public class AllchanModule extends AbstractChanModule {
                     case CAPTCHA_YANDEX_ESTD: url += "estd"; break;
                     case CAPTCHA_YANDEX_RUS: url += "rus"; break;
                 }
-                JSONObject json;
-                try {
-                    json = downloadJSONObject(url, false, listener, task);
-                } catch (HttpWrongStatusCodeException e) {
-                    checkCloudflareError(e, url);
-                    throw e;
-                }
+                JSONObject json = downloadJSONObject(url, false, listener, task);
                 String challenge = json.getString("challenge");
                 String captchaUrl = (useHttps() ? "https://" : "http://") + json.optString("url", "i.captcha.yandex.net/image?key=" + challenge);
                 Bitmap captchaBitmap = null;
@@ -712,7 +664,6 @@ public class AllchanModule extends AbstractChanModule {
             String error = result.optString("errorDescription");
             if (error.length() > 0) throw new Exception(error);
         }
-        lastDeleted = new String[] { model.boardName, model.threadNumber };
         return null;
     }
     
