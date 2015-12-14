@@ -559,7 +559,7 @@ public class MakabaModule extends AbstractChanModule {
         String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "");
         try {
             response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(),
-                    httpClient, null, task, false);
+                    httpClient, null, task, true);
             if (task != null && task.isCancelled()) throw new Exception("interrupted");
             if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
                 captchaType = CAPTCHA_2CHAPTCHA;
@@ -571,6 +571,11 @@ public class MakabaModule extends AbstractChanModule {
         } catch (HttpWrongStatusCodeException e) {
             checkCloudflareError(e, url);
             throw e;
+        }
+        
+        if (threadNumber != null && !preferences.contains(getSharedKey(PREF_KEY_SKIP_CAPTCHA))) {
+            preferences.edit().putBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), true).commit();
+            return getNewCaptcha(boardName, threadNumber, listener, task);
         }
         
         String id = response.substring(response.indexOf('\n') + 1);
