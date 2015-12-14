@@ -52,7 +52,7 @@ public class SSLCompatibility {
             try {
                 Thread thread = workingThread;
                 if (thread == null) return;
-                thread.join(5000);
+                thread.join(10000);
                 if (thread.isAlive()) Logger.e(TAG, "security provider installation timeout");
                 workingThread = null;
             } catch (Exception e) {
