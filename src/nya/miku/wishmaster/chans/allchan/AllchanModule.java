@@ -515,9 +515,13 @@ public class AllchanModule extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String quotaUrl = getUsingUrl() + "api/captchaQuota.json?boardName=" + boardName;
-        int quota = downloadJSONObject(quotaUrl, false, null, task).optInt("quota");
-        if (quota > 0) return null;
+        try {
+            String quotaUrl = getUsingUrl() + "api/captchaQuota.json?boardName=" + boardName;
+            int quota = downloadJSONObject(quotaUrl, false, null, task).optInt("quota");
+            if (quota > 0) return null;
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
         
         CaptchaModel captchaModel;
         int captchaType = getUsingCaptchaType();
