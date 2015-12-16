@@ -207,7 +207,7 @@ public class Serializer {
     public TabsState deserializeTabsState() {
         for (String filename : new String[]{ FileCache.TABS_FILENAME, FileCache.TABS_FILENAME_2 }) {
             try {
-                TabsState obj = deserialize(filename, TabsState.class); 
+                TabsState obj = deserialize(fileCache.getImmediately(filename), TabsState.class); 
                 if (obj != null && obj.tabsArray != null && obj.tabsIdStack != null) return obj;
             } catch (Exception e) {
                 Logger.e(TAG, e);

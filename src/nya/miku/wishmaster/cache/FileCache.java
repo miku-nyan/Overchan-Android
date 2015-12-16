@@ -65,27 +65,54 @@ public class FileCache {
     private volatile long size;
     private volatile long pagesSize;
     
+    private volatile boolean initialized = false;
+    private final Object initLock = new Object();
+    
     /**
      * Конструктор
      * @param directory директория кэша
      * @param maxSize максимальный размер в байтах (0 - неограниченный)
      * @param dbContext контекст для доступа к базе данных
      */
-    public FileCache(File directory, long maxSize, Context dbContext) {
+    public FileCache(File directory, final long maxSize, Context dbContext) {
         this.directory = directory;
         this.database = new FileCacheDB(dbContext);
         makeDir();
         makeNomedia();
         
-        long[] sizeInDB = database.getSize();
-        if (sizeInDB[0] != 0) {
-            this.size = sizeInDB[0];
-            this.pagesSize = sizeInDB[1];
-        } else {
-            resetCache();
+        Thread initThread = new Thread() {
+            @Override
+            public void run() {
+                long[] sizeInDB = database.getSize();
+                if (sizeInDB[0] != 0) {
+                    FileCache.this.size = sizeInDB[0];
+                    FileCache.this.pagesSize = sizeInDB[1];
+                } else {
+                    resetCache();
+                }
+                
+                setMaxSize(maxSize);
+                synchronized (initLock) {
+                    initialized = true;
+                    initLock.notifyAll();
+                    Logger.d(TAG, "File Cache initialized");
+                }
+            }
+        };
+        initThread.start();
+    }
+    
+    private void ensureInitialized() {
+        if (initialized) return;
+        synchronized (initLock) {
+            while (!initialized) {
+                try {
+                    initLock.wait();
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                }
+            }
         }
-        
-        setMaxSize(maxSize);
     }
     
     /**
@@ -103,6 +130,7 @@ public class FileCache {
      * @return текущий размер в байтах
      */
     public long getCurrentSize() {
+        ensureInitialized();
         return size;
     }
     
@@ -118,6 +146,7 @@ public class FileCache {
      * Очистить кэш (удалить все файлы)
      */
     public void clearCache() {
+        ensureInitialized();
         for (File f : filesOfDir(directory)) {
             if (!isUndeletable(f)) f.delete();
         }
@@ -129,13 +158,25 @@ public class FileCache {
      * @param fileName имя файла
      * @return полученный файл, если файл существует, или null, если файл отсутствует
      */
-    public synchronized File get(String fileName) {
-        File file = pathToFile(fileName);
-        if (file.exists() && !file.isDirectory()) {
-            file.setLastModified(System.currentTimeMillis());
-            database.touch(fileName);
-            return file;
+    public File get(String fileName) {
+        ensureInitialized();
+        synchronized (this) {
+            File file = pathToFile(fileName);
+            if (file.exists() && !file.isDirectory()) {
+                file.setLastModified(System.currentTimeMillis());
+                database.touch(fileName);
+                return file;
+            }
+            return null;
         }
+    }
+    
+    /**
+     * Получить файл из кэша немедленно (даже если кэш не инициализирован), но время доступа не обновляется, ни в базе данных, ни в файловой системе.
+     */
+    File getImmediately(String fileName) {
+        File file = pathToFile(fileName);
+        if (file.exists() && !file.isDirectory()) return file;
         return null;
     }
     
@@ -146,25 +187,31 @@ public class FileCache {
      * @param fileName имя файла
      * @return объект типа {@link File}
      */
-    public synchronized File create(String fileName) {
-        makeDir();
-        File file = pathToFile(fileName);
-        if (file.exists()) {
-            delete(file, false);
+    public File create(String fileName) {
+        ensureInitialized();
+        synchronized (this) {
+            makeDir();
+            File file = pathToFile(fileName);
+            if (file.exists()) {
+                delete(file, false);
+            }
+            database.put(fileName, -1);
+            return file;
         }
-        database.put(fileName, -1);
-        return file;
     }
     
     /**
      * Учитывает размер созданного файла, добавляет к размеру кэша, в случае необходимости удаляются устаревшие файлы. 
      * @param file объект типа {@link File}
      */
-    public synchronized void put(File file) {
-        size += file.length();
-        if (isPageFile(file)) pagesSize += file.length();
-        database.put(file.getName(), file.length());
-        trim();
+    public void put(File file) {
+        ensureInitialized();
+        synchronized (this) {
+            size += file.length();
+            if (isPageFile(file)) pagesSize += file.length();
+            database.put(file.getName(), file.length());
+            trim();
+        }
     }
     
     /**
@@ -172,19 +219,22 @@ public class FileCache {
      * @param file объект типа {@link File}
      * @return true, если файл удалён успешно, false в противном случае
      */
-    public synchronized boolean delete(File file) {
+    public boolean delete(File file) {
         return delete(file, true);
     }
     
-    public synchronized boolean delete(File file, boolean removeFromDB) {
-        size -= file.length();
-        if (isPageFile(file)) pagesSize -= file.length();
-        if (file.delete()) {
-            if (removeFromDB) database.remove(file.getName());
-            return true;
-        } else {
-            resetCache();
-            return false;
+    public boolean delete(File file, boolean removeFromDB) {
+        ensureInitialized();
+        synchronized (this) {
+            size -= file.length();
+            if (isPageFile(file)) pagesSize -= file.length();
+            if (file.delete()) {
+                if (removeFromDB) database.remove(file.getName());
+                return true;
+            } else {
+                resetCache();
+                return false;
+            }
         }
     }
     
