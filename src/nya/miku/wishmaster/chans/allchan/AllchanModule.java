@@ -94,6 +94,7 @@ public class AllchanModule extends AbstractChanModule {
     
     private static final String RECAPTCHA_PUBLIC_KEY = "6LfKRgcTAAAAAIe-bmV_pCbMzvKvBZGbZNRsfmED";
     
+    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_CAPTCHA_TYPE = "PREF_KEY_CAPTCHA_TYPE";
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
@@ -170,6 +171,11 @@ public class AllchanModule extends AbstractChanModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
+        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context); //only_new_posts
+        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
+        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
+        onlyNewPostsPreference.setDefaultValue(true);
+        preferenceGroup.addPreference(onlyNewPostsPreference);
         final ListPreference captchaPreference = new ListPreference(context); //captcha_type
         captchaPreference.setTitle(R.string.pref_captcha_type);
         captchaPreference.setDialogTitle(R.string.pref_captcha_type);
@@ -209,6 +215,10 @@ public class AllchanModule extends AbstractChanModule {
                 return true;
             }
         });
+    }
+    
+    private boolean loadOnlyNewPosts() {
+        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
     }
     
     private int getUsingCaptchaType() {
@@ -406,6 +416,18 @@ public class AllchanModule extends AbstractChanModule {
     @Override
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
+        if (oldList != null && oldList.length > 0 && loadOnlyNewPosts()) {
+            String lastPostNumberUrl = getUsingUrl() + "api/threadLastPostNumber.json?boardName=" + boardName + "&threadNumber=" + threadNumber;
+            try {
+                JSONObject lastPostNumber = downloadJSONObject(lastPostNumberUrl, false, listener, task);
+                if (lastPostNumber.optString("lastPostNumber").equals(oldList[oldList.length-1].number)) {
+                    return oldList;
+                }
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            }
+        }
+        
         String url = getUsingUrl() + boardName + "/res/" + threadNumber + ".json";
         JSONObject json = downloadJSONObject(url, oldList != null, listener, task);
         if (json == null) return oldList;
