@@ -252,7 +252,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postform_subject">Тема</string>
     <string name="postform_comment">Коментар</string>
     <string name="postform_sage">Сажа</string>
-    <string name="postform_watermark">Штамп</string>
     <string name="postform_opmark">ОП треду</string>
     <string name="postform_captcha_hint">Підтвердження</string>
     <string name="postform_send">Надіслати</string>
@@ -316,7 +315,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="filedialog_cancel">Скасувати</string>
     <string name="filedialog_create">Зберегти</string>
     <string name="filedialog_no_data">Даних немає</string>
-    <string name="filedialog_error">Помилка</string>
     
     <string name="gallery_error_incorrect_attachment">Хибний додаток</string>
     <string name="gallery_error_play">Помилка відтворення</string>

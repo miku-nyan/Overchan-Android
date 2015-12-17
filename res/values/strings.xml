@@ -242,7 +242,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postform_subject">Subject</string>
     <string name="postform_comment">Comment</string>
     <string name="postform_sage">Sage</string>
-    <string name="postform_watermark">Watermark</string>
     <string name="postform_opmark">OP of thread</string>
     <string name="postform_captcha_hint">Confirmation</string>
     <string name="postform_send">Send</string>
@@ -306,7 +305,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="filedialog_cancel">Cancel</string>
     <string name="filedialog_create">Save</string>
     <string name="filedialog_no_data">No Data</string>
-    <string name="filedialog_error">Error</string>
     
     <string name="gallery_error_incorrect_attachment">Incorrect attachment</string>
     <string name="gallery_error_play">Cannot play the file</string>

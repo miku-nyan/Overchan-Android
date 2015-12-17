@@ -249,7 +249,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postform_subject">Тема</string>
     <string name="postform_comment">Комментарий</string>
     <string name="postform_sage">Sage</string>
-    <string name="postform_watermark">Ватермарка</string>
     <string name="postform_opmark">ОП треда</string>
     <string name="postform_captcha_hint">Подтверждение</string>
     <string name="postform_send">Отправить</string>
@@ -313,7 +312,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="filedialog_cancel">Отмена</string>
     <string name="filedialog_create">Сохранить</string>
     <string name="filedialog_no_data">Нет данных</string>
-    <string name="filedialog_error">Ошибка</string>
     
     <string name="gallery_error_incorrect_attachment">Некорректное вложение</string>
     <string name="gallery_error_play">Ошибка при воспроизведении</string>
