@@ -158,7 +158,7 @@ public class JellyBeanSpanFixTextView extends TextView {
     }
     
     private boolean isNotSpace(CharSequence text, int where) {
-        return text.charAt(where) != ' ';
+        return where < 0 || where >= text.length() || text.charAt(where) != ' ';
     }
     
     private void setTextAndMeasure(CharSequence text, int widthMeasureSpec, int heightMeasureSpec) {
