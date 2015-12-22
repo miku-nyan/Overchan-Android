@@ -91,7 +91,7 @@ public class FileCache {
                     resetCache();
                 }
                 
-                setMaxSize(maxSize);
+                setMaxSizeValues(maxSize);
                 synchronized (initLock) {
                     initialized = true;
                     initLock.notifyAll();
@@ -120,9 +120,14 @@ public class FileCache {
      * @param maxSize максимальный размер в байтах (0 - неограниченный)
      */
     public void setMaxSize(long maxSize) {
+        ensureInitialized();
+        setMaxSizeValues(maxSize);
+        trim();
+    }
+    
+    private void setMaxSizeValues(long maxSize) {
         this.maxSize = maxSize;
         this.maxPagesSize = (long) (maxSize * PAGES_QUOTE);
-        trim();
     }
     
     /**
