@@ -29,6 +29,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
 import nya.miku.wishmaster.common.Logger;
 
@@ -294,7 +295,7 @@ public class FileCache {
     
     private synchronized void resetCache() {
         database.resetDB();
-        for (File file : filesOfDir(directory)) database.put(file.getName(), file.length());
+        database.insertFiles(filesOfDir(directory));
         long[] sizeInDB = database.getSize();
         size = sizeInDB[0];
         pagesSize = sizeInDB[1];
@@ -361,6 +362,24 @@ public class FileCache {
                 dbHelper.getWritableDatabase().update(TABLE_NAME, cv, COL_FILENAME + " = ?", new String[] { filename });
             } else {
                 dbHelper.getWritableDatabase().insert(TABLE_NAME, null, cv);
+            }
+        }
+        
+        public void insertFiles(File[] files) {
+            SQLiteDatabase database = dbHelper.getWritableDatabase();
+            SQLiteStatement statement = database.compileStatement("INSERT INTO " + TABLE_NAME +
+                    " (" + COL_FILENAME + ", " + COL_FILESIZE + ", " + COL_TIMESTAMP + ") VALUES (?, ?, ?)");
+            database.beginTransaction();
+            try {
+                for (File file : files) {
+                    statement.bindString(1, file.getName());
+                    statement.bindLong(2, file.length());
+                    statement.bindLong(3, file.lastModified());
+                    statement.executeInsert();
+                }
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
             }
         }
         
