@@ -22,8 +22,6 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -268,12 +266,12 @@ public class FileCache {
         for (int i=0; i<3; ++i) {
             if (maxSize == 0 || size <= maxSize) return;
             
-            LinkedList<Pair<String, Long>> files = database.getFilesForTrim(size - maxSize);
+            LinkedList<String> files = database.getFilesForTrim(size - maxSize);
             
             while (size > maxSize) {
                 File oldest = null;
-                for (ListIterator<Pair<String, Long>> it = files.listIterator(); it.hasNext();) {
-                    File file = pathToFile(it.next().getLeft());
+                for (ListIterator<String> it = files.listIterator(); it.hasNext();) {
+                    File file = pathToFile(it.next());
                     if (isPageFile(file) && pagesSize < maxPagesSize) continue;
                     it.remove();
                     oldest = file;
@@ -384,19 +382,18 @@ public class FileCache {
             }
         }
         
-        public LinkedList<Pair<String, Long>> getFilesForTrim(long size) {
-            LinkedList<Pair<String, Long>> list = new LinkedList<>();
+        public LinkedList<String> getFilesForTrim(long size) {
+            LinkedList<String> list = new LinkedList<>();
             Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, null, null, null, null, COL_TIMESTAMP, "1000");
             if (c != null) {
                 if (c.moveToFirst()) {
                     int nameIndex = c.getColumnIndex(COL_FILENAME);
-                    int timeIndex = c.getColumnIndex(COL_TIMESTAMP);
                     int sizeIndex = c.getColumnIndex(COL_FILESIZE);
                     long tSize = 0;
                     do {
                         String filename = c.getString(nameIndex);
                         if (!isUndeletable(filename)) {
-                            list.add(Pair.of(filename, c.getLong(timeIndex)));
+                            list.add(filename);
                             if (!isPageFile(filename)) tSize += c.getLong(sizeIndex);
                             if (tSize >= size) break;
                         }
