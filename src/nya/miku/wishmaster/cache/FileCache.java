@@ -309,11 +309,12 @@ public class FileCache {
         return filename.equals(TABS_FILENAME) || filename.equals(TABS_FILENAME_2) || filename.startsWith(PREFIX_BOARDS) || filename.equals(NOMEDIA);
     }
     
-    private boolean isPageFile(File file) {
+    private static boolean isPageFile(File file) {
         return isPageFile(file.getName());
     }
     
     private static boolean isPageFile(String filename) {
+        //the same condition must be in method FileCacheDB.getSize() (SQL) for the sum calculation
         return filename.startsWith(PREFIX_PAGES) || filename.startsWith(PREFIX_DRAFTS);
     }
     
@@ -418,20 +419,19 @@ public class FileCache {
                 c.close();
             }
             
-            c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, null, null, null, null, null);
+            c = dbHelper.getReadableDatabase().rawQuery("SELECT SUM(" + COL_FILESIZE + ") FROM " + TABLE_NAME, null);
             if (c != null) {
-                if (c.moveToFirst()) {
-                    int nameIndex = c.getColumnIndex(COL_FILENAME);
-                    int sizeIndex = c.getColumnIndex(COL_FILESIZE);
-                    do {
-                        String name = c.getString(nameIndex);
-                        long size = c.getLong(sizeIndex);
-                        result[0] += size;
-                        if (isPageFile(name)) result[1] += size;
-                    } while (c.moveToNext());
-                }
+                if (c.moveToFirst()) result[0] = c.getInt(0);
                 c.close();
             }
+            
+            c = dbHelper.getReadableDatabase().rawQuery("SELECT SUM(" + COL_FILESIZE + ") FROM " + TABLE_NAME +
+                    " WHERE " + COL_FILENAME + " LIKE '" + PREFIX_PAGES + "%' OR " + COL_FILENAME + " LIKE '" + PREFIX_DRAFTS + "%'", null);
+            if (c != null) {
+                if (c.moveToFirst()) result[1] = c.getInt(0);
+                c.close();
+            }
+            
             return result;
         }
         
