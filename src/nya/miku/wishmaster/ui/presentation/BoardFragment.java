@@ -1452,8 +1452,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     try {
                         int setPosition = listView.getFirstVisiblePosition();
                         int setTop = listView.getChildAt(0).getTop();
-                        if (setPosition != position || setTop != top) {
-                            listView.setSelectionFromTop(position, top);
+                        int incTop = listView.getChildCount() < 2 ? 0 : Math.max(0, -listView.getChildAt(1).getTop());
+                        if (setPosition != position || setTop != top || incTop > 0) {
+                            listView.setSelectionFromTop(position, top + incTop);
                         }
                     } catch(Exception e) {
                         Logger.e(TAG, e);
