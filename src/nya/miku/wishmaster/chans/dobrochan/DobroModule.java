@@ -306,7 +306,7 @@ public class DobroModule extends AbstractChanModule {
                     replace("\r\n", "<br />").replace("\n", "<br />").
                     replaceAll("[_\\*][_\\*](.*?)[_\\*][_\\*]", "<b>$1</b>").
                     replaceAll("[_\\*](.*?)[_\\*]", "<i>$1</i>").
-                    replaceAll("%%(.*?)%%", "<span class=\"spoiler\">$1</spoiler>").
+                    replaceAll("%%(.*?)%%", "<span class=\"spoiler\">$1</span>").
                     replaceAll("`(.*?)`", "<tt>$1</tt>").
                     replaceAll("\\bhttps?://.+\\b", "<a href=\"$0\">$0</a>").
                     replaceAll("&gt;&gt;(\\d+)\\b", "<a href=\"#i$1\">&gt;&gt;$1</a>").
