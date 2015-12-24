@@ -48,6 +48,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
@@ -90,17 +91,27 @@ public class DobroModule extends AbstractChanModule {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
+    private static final String PREF_KEY_MAX_RATING = "PREF_KEY_MAX_RATING";
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     private static final String PREF_KEY_HANABIRA_COOKIE = "PREF_KEY_HANABIRA_COOKIE";
     private static final String HANABIRA_COOKIE_NAME = "hanabira";
     private static final String DEFAULT_DOMAIN = "dobrochan.com";
     
+    static final String[] RATINGS = new String[] { "SFW", "R-15", "R-18", "R-18G" };
+    private static final int MAXRATING_SFW = 0;
+    private static final int MAXRATING_R15 = 1;
+    private static final int MAXRATING_R18 = 2;
+    private static final int MAXRATING_R18G = 3;
+    
     private String domain;
     
     private boolean postingError = false;
     
+    private int maxRating;
+    
     public DobroModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
+        setMaxRating();
     }
     
     @Override
@@ -206,9 +217,46 @@ public class DobroModule extends AbstractChanModule {
         group.addPreference(domainPref);
     }
     
+    private void addRatingPreference(PreferenceGroup group) {
+        Context context = group.getContext();
+        Preference.OnPreferenceChangeListener updateRatingListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (preference.getKey().equals(getSharedKey(PREF_KEY_MAX_RATING))) {
+                    setMaxRating((String) newValue);
+                    return true;
+                }
+                return false;
+            }
+        };
+        ListPreference ratingPref = new ListPreference(context);
+        ratingPref.setTitle(R.string.dobrochan_prefs_max_rating);
+        ratingPref.setSummary(preferences.getString(getSharedKey(PREF_KEY_MAX_RATING), "R-15"));
+        ratingPref.setEntries(RATINGS);
+        ratingPref.setEntryValues(RATINGS);
+        ratingPref.setDefaultValue("R-15");
+        ratingPref.setKey(getSharedKey(PREF_KEY_MAX_RATING));
+        ratingPref.setOnPreferenceChangeListener(updateRatingListener);
+        group.addPreference(ratingPref);
+    }
+    
+    private void setMaxRating() {
+        setMaxRating(preferences.getString(getSharedKey(PREF_KEY_MAX_RATING), "R-15"));
+    }
+    
+    private void setMaxRating(String key) {
+        switch (key) {
+            case "SFW": maxRating = MAXRATING_SFW; break;
+            case "R-15": maxRating = MAXRATING_R15; break;
+            case "R-18": maxRating = MAXRATING_R18; break;
+            case "R-18G": maxRating = MAXRATING_R18G; break;
+        }
+    }
+    
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         addOnlyNewPostsPreference(preferenceGroup);
+        addRatingPreference(preferenceGroup);
         addDomainPreferences(preferenceGroup);
         super.addPreferencesOnScreen(preferenceGroup);
     }
@@ -373,7 +421,12 @@ public class DobroModule extends AbstractChanModule {
         if (model.type == AttachmentModel.TYPE_AUDIO && "/thumb/generic/sound.png".equals(model.thumbnail)) model.thumbnail = null;
         model.size = json.optInt("size", -1);
         if (model.size > 0) model.size = Math.round(model.size / 1024f);
-        model.isSpoiler = json.optString("rating", "sfw").toLowerCase(Locale.US).startsWith("r-18");
+        String rating = json.optString("rating", "sfw").toLowerCase(Locale.US);
+        switch (maxRating) {
+            case MAXRATING_SFW: model.isSpoiler = rating.startsWith("r-1"); break;
+            case MAXRATING_R15: model.isSpoiler = rating.startsWith("r-18"); break;
+            case MAXRATING_R18: model.isSpoiler = rating.startsWith("r-18g"); break;
+        }
         return model;
     }
     
@@ -426,7 +479,7 @@ public class DobroModule extends AbstractChanModule {
                 addString("captcha", TextUtils.isEmpty(model.captchaAnswer) ? "" : model.captchaAnswer).
                 addString("password", model.password);
         
-        String rating = (model.icon >= 0 && model.icon < DobroBoards.RATINGS.length) ? DobroBoards.RATINGS[model.icon] : "SFW";
+        String rating = (model.icon >= 0 && model.icon < RATINGS.length) ? RATINGS[model.icon] : "SFW";
         int filesCount = model.attachments != null ? model.attachments.length : 0;
         postEntityBuilder.addString("post_files_count", Integer.toString(filesCount + 1));
         for (int i=0; i<filesCount; ++i) {

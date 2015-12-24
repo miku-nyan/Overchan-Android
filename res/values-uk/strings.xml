@@ -399,6 +399,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="dobrochan_prefs_domain">Домен</string>
     <string name="dobrochan_prefs_domain_summary">Резрвні адреси: dobrochan.com, dobrochan.org, dobrochan.ru</string>
+    <string name="dobrochan_prefs_max_rating">Максимальний рейтинг</string>
     
     <string name="dvach_prefs_domain">Домен</string>
     <string name="dvach_prefs_domain_summary">Резервні адреси: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>

@@ -27,8 +27,6 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 
 public class DobroBoards {
-    static final String[] RATINGS = new String[] { "SFW", "R-15", "R-18", "R-18G" };
-    
     private static final List<BoardModel> LIST = new ArrayList<BoardModel>();
     private static final Map<String, BoardModel> MAP = new HashMap<String, BoardModel>();
     private static final SimpleBoardModel[] SIMPLE_ARRAY;
@@ -118,7 +116,7 @@ public class DobroBoards {
         model.allowCustomMark = false;
         model.allowRandomHash = true;
         model.allowIcons = true;
-        model.iconDescriptions = RATINGS;
+        model.iconDescriptions = DobroModule.RATINGS;
         model.attachmentsMaxCount = 5;
         model.attachmentsFormatFilters = null;
         model.markType = BoardModel.MARK_WAKABAMARK;
