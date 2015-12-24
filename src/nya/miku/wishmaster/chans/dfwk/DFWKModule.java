@@ -54,6 +54,7 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -79,6 +80,7 @@ public class DFWKModule extends AbstractWakabaModule {
         DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
     }
     
+    private static final Pattern A_HREF = Pattern.compile("<a href[^>]*>");
     private static final Pattern LINK_DATE = Pattern.compile("<a href=\"([^\"]*)\">(.*?)</a>", Pattern.DOTALL);
     private static final Pattern EMBED_PATTERN = Pattern.compile("<object (?:[^>]*)data=\"(.*?)\"", Pattern.DOTALL);
     private static final Pattern ERROR_POSTING = Pattern.compile("<h2(?:[^>]*)>(.*?)</h2>", Pattern.DOTALL);
@@ -144,6 +146,7 @@ public class DFWKModule extends AbstractWakabaModule {
                 int postsOmitted = -1;
                 int filesOmitted = -1;
                 try {
+                    omitted = RegexUtils.replaceAll(omitted, A_HREF, "");
                     int len = omitted.length();
                     for (int i=0; i<=len; ++i) {
                         char ch = i == len ? ' ' : omitted.charAt(i);
