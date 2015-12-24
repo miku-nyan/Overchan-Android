@@ -157,6 +157,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="www.dobrochan.com" />
                 <data android:host="www.dobrochan.org" />
                 
+                <data android:host="anon.fm" />
+                
                 <data android:host="2ch.hk" />
                 <data android:host="www.2ch.hk" />
                 <data android:host="2ch.pm" />
