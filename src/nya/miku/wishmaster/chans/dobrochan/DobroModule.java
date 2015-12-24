@@ -92,6 +92,7 @@ public class DobroModule extends AbstractChanModule {
     
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_MAX_RATING = "PREF_KEY_MAX_RATING";
+    private static final String PREF_KEY_SHOW_CAPTCHA = "PREF_KEY_SHOW_CAPTCHA";
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     private static final String PREF_KEY_HANABIRA_COOKIE = "PREF_KEY_HANABIRA_COOKIE";
     private static final String HANABIRA_COOKIE_NAME = "hanabira";
@@ -184,7 +185,7 @@ public class DobroModule extends AbstractChanModule {
         onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
         onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
         onlyNewPostsPreference.setDefaultValue(true);
-        group.addItemFromInflater(onlyNewPostsPreference);
+        group.addPreference(onlyNewPostsPreference);
     }
     
     private boolean loadOnlyNewPosts() {
@@ -253,10 +254,21 @@ public class DobroModule extends AbstractChanModule {
         }
     }
     
+    private void addCaptchaPreference(PreferenceGroup group) {
+        Context context = group.getContext();
+        CheckBoxPreference showCaptchaPreference = new CheckBoxPreference(context);
+        showCaptchaPreference.setTitle(R.string.dobrochan_prefs_show_captcha);
+        showCaptchaPreference.setSummary(R.string.dobrochan_prefs_show_captcha_summary);
+        showCaptchaPreference.setKey(getSharedKey(PREF_KEY_SHOW_CAPTCHA));
+        showCaptchaPreference.setDefaultValue(false);
+        group.addPreference(showCaptchaPreference);
+    }
+    
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         addOnlyNewPostsPreference(preferenceGroup);
         addRatingPreference(preferenceGroup);
+        addCaptchaPreference(preferenceGroup);
         addDomainPreferences(preferenceGroup);
         super.addPreferencesOnScreen(preferenceGroup);
     }
@@ -432,7 +444,7 @@ public class DobroModule extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        if (!postingError) {
+        if (!postingError && !preferences.getBoolean(getSharedKey(PREF_KEY_SHOW_CAPTCHA), false)) {
             try {
                 String userJsonUrl = getDomainUrl() + "api/user.json?new_format";
                 JSONObject userJson = downloadJSONObject(userJsonUrl, false, null, task);

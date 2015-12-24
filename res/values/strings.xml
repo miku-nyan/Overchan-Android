@@ -390,6 +390,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dobrochan_prefs_domain">Domain</string>
     <string name="dobrochan_prefs_domain_summary">Reserved domains: dobrochan.com, dobrochan.org, dobrochan.ru</string>
     <string name="dobrochan_prefs_max_rating">Highest rating</string>
+    <string name="dobrochan_prefs_show_captcha">Always show captcha</string>
+    <string name="dobrochan_prefs_show_captcha_summary">Show the captcha even when it is not required to enter</string>
     
     <string name="dvach_prefs_domain">Domain</string>
     <string name="dvach_prefs_domain_summary">Reserved domains: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
