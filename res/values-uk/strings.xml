@@ -345,6 +345,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_update_update_not_required">Ця версія найновіша</string>
     <string name="app_update_update_error">Помилка перевірки оновлень</string>
     
+    <string name="custom_themes_title">Користувальницькі теми</string>
+    <string name="custom_themes_local">(Вибрати з файлу)</string>
+    <string name="custom_themes_loading">Завантаження</string>
+    
     <string name="notification_url_copied">Адресу скопійовано до буферу\n%s</string>
     <string name="notification_post_not_found">Посту не знайдено</string>
     <string name="notification_comment_copied">Тест скопійовано до буферу</string>

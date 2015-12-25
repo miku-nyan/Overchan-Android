@@ -335,6 +335,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_update_update_not_required">Kein Update erforderlich</string>
     <string name="app_update_update_error">Kann nicht nach Updates suchen</string>
     
+    <string name="custom_themes_title">Benutzerdefinierte Themen</string>
+    <string name="custom_themes_local">(Datei auswählen)</string>
+    <string name="custom_themes_loading">Laden</string>
+    
     <string name="notification_url_copied">Adresse ist in die Zwischenablage kopiert\n%s</string>
     <string name="notification_post_not_found">Post ist nicht gefunden</string>
     <string name="notification_comment_copied">Meldung ist in die Zwischenablage kopiert</string>

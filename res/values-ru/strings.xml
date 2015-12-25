@@ -342,6 +342,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_update_update_not_required">Обновление не требуется</string>
     <string name="app_update_update_error">Не удалось проверить обновления</string>
     
+    <string name="custom_themes_title">Пользовательские темы</string>
+    <string name="custom_themes_local">(Выбрать файл)</string>
+    <string name="custom_themes_loading">Загрузка</string>
+    
     <string name="notification_url_copied">Адрес скопирован в буфер обмена\n%s</string>
     <string name="notification_post_not_found">Пост не найден</string>
     <string name="notification_comment_copied">Сообщение скопировано в буфер обмена</string>

@@ -335,6 +335,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_update_update_not_required">No update required</string>
     <string name="app_update_update_error">Cannot check for updates</string>
     
+    <string name="custom_themes_title">Custom themes</string>
+    <string name="custom_themes_local">(Select file)</string>
+    <string name="custom_themes_loading">Loading</string>
+    
     <string name="notification_url_copied">Address is copied to the clipboard\n%s</string>
     <string name="notification_post_not_found">The post isn\'t found</string>
     <string name="notification_comment_copied">Message is copied to the clipboard</string>
