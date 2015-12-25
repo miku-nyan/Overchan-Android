@@ -557,6 +557,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_sidepanel_hide_summary">Tabs Panel nicht ständig zeigen</string>
     <string name="pref_sidepanel_width_title">Tabs Panelbreite</string>
     <string-array name="pref_sidepanel_width_choices">
+        <item>15\uff05</item>
+        <item>20\uff05</item>
         <item>25\uff05</item>
         <item>30\uff05</item>
         <item>35\uff05</item>

@@ -211,6 +211,8 @@ public class ApplicationSettings {
     public float getTabPanelTabletWeight() {
         String key = preferences.getString(resources.getString(R.string.pref_key_sidepanel_width),
                 resources.getString(R.string.pref_sidepanel_width_value_default));
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_15percent))) return 0.15f;
+        if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_20percent))) return 0.20f;
         if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_25percent))) return 0.25f;
         if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_30percent))) return 0.30f;
         if (key.equals(resources.getString(R.string.pref_sidepanel_width_value_35percent))) return 0.35f;
