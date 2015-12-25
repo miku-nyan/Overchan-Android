@@ -32,5 +32,6 @@
 * [Tohno chan](http://tohno-chan.com)
 * [76chan](http://76chan.org)
 * [chuck.dfwk.ru](http://chuck.dfwk.ru/)
+* [anon.fm (feedback)](http://anon.fm/)
 * [2ch.hk](https://2ch.hk/)
 * [arhivach.org](http://arhivach.org)
