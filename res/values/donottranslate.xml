@@ -118,6 +118,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_font_size_value_huge</item>
     </string-array>
     <string name="pref_key_sidepanel_hide">PREF_KEY_SIDEPANEL_HIDE</string>
+    <string name="pref_key_sidepanel_right">PREF_KEY_SIDEPANEL_RIGHT</string>
     <string name="pref_key_sidepanel_width">PREF_KEY_SIDEPANEL_WIDTH</string>
     <string name="pref_sidepanel_width_value_default">@string/pref_sidepanel_width_value_30percent</string>
     <string name="pref_sidepanel_width_value_15percent">PREF_SIDEPANEL_WIDTH_VALUE_15PERCENT</string>

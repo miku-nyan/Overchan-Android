@@ -201,6 +201,10 @@ public class ApplicationSettings {
         return isTablet;
     }
     
+    public boolean isTabsPanelOnRight() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_sidepanel_right), false);
+    }
+    
     public float getRootViewWeight() {
         if (!isRealTablet()) return 1.0f;
         boolean isHidden = preferences.getBoolean(resources.getString(R.string.pref_key_sidepanel_hide), false);

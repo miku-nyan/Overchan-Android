@@ -564,6 +564,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="pref_sidepanel_hide_title">Ховати панель вкладок</string>
     <string name="pref_sidepanel_hide_summary">Не тримати панель вкладок весь час на екрані</string>
+    <string name="pref_sidepanel_right_title">Панель вкладок праворуч</string>
+    <string name="pref_sidepanel_right_summary">Відображати панель вкладок праворуч</string>
     <string name="pref_sidepanel_width_title">Ширина панелі вкладок</string>
     <string-array name="pref_sidepanel_width_choices">
         <item>15\uff05</item>

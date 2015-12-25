@@ -91,6 +91,7 @@ public class MainActivity extends FragmentActivity {
     private GenericThemeEntry theme;
     private int autohideRulesHash;
     private float rootViewWeight = 0;
+    private boolean tabsPanelRight;
     private boolean openSpoilers;
     private boolean isHorizontalOrientation;
     private boolean isPaused = false;
@@ -309,12 +310,13 @@ public class MainActivity extends FragmentActivity {
         settings = MainApplication.getInstance().settings.getStaticSettings();
         autohideRulesHash = MainApplication.getInstance().settings.getAutohideRulesJson().hashCode();
         rootViewWeight = MainApplication.getInstance().settings.getRootViewWeight();
+        tabsPanelRight = MainApplication.getInstance().settings.isTabsPanelOnRight();
         openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         (theme = MainApplication.getInstance().settings.getTheme()).setTo(this);
         super.onCreate(savedInstanceState);
         if (MainApplication.getInstance().settings.showSidePanel()) {
-            setContentView(R.layout.main_activity_tablet);
+            setContentView(tabsPanelRight ? R.layout.main_activity_tablet_right : R.layout.main_activity_tablet);
             LinearLayout.LayoutParams sidebarLayoutParams = (LinearLayout.LayoutParams) findViewById(R.id.sidebar).getLayoutParams();
             Point displaySize = AppearanceUtils.getDisplaySize(getWindowManager().getDefaultDisplay());
             int rootWidth = (int) (displaySize.x * rootViewWeight);
@@ -434,7 +436,8 @@ public class MainActivity extends FragmentActivity {
             restartActivityClearCache();
             return;
         } else if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
-                settings.showHiddenItems != newSettings.showHiddenItems) {
+                settings.showHiddenItems != newSettings.showHiddenItems ||
+                MainApplication.getInstance().settings.isTabsPanelOnRight() != tabsPanelRight) {
             Logger.d(TAG, "appearance settings were changed; restarting activity");
             restartActivity(false);
             return;

@@ -244,9 +244,11 @@ public class PreferencesActivity extends PreferenceActivity {
         if (!MainApplication.getInstance().settings.isRealTablet()) {
             Preference pHide = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel_hide));
             Preference pWidth = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel_width));
+            Preference pRight = getPreferenceManager().findPreference(getString(R.string.pref_key_sidepanel_right));
             PreferenceGroup appearanceGroup = (PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_appearance));
             appearanceGroup.removePreference(pHide);
             appearanceGroup.removePreference(pWidth);
+            appearanceGroup.removePreference(pRight);
         } else {
             updateListSummary(R.string.pref_key_sidepanel_width);
         }

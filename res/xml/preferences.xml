@@ -98,7 +98,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:defaultValue="false"
             android:key="@string/pref_key_sidepanel_hide"
             android:title="@string/pref_sidepanel_hide_title"
-            android:summary="@string/pref_sidepanel_hide_summary" />
+            android:summary="@string/pref_sidepanel_hide_summary"
+            android:disableDependentsState="true" />
         
         <ListPreference
             android:key="@string/pref_key_sidepanel_width"
@@ -107,6 +108,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:entries="@array/pref_sidepanel_width_choices"
             android:entryValues="@array/pref_sidepanel_width_values"
             android:defaultValue="@string/pref_sidepanel_width_value_default" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_sidepanel_right"
+            android:title="@string/pref_sidepanel_right_title"
+            android:summary="@string/pref_sidepanel_right_summary"
+            android:dependency="@string/pref_key_sidepanel_hide" />
         
         <PreferenceScreen
             android:key="@string/pref_key_gallery_screen"
