@@ -18,13 +18,9 @@
 
 package nya.miku.wishmaster.chans.horochan;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -35,8 +31,6 @@ import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
@@ -48,6 +42,7 @@ import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
+import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
@@ -55,11 +50,11 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
-import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
-import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
@@ -70,10 +65,12 @@ public class HorochanModule extends AbstractChanModule {
     private static final String CHAN_NAME = "horochan.ru";
     private static final String DOMAIN = "horochan.ru";
     
-    private static final Pattern URL_PATH_BOARDPAGE_PATTERN = Pattern.compile("([^/]+)/res/(\\d+)[^#]*(?:#(\\d+))?");
-    private static final Pattern URL_PATH_THREADPAGE_PATTERN = Pattern.compile("([^/]+)(?:/(\\d+)?)?");
+    private static final String RECAPTCHA_PUBLIC_KEY = "6LerWhMTAAAAABCXYL2CEv-YyPeM5WbUTx3CknKD";
     
-    private static final String[] ATTACHMENT_FORMATS = new String[] { "gif", "jpg", "jpeg", "png", "bmp" };
+    private static final Pattern URL_PATH_BOARDPAGE_PATTERN = Pattern.compile("([^/]+)(?:/(\\d+)?)?");
+    private static final Pattern URL_PATH_THREADPAGE_PATTERN = Pattern.compile("([^/]+)/thread/(\\d+)");
+    
+    private static final String[] ATTACHMENT_FORMATS = new String[] { "gif", "jpg", "jpeg", "png", "bmp", "webm" };
     
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
@@ -115,6 +112,10 @@ public class HorochanModule extends AbstractChanModule {
     
     private String getUsingUrl(boolean api) {
         return (useHttps() ? "https://" : "http://") + (api ? "api." : "") + DOMAIN + "/";
+    }
+    
+    private String getStaticUrl() {
+        return (useHttps() ? "https://" : "http://") + "static." + DOMAIN + "/";
     }
     
     @Override
@@ -188,26 +189,10 @@ public class HorochanModule extends AbstractChanModule {
     }
 
     @Override
-    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
-        String url = getUsingUrl(true) + "v1/boards";
-        JSONObject boards = downloadJSONObject(url, oldBoardsList != null, listener, task);
-        if (boards == null) return oldBoardsList;
-        try {
-            List<SimpleBoardModel> list = new ArrayList<>();
-            JSONArray data = boards.getJSONArray("data");
-            if (boardNames == null) boardNames = new HashMap<>();
-            for (int i=0; i<data.length(); ++i) {
-                JSONObject board = data.getJSONObject(i);
-                String name = board.getString("name");
-                String description = board.getString("description");
-                list.add(ChanModels.obtainSimpleBoardModel(CHAN_NAME, name, description, "", name.equals("b")));
-                boardNames.put(name, description);
-            }
-            return list.toArray(new SimpleBoardModel[list.size()]);
-        } catch (JSONException e) {
-            if (boards.has("message")) throw new Exception(boards.getString("message"));
-            throw e;
-        }
+    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) {
+        if (boardNames == null) boardNames = new HashMap<>();
+        boardNames.put("b", "Random"); // Virtual board
+        return new SimpleBoardModel[]{ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Random", null, false)};
     }
     
     @Override
@@ -219,20 +204,20 @@ public class HorochanModule extends AbstractChanModule {
         board.boardDescription = boardNames != null ? boardNames.get(shortName) : shortName;
         if (board.boardDescription == null) board.boardDescription = shortName;
         board.boardCategory = "";
-        board.nsfw = shortName.equals("b");
+        board.nsfw = false;
         board.uniqueAttachmentNames = true;
         board.timeZoneId = "GMT+3";
         board.defaultUserName = "Anonymous";
         board.bumpLimit = 250;
         
         board.readonlyBoard = false;
-        board.requiredFileForNewThread = true;
-        board.allowDeletePosts = false;
+        board.requiredFileForNewThread = false;
+        board.allowDeletePosts = true;
         board.allowDeleteFiles = false;
         board.allowReport = BoardModel.REPORT_NOT_ALLOWED;
-        board.allowNames = true;
+        board.allowNames = false;
         board.allowSubjects = true;
-        board.allowSage = true;
+        board.allowSage = false;
         board.allowEmails = false;
         board.allowCustomMark = false;
         board.allowRandomHash = true;
@@ -252,14 +237,15 @@ public class HorochanModule extends AbstractChanModule {
     private PostModel mapPostModel(JSONObject json) {
         PostModel model = new PostModel();
         model.number = Long.toString(json.getLong("id"));
-        model.name = json.optString("name");
-        model.subject = json.optString("subject");
+        model.name = "Anonymous";
         model.comment = json.optString("message");
-        model.trip = json.optString("tripcode");
         model.timestamp = json.optLong("timestamp") * 1000;
         model.parentThread = Long.toString(json.optLong("parent", 0));
-        if (model.parentThread.equals("0")) model.parentThread = model.number;
-        
+        // Is OP
+        if (model.parentThread.equals("0")) {
+            model.subject = json.optString("subject");
+            model.parentThread = model.number;
+        }
         JSONArray files = json.optJSONArray("files");
         if (files != null) {
             model.attachments = new AttachmentModel[files.length()];
@@ -268,13 +254,21 @@ public class HorochanModule extends AbstractChanModule {
                 String name = file.optString("name");
                 String ext = file.optString("ext");
                 model.attachments[i] = new AttachmentModel();
-                model.attachments[i].path = "/data/src/" + name + "." + ext;
-                model.attachments[i].thumbnail = "/data/thumb/thumb_" + name + "." + ext;
+                model.attachments[i].path = getStaticUrl() + "src/" + name + "." + ext;
+                model.attachments[i].thumbnail = getStaticUrl() + "thumb/t" + name + ".jpeg";
                 model.attachments[i].size = file.optInt("size", -1);
                 if (model.attachments[i].size > 0) model.attachments[i].size = Math.round(model.attachments[i].size / 1024f);
                 model.attachments[i].width = file.optInt("width", -1);
                 model.attachments[i].height = file.optInt("height", -1);
-                model.attachments[i].type = ext.equalsIgnoreCase("gif") ? AttachmentModel.TYPE_IMAGE_GIF : AttachmentModel.TYPE_IMAGE_STATIC;
+                if (ext.equalsIgnoreCase("gif")) {
+                    model.attachments[i].type = AttachmentModel.TYPE_IMAGE_GIF;
+                }
+                else if (ext.equalsIgnoreCase("webm")) {
+                    model.attachments[i].type = AttachmentModel.TYPE_VIDEO;
+                }
+                else {
+                    model.attachments[i].type = AttachmentModel.TYPE_IMAGE_STATIC;
+                }
             }
         }
         String embed = json.optString("embed");
@@ -294,7 +288,7 @@ public class HorochanModule extends AbstractChanModule {
     @Override
     public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
             throws Exception {
-        String url = getUsingUrl(true) + "v1/boards/" + boardName + "/" + Integer.toString(page);
+        String url = getUsingUrl(true) + "v1/boards/" + Integer.toString(page);
         JSONObject json = downloadJSONObject(url, oldList != null, listener, task);
         if (json == null) return oldList;
         int totalPages = json.optInt("totalPages", -1);
@@ -355,54 +349,64 @@ public class HorochanModule extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String captchaUrl = getUsingUrl() + "captcha/animaptcha/animaptcha.php";
-        
-        Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-        try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
-        } finally {
-            responseModel.release();
-        }
-        CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
-        captchaModel.bitmap = captchaBitmap;
-        return captchaModel;
+        return null;
     }
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "add";
-        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
-                addString("parent", model.threadNumber == null ? "0" : model.threadNumber).
-                addString("board", model.boardName).
-                addString("name", model.name);
-        if (model.sage) postEntityBuilder.addString("sage", "1");
-        postEntityBuilder.
-                addString("subject", model.subject).
-                addString("message", model.comment.replace("[i]", "[em]").replace("[/i]", "[/em]").replaceAll("\\[/?spoiler\\]", "%%")).
-                addString("captcha", model.captchaAnswer);
-        if (model.attachments != null)
-            for (File attachment : model.attachments)
-                postEntityBuilder.addFile("img[]", attachment, model.randomHash);
-        postEntityBuilder.addString("ajax", "1").addString("kana", "homura");
+        boolean isThread = model.threadNumber == null;
+        String url = getUsingUrl(true) + (isThread ? "v1/threads" : "v1/posts");
         
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
-        HttpResponseModel response = null;
-        try {
-            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
-            if (response.statusCode == 200) {
-                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
-                IOUtils.copyStream(response.stream, output);
-                String htmlResponse = output.toString("UTF-8").trim();
-                if (htmlResponse.contains("отправлен")) return null;
-                throw new Exception(htmlResponse);
-            } else throw new Exception(response.statusCode + " - " + response.statusReason);
-        } finally {
-            if (response != null) response.release();
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
+        if (isThread) {
+            postEntityBuilder.addString("subject", model.subject);
         }
+        else {
+            postEntityBuilder.addString("parent", model.threadNumber);
+        }
+        postEntityBuilder.
+                addString("message", model.comment).
+                addString("password", model.password);
+        
+        if (model.attachments != null) {
+            for (File attachment : model.attachments) {
+                postEntityBuilder.addFile("file[]", attachment, model.randomHash);
+            }
+        }
+        
+        if (isThread) {
+            String response = Recaptcha2solved.pop(RECAPTCHA_PUBLIC_KEY);
+            if (response == null) {
+                throw new Recaptcha2js(RECAPTCHA_PUBLIC_KEY);
+            }
+            postEntityBuilder.addString("g-recaptcha-response", response);
+        }
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
+        JSONObject json = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, true);
+        if (json.getString("status").equalsIgnoreCase("OK")) {
+            if (isThread) {
+                return getUsingUrl() + model.boardName;
+            }
+            else {
+                return getUsingUrl() + model.boardName + "/thread/" + model.threadNumber;
+            }
+        }
+        throw new Exception(json.getString("message"));
+    }
+    
+    @Override
+    public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "v1/posts/" + model.postNumber;
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
+        postEntityBuilder.addString("password", model.password);
+        //FIXME: DELETE method
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
+        JSONObject json = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, true);
+        if (json.getString("status").equalsIgnoreCase("ERR")) {
+            throw new Exception(json.getString("message"));
+        }
+        return null;
     }
     
     @Override
@@ -419,7 +423,7 @@ public class HorochanModule extends AbstractChanModule {
                         return url.append(model.boardName).append('/').toString();
                     return url.append(model.boardName).append('/').append(model.boardPage).toString();
                 case UrlPageModel.TYPE_THREADPAGE:
-                    return url.append(model.boardName).append("/res/").append(model.threadNumber).
+                    return url.append(model.boardName).append("/thread/").append(model.threadNumber).
                             append(model.postNumber == null || model.postNumber.length() == 0 ? "" : ("/#" + model.postNumber)).toString();
                 case UrlPageModel.TYPE_OTHERPAGE:
                     return url.append(model.otherPath.startsWith("/") ? model.otherPath.substring(1) : model.otherPath).toString();
@@ -435,21 +439,21 @@ public class HorochanModule extends AbstractChanModule {
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;
         
-        if (path.length() == 0 || path.equals("index.php")) {
+        if (path.length() == 0 || path.equals("index.html")) {
             model.type = UrlPageModel.TYPE_INDEXPAGE;
             return model;
         }
         
-        Matcher threadPage = URL_PATH_BOARDPAGE_PATTERN.matcher(path);
+        Matcher threadPage = URL_PATH_THREADPAGE_PATTERN.matcher(path);
         if (threadPage.find()) {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.boardName = threadPage.group(1);
             model.threadNumber = threadPage.group(2);
-            model.postNumber = threadPage.group(3);
+            model.postNumber = null;
             return model;
         }
         
-        Matcher boardPage = URL_PATH_THREADPAGE_PATTERN.matcher(path);
+        Matcher boardPage = URL_PATH_BOARDPAGE_PATTERN.matcher(path);
         if (boardPage.find()) {
             model.type = UrlPageModel.TYPE_BOARDPAGE;
             model.boardName = boardPage.group(1);
