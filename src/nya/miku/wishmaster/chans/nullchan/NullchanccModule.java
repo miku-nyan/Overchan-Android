@@ -211,6 +211,7 @@ public class NullchanccModule extends AbstractWakabaModule {
             @Override
             protected void parseDate(String date) {
                 if (date.length() > 0) {
+                    date = date.replace("&#35;", "");
                     date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
                     try {
                         currentPost.timestamp = dateFormat.parse(date).getTime();
