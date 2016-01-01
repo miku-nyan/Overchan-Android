@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.chans.uchan;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -185,6 +186,10 @@ public class UchanModule extends AbstractWakabaModule {
                         currentPost.icons = newIconsArray;
                     }
                 } else super.parseThumbnail(imgTag);
+            }
+            @Override
+            protected String readPostComment() throws IOException {
+                return super.readPostComment().replace("<a href=\"/link.php?url=", "<a href=\"");
             }
         };
     }
