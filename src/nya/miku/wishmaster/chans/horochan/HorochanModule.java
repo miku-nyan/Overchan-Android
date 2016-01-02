@@ -18,7 +18,9 @@
 
 package nya.miku.wishmaster.chans.horochan;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -50,16 +52,19 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
+import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
+import nya.miku.wishmaster.lib.org_json.JSONTokener;
 
 public class HorochanModule extends AbstractChanModule {
     private static final String CHAN_NAME = "horochan.ru";
@@ -367,13 +372,13 @@ public class HorochanModule extends AbstractChanModule {
         postEntityBuilder.
                 addString("message", model.comment).
                 addString("password", model.password);
-        
-        if (model.attachments != null) {
+
+        if (model.attachments != null && model.attachments.length > 0) {
             for (File attachment : model.attachments) {
-                postEntityBuilder.addFile("file[]", attachment, model.randomHash);
+                postEntityBuilder.addFile("files[]", attachment, model.randomHash);
             }
         }
-        
+
         if (isThread) {
             String response = Recaptcha2solved.pop(RECAPTCHA_PUBLIC_KEY);
             if (response == null) {
@@ -381,32 +386,47 @@ public class HorochanModule extends AbstractChanModule {
             }
             postEntityBuilder.addString("g-recaptcha-response", response);
         }
-        
+
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
-        JSONObject json = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, true);
-        if (json.getString("status").equalsIgnoreCase("OK")) {
-            if (isThread) {
-                return getUsingUrl() + model.boardName;
+        HttpResponseModel response = null;
+        BufferedReader in = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
+            in = new BufferedReader(new InputStreamReader(response.stream));
+            JSONObject json = new JSONObject(new JSONTokener(in));
+            if (response.statusCode == 200) return null;
+            if (response.statusCode == 400) {
+                JSONArray errors = json.getJSONArray("message");
+                throw new Exception(errors.getJSONObject(0).getJSONArray("errors").getString(0));
             }
-            else {
-                return getUsingUrl() + model.boardName + "/thread/" + model.threadNumber;
-            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
         }
-        throw new Exception(json.getString("message"));
+        finally {
+            IOUtils.closeQuietly(in);
+            if (response != null) response.release();
+        }
     }
-    
+
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "v1/posts/" + model.postNumber;
+        String url = getUsingUrl(true) + "v1/posts/" + model.postNumber;
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
         postEntityBuilder.addString("password", model.password);
-        //FIXME: DELETE method
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
-        JSONObject json = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, true);
-        if (json.getString("status").equalsIgnoreCase("ERR")) {
-            throw new Exception(json.getString("message"));
+        HttpRequestModel request = HttpRequestModel.builder().setDEL(postEntityBuilder.build()).build();
+        HttpResponseModel response = null;
+        BufferedReader in = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
+            in = new BufferedReader(new InputStreamReader(response.stream));
+            JSONObject json = new JSONObject(new JSONTokener(in));
+            if (response.statusCode == 200) return null;
+            if (response.statusCode == 400) throw new Exception(json.getString("message"));
+            throw new Exception(response.statusCode + " - " + response.statusReason);
         }
-        return null;
+        finally {
+            IOUtils.closeQuietly(in);
+            if (response != null) response.release();
+        }
     }
     
     @Override
