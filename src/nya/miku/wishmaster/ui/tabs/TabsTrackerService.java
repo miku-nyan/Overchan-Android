@@ -167,6 +167,7 @@ public class TabsTrackerService extends Service {
             for (int i=0; i<tabsArrayLength; ++i) tabsArray[i] = tabsState.tabsArray.get(i);
             for (final TabModel tab : tabsArray) {
                 if (task.isCancelled()) return;
+                if (MainApplication.getInstance().settings.isAutoupdateWifiOnly() && !Wifi.isConnected()) return;
                 if (tab.type == TabModel.TYPE_NORMAL && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE && tab.autoupdateBackground) {
                     if (tabsSwitcher.currentId != null && tabsSwitcher.currentId.equals(tab.id)) continue;
                     final String hash = tab.hash;
@@ -218,6 +219,7 @@ public class TabsTrackerService extends Service {
             currentUpdatingTabId = -1;
         }
         if (task.isCancelled()) return;
+        if (MainApplication.getInstance().settings.isAutoupdateWifiOnly() && !Wifi.isConnected()) return;
         if (tabsSwitcher.currentFragment instanceof BoardFragment) {
             TabModel tab = tabsState.findTabById(tabsSwitcher.currentId);
             if (tab != null && tab.pageModel != null && tab.type == TabModel.TYPE_NORMAL && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
