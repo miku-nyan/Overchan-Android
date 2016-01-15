@@ -229,7 +229,7 @@ public class HorochanModule extends AbstractChanModule {
         board.allowIcons = false;
         board.attachmentsMaxCount = 4;
         board.attachmentsFormatFilters = ATTACHMENT_FORMATS;
-        board.markType = BoardModel.MARK_BBCODE;
+        board.markType = BoardModel.MARK_WAKABAMARK;
         
         board.firstPage = 1;
         board.lastPage = (boardPagesCount != null && boardPagesCount.containsKey(shortName)) ?
