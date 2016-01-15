@@ -83,7 +83,7 @@ public class AllchanModule extends AbstractChanModule {
             "Yandex (latin)", "Yandex (digits)", "Yandex (rus)", "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
     private static final String[] CAPTCHA_TYPES_KEYS = new String[] {
             "yandex-elatm", "yandex-estd", "yandex-rus", "recaptcha", "recaptcha-fallback", "recaptchav1" };
-    private static final String CAPTCHA_TYPE_DEFAULT = "yandex-estd";
+    private static final String CAPTCHA_TYPE_DEFAULT = "recaptchav1";
     
     private static final int CAPTCHA_YANDEX_ELATM = 1;
     private static final int CAPTCHA_YANDEX_ESTD = 2;
