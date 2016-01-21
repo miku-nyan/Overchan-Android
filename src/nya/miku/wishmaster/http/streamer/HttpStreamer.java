@@ -123,9 +123,6 @@ public class HttpStreamer {
                 case HttpRequestModel.METHOD_POST:
                     requestBuilder = RequestBuilder.post().setUri(url).setEntity(requestModel.postEntity);
                     break;
-                case HttpRequestModel.METHOD_DELETE:
-                    requestBuilder = RequestBuilder.delete().setUri(url).setEntity(requestModel.postEntity);
-                    break;
                 default:
                     throw new IllegalArgumentException("Incorrect type of HTTP Request");
             }

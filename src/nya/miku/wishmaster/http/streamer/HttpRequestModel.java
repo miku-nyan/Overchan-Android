@@ -35,7 +35,6 @@ public class HttpRequestModel {
     private static final int METHOD_UNDEFINED = -1;
     static final int METHOD_GET = 0;
     static final int METHOD_POST = 1;
-    static final int METHOD_DELETE = 2;
     
     //package
     /** метод запроса (GET или POST) */
@@ -101,20 +100,6 @@ public class HttpRequestModel {
             this.postEntity = postEntity;
             return this;
         }
-
-        /**
-         * Установить метод DELETE
-         * @param postEntity передаваемая сущность (контент)
-         */
-        public Builder setDEL(HttpEntity postEntity) {
-            this.method = METHOD_DELETE;
-            this.postEntity = postEntity;
-            return this;
-        }
-
-        public Builder setDEL() {
-            return this.setDEL(null);
-        }
         
         /**
          * Отключить любой редирект: страница по редиректу не будет загружаться автоматически.
@@ -157,8 +142,7 @@ public class HttpRequestModel {
          */
         public HttpRequestModel build() {
             if (method == METHOD_UNDEFINED) throw new IllegalStateException("method not set");
-            if ((method == METHOD_POST || method == METHOD_DELETE) && checkIfModified)
-                throw new IllegalStateException("check if-modified is available only for GET method");
+            if (method == METHOD_POST && checkIfModified) throw new IllegalStateException("check if-modified is available only for GET method");
             return new HttpRequestModel(method, checkIfModified, noRedirect, customHeaders, postEntity, timeoutValue);
         }
         

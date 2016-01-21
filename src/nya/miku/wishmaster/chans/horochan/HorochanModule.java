@@ -19,7 +19,9 @@
 package nya.miku.wishmaster.chans.horochan;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,8 +30,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cz.msebera.android.httpclient.HttpEntity;
+import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.StatusLine;
+import cz.msebera.android.httpclient.client.methods.HttpUriRequest;
+import cz.msebera.android.httpclient.client.methods.RequestBuilder;
 import cz.msebera.android.httpclient.cookie.Cookie;
 import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
+import cz.msebera.android.httpclient.util.EntityUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -372,13 +380,13 @@ public class HorochanModule extends AbstractChanModule {
         postEntityBuilder.
                 addString("message", model.comment).
                 addString("password", model.password);
-
+        
         if (model.attachments != null && model.attachments.length > 0) {
             for (File attachment : model.attachments) {
                 postEntityBuilder.addFile("files[]", attachment, model.randomHash);
             }
         }
-
+        
         if (isThread) {
             String response = Recaptcha2solved.pop(RECAPTCHA_PUBLIC_KEY);
             if (response == null) {
@@ -386,7 +394,7 @@ public class HorochanModule extends AbstractChanModule {
             }
             postEntityBuilder.addString("g-recaptcha-response", response);
         }
-
+        
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
         HttpResponseModel response = null;
         BufferedReader in = null;
@@ -406,26 +414,33 @@ public class HorochanModule extends AbstractChanModule {
             if (response != null) response.release();
         }
     }
-
+    
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String url = getUsingUrl(true) + "v1/posts/" + model.postNumber;
-        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
-        postEntityBuilder.addString("password", model.password);
-        HttpRequestModel request = HttpRequestModel.builder().setDEL(postEntityBuilder.build()).build();
-        HttpResponseModel response = null;
-        BufferedReader in = null;
+        HttpEntity entity = ExtendedMultipartBuilder.create().setDelegates(listener, task).addString("password", model.password).build();
+        HttpUriRequest request = null;
+        HttpResponse response = null;
+        HttpEntity responseEntity = null;
         try {
-            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
-            in = new BufferedReader(new InputStreamReader(response.stream));
-            JSONObject json = new JSONObject(new JSONTokener(in));
-            if (response.statusCode == 200) return null;
-            if (response.statusCode == 400) throw new Exception(json.getString("message"));
-            throw new Exception(response.statusCode + " - " + response.statusReason);
-        }
-        finally {
-            IOUtils.closeQuietly(in);
-            if (response != null) response.release();
+            request = RequestBuilder.delete().setUri(url).setEntity(entity).build();
+            response = httpClient.execute(request);
+            StatusLine status = response.getStatusLine();
+            switch (status.getStatusCode()) {
+                case 200:
+                    return null;
+                case 400:
+                    responseEntity = response.getEntity();
+                    InputStream stream = IOUtils.modifyInputStream(responseEntity.getContent(), null, task);
+                    JSONObject json = new JSONObject(new JSONTokener(new BufferedReader(new InputStreamReader(stream))));
+                    throw new Exception(json.getString("message"));
+                default:
+                    throw new Exception(status.getStatusCode() + " - " + status.getReasonPhrase());
+            }
+        } finally {
+            try { if (request != null) request.abort(); } catch (Exception e) {}
+            EntityUtils.consumeQuietly(responseEntity);
+            if (response != null && response instanceof Closeable) IOUtils.closeQuietly((Closeable) response);
         }
     }
     
