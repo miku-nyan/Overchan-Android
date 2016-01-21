@@ -63,7 +63,7 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -77,15 +77,21 @@ import nya.miku.wishmaster.lib.org_json.JSONTokener;
 public class HorochanModule extends AbstractChanModule {
     private static final String CHAN_NAME = "horochan.ru";
     private static final String DOMAIN = "horochan.ru";
+    private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Random", null, false)
+    };
     
     private static final String RECAPTCHA_PUBLIC_KEY = "6LerWhMTAAAAABCXYL2CEv-YyPeM5WbUTx3CknKD";
     
     private static final Pattern URL_PATH_BOARDPAGE_PATTERN = Pattern.compile("([^/]+)(?:/(\\d+)?)?");
-    private static final Pattern URL_PATH_THREADPAGE_PATTERN = Pattern.compile("([^/]+)/thread/(\\d+)");
+    private static final Pattern URL_PATH_THREADPAGE_PATTERN = Pattern.compile("([^/]+)/thread/(\\d+)(?:#(\\d+)?)?");
+    
+    private static final Pattern COMMENT_LINK = Pattern.compile("<a href=\"/(\\d+)\">");
     
     private static final String[] ATTACHMENT_FORMATS = new String[] { "gif", "jpg", "jpeg", "png", "bmp", "webm" };
     
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
+    private static final String PREF_KEY_RECAPTCHA_FALLBACK = "PREF_KEY_RECAPTCHA_FALLBACK";
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
     
@@ -159,7 +165,13 @@ public class HorochanModule extends AbstractChanModule {
         onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
         onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
         onlyNewPostsPreference.setDefaultValue(true);
-        preferenceGroup.addItemFromInflater(onlyNewPostsPreference);
+        preferenceGroup.addPreference(onlyNewPostsPreference);
+        CheckBoxPreference fallbackRecaptchaPref = new CheckBoxPreference(context); // recaptcha fallback
+        fallbackRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha_fallback);
+        fallbackRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_fallback_summary);
+        fallbackRecaptchaPref.setKey(getSharedKey(PREF_KEY_RECAPTCHA_FALLBACK));
+        fallbackRecaptchaPref.setDefaultValue(false);
+        preferenceGroup.addPreference(fallbackRecaptchaPref);
         CheckBoxPreference httpsPref = new CheckBoxPreference(context); //https
         httpsPref.setTitle(R.string.pref_use_https);
         httpsPref.setSummary(R.string.pref_use_https_summary);
@@ -172,6 +184,10 @@ public class HorochanModule extends AbstractChanModule {
     
     private boolean loadOnlyNewPosts() {
         return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
+    }
+    
+    private boolean recaptchaFallback() {
+        return preferences.getBoolean(getSharedKey(PREF_KEY_RECAPTCHA_FALLBACK), false);
     }
     
     private JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
@@ -203,14 +219,15 @@ public class HorochanModule extends AbstractChanModule {
 
     @Override
     public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) {
-        if (boardNames == null) boardNames = new HashMap<>();
-        boardNames.put("b", "Random"); // Virtual board
-        return new SimpleBoardModel[]{ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Random", null, false)};
+        return BOARDS;
     }
     
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
-        if (boardNames == null || boardNames.isEmpty()) getBoardsList(listener, task, null);
+        if (boardNames == null || boardNames.isEmpty()) {
+            if (boardNames == null) boardNames = new HashMap<>();
+            for (SimpleBoardModel board : BOARDS) boardNames.put(board.boardName, board.boardDescription);
+        }
         BoardModel board = new BoardModel();
         board.chan = CHAN_NAME;
         board.boardName = shortName;
@@ -252,6 +269,7 @@ public class HorochanModule extends AbstractChanModule {
         model.number = Long.toString(json.getLong("id"));
         model.name = "Anonymous";
         model.comment = json.optString("message");
+        model.comment = RegexUtils.replaceAll(model.comment, COMMENT_LINK, "<a href=\"#$1\">");
         model.timestamp = json.optLong("timestamp") * 1000;
         model.parentThread = Long.toString(json.optLong("parent", 0));
         // Is OP
@@ -373,8 +391,7 @@ public class HorochanModule extends AbstractChanModule {
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
         if (isThread) {
             postEntityBuilder.addString("subject", model.subject);
-        }
-        else {
+        } else {
             postEntityBuilder.addString("parent", model.threadNumber);
         }
         postEntityBuilder.
@@ -387,13 +404,9 @@ public class HorochanModule extends AbstractChanModule {
             }
         }
         
-        if (isThread) {
-            String response = Recaptcha2solved.pop(RECAPTCHA_PUBLIC_KEY);
-            if (response == null) {
-                throw new Recaptcha2js(RECAPTCHA_PUBLIC_KEY);
-            }
-            postEntityBuilder.addString("g-recaptcha-response", response);
-        }
+        String recaptchaResponse = Recaptcha2solved.pop(RECAPTCHA_PUBLIC_KEY);
+        if (recaptchaResponse == null) throw Recaptcha2.obtain(RECAPTCHA_PUBLIC_KEY, CHAN_NAME, recaptchaFallback());
+        postEntityBuilder.addString("g-recaptcha-response", recaptchaResponse);
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
         HttpResponseModel response = null;
@@ -404,12 +417,17 @@ public class HorochanModule extends AbstractChanModule {
             JSONObject json = new JSONObject(new JSONTokener(in));
             if (response.statusCode == 200) return null;
             if (response.statusCode == 400) {
-                JSONArray errors = json.getJSONArray("message");
-                throw new Exception(errors.getJSONObject(0).getJSONArray("errors").getString(0));
+                String error;
+                try {
+                    JSONArray errors = json.getJSONArray("message");
+                    error = errors.getJSONObject(0).getJSONArray("errors").getString(0);
+                } catch (Exception e) {
+                    error = json.getString("message");
+                }
+                throw new Exception(error);
             }
             throw new Exception(response.statusCode + " - " + response.statusReason);
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(in);
             if (response != null) response.release();
         }
@@ -484,7 +502,7 @@ public class HorochanModule extends AbstractChanModule {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.boardName = threadPage.group(1);
             model.threadNumber = threadPage.group(2);
-            model.postNumber = null;
+            model.postNumber = threadPage.group(3);
             return model;
         }
         
