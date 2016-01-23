@@ -246,6 +246,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         hash = getIntent().getStringExtra(PostingService.EXTRA_PAGE_HASH);
         boardModel = (BoardModel) getIntent().getSerializableExtra(PostingService.EXTRA_BOARD_MODEL);
         sendPostModel = (SendPostModel) getIntent().getSerializableExtra(PostingService.EXTRA_SEND_POST_MODEL);
+        if (sendPostModel == null) {
+            finish();
+            return;
+        }
         chan = MainApplication.getInstance().getChanModule(sendPostModel.chanName);
         setTitle(sendPostModel.threadNumber == null ? R.string.postform_title_thread : R.string.postform_title_post);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && chan != null)
