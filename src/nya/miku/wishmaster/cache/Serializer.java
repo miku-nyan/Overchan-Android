@@ -122,17 +122,18 @@ public class Serializer {
     
     private Object serializeLock = new Object();
     private class SerializeTask implements Runnable {
-        private final File file;
+        private final String filename;
         private final Object obj;
         
-        public SerializeTask(File file, Object obj) {
-            this.file = file;
+        public SerializeTask(String filename, Object obj) {
+            this.filename = filename;
             this.obj = obj;
         }
         
         @Override
         public void run() {
             synchronized (serializeLock) {
+                File file = fileCache.create(filename);
                 Output output = null;
                 try {
                     output = isHoneycomb() ? new KryoOutputHC(new FileOutputStream(file)) : new Output(new FileOutputStream(file));
@@ -150,12 +151,12 @@ public class Serializer {
         }
     }
     
-    public void serialize(File file, Object obj) {
-        serialize(file, obj, true);
+    public void serialize(String filename, Object obj) {
+        serialize(filename, obj, true);
     }
     
-    public void serialize(File file, Object obj, boolean async) {
-        Runnable task = new SerializeTask(file, obj);
+    public void serialize(String filename, Object obj, boolean async) {
+        Runnable task = new SerializeTask(filename, obj);
         if (async) {
             PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(task).start();
         } else {
@@ -163,7 +164,7 @@ public class Serializer {
         }
     }
     
-    public <T> T deserialize(File file, Class<T> type) {
+    private <T> T deserialize(File file, Class<T> type) {
         if (file == null || !file.exists()) {
             return null;
         }
@@ -186,10 +187,6 @@ public class Serializer {
         return null;
     }
     
-    public void serialize(String fileName, Object object) {
-        serialize(fileCache.create(fileName), object);
-    }
-    
     public <T> T deserialize(String fileName, Class<T> type) {
         return deserialize(fileCache.get(fileName), type);
     }
@@ -198,16 +195,24 @@ public class Serializer {
         PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
             @Override
             public void run() {
-                serialize(fileCache.create(FileCache.TABS_FILENAME), state, false);
-                serialize(fileCache.create(FileCache.TABS_FILENAME_2), state, false);
+                serialize(FileCache.TABS_FILENAME, state, false);
+                serialize(FileCache.TABS_FILENAME_2, state, false);
             }
         }).start();
     }
     
     public TabsState deserializeTabsState() {
-        for (String filename : new String[]{ FileCache.TABS_FILENAME, FileCache.TABS_FILENAME_2 }) {
+        File file1 = fileCache.getImmediately(FileCache.TABS_FILENAME);
+        File file2 = fileCache.getImmediately(FileCache.TABS_FILENAME_2);
+        File[] files;
+        if (file1 == null && file2 == null) files = new File[0];
+        else if (file1 == null) files = new File[] { file2 };
+        else if (file2 == null) files = new File[] { file1 };
+        else files = file1.lastModified() > file2.lastModified() ? new File[] { file2, file1 } : new File[] { file1, file2 };
+        
+        for (File file : files) {
             try {
-                TabsState obj = deserialize(fileCache.getImmediately(filename), TabsState.class); 
+                TabsState obj = deserialize(file, TabsState.class); 
                 if (obj != null && obj.tabsArray != null && obj.tabsIdStack != null) return obj;
             } catch (Exception e) {
                 Logger.e(TAG, e);

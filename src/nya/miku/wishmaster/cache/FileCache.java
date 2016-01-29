@@ -227,7 +227,7 @@ public class FileCache {
         return delete(file, true);
     }
     
-    public boolean delete(File file, boolean removeFromDB) {
+    private boolean delete(File file, boolean removeFromDB) {
         ensureInitialized();
         synchronized (this) {
             size -= file.length();
