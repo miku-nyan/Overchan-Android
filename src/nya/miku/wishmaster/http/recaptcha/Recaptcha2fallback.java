@@ -74,7 +74,9 @@ public class Recaptcha2fallback extends InteractiveException {
     
     private String chanName;
     private String scheme;
+    private String baseUrl;
     private String publicKey;
+    private String sToken;
     
     @Override
     public String getServiceName() {
@@ -82,21 +84,32 @@ public class Recaptcha2fallback extends InteractiveException {
     }
     
     /**
+     * @param baseUrl URL, с которого должна открываться капча
      * @param publicKey открытый ключ
+     * @param sToken Secure Token
      * @param chanName название модуля чана (модуль должен имплементировать {@link HttpChanModule})
      */
-    public Recaptcha2fallback(String publicKey, String chanName) throws RecaptchaException {
+    public Recaptcha2fallback(String baseUrl, String publicKey, String sToken, String chanName) {
         this.chanName = chanName;
         this.scheme = "https";
+        this.baseUrl = baseUrl;
         this.publicKey = publicKey;
+        this.sToken = sToken;
+    }
+    
+    @Deprecated
+    public Recaptcha2fallback(String publicKey, String chanName) {
+        this(null, publicKey, null, chanName);
     }
     
     @Override
     public void handle(final Activity activity, final CancellableTask task, final Callback callback) {
         try {
             final HttpClient httpClient = ((HttpChanModule) MainApplication.getInstance().getChanModule(chanName)).getHttpClient();
-            final String usingURL = scheme + RECAPTCHA_FALLBACK_URL + publicKey;
-            Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, usingURL) };
+            final String usingURL = scheme + RECAPTCHA_FALLBACK_URL + publicKey +
+                    (sToken != null && sToken.length() > 0 ? ("&stoken=" + sToken) : "");
+            String refererURL = baseUrl != null && baseUrl.length() > 0 ? baseUrl : usingURL;
+            Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, refererURL) };
             String htmlChallenge;
             if (lastChallenge != null && lastChallenge.getLeft().equals(usingURL)) {
                 htmlChallenge = lastChallenge.getRight();

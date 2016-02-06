@@ -26,7 +26,12 @@ import nya.miku.wishmaster.http.interactive.InteractiveException;
  *
  */
 public class Recaptcha2 {
-    public static InteractiveException obtain(String publicKey, String chanName, boolean fallback) throws RecaptchaException {
-        return fallback ? new Recaptcha2fallback(publicKey, chanName) : new Recaptcha2js(publicKey);
+    public static InteractiveException obtain(String baseUrl, String publicKey, String sToken, String chanName, boolean fallback) {
+        return fallback ? new Recaptcha2fallback(baseUrl, publicKey, sToken, chanName) : new Recaptcha2js(baseUrl, publicKey, sToken);
+    }
+    
+    @Deprecated
+    public static InteractiveException obtain(String publicKey, String chanName, boolean fallback) {
+        return obtain(null, publicKey, null, chanName, fallback);
     }
 }

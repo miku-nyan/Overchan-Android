@@ -56,7 +56,7 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
     protected static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
     
     protected static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    protected static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
+    protected static final String CLOUDFLARE_RECAPTCHA_KEY = "6LfOYgoTAAAAAInWDVTLSc8Yibqp-c9DaLimzNGM";
     protected static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
     
     private Map<String, SimpleBoardModel> boardsMap = null;
@@ -147,10 +147,9 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
                     } catch (Exception e) {}
                     if (html != null) {
                         if (responseModel.statusCode == 403 && html.contains("CAPTCHA")) {
-                            throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                                    getUsingUrl() + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT, CLOUDFLARE_COOKIE_NAME, getChanName());
+                            throw CloudflareException.withRecaptcha(getUsingUrl(), getChanName(), html, true);
                         } else if (responseModel.statusCode == 503 && html.contains("Just a moment...")) {
-                            throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, getChanName());
+                            throw CloudflareException.antiDDOS(url, getChanName());
                         }
                     }
                 }

@@ -18,17 +18,11 @@
 
 package nya.miku.wishmaster.http.cloudflare;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Date;
-import java.util.Locale;
-
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.HttpConstants;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha;
-import nya.miku.wishmaster.http.recaptcha.RecaptchaException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -215,19 +209,6 @@ public class CloudflareChecker {
     }
     
     /**
-     * Получить рекапчу для дальнейшей проверки cloudflare 
-     * @param exception Cloudflare исключение
-     * @param httpClient HTTP клиент
-     * @param task отменяемая задача
-     * @return полученная рекапча
-     */
-    public Recaptcha getRecaptcha(CloudflareException exception, HttpClient httpClient, CancellableTask task) throws RecaptchaException {
-        if (!exception.isRecaptcha()) throw new IllegalArgumentException();
-        String scheme = exception.getCheckCaptchaUrlFormat().startsWith("https") ? "https" : "http";
-        return Recaptcha.obtain(exception.getRecaptchaPublicKey(), task, httpClient, scheme);
-    }
-    
-    /**
      * Проверить рекапчу cloudflare, получить cookie
      * @param exception Cloudflare исключение
      * @param httpClient HTTP клиент
@@ -236,15 +217,8 @@ public class CloudflareChecker {
      * @param recaptchaAnswer ответ на рекапчу
      * @return полученная cookie или null, если проверка не прошла
      */
-    public Cookie checkRecaptcha(
-            CloudflareException exception, ExtendedHttpClient httpClient, CancellableTask task, String challenge, String recaptchaAnswer) {
+    public Cookie checkRecaptcha(CloudflareException exception, ExtendedHttpClient httpClient, CancellableTask task, String url) {
         if (!exception.isRecaptcha()) throw new IllegalArgumentException("wrong type of CloudflareException");
-        try {
-            recaptchaAnswer = URLEncoder.encode(recaptchaAnswer, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            Logger.e(TAG, e);
-        }
-        String url = String.format(Locale.US, exception.getCheckCaptchaUrlFormat(), challenge, recaptchaAnswer);
         HttpResponseModel responseModel = null;
         try {
             HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setNoRedirect(false).build();

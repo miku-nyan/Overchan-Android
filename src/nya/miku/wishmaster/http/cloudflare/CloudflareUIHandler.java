@@ -24,23 +24,13 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha;
-import nya.miku.wishmaster.http.recaptcha.RecaptchaException;
-
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import cz.msebera.android.httpclient.cookie.Cookie;
 
-import android.annotation.SuppressLint;
+import java.util.Locale;
+
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Build;
-import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.ImageView;
 
 /**
  * UI обработчик Cloudflare-исключений (статический класс)
@@ -102,87 +92,36 @@ import android.widget.ImageView;
                 });
             }
         } else {  // проверка с рекапчей
-            final Recaptcha recaptcha;
-            try {
-                recaptcha = CloudflareChecker.getInstance().getRecaptcha(e, chan.getHttpClient(), cfTask);
-            } catch (RecaptchaException recaptchaException) {
-                if (!cfTask.isCancelled()) activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onError(activity.getString(R.string.error_cloudflare_get_captcha));
-                    }
-                });
-                return;
-            }
-            
-            if (!cfTask.isCancelled()) activity.runOnUiThread(new Runnable() {
-                @SuppressLint("InflateParams")
+            Recaptcha2.obtain(e.getCheckUrl(), e.getRecaptchaPublicKey(), e.getRecaptchaSecureToken(), chan.getChanName(), e.isRecaptchaFallback()).
+                    handle(activity, cfTask, new InteractiveException.Callback() {
                 @Override
-                public void run() {
-                    Context dialogContext = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ?
-                            new ContextThemeWrapper(activity, R.style.Theme_Neutron) : activity;
-                    View view = LayoutInflater.from(dialogContext).inflate(R.layout.dialog_cloudflare_captcha, null);
-                    ImageView captchaView = (ImageView) view.findViewById(R.id.dialog_captcha_view);
-                    final EditText captchaField = (EditText) view.findViewById(R.id.dialog_captcha_field);
-                    captchaView.setImageBitmap(recaptcha.bitmap);
-                    
-                    DialogInterface.OnClickListener process = new DialogInterface.OnClickListener() {
+                public void onSuccess() {
+                    PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (cfTask.isCancelled()) return;
-                            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    String answer = captchaField.getText().toString();
-                                    Cookie cfCookie = CloudflareChecker.getInstance().
-                                            checkRecaptcha(e, (ExtendedHttpClient) chan.getHttpClient(), cfTask, recaptcha.challenge, answer);
-                                    if (cfCookie != null) {
-                                        chan.saveCookie(cfCookie);
-                                        if (!cfTask.isCancelled()) {
-                                            activity.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    callback.onSuccess();
-                                                }
-                                            });
+                        public void run() {
+                            String url = String.format(Locale.US, e.getCheckCaptchaUrlFormat(), Recaptcha2solved.pop(e.getRecaptchaPublicKey()));
+                            Cookie cfCookie = CloudflareChecker.getInstance().
+                                    checkRecaptcha(e, (ExtendedHttpClient) chan.getHttpClient(), cfTask, url);
+                            if (cfCookie != null) {
+                                chan.saveCookie(cfCookie);
+                                if (!cfTask.isCancelled()) {
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            callback.onSuccess();
                                         }
-                                    } else {
-                                        //печенька не получена (вероятно, ответ неверный, загружаем капчу еще раз)
-                                        handleCloudflare(e, chan, activity, cfTask, callback);
-                                    }
+                                    });
                                 }
-                            }).start();
+                            } else {
+                                //печенька не получена (вероятно, ответ неверный, загружаем капчу еще раз)
+                                handleCloudflare(e, chan, activity, cfTask, callback);
+                            }
                         }
-                    };
-                    
-                    DialogInterface.OnCancelListener onCancel = new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            callback.onError(activity.getString(R.string.error_cloudflare_cancelled));
-                        }
-                    };
-                    
-                    if (cfTask.isCancelled()) return;
-                    
-                    final AlertDialog recaptchaDialog = new AlertDialog.Builder(dialogContext).setView(view).
-                            setPositiveButton(R.string.dialog_cloudflare_captcha_check, process).setOnCancelListener(onCancel).create();
-                    recaptchaDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                    recaptchaDialog.setCanceledOnTouchOutside(false);
-                    recaptchaDialog.show();
-                    
-                    captchaView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            recaptchaDialog.dismiss();
-                            if (cfTask.isCancelled()) return;
-                            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    handleCloudflare(e, chan, activity, cfTask, callback);
-                                }
-                            }).start();
-                        }
-                    });
+                    }).start();
+                }
+                @Override
+                public void onError(String message) {
+                    if (!cfTask.isCancelled()) callback.onError(message);
                 }
             });
         }

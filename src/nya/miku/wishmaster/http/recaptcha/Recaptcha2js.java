@@ -48,9 +48,9 @@ public class Recaptcha2js extends InteractiveException {
     private static final String FALLBACK_INTERCEPT = "_fallback";
     private static final String FALLBACK_FILTER = "g-recaptcha-response=";
     
-    private final String publicKey;
+    private final String baseUrl, publicKey, sToken;
     
-    private static final String getRecahtchaHtml(String publicKey) {
+    private static final String getRecahtchaHtml(String publicKey, String sToken) {
         return
             "<script type=\"text/javascript\">" +
                 "window.globalOnCaptchaEntered = function(res) { " +
@@ -59,7 +59,9 @@ public class Recaptcha2js extends InteractiveException {
             "</script>" +
             "<script src=\"https://www.google.com/recaptcha/api.js\" async defer></script>" +
             "<form action=\"" + FALLBACK_INTERCEPT + "\" method=\"GET\" id=\"_overchan_submitform\">" +
-                "<div class=\"g-recaptcha\" data-sitekey=\"" + publicKey + "\" data-callback=\"globalOnCaptchaEntered\"></div>" +
+                "<div class=\"g-recaptcha\" data-sitekey=\"" + publicKey + "\" " +
+                    (sToken != null && sToken.length() > 0 ? ("data-stoken=\"" + sToken + "\" ") : "") +
+                    "data-callback=\"globalOnCaptchaEntered\"></div>" +
             "</form>" +
             "<script type=\"text/javascript\">" +
                 "function _overchan_add_fallback_submit() { " +
@@ -75,10 +77,19 @@ public class Recaptcha2js extends InteractiveException {
     private volatile boolean done = false;
     
     /**
+     * @param baseUrl URL, с которого должна открываться капча
      * @param publicKey открытый ключ
+     * @param sToken Secure Token
      */
-    public Recaptcha2js(String publicKey) {
+    public Recaptcha2js(String baseUrl, String publicKey, String sToken) {
+        this.baseUrl = baseUrl;
         this.publicKey = publicKey;
+        this.sToken = sToken;
+    }
+    
+    @Deprecated
+    public Recaptcha2js(String publicKey) {
+        this(null, publicKey, null);
     }
     
     @Override
@@ -145,7 +156,8 @@ public class Recaptcha2js extends InteractiveException {
                 });
                 dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 dialog.show();
-                webView.loadDataWithBaseURL("https://127.0.0.1/", getRecahtchaHtml(publicKey), "text/html", "UTF-8", null);
+                String url = baseUrl != null ? baseUrl : "https://127.0.0.1/";
+                webView.loadDataWithBaseURL(url, getRecahtchaHtml(publicKey, sToken), "text/html", "UTF-8", null);
             }
         });
     }

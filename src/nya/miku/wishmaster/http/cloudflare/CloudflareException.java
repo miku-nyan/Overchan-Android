@@ -22,6 +22,11 @@ import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
+
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.app.Activity;
 
 /**
@@ -33,12 +38,17 @@ public class CloudflareException extends InteractiveException {
     private static final long serialVersionUID = 1L;
     
     private static final String SERVICE_NAME = "Cloudflare";
+    private static final String COOKIE_NAME = "cf_clearance";
+    private static final String RECAPTCHA_KEY = "6LfOYgoTAAAAAInWDVTLSc8Yibqp-c9DaLimzNGM";
+    
+    private static final Pattern PATTERN_STOKEN = Pattern.compile("stoken=\"?([^\"&]+)");
+    private static final Pattern PATTERN_ID = Pattern.compile("stoken=\"?([^\"&]+)");
     
     private boolean recaptcha;
     private String url;
-    private String publicKey;
+    private String sToken;
+    private boolean fallback;
     private String checkCaptchaUrlFormat;
-    private String cfCookieName;
     private String chanName;
     
     //для создания экземплятов используются статические методы 
@@ -56,41 +66,65 @@ public class CloudflareException extends InteractiveException {
      * @param chanName название модуля чана (модуль должен имплементировать {@link HttpChanModule})
      * @return созданный объект
      */
-    public static CloudflareException antiDDOS(String url, String cfCookieName, String chanName) {
+    public static CloudflareException antiDDOS(String url, String chanName) {
         CloudflareException e = new CloudflareException();
         e.url = url;
         e.recaptcha = false;
-        e.publicKey = null;
-        e.checkCaptchaUrlFormat = null;
-        e.cfCookieName = cfCookieName;
+        return e;
+    }
+    
+    @Deprecated
+    public static CloudflareException antiDDOS(String url, String cookie, String chanName) {
+        return antiDDOS(url, chanName);
+    }
+    
+    public static CloudflareException withRecaptcha(String url, String chanName, String sToken, String checkUrlFormat, boolean fallback) {
+        CloudflareException e = new CloudflareException();
+        e.url = url;
+        e.recaptcha = true;
+        e.sToken = sToken;
+        e.checkCaptchaUrlFormat = checkUrlFormat;
         e.chanName = chanName;
         return e;
     }
     
+    @Deprecated
+    public static CloudflareException withRecaptcha(String key, String url, String cookie, String chanName) {
+        return withRecaptcha(url, chanName, "", true);
+    }
+    
     /**
      * Создать новый экземпляр cloudflare-исключения (проверка с рекапчей).
-     * @param publicKey открытый ключ рекапчи
-     * @param checkUrlFormat строка-формат URL для проверки капчи (первый %s - challenge, второй %s - ответ на капчу)
-     * @param cfCookieName название cloudflare-куки
+     * @param url адрес, по которому вызвана проверка
      * @param chanName название модуля чана
+     * @param htmlString строка с html-страницей, загрузившейся с запросом проверки
+     * @param fallback использовать ли проверку в fallback-режиме (без js)
      * @return созданный объект
      */
-    public static CloudflareException withRecaptcha(String publicKey, String checkUrlFormat, String cfCookieName, String chanName) {
-        CloudflareException e = new CloudflareException();
-        e.url = null;
-        e.recaptcha = true;
-        e.publicKey = publicKey;
-        e.checkCaptchaUrlFormat = checkUrlFormat;
-        e.cfCookieName = cfCookieName;
-        e.chanName = chanName;
-        return e;
+    public static CloudflareException withRecaptcha(String url, String chanName, String htmlString, boolean fallback) {
+        String token = null;
+        Matcher m = PATTERN_STOKEN.matcher(htmlString);
+        if (m.find()) token = m.group(1);
+        
+        String id = null;
+        m = PATTERN_ID.matcher(htmlString);
+        if (m.find()) id = m.group(1);
+        
+        try {
+            URL baseUrl = new URL(url);
+            url = baseUrl.getProtocol() + "://" + baseUrl.getHost() + "/";
+        } catch (Exception e) {
+            if (!url.endsWith("/")) url = url + "/";
+        }
+        String checkUrl = url + "cdn-cgi/l/chk_captcha?" + (id != null ? ("id=" + id + "&") : "") + "g-recaptcha-response=%s";
+        return withRecaptcha(url, chanName, token, checkUrl, fallback);
     }
     
     /**
      * определить тип проверки (рекапча или обычная anti-ddos)
      * @return true, если проверка с рекапчей
      */
-    public boolean isRecaptcha() {
+    /*package*/ boolean isRecaptcha() {
         return recaptcha;
     }
     
@@ -98,7 +132,7 @@ public class CloudflareException extends InteractiveException {
      * получить url, по которому была вызвана проверка
      * @return url
      */
-    public String getCheckUrl() {
+    /*package*/ String getCheckUrl() {
         return url;
     }
     
@@ -106,15 +140,30 @@ public class CloudflareException extends InteractiveException {
      * получить открытый ключ рекапчи
      * @return открытый ключ
      */
-    public String getRecaptchaPublicKey() {
-        return publicKey;
+    /*package*/ String getRecaptchaPublicKey() {
+        return RECAPTCHA_KEY;
+    }
+    
+    /**
+     * получить secure token (data-stoken, stoken) для рекапчи
+     */
+    /*package*/ String getRecaptchaSecureToken() {
+        return sToken;
+    }
+    
+    /**
+     * определяет, требуется ли использовать проверку recaptcha в fallback-режиме (без js)
+     * @return true, если в режиме fallback
+     */
+    /*package*/ boolean isRecaptchaFallback() {
+        return fallback;
     }
     
     /**
      * получить строку-формат URL для проверки рекапчи
      * @return формат (первый %s - challenge, второй %s - ответ на капчу)
      */
-    public String getCheckCaptchaUrlFormat() {
+    /*package*/ String getCheckCaptchaUrlFormat() {
         return checkCaptchaUrlFormat;
     }
     
@@ -122,8 +171,8 @@ public class CloudflareException extends InteractiveException {
      * получить название cloudflare-куки, которую необходимо получить
      * @return название cookie
      */
-    public String getRequiredCookieName() {
-        return cfCookieName;
+    /*package*/ String getRequiredCookieName() {
+        return COOKIE_NAME;
     }
     
     @Override
