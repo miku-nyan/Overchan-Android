@@ -52,7 +52,6 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -169,16 +168,7 @@ public class DvachnetModule extends AbstractWakabaModule {
         try {
             object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, canCloudflare());
         } catch (HttpWrongStatusCodeException e) {
-            if (e.getStatusCode() == 403) {
-                if (e.getHtmlString() != null && e.getHtmlString().contains("CAPTCHA")) {
-                    throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                            getUsingUrl() + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT, CLOUDFLARE_COOKIE_NAME, getChanName());
-                }
-            } else if (e.getStatusCode() == 503) {
-                if (e.getHtmlString() != null && e.getHtmlString().contains("Just a moment...")) {
-                    throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, getChanName());
-                }
-            }
+            checkCloudflareError(e, url);
             throw e;
         }
         if (task != null && task.isCancelled()) throw new Exception("interrupted");

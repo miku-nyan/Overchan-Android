@@ -30,7 +30,6 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpHeaders;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import cz.msebera.android.httpclient.message.BasicHeader;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import cz.msebera.android.httpclient.util.TextUtils;
@@ -121,13 +120,8 @@ public class InfinityModule extends AbstractVichanModule {
     }
     
     @Override
-    protected void initHttpClient() {
-        String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
-        if (cloudflareCookie != null) {
-            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
-            c.setDomain(DEFAULT_DOMAIN);
-            httpClient.getCookieStore().addCookie(c);
-        }
+    protected String getCloudflareCookieDomain() {
+        return DEFAULT_DOMAIN;
     }
     
     @Override

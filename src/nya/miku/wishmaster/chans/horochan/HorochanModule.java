@@ -35,8 +35,6 @@ import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.StatusLine;
 import cz.msebera.android.httpclient.client.methods.HttpUriRequest;
 import cz.msebera.android.httpclient.client.methods.RequestBuilder;
-import cz.msebera.android.httpclient.cookie.Cookie;
-import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import cz.msebera.android.httpclient.util.EntityUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -46,7 +44,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractChanModule;
+import nya.miku.wishmaster.api.CloudflareChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
@@ -62,7 +60,6 @@ import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -74,7 +71,7 @@ import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 import nya.miku.wishmaster.lib.org_json.JSONTokener;
 
-public class HorochanModule extends AbstractChanModule {
+public class HorochanModule extends CloudflareChanModule {
     private static final String CHAN_NAME = "horochan.ru";
     private static final String DOMAIN = "horochan.ru";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
@@ -93,11 +90,6 @@ public class HorochanModule extends AbstractChanModule {
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_RECAPTCHA_FALLBACK = "PREF_KEY_RECAPTCHA_FALLBACK";
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
-    
-    private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
-    private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
     
     private Map<String, String> boardNames = null;
     private Map<String, Integer> boardPagesCount = null;
@@ -138,23 +130,8 @@ public class HorochanModule extends AbstractChanModule {
     }
     
     @Override
-    protected void initHttpClient() {
-        String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
-        if (cloudflareCookie != null) {
-            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
-            c.setDomain(DOMAIN);
-            httpClient.getCookieStore().addCookie(c);
-        }
-    }
-    
-    @Override
-    public void saveCookie(Cookie cookie) {
-        if (cookie != null) {
-            httpClient.getCookieStore().addCookie(cookie);
-            if (cookie.getName().equals(CLOUDFLARE_COOKIE_NAME)) {
-                preferences.edit().putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), cookie.getValue()).commit();
-            }
-        }
+    protected String getCloudflareCookieDomain() {
+        return DOMAIN;
     }
     
     @Override
@@ -179,6 +156,7 @@ public class HorochanModule extends AbstractChanModule {
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
         addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
+        addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     
@@ -204,19 +182,6 @@ public class HorochanModule extends AbstractChanModule {
         return response;
     }
     
-    private void checkCloudflareError(HttpWrongStatusCodeException e, String url) throws CloudflareException {
-        if (e.getStatusCode() == 403) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("CAPTCHA")) {
-                throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                        getUsingUrl() + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        } else if (e.getStatusCode() == 503) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("Just a moment...")) {
-                throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        }
-    }
-
     @Override
     public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) {
         return BOARDS;
@@ -405,7 +370,7 @@ public class HorochanModule extends AbstractChanModule {
         }
         
         String recaptchaResponse = Recaptcha2solved.pop(RECAPTCHA_PUBLIC_KEY);
-        if (recaptchaResponse == null) throw Recaptcha2.obtain(RECAPTCHA_PUBLIC_KEY, CHAN_NAME, recaptchaFallback());
+        if (recaptchaResponse == null) throw Recaptcha2.obtain(getUsingUrl(), RECAPTCHA_PUBLIC_KEY, null, CHAN_NAME, recaptchaFallback());
         postEntityBuilder.addString("g-recaptcha-response", recaptchaResponse);
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();

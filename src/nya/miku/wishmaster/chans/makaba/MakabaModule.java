@@ -36,7 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractChanModule;
+import nya.miku.wishmaster.api.CloudflareChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -52,7 +52,6 @@ import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -84,7 +83,7 @@ import android.text.InputType;
  *
  */
 
-public class MakabaModule extends AbstractChanModule {
+public class MakabaModule extends CloudflareChanModule {
     private static final String TAG = "MakabaModule"; 
     
     /** что-то типа '2ch.hk' */
@@ -131,10 +130,7 @@ public class MakabaModule extends AbstractChanModule {
     
     @Override
     protected void initHttpClient() {
-        setCookie(
-                preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN), null),
-                CLOUDFLARE_COOKIE_NAME,
-                preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE_VALUE), null));
+        super.initHttpClient();
         setCookie(
                 preferences.getString(getSharedKey(PREF_KEY_USERCODE_COOKIE_DOMAIN), null),
                 USERCODE_COOKIE_NAME,
@@ -160,18 +156,11 @@ public class MakabaModule extends AbstractChanModule {
     
     @Override
     public void saveCookie(Cookie cookie) {
-        if (cookie != null) {
-            httpClient.getCookieStore().addCookie(cookie);
-            if (cookie.getName().equals(CLOUDFLARE_COOKIE_NAME)) {
-                preferences.edit().
-                        putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN), cookie.getDomain()).
-                        putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE_VALUE), cookie.getValue()).commit();
-            }
-            if (cookie.getName().equals(USERCODE_COOKIE_NAME)) {
-                preferences.edit().
-                        putString(getSharedKey(PREF_KEY_USERCODE_COOKIE_DOMAIN), cookie.getDomain()).
-                        putString(getSharedKey(PREF_KEY_USERCODE_COOKIE_VALUE), cookie.getValue()).commit();
-            }
+        super.saveCookie(cookie);
+        if (cookie != null && cookie.getName().equals(USERCODE_COOKIE_NAME)) {
+            preferences.edit().
+                    putString(getSharedKey(PREF_KEY_USERCODE_COOKIE_DOMAIN), cookie.getDomain()).
+                    putString(getSharedKey(PREF_KEY_USERCODE_COOKIE_VALUE), cookie.getValue()).commit();
         }
     }
     
@@ -209,20 +198,6 @@ public class MakabaModule extends AbstractChanModule {
         if (task != null && task.isCancelled()) throw new Exception("interrupted");
         if (listener != null) listener.setIndeterminate();
         return response;
-    }
-    
-    /** выбрасывает CloudflareException, если исключение была вызвано из-за ошибки с Cloudflare */
-    private void checkCloudflareError(HttpWrongStatusCodeException e, String url) throws CloudflareException {
-        if (e.getStatusCode() == 403) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("CAPTCHA")) {
-                throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                        this.domainUrl + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        } else if (e.getStatusCode() == 503) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("Just a moment...")) {
-                throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        }
     }
     
     private void addMobileAPIPreference(PreferenceGroup group) {
@@ -291,6 +266,7 @@ public class MakabaModule extends AbstractChanModule {
     public void addPreferencesOnScreen(final PreferenceGroup preferenceScreen) {
         addMobileAPIPreference(preferenceScreen);
         addCaptchaPreference(preferenceScreen);
+        addCloudflareRecaptchaFallbackPreference(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
     }

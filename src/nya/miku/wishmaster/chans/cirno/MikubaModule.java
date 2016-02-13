@@ -39,7 +39,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractChanModule;
+import nya.miku.wishmaster.api.CloudflareChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -55,7 +55,6 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -67,7 +66,7 @@ import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
  *
  */
 
-public class MikubaModule extends AbstractChanModule {
+public class MikubaModule extends CloudflareChanModule {
     private static final String TAG = "MikubaModule";
     
     private static final String MIKUBA_NAME = "hatsune.ru";
@@ -80,14 +79,9 @@ public class MikubaModule extends AbstractChanModule {
             Pattern.CASE_INSENSITIVE);
     
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
     private static final String PREF_KEY_SESSION_COOKIE = "PREF_KEY_SESSION_COOKIE";
     
     private static final String SESSION_COOKIE_NAME = "webpy_session_id";
-    
-    private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
-    private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
     
     private static final BoardModel MIKUBA_BOARD;
     private static final SimpleBoardModel[] MIKUBA_SIMPLE_BOARDS_LIST;
@@ -141,13 +135,8 @@ public class MikubaModule extends AbstractChanModule {
     
     @Override
     protected void initHttpClient() {
-        String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
+        super.initHttpClient();
         String sessionCookie = preferences.getString(getSharedKey(PREF_KEY_SESSION_COOKIE), null);
-        if (cloudflareCookie != null) {
-            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
-            c.setDomain(MIKUBA_DOMAIN);
-            httpClient.getCookieStore().addCookie(c);
-        }
         if (sessionCookie != null) {
             BasicClientCookie c = new BasicClientCookie(SESSION_COOKIE_NAME, sessionCookie);
             c.setDomain(MIKUBA_DOMAIN);
@@ -156,9 +145,14 @@ public class MikubaModule extends AbstractChanModule {
     }
     
     @Override
+    protected String getCloudflareCookieDomain() {
+        return MIKUBA_DOMAIN;
+    }
+    
+    @Override
     public void saveCookie(Cookie cookie) {
+        super.saveCookie(cookie);
         if (cookie != null) {
-            httpClient.getCookieStore().addCookie(cookie);
             saveCookieToPreferences(cookie);
         }
     }
@@ -168,9 +162,7 @@ public class MikubaModule extends AbstractChanModule {
     }
     
     private void saveCookieToPreferences(Cookie cookie) {
-        if (cookie.getName().equals(CLOUDFLARE_COOKIE_NAME)) {
-            preferences.edit().putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), cookie.getValue()).commit();
-        } else if (cookie.getName().equals(SESSION_COOKIE_NAME)) {
+        if (cookie.getName().equals(SESSION_COOKIE_NAME)) {
             preferences.edit().putString(getSharedKey(PREF_KEY_SESSION_COOKIE), cookie.getValue()).commit();
         }
     }
@@ -185,6 +177,7 @@ public class MikubaModule extends AbstractChanModule {
         httpsPref.setDefaultValue(false);
         preferenceGroup.addPreference(httpsPref);
         addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
+        addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     
@@ -219,20 +212,14 @@ public class MikubaModule extends AbstractChanModule {
                 return in.readPage();
             } else {
                 if (responseModel.notModified()) return null;
-                String html = null;
+                byte[] html = null;
                 try {
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(1024);
                     IOUtils.copyStream(responseModel.stream, byteStream);
-                    html = byteStream.toString("UTF-8");
+                    html = byteStream.toByteArray();
                 } catch (Exception e) {}
                 if (html != null) {
-                    if (responseModel.statusCode == 403 && html.contains("CAPTCHA")) {
-                        throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                                (useHttps() ? "https://" : "http://") + MIKUBA_DOMAIN + "/" + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT,
-                                CLOUDFLARE_COOKIE_NAME, MIKUBA_NAME);
-                    } else if (responseModel.statusCode == 503 && html.contains("Just a moment...")) {
-                        throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, MIKUBA_NAME);
-                    }
+                    checkCloudflareError(new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusReason, html), url);
                 }
                 throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
             }

@@ -72,14 +72,8 @@ public class MakabaConstants {
     public static final String PREF_KEY_SKIP_CAPTCHA = "skip_captcha1";
     public static final String PREF_KEY_USERCODE_COOKIE_DOMAIN = "usercode_domain";
     public static final String PREF_KEY_USERCODE_COOKIE_VALUE = "usercode_cookie";
-    public static final String PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN = "cf_domain";
-    public static final String PREF_KEY_CLOUDFLARE_COOKIE_VALUE = "cf_cookie";
     
-    public static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
     public static final String USERCODE_COOKIE_NAME = "usercode_auth";
-    
-    public static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog";
-    public static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
     
     public static final String DASHCHAN_PUBLIC_KEY = "CVjh9SfLC46PzUkv3gc5CeMhLOlnpQ8z";
     public static final String DASHCHAN_PRIVATE_KEY = "slqOXfj0CmOnDvNMxZwj1X1JXj24URhK";

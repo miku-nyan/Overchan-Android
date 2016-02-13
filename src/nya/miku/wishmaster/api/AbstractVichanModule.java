@@ -61,7 +61,6 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -107,19 +106,6 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         if (task != null && task.isCancelled()) throw new Exception("interrupted");
         if (listener != null) listener.setIndeterminate();
         return array;
-    }
-    
-    protected void checkCloudflareError(HttpWrongStatusCodeException e, String url) throws CloudflareException {
-        if (e.getStatusCode() == 403) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("CAPTCHA")) {
-                throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                        getUsingUrl() + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        } else if (e.getStatusCode() == 503) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("Just a moment...")) {
-                throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        }
     }
     
     @Override

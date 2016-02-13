@@ -28,9 +28,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import cz.msebera.android.httpclient.cookie.Cookie;
-import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -44,7 +41,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractChanModule;
+import nya.miku.wishmaster.api.CloudflareChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
@@ -61,10 +58,8 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2fallback;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2js;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -74,7 +69,7 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-public class AllchanModule extends AbstractChanModule {
+public class AllchanModule extends CloudflareChanModule {
     private static final String TAG = "AllchanModule";
     private static final String CHAN_NAME = "allchan.su";
     private static final String DOMAIN = "allchan.su";
@@ -97,11 +92,6 @@ public class AllchanModule extends AbstractChanModule {
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_CAPTCHA_TYPE = "PREF_KEY_CAPTCHA_TYPE";
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
-    
-    private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
-    private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
     
     public static final String[] CATALOG_TYPES = new String[] { "date", "recent", "bumps" };
     public static final String[] CATALOG_DESCRIPTIONS = new String[] {
@@ -149,23 +139,8 @@ public class AllchanModule extends AbstractChanModule {
     }
     
     @Override
-    protected void initHttpClient() {
-        String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
-        if (cloudflareCookie != null) {
-            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
-            c.setDomain(DOMAIN);
-            httpClient.getCookieStore().addCookie(c);
-        }
-    }
-    
-    @Override
-    public void saveCookie(Cookie cookie) {
-        if (cookie != null) {
-            httpClient.getCookieStore().addCookie(cookie);
-            if (cookie.getName().equals(CLOUDFLARE_COOKIE_NAME)) {
-                preferences.edit().putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), cookie.getValue()).commit();
-            }
-        }
+    protected String getCloudflareCookieDomain() {
+        return DOMAIN;
     }
     
     @Override
@@ -193,6 +168,7 @@ public class AllchanModule extends AbstractChanModule {
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
         addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
+        addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
         
         final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
@@ -255,19 +231,6 @@ public class AllchanModule extends AbstractChanModule {
         if (task != null && task.isCancelled()) throw new Exception("interrupted");
         if (listener != null) listener.setIndeterminate();
         return response;
-    }
-    
-    private void checkCloudflareError(HttpWrongStatusCodeException e, String url) throws CloudflareException {
-        if (e.getStatusCode() == 403) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("CAPTCHA")) {
-                throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                        getUsingUrl() + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        } else if (e.getStatusCode() == 503) {
-            if (e.getHtmlString() != null && e.getHtmlString().contains("Just a moment...")) {
-                throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, getChanName());
-            }
-        }
     }
     
     @Override
@@ -619,9 +582,8 @@ public class AllchanModule extends AbstractChanModule {
                 postEntityBuilder.addString("captchaEngine", "google-recaptcha");
                 String response = Recaptcha2solved.pop(RECAPTCHA_PUBLIC_KEY);
                 if (response == null) {
-                    throw (getUsingCaptchaType() == CAPTCHA_RECAPTCHA_FALLBACK ?
-                            new Recaptcha2fallback(RECAPTCHA_PUBLIC_KEY, CHAN_NAME) :
-                                new Recaptcha2js(RECAPTCHA_PUBLIC_KEY));
+                    boolean fallback = getUsingCaptchaType() == CAPTCHA_RECAPTCHA_FALLBACK;
+                    throw Recaptcha2.obtain(getUsingUrl(), RECAPTCHA_PUBLIC_KEY, null, CHAN_NAME, fallback);
                 }
                 postEntityBuilder.addString("g-recaptcha-response", response);
                 break;

@@ -52,7 +52,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractChanModule;
+import nya.miku.wishmaster.api.CloudflareChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -68,28 +68,22 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-public class KrautModule extends AbstractChanModule {
+public class KrautModule extends CloudflareChanModule {
     private static final String TAG = "KrautModule";
     
     static final String CHAN_NAME = "krautchan.net";
     private static final String CHAN_DOMAIN = "krautchan.net";
     
     private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    private static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
     private static final String PREF_KEY_KOMPTURCODE_COOKIE = "PREF_KEY_KOMPTURCODE_COOKIE";
     
-    private static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    private static final String CLOUDFLARE_RECAPTCHA_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog"; 
-    private static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
-    
-    private static final String KOMPTURCODE_COOKIE_NAME = "desuchan.komturcode";
+    private static final String KOMTURCODE_COOKIE_NAME = "desuchan.komturcode";
     
     private Map<String, BoardModel> boardsMap = null;
     private String lastCaptchaId = null;
@@ -115,28 +109,18 @@ public class KrautModule extends AbstractChanModule {
     
     @Override
     protected void initHttpClient() {
-        String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
-        if (cloudflareCookie != null) {
-            BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
-            c.setDomain(CHAN_DOMAIN);
-            httpClient.getCookieStore().addCookie(c);
-        }
+        super.initHttpClient();
         setKompturcodeCookie(preferences.getString(getSharedKey(PREF_KEY_KOMPTURCODE_COOKIE), null));
     }
     
     @Override
-    public void saveCookie(Cookie cookie) {
-        if (cookie != null) {
-            httpClient.getCookieStore().addCookie(cookie);
-            if (cookie.getName().equals(CLOUDFLARE_COOKIE_NAME)) {
-                preferences.edit().putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), cookie.getValue()).commit();
-            }
-        }
+    protected String getCloudflareCookieDomain() {
+        return CHAN_DOMAIN;
     }
     
     private void setKompturcodeCookie(String kompturcodeCookie) {
         if (kompturcodeCookie != null && kompturcodeCookie.length() > 0) {
-            BasicClientCookie c = new BasicClientCookie(KOMPTURCODE_COOKIE_NAME, kompturcodeCookie);
+            BasicClientCookie c = new BasicClientCookie(KOMTURCODE_COOKIE_NAME, kompturcodeCookie);
             c.setDomain(CHAN_DOMAIN);
             httpClient.getCookieStore().addCookie(c);
         }
@@ -171,6 +155,7 @@ public class KrautModule extends AbstractChanModule {
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
         addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
+        addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     
@@ -199,20 +184,14 @@ public class KrautModule extends AbstractChanModule {
                     (catalog ? ((KrautCatalogReader) in).readPage() : ((KrautReader) in).readPage());
             } else {
                 if (responseModel.notModified()) return null;
-                String html = null;
+                byte[] html = null;
                 try {
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(1024);
                     IOUtils.copyStream(responseModel.stream, byteStream);
-                    html = byteStream.toString("UTF-8");
+                    html = byteStream.toByteArray();
                 } catch (Exception e) {}
                 if (html != null) {
-                    if (responseModel.statusCode == 403 && html.contains("CAPTCHA")) {
-                        throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                                (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/" + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT,
-                                CLOUDFLARE_COOKIE_NAME, CHAN_NAME);
-                    } else if (responseModel.statusCode == 503 && html.contains("Just a moment...")) {
-                        throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, CHAN_NAME);
-                    }
+                    checkCloudflareError(new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusReason, html), url);
                 }
                 throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
             }
@@ -348,17 +327,7 @@ public class KrautModule extends AbstractChanModule {
                 
             }
         } catch (HttpWrongStatusCodeException e) {
-            if (e.getStatusCode() == 403) {
-                if (e.getHtmlString() != null && e.getHtmlString().contains("CAPTCHA")) {
-                    throw CloudflareException.withRecaptcha(CLOUDFLARE_RECAPTCHA_KEY,
-                            (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/" + CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT,
-                            CLOUDFLARE_COOKIE_NAME, CHAN_NAME);
-                }
-            } else if (e.getStatusCode() == 503) {
-                if (e.getHtmlString() != null && e.getHtmlString().contains("Just a moment...")) {
-                    throw CloudflareException.antiDDOS(url, CLOUDFLARE_COOKIE_NAME, CHAN_NAME);
-                }
-            }
+            checkCloudflareError(e, url);
         } catch (Exception e) {
             Logger.e(TAG, "exception while getting captcha", e);
         }

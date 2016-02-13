@@ -480,7 +480,8 @@ public class FourchanModule extends AbstractChanModule {
         String recaptcha2 = Recaptcha2solved.pop(RECAPTCHA_KEY);
         if (!usingPasscode) {
             if (useNewRecaptcha()) {
-                if (recaptcha2 == null) throw Recaptcha2.obtain(RECAPTCHA_KEY, CHAN_NAME, newRecaptchaFallback());
+                if (recaptcha2 == null) throw Recaptcha2.obtain(
+                        (useHttps() ? "https://" : "http://") + "4chan.org/", RECAPTCHA_KEY, null, CHAN_NAME, newRecaptchaFallback());
             } else if (recaptcha == null) throw new Exception("Invalid captcha");
         }
         String url = "https://sys.4chan.org/" + model.boardName + "/post";

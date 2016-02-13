@@ -24,9 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import cz.msebera.android.httpclient.cookie.Cookie;
-import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
-
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
@@ -39,7 +36,6 @@ import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
-import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -50,14 +46,9 @@ import android.content.res.Resources;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 
-public abstract class AbstractWakabaModule extends AbstractChanModule {
+public abstract class AbstractWakabaModule extends CloudflareChanModule {
     
     protected static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
-    protected static final String PREF_KEY_CLOUDFLARE_COOKIE = "PREF_KEY_CLOUDFLARE_COOKIE";
-    
-    protected static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    protected static final String CLOUDFLARE_RECAPTCHA_KEY = "6LfOYgoTAAAAAInWDVTLSc8Yibqp-c9DaLimzNGM";
-    protected static final String CLOUDFLARE_RECAPTCHA_CHECK_URL_FMT = "cdn-cgi/l/chk_captcha?recaptcha_challenge_field=%s&recaptcha_response_field=%s";
     
     private Map<String, SimpleBoardModel> boardsMap = null;
     
@@ -88,36 +79,18 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
         return (useHttps() ? "https://" : "http://") + getUsingDomain() + "/";
     }
     
+    @Override
     protected boolean canCloudflare() {
         return false;
     }
     
+    @Override
+    protected String getCloudflareCookieDomain() {
+        return getUsingDomain();
+    }
+    
     protected boolean wakabaNoRedirect() {
         return false;
-    }
-    
-    @Override
-    protected void initHttpClient() {
-        if (canCloudflare()) {
-            String cloudflareCookie = preferences.getString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), null);
-            if (cloudflareCookie != null) {
-                BasicClientCookie c = new BasicClientCookie(CLOUDFLARE_COOKIE_NAME, cloudflareCookie);
-                c.setDomain(getUsingDomain());
-                httpClient.getCookieStore().addCookie(c);
-            }
-        }
-    }
-    
-    @Override
-    public void saveCookie(Cookie cookie) {
-        if (cookie != null) {
-            httpClient.getCookieStore().addCookie(cookie);
-            if (canCloudflare()) {
-                if (cookie.getName().equals(CLOUDFLARE_COOKIE_NAME)) {
-                    preferences.edit().putString(getSharedKey(PREF_KEY_CLOUDFLARE_COOKIE), cookie.getValue()).commit();
-                }
-            }
-        }
     }
     
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
@@ -139,18 +112,14 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
                 if (responseModel.notModified()) return null;
                 
                 if (canCloudflare()) {
-                    String html = null;
+                    byte[] html = null;
                     try {
                         ByteArrayOutputStream byteStream = new ByteArrayOutputStream(1024);
                         IOUtils.copyStream(responseModel.stream, byteStream);
-                        html = byteStream.toString("UTF-8");
+                        html = byteStream.toByteArray();
                     } catch (Exception e) {}
                     if (html != null) {
-                        if (responseModel.statusCode == 403 && html.contains("CAPTCHA")) {
-                            throw CloudflareException.withRecaptcha(getUsingUrl(), getChanName(), html, true);
-                        } else if (responseModel.statusCode == 503 && html.contains("Just a moment...")) {
-                            throw CloudflareException.antiDDOS(url, getChanName());
-                        }
+                        checkCloudflareError(new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusReason, html), url);
                     }
                 }
                 throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
@@ -177,6 +146,7 @@ public abstract class AbstractWakabaModule extends AbstractChanModule {
             preferenceGroup.addPreference(httpsPref);
             addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         }
+        addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     
