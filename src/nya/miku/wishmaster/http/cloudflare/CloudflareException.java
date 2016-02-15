@@ -85,6 +85,7 @@ public class CloudflareException extends InteractiveException {
         e.sToken = sToken;
         e.checkCaptchaUrlFormat = checkUrlFormat;
         e.chanName = chanName;
+        e.fallback = fallback;
         return e;
     }
     
