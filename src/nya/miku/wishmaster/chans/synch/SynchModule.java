@@ -154,7 +154,6 @@ public class SynchModule extends AbstractVichanModule {
     
     @Override
     public String fixRelativeUrl(String url) {
-        if (url.startsWith("?/")) url = url.substring(1);
         if (url.startsWith("/src/") | url.startsWith("/thumb/")) return "http://cdn.syn-ch.com" + url;
         return super.fixRelativeUrl(url);
     }

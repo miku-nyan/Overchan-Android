@@ -500,6 +500,12 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         }
     }
     
+    @Override
+    public String fixRelativeUrl(String url) {
+        if (url.startsWith("?/")) url = url.substring(1);
+        return super.fixRelativeUrl(url); 
+    }
+    
     protected static class VichanAntiBot {
         public static List<Pair<String, String>> getFormValues(String url, CancellableTask task, HttpClient httpClient) throws Exception {
             return getFormValues(url, HttpRequestModel.builder().setGET().build(), task, httpClient, "<form name=\"post\"", "</form>");
