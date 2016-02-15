@@ -25,6 +25,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import cz.msebera.android.httpclient.cookie.Cookie;
 import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
+import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 
@@ -100,8 +101,8 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
         if (canCloudflare()) {
             Context context = preferenceGroup.getContext();
             CheckBoxPreference fallbackPref = new CheckBoxPreference(context);
-            fallbackPref.setTitle("Cloudflare Recaptcha fallback");
-            fallbackPref.setSummary("Use Cloudflare Recaptcha 2 in compatibility mode");
+            fallbackPref.setTitle(R.string.pref_cf_recaptcha_fallback);
+            fallbackPref.setSummary(R.string.pref_cf_recaptcha_fallback_summary);
             fallbackPref.setKey(getSharedKey(PREF_KEY_CLOUDFLARE_RECAPTCHA_FALLBACK));
             fallbackPref.setDefaultValue(false);
             preferenceGroup.addPreference(fallbackPref);

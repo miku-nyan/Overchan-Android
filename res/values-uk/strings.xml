@@ -453,6 +453,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_https_summary">Захищене шифроване з’єднання</string>
     <string name="pref_ignore_ssl_errors">Ігнорувати помилки SSL</string>
     <string name="pref_ignore_ssl_errors_summary">Не зважати на хостнейм і сертифікат</string>
+    <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
+    <string name="pref_cf_recaptcha_fallback_summary">Використовувати капчу Cloudflare в режимі сумісності</string>
     <string name="pref_only_new_posts">Лише нові пости</string>
     <string name="pref_only_new_posts_summary">Запитувати лише нові пости, а не цілий тред</string>
     <string name="pref_captcha_type">Тип капчі</string>

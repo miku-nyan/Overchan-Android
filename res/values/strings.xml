@@ -443,6 +443,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_https_summary">Secure encrypted connection</string>
     <string name="pref_ignore_ssl_errors">Ignore SSL Errors</string>
     <string name="pref_ignore_ssl_errors_summary">Disable Hostname and Certificate Validation</string>
+    <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
+    <string name="pref_cf_recaptcha_fallback_summary">Use Cloudflare Recaptcha 2 in compatibility mode</string>
     <string name="pref_only_new_posts">Only new posts</string>
     <string name="pref_only_new_posts_summary">Load only new posts without reloading the whole thread</string>
     <string name="pref_captcha_type">Captcha type</string>

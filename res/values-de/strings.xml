@@ -444,6 +444,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_https_summary">Sichere, verschlüsselte Verbindung</string>
     <string name="pref_ignore_ssl_errors">SSL-Fehler ignorieren</string>
     <string name="pref_ignore_ssl_errors_summary">Hostname und Certificate Validation deaktivieren</string>
+    <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
+    <string name="pref_cf_recaptcha_fallback_summary">Den Kompatibilitätsmodus verwenden</string>
     <string name="pref_only_new_posts">Nur neue Posts</string>
     <string name="pref_only_new_posts_summary">Laden Sie nur neuen Posts ohne Neuladen der ganzen Thread</string>
     <string name="pref_captcha_type">Captcha-Typ</string>

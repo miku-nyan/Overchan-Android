@@ -450,6 +450,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_https_summary">Защищённое шифрованное соединение</string>
     <string name="pref_ignore_ssl_errors">Игнорировать ошибки SSL</string>
     <string name="pref_ignore_ssl_errors_summary">Отключить проверку имени и сертификата</string>
+    <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
+    <string name="pref_cf_recaptcha_fallback_summary">Использовать капчу Cloudflare в режиме совместимости</string>
     <string name="pref_only_new_posts">Только новые посты</string>
     <string name="pref_only_new_posts_summary">Загружать только новые посты вместо обновления всего треда</string>
     <string name="pref_captcha_type">Тип капчи</string>
