@@ -75,6 +75,7 @@ public class Recaptcha2js extends InteractiveException {
     }
     
     private volatile boolean done = false;
+    private volatile String pushedHash = null;
     
     /**
      * @param baseUrl URL, с которого должна открываться капча
@@ -85,11 +86,6 @@ public class Recaptcha2js extends InteractiveException {
         this.baseUrl = baseUrl;
         this.publicKey = publicKey;
         this.sToken = sToken;
-    }
-    
-    @Deprecated
-    public Recaptcha2js(String publicKey) {
-        this(null, publicKey, null);
     }
     
     @Override
@@ -117,8 +113,11 @@ public class Recaptcha2js extends InteractiveException {
                     public void onPageStarted(WebView view, String url, Bitmap favicon) {
                         if (url.contains(INTERCEPT) || url.contains(FALLBACK_INTERCEPT)) {
                             String hash = url.contains(INTERCEPT) ? url.substring(url.indexOf(INTERCEPT) + INTERCEPT.length()) :
-                                (url.indexOf(FALLBACK_FILTER) != -1 ? url.substring(url.indexOf(FALLBACK_FILTER) + FALLBACK_FILTER.length()) : null);
-                            Recaptcha2solved.push(publicKey, hash != null ? hash : "NULL");
+                                (url.contains(FALLBACK_FILTER) ? url.substring(url.indexOf(FALLBACK_FILTER) + FALLBACK_FILTER.length()) : null);
+                            if (hash != null && hash.length() > 0 && !hash.equals(pushedHash)) {
+                                Recaptcha2solved.push(publicKey, hash);
+                                pushedHash = hash;
+                            }
                             if (!done && !task.isCancelled()) activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

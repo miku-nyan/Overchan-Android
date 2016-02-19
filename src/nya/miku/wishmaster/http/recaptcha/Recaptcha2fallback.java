@@ -97,11 +97,6 @@ public class Recaptcha2fallback extends InteractiveException {
         this.sToken = sToken;
     }
     
-    @Deprecated
-    public Recaptcha2fallback(String publicKey, String chanName) {
-        this(null, publicKey, null, chanName);
-    }
-    
     @Override
     public void handle(final Activity activity, final CancellableTask task, final Callback callback) {
         try {
