@@ -65,6 +65,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -375,6 +376,7 @@ public class DownloadingService extends Service {
                         } finally {
                             IOUtils.closeQuietly(out);
                             if (!success) target.delete();
+                            else notifyMediaScanner(target);
                             downloadingLocker.unlock(targetFilename);
                         }
                     }
@@ -803,6 +805,14 @@ public class DownloadingService extends Service {
         private String getMessageOrENOSPC(Exception e) {
             if (IOUtils.isENOSPC(e)) return getString(R.string.error_no_space);
             return e.getMessage();
+        }
+        
+        private void notifyMediaScanner(File file) {
+            try {
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            }
         }
     }
     
