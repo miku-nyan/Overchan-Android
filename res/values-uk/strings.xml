@@ -360,8 +360,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="error_unknown">Невідома помилка</string>
     <string name="error_deserialization">Помилка десеріалізації</string>
-    <string name="error_cloudflare_get_captcha">Помилка отримання капчі CloudFlare</string>
-    <string name="error_cloudflare_cancelled">CloudFlare відхилив запит</string>
     <string name="error_cloudflare_antiddos">Анти-DDOS CloudFlare не пройдено</string>
     <string name="error_ssl">Помилка SSL/HTTPS (з’єднання не захищено)</string>
     <string name="error_ssl_help">\n\nЯкщо ви розумієте, що відбувається, у налаштуваннях дошки можна дозволити

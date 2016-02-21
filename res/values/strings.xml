@@ -350,8 +350,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="error_unknown">An unknown error occurred</string>
     <string name="error_deserialization">Error while deserialization</string>
-    <string name="error_cloudflare_get_captcha">Unable to get Cloudflare captcha</string>
-    <string name="error_cloudflare_cancelled">Cloudflare checking has not been passed</string>
     <string name="error_cloudflare_antiddos">Unable to pass Cloudflare anti-DDOS checking</string>
     <string name="error_ssl">SSL/HTTPS Error (Connection is Untrusted)</string>
     <string name="error_ssl_help">\n\nIf you understand what\'s going on, you can set in preferences of this imageboard:

@@ -350,8 +350,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="error_unknown">Ein unbekannter Fehler</string>
     <string name="error_deserialization">Fehler bei Deserialisierung</string>
-    <string name="error_cloudflare_get_captcha">Nicht möglich Cloudflare captcha zu erhalten</string>
-    <string name="error_cloudflare_cancelled">Cloudflare Überprüfung nicht bestanden</string>
     <string name="error_cloudflare_antiddos">Cloudflare anti-DDOS Überprüfung ist nicht möglich</string>
     <string name="error_ssl">SSL/HTTPS-Fehler (Verbindung wird nicht vertraut)</string>
     <string name="error_ssl_help">\n\nWenn Sie verstehen, was los ist, können Sie in den Einstellungen dieser Imageboard wählen:

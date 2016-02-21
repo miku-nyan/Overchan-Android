@@ -357,8 +357,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="error_unknown">Неизвестная ошибка</string>
     <string name="error_deserialization">Ошибка десериализации</string>
-    <string name="error_cloudflare_get_captcha">Не удалось получить Cloudflare капчу</string>
-    <string name="error_cloudflare_cancelled">Проверка Cloudflare не пройдена</string>
     <string name="error_cloudflare_antiddos">Не удалось выполнить анти-DDOS проверку Cloudflare</string>
     <string name="error_ssl">Ошибка SSL/HTTPS (соединение не защищено)</string>
     <string name="error_ssl_help">\n\nЕсли вы понимаете, что происходит, вы можете установить в настройках данной имиджборды:
