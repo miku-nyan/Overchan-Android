@@ -41,13 +41,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
-import android.net.http.SslError;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -132,11 +130,6 @@ public class CloudflareChecker {
         
         final ViewGroup layout = (ViewGroup) activity.getWindow().getDecorView().getRootView();
         final WebViewClient client = new WebViewClient() {
-            @Override
-            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                handler.proceed();
-            }
-            
             @Override
             public void onPageFinished(WebView webView, String url) {
                 super.onPageFinished(webView, url);

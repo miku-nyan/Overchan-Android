@@ -28,9 +28,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.net.http.SslError;
 import android.view.ViewGroup;
-import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -105,10 +103,6 @@ public class Recaptcha2js extends InteractiveException {
                 webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 webView.setWebViewClient(new WebViewClient() {
                     AtomicBoolean fallbackButtonAdded = new AtomicBoolean(false);
-                    @Override
-                    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                        handler.proceed();
-                    }
                     @Override
                     public void onPageStarted(WebView view, String url, Bitmap favicon) {
                         if (url.contains(INTERCEPT) || url.contains(FALLBACK_INTERCEPT)) {

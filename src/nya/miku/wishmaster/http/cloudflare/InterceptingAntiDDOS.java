@@ -37,11 +37,9 @@ import cz.msebera.android.httpclient.cookie.Cookie;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.net.http.SslError;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -87,11 +85,6 @@ import android.webkit.WebViewClient;
         CloudflareChecker.removeCookie(cookieStore, exception.getRequiredCookieName());
         final ViewGroup layout = (ViewGroup)activity.getWindow().getDecorView().getRootView();
         final WebViewClient client = new WebViewClient() {
-            @Override
-            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                handler.proceed();
-            }
-            
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
                 HttpResponseModel responseModel = null;

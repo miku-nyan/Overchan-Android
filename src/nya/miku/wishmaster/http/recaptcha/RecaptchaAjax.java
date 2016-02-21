@@ -41,10 +41,8 @@ import cz.msebera.android.httpclient.message.BasicHeader;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.net.http.SslError;
 import android.os.Build;
 import android.os.Handler;
-import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -130,10 +128,6 @@ public class RecaptchaAjax {
                 holder.webView = new WebView(context);
                 holder.webView.setWebViewClient(new WebViewClient() {
                     @Override
-                    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                        handler.proceed();
-                    }
-                    @Override
                     public void onLoadResource(WebView view, String url) {
                         String challenge = getChallengeFromImageUrl(url);
                         if (challenge != null) holder.challenge = challenge;
@@ -185,10 +179,6 @@ public class RecaptchaAjax {
                 public void run() {
                     holder.webView = new WebView(context);
                     holder.webView.setWebViewClient(new WebViewClient() {
-                        @Override
-                        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                            handler.proceed();
-                        }
                         @Override
                         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
                             String challenge = getChallengeFromImageUrl(url);
