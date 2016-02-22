@@ -22,7 +22,6 @@ import static nya.miku.wishmaster.chans.makaba.MakabaConstants.*;
 import static nya.miku.wishmaster.chans.makaba.MakabaJsonMapper.*;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -670,18 +669,6 @@ public class MakabaModule extends CloudflareChanModule {
         }
     }
     
-    @Override
-    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
-        String fixedUrl = fixRelativeUrl(url);
-        try {
-            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().build();
-            HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, rqModel, httpClient, listener, task, true);
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, fixedUrl);
-            throw e;
-        }
-    }
-
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN_NAME)) throw new IllegalArgumentException("wrong chan");

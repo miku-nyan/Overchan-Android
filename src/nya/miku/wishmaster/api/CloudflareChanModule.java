@@ -18,6 +18,8 @@
 
 package nya.miku.wishmaster.api;
 
+import java.io.OutputStream;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -26,7 +28,11 @@ import android.preference.PreferenceGroup;
 import cz.msebera.android.httpclient.cookie.Cookie;
 import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
+import nya.miku.wishmaster.http.streamer.HttpRequestModel;
+import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 
 public abstract class CloudflareChanModule extends AbstractChanModule {
@@ -111,6 +117,18 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
     
     protected boolean cloudflareRecaptchaFallback() {
         return preferences.getBoolean(getSharedKey(PREF_KEY_CLOUDFLARE_RECAPTCHA_FALLBACK), false);
+    }
+    
+    @Override
+    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
+        String fixedUrl = fixRelativeUrl(url);
+        try {
+            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().build();
+            HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, rqModel, httpClient, listener, task, true);
+        } catch (HttpWrongStatusCodeException e) {
+            if (canCloudflare()) checkCloudflareError(e, fixedUrl);
+            throw e;
+        }
     }
     
 }
