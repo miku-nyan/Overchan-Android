@@ -354,6 +354,7 @@ public class DownloadingService extends Service {
                             IOUtils.closeQuietly(is);
                             IOUtils.closeQuietly(os);
                             if (!success) target.delete();
+                            else notifyMediaScanner(target);
                         }
                     } else {
                         String targetFilename = target.getAbsolutePath();
