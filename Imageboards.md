@@ -25,6 +25,7 @@
 * [syn-ch](http://syn-ch.com/)
 * [Inach.org](http://inach.org/)
 * [claire.ws](http://claire.ws/)
+* [kurisa.ch](http://kurisa.ch/)
 * [10ch.ru](http://10ch.ru/)
 * [haruhichan.ru](http://haruhichan.ru/)
 * [pl.vichan.net](https://pl.vichan.net/)
@@ -35,3 +36,4 @@
 * [anon.fm (feedback)](http://anon.fm/)
 * [2ch.hk](https://2ch.hk/)
 * [arhivach.org](http://arhivach.org)
+* [Samachan](http://samachan.org/)
