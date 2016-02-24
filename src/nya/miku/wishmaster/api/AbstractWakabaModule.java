@@ -144,7 +144,6 @@ public abstract class AbstractWakabaModule extends CloudflareChanModule {
             httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
             httpsPref.setDefaultValue(useHttpsDefaultValue());
             preferenceGroup.addPreference(httpsPref);
-            addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         }
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);

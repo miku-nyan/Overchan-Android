@@ -370,6 +370,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_interactive_cancelled_format">Проверка %s не пройдена</string>
     <string name="error_out_of_memory">Недостаточно памяти</string>
     
+    <string name="ssl_accept_cert">Недоверенный сертификат</string>
+    <string name="ssl_trust_anchor">Сертификат не подписан доверенным центром сертификации.</string>
+    <string name="ssl_cert_expired">Срок действия сертификата истёк.</string>
+    <string name="ssl_accept_servername">Неверное имя сертификата</string>
+    <string name="ssl_hostname_mismatch">Сертификат не соответствует имени узла \&quot;%s\&quot;.
+        Сертификат действителен только для следующих имён:</string>
+    <string name="ssl_connect_anyway">Это может быть попытка перехватить данные.
+        Вы не должны продолжать, если не уверены, что это не атака.\n\nПодключиться в любом случае?</string>
+    <string name="ssl_cert_details">Данные сертификата:</string>
+    <string name="ssl_decision_always">Всегда</string>
+    <string name="ssl_decision_once">Один раз</string>
+    <string name="ssl_decision_abort">Прервать</string>
+    
     <string name="crash_dialog_title">Overchan - сбой</string>
     <string name="crash_dialog_text">Непредвиденная ошибка привела к вынужденной остановке приложения.
         Пожалуйста, помогите исправить её, пришлите отчет об ошибке - для этого нажмите OK.</string>

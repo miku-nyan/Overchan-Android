@@ -37,7 +37,6 @@ import cz.msebera.android.httpclient.impl.client.HttpClients;
  */
 
 public class ExtendedHttpClient extends HttpClientWrapper {
-    private final boolean safe;
     private final CookieStore cookieStore;
     private final HttpHost proxy;
     private volatile HttpClient httpClient;
@@ -61,7 +60,7 @@ public class ExtendedHttpClient extends HttpClientWrapper {
         if (httpClient == null) {
             synchronized (this) {
                 if (httpClient == null) {
-                    httpClient = build(safe, proxy, getCookieStore());
+                    httpClient = build(proxy, getCookieStore());
                 }
             }
         }
@@ -70,12 +69,10 @@ public class ExtendedHttpClient extends HttpClientWrapper {
     
     /**
      * Конструктор
-     * @param safe включить проверку сертификата и имени хоста для SSL
      * @param proxy адрес HTTP прокси (возможно null)
      */
-    public ExtendedHttpClient(boolean safe, HttpHost proxy) {
+    public ExtendedHttpClient(HttpHost proxy) {
         super();
-        this.safe = safe;
         this.cookieStore = new BasicCookieStore();
         this.proxy = proxy;
     }
@@ -93,14 +90,14 @@ public class ExtendedHttpClient extends HttpClientWrapper {
                 setStaleConnectionCheckEnabled(false);
     }
     
-    private static HttpClient build(boolean safe, final HttpHost proxy, CookieStore cookieStore) {
+    private static HttpClient build(final HttpHost proxy, CookieStore cookieStore) {
         SSLCompatibility.waitIfInstallingAsync();
         return HttpClients.custom().
                 setDefaultRequestConfig(getDefaultRequestConfigBuilder(HttpConstants.DEFAULT_HTTP_TIMEOUT).build()).
                 setUserAgent(HttpConstants.USER_AGENT_STRING).
                 setProxy(proxy).
                 setDefaultCookieStore(cookieStore).
-                setSSLSocketFactory(safe ? ExtendedSSLSocketFactory.getSocketFactory() : ExtendedSSLSocketFactory.getUnsafeSocketFactory()).
+                setSSLSocketFactory(ExtendedSSLSocketFactory.getSocketFactory()).
                 build();
     }
 }

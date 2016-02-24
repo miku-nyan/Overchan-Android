@@ -56,7 +56,7 @@ public class CustomThemeListActivity extends ListActivity {
     private ArrayAdapter<String> adapter;
     private ArrayList<String> names, files;
     
-    private ExtendedHttpClient httpClient = new ExtendedHttpClient(true, null);
+    private ExtendedHttpClient httpClient = new ExtendedHttpClient(null);
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {

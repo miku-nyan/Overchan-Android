@@ -34,6 +34,7 @@ import nya.miku.wishmaster.cache.FileCache;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.Serializer;
 import nya.miku.wishmaster.http.SSLCompatibility;
+import nya.miku.wishmaster.http.client.ExtendedTrustManager;
 import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
@@ -212,6 +213,7 @@ public class MainApplication extends Application {
     
     private void initObjects() {
         SSLCompatibility.fixSSLs(this);
+        ExtendedTrustManager.setAppContext(this);
         HttpStreamer.initInstance();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         resources = this.getResources();

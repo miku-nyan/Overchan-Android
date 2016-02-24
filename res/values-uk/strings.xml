@@ -373,6 +373,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_interactive_cancelled_format">Перевірку не пройдено: %s</string>
     <string name="error_out_of_memory">Пам’ять вичерпано</string>
     
+    <string name="ssl_accept_cert">Недовірений сертифікат</string>
+    <string name="ssl_trust_anchor">Сертифікат не підписаний довіреною центром сертифікації.</string>
+    <string name="ssl_cert_expired">Термін дії сертифіката минув.</string>
+    <string name="ssl_accept_servername">Неправильна назва сертифіката</string>
+    <string name="ssl_hostname_mismatch">Сертифікат не збігається з назвою вузла \&quot;%s\&quot;.
+        Сертифікат дійсний тільки для наступних імен:</string>
+    <string name="ssl_connect_anyway">Це може бути спроба перехопити дані.
+        Ви не повинні продовжувати, якщо не впевнені, що це не атака.\n\nПідключитися в будь-якому випадку?</string>
+    <string name="ssl_cert_details">Дані сертифіката:</string>
+    <string name="ssl_decision_always">Завжди</string>
+    <string name="ssl_decision_once">Один раз</string>
+    <string name="ssl_decision_abort">Перервати</string>
+    
     <string name="crash_dialog_title">Overchan – збій</string>
     <string name="crash_dialog_text">Програму зупинено через невідому помилку.
         Натисніть OK, щоб надіслати звіт розробникам.</string>

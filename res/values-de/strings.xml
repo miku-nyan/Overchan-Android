@@ -363,6 +363,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_interactive_cancelled_format">%s Überprüfung nicht bestanden</string>
     <string name="error_out_of_memory">Out of Memory</string>
     
+    <string name="ssl_accept_cert">Unbekanntes Zertifikat akzeptieren?</string>
+    <string name="ssl_trust_anchor">Das Serverzertifikat stammt nicht von einer bekannten Ausstellungsstelle (CA).</string>
+    <string name="ssl_cert_expired">Das Serverzertifikat ist abgelaufen.</string>
+    <string name="ssl_accept_servername">Abweichenden Servernamen akzeptieren?</string>
+    <string name="ssl_hostname_mismatch">Der Server konnte sich nicht als »%s« ausweisen. Das Zertifikat gilt nur für:</string>
+    <string name="ssl_connect_anyway">Das kann ein Versuch sein, Ihre Daten abzufangen.
+        Sie sollten sich nicht weiter verbinden, wenn Sie nicht sicher sind, dies ist nicht ein Angriff.\n\nVerbindung trotzdem aufbauen?</string>
+    <string name="ssl_cert_details">Zertifikatdetails:</string>
+    <string name="ssl_decision_always">Immer</string>
+    <string name="ssl_decision_once">Einmal</string>
+    <string name="ssl_decision_abort">Abbrechen</string>
+    
     <string name="crash_dialog_title">Overchan ist abgestürzt</string>
     <string name="crash_dialog_text">Ein unerwarteter Fehler ist aufgetreten, der
         zum Beenden der Anwendung führte. Helfen Sie diesen Fehler

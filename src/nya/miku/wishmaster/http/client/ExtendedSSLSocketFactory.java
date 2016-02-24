@@ -21,21 +21,18 @@ package nya.miku.wishmaster.http.client;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.X509TrustManager;
 
 import cz.msebera.android.httpclient.HttpHost;
 import cz.msebera.android.httpclient.conn.socket.LayeredConnectionSocketFactory;
-import cz.msebera.android.httpclient.conn.ssl.AllowAllHostnameVerifier;
 import cz.msebera.android.httpclient.conn.ssl.BrowserCompatHostnameVerifier;
 import cz.msebera.android.httpclient.conn.ssl.SSLContexts;
-import cz.msebera.android.httpclient.conn.ssl.TrustStrategy;
 import cz.msebera.android.httpclient.conn.ssl.X509HostnameVerifier;
 import cz.msebera.android.httpclient.protocol.HttpContext;
 import cz.msebera.android.httpclient.util.Args;
@@ -44,37 +41,42 @@ import nya.miku.wishmaster.common.Logger;
 public class ExtendedSSLSocketFactory implements LayeredConnectionSocketFactory {
     private static final String TAG = "ExtendedSSLSocketFactory";
     
-    private static final X509HostnameVerifier ALLOW_ALL_HOSTNAME_VERIFIER = new AllowAllHostnameVerifier();
     private static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
-    private static final TrustStrategy TRUST_ALL = new TrustStrategy() {
-        @Override
-        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            return true;
-        }
-    };
     
-    private static SSLContext unsafe_ssl_context = null;
-    public static ExtendedSSLSocketFactory getUnsafeSocketFactory() {
-        try {
-            if (unsafe_ssl_context == null) unsafe_ssl_context = SSLContexts.custom().loadTrustMaterial(null, TRUST_ALL).build();
-            return new ExtendedSSLSocketFactory(unsafe_ssl_context, ALLOW_ALL_HOSTNAME_VERIFIER);
-        } catch (Exception e) {
-            Logger.e(TAG, "cannot instantiate the unsafe SSL socket factory", e);
-            return getSocketFactory();
+    private static volatile boolean initialized = false;
+    private static SSLContext interactiveContext = null;
+    private static X509HostnameVerifier interactiveHostnameVerifier = null;
+    private static void initInteractiveObjects() throws Exception {
+        if (initialized) return;
+        synchronized (ExtendedSSLSocketFactory.class) {
+            if (initialized) return;
+            
+            SSLContext context = SSLContexts.createDefault();
+            ExtendedTrustManager mtm = new ExtendedTrustManager();
+            context.init(null, new X509TrustManager[] { mtm }, null);
+            X509HostnameVerifier verifier = mtm.wrapHostnameVerifier(BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+            
+            interactiveContext = context;
+            interactiveHostnameVerifier = verifier;
+            initialized = true;
         }
     }
     
     public static ExtendedSSLSocketFactory getSocketFactory() {
-        return new ExtendedSSLSocketFactory(
-            SSLContexts.createDefault(),
-            BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        try {
+            initInteractiveObjects();
+            return new ExtendedSSLSocketFactory(interactiveContext, interactiveHostnameVerifier);
+        } catch (Exception e) {
+            Logger.e(TAG, "cannot instantiate interactive SSL socket factory", e);
+            return new ExtendedSSLSocketFactory(SSLContexts.createDefault(), BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        }
     }
     
     private final javax.net.ssl.SSLSocketFactory socketfactory;
     private final X509HostnameVerifier hostnameVerifier;
     
     public ExtendedSSLSocketFactory(final SSLContext sslContext) {
-        this(sslContext, BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        this(sslContext, null);
     }
     
     public ExtendedSSLSocketFactory(final SSLContext sslContext, final X509HostnameVerifier hostnameVerifier) {

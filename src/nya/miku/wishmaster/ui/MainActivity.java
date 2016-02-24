@@ -25,6 +25,7 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
+import nya.miku.wishmaster.http.client.ExtendedTrustManager;
 import nya.miku.wishmaster.lib.appcompat_v7_actionbartoogle.wrappers.ActionBarDrawerToogleCompat;
 import nya.miku.wishmaster.lib.appcompat_v7_actionbartoogle.wrappers.ActionBarDrawerToogleV4;
 import nya.miku.wishmaster.lib.appcompat_v7_actionbartoogle.wrappers.ActionBarDrawerToogleV7;
@@ -393,12 +394,14 @@ public class MainActivity extends FragmentActivity {
         super.onStart();
         registerReceiver(broadcastReceiver, intentFilter);
         tabsAdapter.notifyDataSetChanged(false);
+        ExtendedTrustManager.bindActivity(this);
     }
     
     @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(broadcastReceiver);
+        ExtendedTrustManager.unbindActivity();
     }
     
     @Override

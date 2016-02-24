@@ -363,6 +363,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_interactive_cancelled_format">%s checking has not been passed</string>
     <string name="error_out_of_memory">Out of memory</string>
     
+    <string name="ssl_accept_cert">Accept Unknown Certificate?</string>
+    <string name="ssl_trust_anchor">The server certificate is not signed by a known Certificate Authority.</string>
+    <string name="ssl_cert_expired">The server certificate is expired.</string>
+    <string name="ssl_accept_servername">Accept Mismatching Server Name?</string>
+    <string name="ssl_hostname_mismatch">Server could not authenticate as \&quot;%s\&quot;. The certificate is only valid for:</string>
+    <string name="ssl_connect_anyway">This may be an attempt to intercept your data.
+        You should not continue connecting unless you are sure this is not an attack.\n\nDo you want to connect anyway?</string>
+    <string name="ssl_cert_details">Certificate details:</string>
+    <string name="ssl_decision_always">Always</string>
+    <string name="ssl_decision_once">Once</string>
+    <string name="ssl_decision_abort">Abort</string>
+    
     <string name="crash_dialog_title">Overchan has crashed</string>
     <string name="crash_dialog_text">An unexpected error occurred forcing the application to stop.
         Please help fix this by sending the error report, all you have to do is click OK.</string>

@@ -242,8 +242,7 @@ public class DvachModule extends AbstractWakabaModule {
     private Exception rethrow(Exception e) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 &&
                 e instanceof HttpRequestException &&
-                ((HttpRequestException) e).isSslException() &&
-                preferences.getBoolean(getSharedKey(PREF_KEY_UNSAFE_SSL), false))
+                ((HttpRequestException) e).isSslException())
             return new Exception("SSL Internal Error\nTry to use Tor/.onion domain");
         return e;
     }
