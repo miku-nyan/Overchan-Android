@@ -209,9 +209,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_report_button">Пожаловаться</string>
     <string name="dialog_report_progress">Подождите</string>
     
-    <string name="dialog_cloudflare_captcha_text">Cloudflare запрашивает проверку безопасности.\nВведите символы с картинки:</string>
-    <string name="dialog_cloudflare_captcha_hint">Капча</string>
-    <string name="dialog_cloudflare_captcha_check">Проверить</string>
+    <string name="dialog_captcha_check">Проверить</string>
     
     <string name="dialog_external_url_title">Переход по внешней ссылке</string>
     <string name="dialog_external_url_text">%s\n\nДанная страница будет открыта внешним приложением.
@@ -358,9 +356,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_unknown">Неизвестная ошибка</string>
     <string name="error_deserialization">Ошибка десериализации</string>
     <string name="error_cloudflare_antiddos">Не удалось выполнить анти-DDOS проверку Cloudflare</string>
-    <string name="error_ssl">Ошибка SSL/HTTPS (соединение не защищено)</string>
-    <string name="error_ssl_help">\n\nЕсли вы понимаете, что происходит, вы можете установить в настройках данной имиджборды:
-        \n\"Игнорировать ошибки SSL\".\n\nПри этом безопасность соединения не гарантирована.</string>
+    <string name="error_ssl">Ошибка SSL/HTTPS</string>
     <string name="error_connection">Ошибка при загрузке</string>
     <string name="error_connection_timeout">Время ожидания соединения истекло</string>
     <string name="error_parse">Невозможно распарсить страницу</string>
@@ -459,8 +455,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_onion_summary">Требуется подключение через сеть Tor</string>
     <string name="pref_use_https">Использовать HTTPS</string>
     <string name="pref_use_https_summary">Защищённое шифрованное соединение</string>
-    <string name="pref_ignore_ssl_errors">Игнорировать ошибки SSL</string>
-    <string name="pref_ignore_ssl_errors_summary">Отключить проверку имени и сертификата</string>
     <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
     <string name="pref_cf_recaptcha_fallback_summary">Использовать капчу Cloudflare в режиме совместимости</string>
     <string name="pref_only_new_posts">Только новые посты</string>

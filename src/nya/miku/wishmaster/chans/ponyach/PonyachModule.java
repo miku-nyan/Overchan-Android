@@ -271,7 +271,6 @@ public class PonyachModule extends AbstractWakabaModule {
         httpsPref.setDefaultValue(useHttpsDefaultValue());
         preferenceGroup.addPreference(httpsPref);
         
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         addProxyPreferences(preferenceGroup);
         captchaLevel.setSummary(captchaLevel.getEntry());
         domainPref.setSummary(domainPref.getEntry());

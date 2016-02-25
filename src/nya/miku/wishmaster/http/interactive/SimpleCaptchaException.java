@@ -72,7 +72,7 @@ public abstract class SimpleCaptchaException extends InteractiveException {
                     responseField.setSingleLine();
                     layout.addView(responseField);
                     final AlertDialog recaptchaDialog = new AlertDialog.Builder(activity).setView(layout).
-                            setPositiveButton(R.string.dialog_cloudflare_captcha_check, new DialogInterface.OnClickListener() {
+                            setPositiveButton(R.string.dialog_captcha_check, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     storeResponse(responseField.getText().toString());

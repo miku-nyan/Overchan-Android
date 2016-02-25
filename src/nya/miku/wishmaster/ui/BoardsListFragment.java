@@ -33,7 +33,6 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import nya.miku.wishmaster.ui.tabs.TabModel;
@@ -381,7 +380,6 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         loadingView.setVisibility(View.GONE);
         errorView.setVisibility(View.VISIBLE);
         listView.setVisibility(View.GONE);
-        if (message != null && message.equals(resources.getString(R.string.error_ssl))) message += resources.getString(R.string.error_ssl_help);
         errorTextView.setText(fixErrorMessage(message));
     }
     
@@ -466,16 +464,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                             }
                         });
                     } else {
-                        final String message;
-                        if (e instanceof HttpRequestException) {
-                            if (((HttpRequestException) e).isSslException()) {
-                                message = resources.getString(R.string.error_ssl);
-                            } else {
-                                message = resources.getString(R.string.error_connection);
-                            }
-                        } else {
-                            message = e.getMessage();
-                        }
+                        final String message = e.getMessage();
                         handler.post(new Runnable() {
                             @Override
                             public void run() {

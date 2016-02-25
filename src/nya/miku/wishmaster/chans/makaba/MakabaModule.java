@@ -258,7 +258,6 @@ public class MakabaModule extends CloudflareChanModule {
         httpsPref.setDefaultValue(true);
         httpsPref.setOnPreferenceChangeListener(updateDomainListener);
         domainCat.addPreference(httpsPref);
-        addUnsafeSslPreference(domainCat, getSharedKey(PREF_KEY_USE_HTTPS)); //чекбокс "игнорировать ошибки SSL"
     }
     
     @Override

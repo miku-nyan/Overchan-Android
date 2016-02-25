@@ -204,9 +204,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_report_button">Report</string>
     <string name="dialog_report_progress">Wait</string>
     
-    <string name="dialog_cloudflare_captcha_text">Cloudflare requested the checking.\nEnter the characters shown in the image.</string>
-    <string name="dialog_cloudflare_captcha_hint">Captcha</string>
-    <string name="dialog_cloudflare_captcha_check">Check</string>
+    <string name="dialog_captcha_check">Check</string>
     
     <string name="dialog_external_url_title">Going external</string>
     <string name="dialog_external_url_text">%s\n\nThis page will be opened by an external application.
@@ -351,9 +349,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_unknown">An unknown error occurred</string>
     <string name="error_deserialization">Error while deserialization</string>
     <string name="error_cloudflare_antiddos">Unable to pass Cloudflare anti-DDOS checking</string>
-    <string name="error_ssl">SSL/HTTPS Error (Connection is Untrusted)</string>
-    <string name="error_ssl_help">\n\nIf you understand what\'s going on, you can set in preferences of this imageboard:
-        \n\"Ignore SSL Errors\".\n\nIn this case, the security of the connection is not guaranteed.</string>
+    <string name="error_ssl">SSL/HTTPS Error</string>
     <string name="error_connection">Unable to connect to server</string>
     <string name="error_connection_timeout">Connection timed out</string>
     <string name="error_parse">Unable to parse the page</string>
@@ -451,8 +447,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_onion_summary">Requires a connection through the Tor network</string>
     <string name="pref_use_https">Use HTTPS</string>
     <string name="pref_use_https_summary">Secure encrypted connection</string>
-    <string name="pref_ignore_ssl_errors">Ignore SSL Errors</string>
-    <string name="pref_ignore_ssl_errors_summary">Disable Hostname and Certificate Validation</string>
     <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
     <string name="pref_cf_recaptcha_fallback_summary">Use Cloudflare Recaptcha 2 in compatibility mode</string>
     <string name="pref_only_new_posts">Only new posts</string>

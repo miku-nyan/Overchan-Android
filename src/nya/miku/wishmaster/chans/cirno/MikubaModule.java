@@ -174,15 +174,14 @@ public class MikubaModule extends CloudflareChanModule {
         httpsPref.setTitle(R.string.pref_use_https);
         httpsPref.setSummary(R.string.pref_use_https_summary);
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(false);
+        httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     
     private boolean useHttps() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), false);
+        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true);
     }
     
     @Override

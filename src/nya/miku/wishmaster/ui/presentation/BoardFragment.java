@@ -1042,7 +1042,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         catalogBarView.setVisibility(View.GONE);
         searchBarView.setVisibility(View.GONE);
         navigationBarView.setVisibility(View.GONE);
-        if (message != null && message.equals(resources.getString(R.string.error_ssl))) message += resources.getString(R.string.error_ssl_help);
         errorTextView.setText(fixErrorMessage(message));
     }
     

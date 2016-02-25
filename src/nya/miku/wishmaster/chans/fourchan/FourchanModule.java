@@ -329,7 +329,6 @@ public class FourchanModule extends AbstractChanModule {
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, null/*getSharedKey(PREF_KEY_USE_HTTPS)*/);
         addProxyPreferences(preferenceGroup);
         
         final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));

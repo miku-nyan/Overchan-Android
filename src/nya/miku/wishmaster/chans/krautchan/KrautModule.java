@@ -154,7 +154,6 @@ public class KrautModule extends CloudflareChanModule {
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }

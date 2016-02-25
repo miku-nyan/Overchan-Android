@@ -39,7 +39,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -59,7 +58,6 @@ import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
-import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
@@ -68,7 +66,6 @@ import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -143,7 +140,6 @@ public class DvachModule extends AbstractWakabaModule {
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
         addPasswordPreference(preferenceGroup);
-        addUnsafeSslPreference(preferenceGroup, null);
         CheckBoxPreference onionPref = new CheckBoxPreference(context);
         onionPref.setTitle(R.string.pref_use_onion);
         onionPref.setSummary(R.string.pref_use_onion_summary);
@@ -182,7 +178,7 @@ public class DvachModule extends AbstractWakabaModule {
             }
         } catch (Exception e) {
             if (responseModel != null) HttpStreamer.getInstance().removeFromModifiedMap(url);
-            throw rethrow(e);
+            throw e;
         } finally {
             IOUtils.closeQuietly(in);
             if (responseModel != null) responseModel.release();
@@ -230,24 +226,6 @@ public class DvachModule extends AbstractWakabaModule {
     }
     
     @Override
-    protected ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkModified, UrlPageModel urlModel)
-            throws Exception {
-        try {
-            return super.readWakabaPage(url, listener, task, checkModified, urlModel);
-        } catch (Exception e) {
-            throw rethrow(e);
-        }
-    }
-    
-    private Exception rethrow(Exception e) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 &&
-                e instanceof HttpRequestException &&
-                ((HttpRequestException) e).isSslException())
-            return new Exception("SSL Internal Error\nTry to use Tor/.onion domain");
-        return e;
-    }
-    
-    @Override
     public PostModel[] search(String boardName, String searchRequest, ProgressListener listener, CancellableTask task) throws Exception {
         String url = getUsingUrl() + boardName + "/search?q=" + URLEncoder.encode(searchRequest, "UTF-8");
         HttpResponseModel responseModel = null;
@@ -262,8 +240,6 @@ public class DvachModule extends AbstractWakabaModule {
             } else {
                 throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
             }
-        } catch (Exception e) {
-            throw rethrow(e);
         } finally {
             IOUtils.closeQuietly(in);
             if (responseModel != null) responseModel.release();

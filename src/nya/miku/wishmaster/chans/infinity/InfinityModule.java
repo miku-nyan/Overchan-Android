@@ -134,7 +134,6 @@ public class InfinityModule extends AbstractVichanModule {
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
         httpsPref.setDefaultValue(true);
         preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         CheckBoxPreference onionPref = new CheckBoxPreference(context);
         onionPref.setTitle(R.string.pref_use_onion);
         onionPref.setSummary(R.string.pref_use_onion_summary);

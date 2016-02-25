@@ -49,7 +49,6 @@ import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.ReadableContainer;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.gallery.FixedSubsamplingScaleImageView;
 import nya.miku.wishmaster.lib.gallery.JSWebView;
 import nya.miku.wishmaster.lib.gallery.Jpeg;
@@ -794,12 +793,6 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                         });
                     } else if (IOUtils.isENOSPC(e)) {
                         showError(tag, getString(R.string.error_no_space));
-                    } else if (e instanceof HttpRequestException) {
-                        if (((HttpRequestException) e).isSslException()) {
-                            showError(tag, getString(R.string.error_ssl));
-                        } else {
-                            showError(tag, getString(R.string.error_connection));
-                        }
                     } else {
                         showError(tag, e.getMessage());
                     }
@@ -861,7 +854,6 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 if (message == null || message.length() == 0) {
                     return getString(R.string.error_unknown);
                 }
-                if (message.equals(getString(R.string.error_ssl))) message += getString(R.string.error_ssl_help);
                 return message;
             }
         });

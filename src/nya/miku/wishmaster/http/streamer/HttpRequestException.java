@@ -18,12 +18,14 @@
 
 package nya.miku.wishmaster.http.streamer;
 
+import java.net.SocketTimeoutException;
+
 import javax.net.ssl.SSLException;
 
 import nya.miku.wishmaster.R;
 
 /**
- * Исключение возбуждается в случае ошибки в HTTP запросе.
+ * Исключение возбуждается в случае ошибки при HTTP запросе.
  * @author miku-nyan
  *
  */
@@ -32,28 +34,26 @@ public class HttpRequestException extends Exception {
     private final boolean sslException;
     
     public HttpRequestException(Exception e) {
-        super((e != null ? (e.getMessage() != null ? e.getMessage() : e.toString()) : null), e);
+        super(getMessage(e), e);
         sslException = e instanceof SSLException;
+    }
+    
+    public static String getMessage(Exception e) {
+        if (e instanceof SSLException) return getString(R.string.error_ssl, "SSL/HTTPS Error");
+        if (e instanceof SocketTimeoutException) return getString(R.string.error_connection_timeout, "Connection timed out");
+        if (e != null && e.getMessage() != null) return e.getMessage();
+        return getString(R.string.error_connection, "Unable to connect to server");
     }
     
     public boolean isSslException() {
         return sslException;
     }
     
-    @Override
-    public String getMessage() {
-        if (sslException) return getString(R.string.error_ssl, "SSL/HTTPS Error (Connection is Untrusted)");
-        String message = super.getMessage();
-        if (message.equals("java.net.SocketTimeoutException")) return getString(R.string.error_connection_timeout, "Connection timed out");
-        return message;
-    }
-    
-    private String getString(int resId, String defaultValue) {
+    private static String getString(int resId, String defaultValue) {
         try {
             return nya.miku.wishmaster.common.MainApplication.getInstance().getString(resId);
         } catch (Exception e) {
             return defaultValue;
         }
     }
-
 }

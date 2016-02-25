@@ -107,7 +107,6 @@ public class NowereModule extends AbstractChanModule {
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
         httpsPref.setDefaultValue(false);
         preferenceGroup.addPreference(httpsPref);
-        addUnsafeSslPreference(preferenceGroup, getSharedKey(PREF_KEY_USE_HTTPS));
         addProxyPreferences(preferenceGroup);
     }
     

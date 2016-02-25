@@ -204,9 +204,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_report_button">Melden</string>
     <string name="dialog_report_progress">Warten Sie</string>
     
-    <string name="dialog_cloudflare_captcha_text">Cloudflare beantragt die Überprüfung.\nGeben Sie die folgenden Zeichen ein:</string>
-    <string name="dialog_cloudflare_captcha_hint">Captcha</string>
-    <string name="dialog_cloudflare_captcha_check">Überprüfen</string>
+    <string name="dialog_captcha_check">Überprüfen</string>
     
     <string name="dialog_external_url_title">Externe Link</string>
     <string name="dialog_external_url_text">%s\n\nDiese Seite wird von einer externen Anwendung geöffnet werden.
@@ -351,9 +349,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_unknown">Ein unbekannter Fehler</string>
     <string name="error_deserialization">Fehler bei Deserialisierung</string>
     <string name="error_cloudflare_antiddos">Cloudflare anti-DDOS Überprüfung ist nicht möglich</string>
-    <string name="error_ssl">SSL/HTTPS-Fehler (Verbindung wird nicht vertraut)</string>
-    <string name="error_ssl_help">\n\nWenn Sie verstehen, was los ist, können Sie in den Einstellungen dieser Imageboard wählen:
-        \n\"SSL-Fehler ignorieren\".\n\nIn diesem Fall wird die Sicherheit der Verbindung nicht gewährleistet.</string>
+    <string name="error_ssl">SSL/HTTPS-Fehler</string>
     <string name="error_connection">Keine Verbindung zum Server</string>
     <string name="error_connection_timeout">Verbindungszeit überschritten</string>
     <string name="error_parse">Nicht möglich, die Seite zu parsen</string>
@@ -452,8 +448,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_onion_summary">Eine Verbindung durch das Tor-Netzwerk ist erfordert</string>
     <string name="pref_use_https">HTTPS verwenden</string>
     <string name="pref_use_https_summary">Sichere, verschlüsselte Verbindung</string>
-    <string name="pref_ignore_ssl_errors">SSL-Fehler ignorieren</string>
-    <string name="pref_ignore_ssl_errors_summary">Hostname und Certificate Validation deaktivieren</string>
     <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
     <string name="pref_cf_recaptcha_fallback_summary">Den Kompatibilitätsmodus verwenden</string>
     <string name="pref_only_new_posts">Nur neue Posts</string>

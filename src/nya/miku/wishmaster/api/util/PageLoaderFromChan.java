@@ -28,9 +28,7 @@ import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.org_json.JSONException;
-import android.content.res.Resources;
 
 /**
  * Загрузчик АИБ-страниц, загружает или обновляет объект {@link SerializablePage} с чана напрямую.
@@ -98,13 +96,6 @@ public class PageLoaderFromChan implements Runnable {
             if (callback != null) {
                 if (e instanceof InteractiveException) {
                     callback.onInteractiveException((InteractiveException) e);
-                } else if (e instanceof HttpRequestException) {
-                    Resources resources = MainApplication.getInstance().resources;
-                    if (((HttpRequestException) e).isSslException()) {
-                        callback.onError(resources.getString(R.string.error_ssl));
-                    } else {
-                        callback.onError(resources.getString(R.string.error_connection));
-                    }
                 } else if (e instanceof JSONException) {
                     callback.onError(MainApplication.getInstance().resources.getString(R.string.error_parse));
                 } else {

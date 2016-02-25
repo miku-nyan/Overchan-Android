@@ -214,9 +214,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_report_button">Поскаржитися</string>
     <string name="dialog_report_progress">Зачекайте</string>
     
-    <string name="dialog_cloudflare_captcha_text">Перевірка безпеки CloudFlare.\nВведіть символи з картинки:</string>
-    <string name="dialog_cloudflare_captcha_hint">Капча</string>
-    <string name="dialog_cloudflare_captcha_check">Перевірити</string>
+    <string name="dialog_captcha_check">Перевірити</string>
     
     <string name="dialog_external_url_title">Лінк назовні</string>
     <string name="dialog_external_url_text">%s\n\nСторінку відкриє браузер. Можливо, сайт розповсюджує зловмисний код.
@@ -361,9 +359,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="error_unknown">Невідома помилка</string>
     <string name="error_deserialization">Помилка десеріалізації</string>
     <string name="error_cloudflare_antiddos">Анти-DDOS CloudFlare не пройдено</string>
-    <string name="error_ssl">Помилка SSL/HTTPS (з’єднання не захищено)</string>
-    <string name="error_ssl_help">\n\nЯкщо ви розумієте, що відбувається, у налаштуваннях дошки можна дозволити
-        ігнорування помилок SSL. З’єднання стане вразливим.</string>
+    <string name="error_ssl">Помилка SSL/HTTPS</string>
     <string name="error_connection">Помилка з’єднання з сервером</string>
     <string name="error_connection_timeout">Час очікування сплив</string>
     <string name="error_parse">Не вдається розпарсити сторінку</string>
@@ -462,8 +458,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_onion_summary">Вручну спрямуйте трафік програми через Tor</string>
     <string name="pref_use_https">HTTPS</string>
     <string name="pref_use_https_summary">Захищене шифроване з’єднання</string>
-    <string name="pref_ignore_ssl_errors">Ігнорувати помилки SSL</string>
-    <string name="pref_ignore_ssl_errors_summary">Не зважати на хостнейм і сертифікат</string>
     <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
     <string name="pref_cf_recaptcha_fallback_summary">Використовувати капчу Cloudflare в режимі сумісності</string>
     <string name="pref_only_new_posts">Лише нові пости</string>
