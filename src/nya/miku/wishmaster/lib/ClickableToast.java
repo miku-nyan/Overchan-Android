@@ -54,6 +54,7 @@ public class ClickableToast extends FrameLayout {
         this.windowManager = (WindowManager) this.getContext().getSystemService(Application.WINDOW_SERVICE);
     }
     
+    @Override
     public void onAttachedToWindow(){
         WindowManager.LayoutParams params = getWmParams();
         try{
@@ -155,17 +156,18 @@ public class ClickableToast extends FrameLayout {
     }
     
     
-    public static void show(Context ctx, View v, int duration){
+    public static ClickableToast show(Context ctx, View v, int duration){
         ClickableToast toast = new ClickableToast(ctx);
         toast.addView(v);
         toast.show(duration);
+        return toast;
     }
     
-    public static void showText(Context ctx, CharSequence text, OnClickListener listener) {
-        showText(ctx, text, listener, false);
+    public static ClickableToast showText(Context ctx, CharSequence text, OnClickListener listener) {
+        return showText(ctx, text, listener, false);
     }
     
-    public static void showText(Context ctx, CharSequence text, OnClickListener listener, boolean gravityTop) {
+    public static ClickableToast showText(Context ctx, CharSequence text, OnClickListener listener, boolean gravityTop) {
         try {
             if (internalResources == null) internalResources = Resources.getSystem();
             LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -192,11 +194,13 @@ public class ClickableToast extends FrameLayout {
             });
             toast.addView(v);
             toast.show(3500);
+            return toast;
         } catch (Exception e) {
             Logger.e(TAG, e);
             Toast fallbackToast = Toast.makeText(ctx, text, Toast.LENGTH_LONG);
             if (gravityTop) fallbackToast.setGravity(Gravity.TOP, 0, 0);
             fallbackToast.show();
+            return null;
         }
     }
     

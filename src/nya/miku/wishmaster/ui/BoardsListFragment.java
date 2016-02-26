@@ -94,6 +94,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
     private BoardsListAdapter adapter;
     
     private List<QuickAccess.Entry> quickAccessList;
+    private ClickableToast toast;
     
     public static BoardsListFragment newInstance(long tabId) {
         TabsState tabsState = MainApplication.getInstance().tabsState;
@@ -139,7 +140,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         
         quickAccessList = QuickAccess.getQuickAccessFromPreferences();
         if (quickAccessList.isEmpty()) {
-            ClickableToast.showText(activity, resources.getString(R.string.boardslist_quickaccess_tip), new ClickableToast.OnClickListener() {
+            toast = ClickableToast.showText(activity, resources.getString(R.string.boardslist_quickaccess_tip), new ClickableToast.OnClickListener() {
                 @Override
                 public void onClick() {
                     try {
@@ -341,6 +342,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
     public void onDestroyView() {
         super.onDestroyView();
         saveCurrentPostPosition();
+        if (toast != null) toast.hide();
     }
     
     @Override
