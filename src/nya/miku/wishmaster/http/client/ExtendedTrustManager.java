@@ -472,7 +472,7 @@ public class ExtendedTrustManager implements X509TrustManager {
         return si.toString();
     }
     
-    private static void certDetails(StringBuilder si, X509Certificate c) {
+    public static void certDetails(StringBuilder si, X509Certificate c) {
         SimpleDateFormat validityDateFormater = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         si.append(c.getSubjectDN().toString());
         si.append("\n");

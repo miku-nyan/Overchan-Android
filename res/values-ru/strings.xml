@@ -378,6 +378,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="ssl_decision_always">Всегда</string>
     <string name="ssl_decision_once">Один раз</string>
     <string name="ssl_decision_abort">Прервать</string>
+    <string name="ssl_certificates_title">Сертификаты</string>
+    <string name="ssl_certificate_delete">Удалить</string>
     
     <string name="crash_dialog_title">Overchan - сбой</string>
     <string name="crash_dialog_text">Непредвиденная ошибка привела к вынужденной остановке приложения.
@@ -470,6 +472,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_email_hint">email</string>
     <string name="pref_hide_personal_title">Скрывать блок личных данных</string>
     <string name="pref_hide_personal_summary">Всегда использовать значения по умолчанию</string>
+    <string name="pref_ssl_certificates_title">SSL сертификаты</string>
+    <string name="pref_ssl_certificates_summary">Доверенные SSL сертификаты (исключения)</string>
     <string name="pref_random_hash_title">Произвольный хэш</string>
     <string name="pref_random_hash_summary">Добавлять несколько байт в конец прикрепляемых файлов</string>
     <string name="pref_show_all_chans_list_title">Список имиджборд</string>

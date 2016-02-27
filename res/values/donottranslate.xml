@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_name">PREF_KEY_NAME</string>
     <string name="pref_key_email">PREF_KEY_EMAIL</string>
     <string name="pref_key_hide_personal">PREF_KEY_HIDE_PERSONAL</string>
+    <string name="pref_key_ssl_certificates">PREF_KEY_SSL_CERTIFICATES</string>
     <string name="pref_key_random_hash">PREF_KEY_RANDOM_HASH</string>
     <string name="pref_key_show_all_chans_list">PREF_KEY_SHOW_ALL_CHANS_LIST</string>
     <string name="pref_key_show_nsfw_boards">PREF_KEY_SHOW_NSFW_BOARDS</string>

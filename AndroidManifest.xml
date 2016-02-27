@@ -226,6 +226,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <activity android:name="nya.miku.wishmaster.ui.settings.PreferencesActivity" />
         <activity android:name="nya.miku.wishmaster.ui.settings.AutohideActivity" />
         <activity android:name="nya.miku.wishmaster.ui.settings.ChansSortActivity" />
+        <activity android:name="nya.miku.wishmaster.ui.settings.CertificatesActivity" />
         <activity android:name="nya.miku.wishmaster.ui.settings.CustomThemeListActivity" />
         
         <activity android:name="nya.miku.wishmaster.ui.ShareActivity" >

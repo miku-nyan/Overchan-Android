@@ -370,6 +370,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="ssl_decision_always">Immer</string>
     <string name="ssl_decision_once">Einmal</string>
     <string name="ssl_decision_abort">Abbrechen</string>
+    <string name="ssl_certificates_title">Zertifikate</string>
+    <string name="ssl_certificate_delete">Löschen</string>
     
     <string name="crash_dialog_title">Overchan ist abgestürzt</string>
     <string name="crash_dialog_text">Ein unerwarteter Fehler ist aufgetreten, der
@@ -463,6 +465,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_email_hint">email</string>
     <string name="pref_hide_personal_title">Persönliche Daten verbergen</string>
     <string name="pref_hide_personal_summary">Immer die Standardwerte verwenden</string>
+    <string name="pref_ssl_certificates_title">SSL-Zertifikate</string>
+    <string name="pref_ssl_certificates_summary">Vertrauenswürdigen Zertifikate (Ausnahmen)</string>
     <string name="pref_random_hash_title">Zufällige Hash</string>
     <string name="pref_random_hash_summary">Ein paar Bytes an das Ende der Anlagedateien fügen</string>
     <string name="pref_show_all_chans_list_title">Imageboards-Liste</string>

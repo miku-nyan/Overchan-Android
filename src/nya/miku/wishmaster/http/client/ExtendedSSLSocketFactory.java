@@ -45,6 +45,7 @@ public class ExtendedSSLSocketFactory implements LayeredConnectionSocketFactory 
     
     private static volatile boolean initialized = false;
     private static SSLContext interactiveContext = null;
+    private static ExtendedTrustManager interactiveTrustManager = null;
     private static X509HostnameVerifier interactiveHostnameVerifier = null;
     private static void initInteractiveObjects() throws Exception {
         if (initialized) return;
@@ -57,6 +58,7 @@ public class ExtendedSSLSocketFactory implements LayeredConnectionSocketFactory 
             X509HostnameVerifier verifier = mtm.wrapHostnameVerifier(BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
             
             interactiveContext = context;
+            interactiveTrustManager = mtm;
             interactiveHostnameVerifier = verifier;
             initialized = true;
         }
@@ -70,6 +72,11 @@ public class ExtendedSSLSocketFactory implements LayeredConnectionSocketFactory 
             Logger.e(TAG, "cannot instantiate interactive SSL socket factory", e);
             return new ExtendedSSLSocketFactory(SSLContexts.createDefault(), BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
         }
+    }
+    
+    public static ExtendedTrustManager getTrustManager() throws Exception {
+        initInteractiveObjects();
+        return interactiveTrustManager;
     }
     
     private final javax.net.ssl.SSLSocketFactory socketfactory;

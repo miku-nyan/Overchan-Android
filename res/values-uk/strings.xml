@@ -381,6 +381,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="ssl_decision_always">Завжди</string>
     <string name="ssl_decision_once">Один раз</string>
     <string name="ssl_decision_abort">Перервати</string>
+    <string name="ssl_certificates_title">Сертифікати</string>
+    <string name="ssl_certificate_delete">Видалити</string>
     
     <string name="crash_dialog_title">Overchan – збій</string>
     <string name="crash_dialog_text">Програму зупинено через невідому помилку.
@@ -473,6 +475,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_email_hint">sage</string>
     <string name="pref_hide_personal_title">Ховати блок особистих даних</string>
     <string name="pref_hide_personal_summary">Завжди використовувати типові значення</string>
+    <string name="pref_ssl_certificates_title">SSL сертифікати</string>
+    <string name="pref_ssl_certificates_summary">Довірені SSL сертифікати (виключення)</string>
     <string name="pref_random_hash_title">Випадковий хеш</string>
     <string name="pref_random_hash_summary">Додавати кілька байтів у кінець прикріплених файлів</string>
     <string name="pref_show_all_chans_list_title">Список іміджбордів</string>

@@ -126,6 +126,20 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
         
+        Preference certificatesPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_ssl_certificates));
+        if (CertificatesActivity.hasCertificates()) {
+            certificatesPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    startActivity(new Intent(PreferencesActivity.this, CertificatesActivity.class));
+                    return true;
+                }
+            });
+        } else {
+            ((PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_advanced))).
+                    removePreference(certificatesPreference);
+        }
+        
         getPreferenceManager().findPreference(getString(R.string.pref_key_autohide)).setOnPreferenceClickListener(
                 new Preference.OnPreferenceClickListener() {
             @Override
