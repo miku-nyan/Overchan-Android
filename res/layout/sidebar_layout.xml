@@ -37,6 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="0dp"
             android:layout_weight="1"
             android:src="?attr/sidebarBtnNewTab"
+            android:focusable="true"
+            android:nextFocusDown="@+id/sidebar_tabs_list"
+            android:nextFocusRight="@+id/sidebar_btn_history"
             android:contentDescription="@string/tabs_newtab" />
         <ImageView
             style="@style/SelectableItem"
@@ -45,6 +48,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="0dp"
             android:layout_weight="1"
             android:src="?attr/sidebarBtnHistory"
+            android:focusable="true"
+            android:nextFocusLeft="@id/sidebar_btn_newtab"
+            android:nextFocusRight="@+id/sidebar_btn_favorites"
+            android:nextFocusDown="@id/sidebar_tabs_list"
             android:contentDescription="@string/tabs_history" />
         <ImageView
             style="@style/SelectableItem"
@@ -53,6 +60,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:layout_width="0dp"
             android:layout_weight="1"
             android:src="?attr/sidebarBtnFavorites"
+            android:focusable="true"
+            android:nextFocusLeft="@id/sidebar_btn_history"
+            android:nextFocusDown="@id/sidebar_tabs_list"
             android:contentDescription="@string/tabs_favorites" />
     </LinearLayout>
     
@@ -65,6 +75,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <nya.miku.wishmaster.lib.dslv.DragSortListView
         android:id="@+id/sidebar_tabs_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:nextFocusUp="@id/sidebar_btn_newtab" />
 
 </LinearLayout>

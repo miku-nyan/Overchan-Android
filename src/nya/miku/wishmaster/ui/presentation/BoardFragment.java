@@ -1203,6 +1203,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 if (adapter == null) return;
                                 if (nullAdapterIsSet) {
                                     listView.setAdapter(adapter);
+                                    listView.requestFocus();
                                     hackListViewSetPosition(listView, nullAdapterSavedPosition, nullAdapterSavedTop);
                                     nullAdapterIsSet = false;
                                 }
@@ -1355,6 +1356,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         Toast.makeText(activity, R.string.error_unknown, Toast.LENGTH_LONG).show();
                     
                     listView.setAdapter(adapter);
+                    listView.requestFocus();
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1) {
                         //busy состояние адаптера, не загружать картинки из интернета, во время скроллинга
                         listView.setOnScrollListener(new ListView.OnScrollListener() {
