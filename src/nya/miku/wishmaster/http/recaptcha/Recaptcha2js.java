@@ -18,6 +18,7 @@
 
 package nya.miku.wishmaster.http.recaptcha;
 
+import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 
@@ -25,10 +26,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.net.http.SslError;
 import android.view.ViewGroup;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -131,6 +135,23 @@ public class Recaptcha2js extends InteractiveException {
                             view.loadUrl("javascript:_overchan_add_fallback_submit()");
                         }
                         super.onLoadResource(view, url);
+                    }
+                    @Override
+                    public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
+                        new AlertDialog.Builder(activity).
+                        setTitle(R.string.error_ssl).
+                        setMessage(R.string.ssl_connect_anyway).
+                        setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                handler.proceed();
+                            }
+                        }).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                handler.cancel();
+                            }
+                        }).show();
                     }
                 });
                 //webView.getSettings().setUserAgentString(HttpConstants.USER_AGENT_STRING);
