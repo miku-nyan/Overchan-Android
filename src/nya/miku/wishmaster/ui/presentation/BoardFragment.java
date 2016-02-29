@@ -868,6 +868,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         super.onPause();
         activity.setDrawerLock(DrawerLayout.LOCK_MODE_UNLOCKED);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.showActionBar(activity);
+        saveCurrentPostPosition();
     }
     
     @Override
@@ -884,17 +885,23 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     private void saveCurrentPostPosition() {
         try {
+            String startItemNumber;
+            int startItemTop;
             if (/*pageType == TYPE_POSTSLIST && */nullAdapterIsSet) {
-                tabModel.startItemNumber = nullAdapterSavedNumber;
-                tabModel.startItemTop = nullAdapterSavedTop;
+                startItemNumber = nullAdapterSavedNumber;
+                startItemTop = nullAdapterSavedTop;
             } else if (listView != null && listView.getChildCount() > 0 && adapter != null) {
                 View v = listView.getChildAt(0);
                 int position = listView.getPositionForView(v);
                 PresentationItemModel model = adapter.getItem(position);
-                tabModel.startItemNumber = model.sourceModel.number;
-                tabModel.startItemTop = v == null ? 0 : v.getTop();
+                startItemNumber = model.sourceModel.number;
+                startItemTop = v == null ? 0 : v.getTop();
             } else return;
-            MainApplication.getInstance().serializer.serializeTabsState(MainApplication.getInstance().tabsState);
+            if (startItemTop != tabModel.startItemTop || !startItemNumber.equals(tabModel.startItemNumber)) {
+                tabModel.startItemNumber = startItemNumber;
+                tabModel.startItemTop = startItemTop;
+                MainApplication.getInstance().serializer.serializeTabsState(MainApplication.getInstance().tabsState);
+            }
         } catch (Exception e) {
             Logger.e(TAG, e);
         }
