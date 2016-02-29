@@ -142,9 +142,13 @@ public class CompatibilityImpl {
         textView.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                setShowAsActionAlways(menu.add(Menu.NONE, 1, Menu.FIRST, titleRes).setIcon(icon));
-                menu.removeItem(android.R.id.selectAll);
-                return true;
+                try {
+                    setShowAsActionAlways(menu.add(Menu.NONE, 1, Menu.FIRST, titleRes).setIcon(icon));
+                    menu.removeItem(android.R.id.selectAll);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
             }
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
