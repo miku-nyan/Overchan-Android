@@ -126,7 +126,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:title="@string/pref_gallery_fullscreen_title" />
             
             <CheckBoxPreference
-                android:defaultValue="false"
+                android:defaultValue="true"
                 android:key="@string/pref_key_gallery_swipe_to_close"
                 android:title="@string/pref_gallery_swipe_to_close_title"
                 android:summary="@string/pref_gallery_swipe_to_close_summary" />

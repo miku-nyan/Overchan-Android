@@ -302,7 +302,7 @@ public class ApplicationSettings {
     }
     
     public boolean swipeToCloseGallery() {
-        return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_swipe_to_close), false);
+        return preferences.getBoolean(resources.getString(R.string.pref_key_gallery_swipe_to_close), true);
     }
     
     public boolean scrollThreadFromGallery() {
