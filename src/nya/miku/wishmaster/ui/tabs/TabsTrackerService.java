@@ -67,6 +67,8 @@ public class TabsTrackerService extends Service {
     public static boolean unread = false;
     /** ID вкладки, которая обновляется в данный момент или -1 */
     public static long currentUpdatingTabId = -1;
+    /** установите эту переменную в true, чтобы запустить автообновление */
+    public static boolean updateImmediately = false;
     
     private Handler handler;
     
@@ -252,12 +254,14 @@ public class TabsTrackerService extends Service {
                     return;
                 }
                 notifBuilder.setContentTitle(getString(unread ? R.string.tabs_tracker_title_unread : R.string.tabs_tracker_title));
-                if (++timerCounter > timerDelay) {
+                if (++timerCounter > timerDelay || updateImmediately) {
                     timerCounter = 0;
                     if (enableNotification) {
                         notifyForeground(TRACKER_NOTIFICATION_ID, notifBuilder.setContentText(getString(R.string.tabs_tracker_updating)).build());
                     }
-                    if (!MainApplication.getInstance().settings.isAutoupdateWifiOnly() || Wifi.isConnected()) doUpdate(this);
+                    if (!MainApplication.getInstance().settings.isAutoupdateWifiOnly() || Wifi.isConnected() || updateImmediately)
+                        doUpdate(this);
+                    updateImmediately = false;
                     
                     if (isCancelled()) {
                         cancelForeground(TRACKER_NOTIFICATION_ID);
