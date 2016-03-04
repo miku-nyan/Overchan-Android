@@ -20,6 +20,7 @@ package nya.miku.wishmaster.ui.settings;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -33,6 +34,8 @@ import android.content.DialogInterface;
 import android.widget.Toast;
 
 public class AppUpdatesChecker {
+    private static final String TAG = "AppUpdatesChecker";
+    
     private static final String URL = "http://miku-nyan.github.io/Overchan-Android/data/version.json";
     private static final String SITE_URL = "http://miku-nyan.github.io/Overchan-Android/dl.html";
     
@@ -67,7 +70,12 @@ public class AppUpdatesChecker {
                     @Override
                     public void run() {
                         if (task.isCancelled()) return;
-                        progressDialog.dismiss();
+                        try {
+                            progressDialog.dismiss();
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                            return;
+                        }
                         try {
                             if (result == null) throw new Exception();
                             int newVersion = result.getInt("versionCode");
@@ -90,6 +98,7 @@ public class AppUpdatesChecker {
                                 Toast.makeText(activity, R.string.app_update_update_not_required, Toast.LENGTH_LONG).show();
                             }
                         } catch (Exception e) {
+                            Logger.e(TAG, e);
                             Toast.makeText(activity, R.string.app_update_update_error, Toast.LENGTH_LONG).show();
                         }
                     }
