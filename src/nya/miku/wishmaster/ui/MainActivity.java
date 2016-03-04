@@ -257,6 +257,9 @@ public class MainActivity extends FragmentActivity {
                     model.type == TabModel.TYPE_NORMAL && model.pageModel != null && model.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
                 menu.add(Menu.NONE, R.id.context_menu_autoupdate_background, 5, R.string.context_menu_autoupdate_background).
                         setCheckable(true).setChecked(model.autoupdateBackground);
+                if (model.autoupdateBackground) {
+                    menu.add(Menu.NONE, R.id.context_menu_autoupdate_now, 6, R.string.context_menu_autoupdate_now);
+                }
             }
         }
     }
@@ -291,6 +294,14 @@ public class MainActivity extends FragmentActivity {
             case R.id.context_menu_autoupdate_background:
                 tabsAdapter.getItem(menuInfo.position).autoupdateBackground = !tabsAdapter.getItem(menuInfo.position).autoupdateBackground;
                 tabsAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.context_menu_autoupdate_now:
+                try {
+                    TabsTrackerService.updateImmediately();
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                    Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_LONG).show();
+                }
                 return true;
         }
         return false;

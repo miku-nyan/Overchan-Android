@@ -177,6 +177,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_remove_history">Стерти з історії</string>
     <string name="context_menu_open_browser">Браузер</string>
     <string name="context_menu_autoupdate_background">Автооновлення</string>
+    <string name="context_menu_autoupdate_now">Виконати автооновлення</string>
     <string name="context_menu_open_in_new_tab">У новій вкладці</string>
     <string name="context_menu_thread_preview">Переглянути тред</string>
     <string name="context_menu_reply">Відповісти</string>

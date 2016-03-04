@@ -67,8 +67,8 @@ public class TabsTrackerService extends Service {
     public static boolean unread = false;
     /** ID вкладки, которая обновляется в данный момент или -1 */
     public static long currentUpdatingTabId = -1;
-    /** установите эту переменную в true, чтобы запустить автообновление */
-    public static boolean updateImmediately = false;
+    
+    private static boolean updateImmediately = false;
     
     private Handler handler;
     
@@ -83,6 +83,12 @@ public class TabsTrackerService extends Service {
     private boolean backgroundTabs;
     
     private CancellableTask task = null;
+    
+    /** запустить автообновление немедленно */
+    public static void updateImmediately() {
+        if (!running) throw new IllegalStateException("service not running");
+        updateImmediately = true;
+    }
     
     private void notifyForeground(int id, Notification notification) {
         if (!isForeground) {
@@ -259,9 +265,10 @@ public class TabsTrackerService extends Service {
                     if (enableNotification) {
                         notifyForeground(TRACKER_NOTIFICATION_ID, notifBuilder.setContentText(getString(R.string.tabs_tracker_updating)).build());
                     }
-                    if (!MainApplication.getInstance().settings.isAutoupdateWifiOnly() || Wifi.isConnected() || updateImmediately)
+                    if (!MainApplication.getInstance().settings.isAutoupdateWifiOnly() || Wifi.isConnected() || updateImmediately) {
                         doUpdate(this);
-                    updateImmediately = false;
+                        updateImmediately = false;
+                    }
                     
                     if (isCancelled()) {
                         cancelForeground(TRACKER_NOTIFICATION_ID);
@@ -273,7 +280,7 @@ public class TabsTrackerService extends Service {
                 } else {
                    if (enableNotification) {
                        int remainingTime = timerDelay - timerCounter + 1;
-                       String message = getResources().getQuantityString(R.plurals.tabs_tracker_timer, remainingTime, remainingTime);;
+                       String message = getResources().getQuantityString(R.plurals.tabs_tracker_timer, remainingTime, remainingTime);
                        notifyForeground(TRACKER_NOTIFICATION_ID, notifBuilder.setContentText(message).build());
                    }
                 }
