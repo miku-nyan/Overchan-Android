@@ -486,7 +486,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- <string name="pref_hide_completely_title">Скрывать полностью</string>
     <string name="pref_hide_completely_summary">Не показывать скрытые посты и треды</string> -->
     <string name="pref_external_links_confirmation_title">Подтверждение ссылок</string>
-    <string name="pref_external_links_confirmation_summary">Спрашивать, предже чем открывать внешние ссылки</string>
+    <string name="pref_external_links_confirmation_summary">Спрашивать, прежде чем открывать внешние ссылки</string>
     <string name="pref_do_not_close_tabs_title">Не закрывать вкладки</string>
     <string name="pref_do_not_close_tabs_summary">Не закрывать вкладки по нажатию кнопки Назад</string>
     <string name="pref_pin_markup_title">Закрепить кнопки разметки</string>
