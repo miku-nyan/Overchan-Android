@@ -630,6 +630,7 @@ public class SwipeRefreshLayout extends ViewGroup {
      */
     private boolean isFastScrollX(MotionEvent ev) {
         if (android.os.Build.VERSION.SDK_INT < 19) return false; //fast scroll работает не так на Android < 4.4
+        if (MotionEventCompat.getActionMasked(ev) != MotionEvent.ACTION_DOWN) return false;
         
         try {
             return getWidth() - ev.getX() < mFastScrollWidth;
