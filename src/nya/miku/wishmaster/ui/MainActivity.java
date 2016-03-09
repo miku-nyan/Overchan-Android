@@ -70,6 +70,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -669,9 +670,37 @@ public class MainActivity extends FragmentActivity {
         return adapter;
     }
     
+    private boolean hasChild(View view, View child) {
+        if (view == child) return true;
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i=0; i<group.getChildCount(); ++i) {
+                if (hasChild(group.getChildAt(i), child)) return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean focusActionBar() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) return false;
+        if (drawerLayout == null || drawerLayout.isDrawerOpen(DRAWER_GRAVITY)) return false;
+        try {
+            int resId = getResources().getIdentifier("action_bar_container", "id", "android");
+            View actionBar = getWindow().getDecorView().findViewById(resId);
+            if (hasChild(actionBar, getCurrentFocus())) return false;
+            actionBar.requestFocus();
+            return true;
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            return false;
+        }
+    }
+    
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && onBack()) {
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT && focusActionBar()) {
             return true;
         } else { 
             return super.onKeyDown(keyCode, event);
