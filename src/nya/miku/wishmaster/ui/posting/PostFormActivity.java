@@ -55,7 +55,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.text.Editable;
 import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -124,7 +123,6 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             case R.id.postform_send_button:
                 send();
                 break;
-            //TODO выделить операции с разметкой в отдельный класс
             case R.id.postform_mark_bold:
             case R.id.postform_mark_italic:
             case R.id.postform_mark_underline:
@@ -132,98 +130,25 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             case R.id.postform_mark_spoiler:
             case R.id.postform_mark_quote:
                 try {
-                    Editable comment = commentField.getEditableText();
-                    String text = comment.toString();
-                    int selectionStart = Math.max(0, commentField.getSelectionStart());
-                    int selectionEnd = Math.min(text.length(), commentField.getSelectionEnd());
-                    text = text.substring(selectionStart, selectionEnd);
-                    
-                    if (boardModel.markType == BoardModel.MARK_WAKABAMARK) {
-                        switch (v.getId()) {
-                            case R.id.postform_mark_bold:
-                                comment.replace(selectionStart, selectionEnd, "**" + text.replace("\n", "**\n**") + "**");
-                                commentField.setSelection(selectionStart + 2);
-                                break;
-                            case R.id.postform_mark_italic:
-                                comment.replace(selectionStart, selectionEnd, "*" + text.replace("\n", "*\n*") + "*");
-                                commentField.setSelection(selectionStart + 1);
-                                break;
-                            case R.id.postform_mark_strike:
-                                StringBuilder strike = new StringBuilder();
-                                for (String s : text.split("\n")) {
-                                    strike.append(s);
-                                    for (int i=0; i<s.length(); ++i) strike.append("^H");
-                                    strike.append('\n');
-                                }
-                                comment.replace(selectionStart, selectionEnd, strike.substring(0, strike.length() - 1));
-                                commentField.setSelection(selectionStart);
-                                break;
-                            case R.id.postform_mark_spoiler:
-                                comment.replace(selectionStart, selectionEnd, "%%" + text.replace("\n", "%%\n%%") + "%%");
-                                commentField.setSelection(selectionStart + 2);
-                                break;
-                            case R.id.postform_mark_quote:
-                                comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
-                                break;
-                        }
-                    } else if (boardModel.markType == BoardModel.MARK_BBCODE) {
-                        switch (v.getId()) {
-                            case R.id.postform_mark_bold:
-                                comment.replace(selectionStart, selectionEnd, "[b]" + text + "[/b]");
-                                commentField.setSelection(selectionStart + 3);
-                                break;
-                            case R.id.postform_mark_italic:
-                                comment.replace(selectionStart, selectionEnd, "[i]" + text + "[/i]");
-                                commentField.setSelection(selectionStart + 3);
-                                break;
-                            case R.id.postform_mark_underline:
-                                comment.replace(selectionStart, selectionEnd, "[u]" + text + "[/u]");
-                                commentField.setSelection(selectionStart + 3);
-                                break;
-                            case R.id.postform_mark_strike:
-                                comment.replace(selectionStart, selectionEnd, "[s]" + text + "[/s]");
-                                commentField.setSelection(selectionStart + 3);
-                                break;
-                            case R.id.postform_mark_spoiler:
-                                comment.replace(selectionStart, selectionEnd, "[spoiler]" + text + "[/spoiler]");
-                                commentField.setSelection(selectionStart + 9);
-                                break;
-                            case R.id.postform_mark_quote:
-                                comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
-                                break;
-                        }
-                    } else if (boardModel.markType == BoardModel.MARK_4CHAN) {
-                        switch (v.getId()) {
-                            case R.id.postform_mark_bold:
-                                comment.replace(selectionStart, selectionEnd, "**" + text.replace("\n", "**\n**") + "**");
-                                commentField.setSelection(selectionStart + 2);
-                                break;
-                            case R.id.postform_mark_italic:
-                                comment.replace(selectionStart, selectionEnd, "*" + text.replace("\n", "*\n*") + "*");
-                                commentField.setSelection(selectionStart + 1);
-                                break;
-                            case R.id.postform_mark_underline:
-                                comment.replace(selectionStart, selectionEnd, "__" + text.replace("\n", "__\n__") + "__");
-                                commentField.setSelection(selectionStart + 2);
-                                break;
-                            case R.id.postform_mark_strike:
-                                StringBuilder strike = new StringBuilder();
-                                for (String s : text.split("\n")) {
-                                    strike.append(s);
-                                    for (int i=0; i<s.length(); ++i) strike.append("^H");
-                                    strike.append('\n');
-                                }
-                                comment.replace(selectionStart, selectionEnd, strike.substring(0, strike.length() - 1));
-                                commentField.setSelection(selectionStart);
-                                break;
-                            case R.id.postform_mark_spoiler:
-                                comment.replace(selectionStart, selectionEnd, "[spoiler]" + text + "[/spoiler]");
-                                commentField.setSelection(selectionStart + 9);
-                                break;
-                            case R.id.postform_mark_quote:
-                                comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
-                                break;
-                        }
+                    switch (v.getId()) {
+                        case R.id.postform_mark_bold:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_BOLD);
+                            break;
+                        case R.id.postform_mark_italic:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_ITALIC);
+                            break;
+                        case R.id.postform_mark_underline:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_UNDERLINE);
+                            break;
+                        case R.id.postform_mark_strike:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_STRIKE);
+                            break;
+                        case R.id.postform_mark_spoiler:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_SPOILER);
+                            break;
+                        case R.id.postform_mark_quote:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_QUOTE);
+                            break;
                     }
                 } catch (Exception e) {
                     Logger.e(TAG, e);
@@ -551,8 +476,26 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             else if (!boardModel.allowNames && boardModel.allowEmails) emailField.setLayoutParams(getWideLayoutParams());
         }
         
-        markLayout.setVisibility(boardModel.markType != BoardModel.MARK_NOMARK ? View.VISIBLE : View.GONE);
-        if (boardModel.markType == BoardModel.MARK_WAKABAMARK) markLayout.findViewById(R.id.postform_mark_underline).setVisibility(View.GONE);
+        boolean[] markupEnabled = {
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_QUOTE),
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_BOLD),
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_ITALIC),
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_UNDERLINE),
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_STRIKE),
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_SPOILER),
+        };
+        if (markupEnabled[0] || markupEnabled[1] || markupEnabled[2] || markupEnabled[3] || markupEnabled[4] || markupEnabled[5]) {
+            markLayout.setVisibility(View.VISIBLE);
+            if (!markupEnabled[0]) markLayout.findViewById(R.id.postform_mark_quote).setVisibility(View.GONE);
+            if (!markupEnabled[1]) markLayout.findViewById(R.id.postform_mark_bold).setVisibility(View.GONE);
+            if (!markupEnabled[2]) markLayout.findViewById(R.id.postform_mark_italic).setVisibility(View.GONE);
+            if (!markupEnabled[3]) markLayout.findViewById(R.id.postform_mark_underline).setVisibility(View.GONE);
+            if (!markupEnabled[4]) markLayout.findViewById(R.id.postform_mark_strike).setVisibility(View.GONE);
+            if (!markupEnabled[5]) markLayout.findViewById(R.id.postform_mark_spoiler).setVisibility(View.GONE);
+        } else {
+            markLayout.setVisibility(View.GONE);
+        }
+        
         subjectField.setVisibility(boardModel.allowSubjects ? View.VISIBLE : View.GONE);
         chkboxLayout.setVisibility(boardModel.allowSage || boardModel.allowCustomMark ? View.VISIBLE : View.GONE);
         sageChkbox.setVisibility(boardModel.allowSage ? View.VISIBLE : View.GONE);

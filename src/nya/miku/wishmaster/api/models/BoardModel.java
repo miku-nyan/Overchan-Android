@@ -129,7 +129,7 @@ public class BoardModel implements Serializable {
      *  [i]italic[/i] [b]bold[/b] [u]underline[/u] [spoiler]spoiler[/spoiler] [s]strike[/s] */
     public static final int MARK_BBCODE = 2;
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - 4chan.<br>
-     *  *italic* **bold** __underline__ [spoiler]spoiler[/spoiler] strike^H^H^H^H^H^H */
+     *  *italic* **bold** __underline__ [spoiler]spoiler[/spoiler] */
     public static final int MARK_4CHAN = 3;
     
     /** Константное значение, если на данной доске нет возможности пожаловаться на сообщения */
