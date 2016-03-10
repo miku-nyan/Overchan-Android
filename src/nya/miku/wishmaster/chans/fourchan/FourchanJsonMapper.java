@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.chans.fourchan;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -33,6 +34,8 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class FourchanJsonMapper {
     private static final boolean LINKIFY = true;
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "png", "gif", "webm" };
+    
+    private static final Pattern S_TAG = Pattern.compile("<(/?)s>");
     
     static BoardModel mapBoardModel(JSONObject object) {
         BoardModel model = getDefaultBoardModel(object.getString("board"));
@@ -84,6 +87,7 @@ public class FourchanJsonMapper {
         model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous")));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
         String comment = object.optString("com", "");
+        comment = RegexUtils.replaceAll(comment, S_TAG, "<$1aibspoiler>");
         model.comment = LINKIFY ? RegexUtils.linkify(comment) : comment;
         model.email = null;
         model.trip = object.optString("trip", "");
