@@ -70,7 +70,6 @@ import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
@@ -219,13 +218,20 @@ public class MakabaModule extends CloudflareChanModule {
         skipCaptchaPreference.setTitle(R.string.makaba_prefs_skip_captcha);
         skipCaptchaPreference.setKey(getSharedKey(PREF_KEY_SKIP_CAPTCHA));
         skipCaptchaPreference.setDefaultValue(false);
+        skipCaptchaPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                preferences.edit().putBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA_SET), true).commit();
+                return true;
+            }
+        });
         captchaCategory.addPreference(skipCaptchaPreference);
     }
     
     /** Добавить категорию настроек домена (в т.ч. https) */
     private void addDomainPreferences(PreferenceGroup group) {
         Context context = group.getContext();
-        OnPreferenceChangeListener updateDomainListener = new OnPreferenceChangeListener() {
+        Preference.OnPreferenceChangeListener updateDomainListener = new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if (preference.getKey().equals(getSharedKey(PREF_KEY_DOMAIN))) {
@@ -508,7 +514,8 @@ public class MakabaModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        if (threadNumber != null && preferences.getBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), false)) {
+        boolean skipCaptcha = preferences.getBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), false);
+        if (threadNumber != null && skipCaptcha) {
             String url = null;
             try {
                 url = domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY + "&check=1";
@@ -547,7 +554,7 @@ public class MakabaModule extends CloudflareChanModule {
             throw e;
         }
         
-        if (threadNumber != null && !preferences.contains(getSharedKey(PREF_KEY_SKIP_CAPTCHA))) {
+        if (threadNumber != null && !skipCaptcha && !preferences.contains(getSharedKey(PREF_KEY_SKIP_CAPTCHA_SET))) {
             preferences.edit().putBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), true).commit();
             return getNewCaptcha(boardName, threadNumber, listener, task);
         }

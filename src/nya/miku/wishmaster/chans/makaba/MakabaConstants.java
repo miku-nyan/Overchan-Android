@@ -70,6 +70,7 @@ public class MakabaConstants {
     public static final String PREF_KEY_USE_HTTPS = "use_https";
     public static final String PREF_KEY_DOMAIN = "domain";
     public static final String PREF_KEY_SKIP_CAPTCHA = "skip_captcha1";
+    public static final String PREF_KEY_SKIP_CAPTCHA_SET = "skip_captcha_set";
     public static final String PREF_KEY_USERCODE_COOKIE_DOMAIN = "usercode_domain";
     public static final String PREF_KEY_USERCODE_COOKIE_VALUE = "usercode_cookie";
     
