@@ -530,7 +530,7 @@ public class MakabaModule extends CloudflareChanModule {
         }
         
         String response;
-        String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "");
+        String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "") + ("&board=" + boardName);
         try {
             response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(),
                     httpClient, null, task, true);
