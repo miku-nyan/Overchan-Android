@@ -40,6 +40,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceGroup;
@@ -91,7 +92,7 @@ public class DvachModule extends AbstractWakabaModule {
     
     public DvachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
-        handler = new Handler();
+        handler = new Handler(Looper.getMainLooper());
     }
     
     @Override

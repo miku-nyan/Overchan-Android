@@ -35,7 +35,6 @@ import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.Serializer;
 import nya.miku.wishmaster.http.SSLCompatibility;
 import nya.miku.wishmaster.http.client.ExtendedTrustManager;
-import nya.miku.wishmaster.http.recaptcha.RecaptchaAjax;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
@@ -233,7 +232,6 @@ public class MainApplication extends Application {
         
         registerChanModules();
         
-        RecaptchaAjax.init();
         Wifi.updateState(this);
     }
     
