@@ -52,7 +52,6 @@ import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.ReadableContainer;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.ClickableLinksTextView;
 import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.lib.JellyBeanSpanFixTextView;
@@ -3474,11 +3473,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             }
                             
                             Logger.e(TAG, "cannot delete post", e);
-                            if (e instanceof HttpRequestException && ((HttpRequestException) e).isSslException()) {
-                                error = resources.getString(R.string.error_ssl);
-                            } else {
-                                error = e.getMessage() == null ? "" : e.getMessage();
-                            }
+                            error = e.getMessage() == null ? "" : e.getMessage();
                         }
                         if (deleteTask.isCancelled()) return;
                         final boolean success = error == null;
@@ -3572,11 +3567,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             }
                             
                             Logger.e(TAG, "cannot report post", e);
-                            if (e instanceof HttpRequestException && ((HttpRequestException) e).isSslException()) {
-                                error = resources.getString(R.string.error_ssl);
-                            } else {
-                                error = e.getMessage() == null ? "" : e.getMessage();
-                            }
+                            error = e.getMessage() == null ? "" : e.getMessage();
                         }
                         if (reportTask.isCancelled()) return;
                         final boolean success = error == null;

@@ -33,7 +33,6 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.lib.UriFileUtils;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
@@ -635,16 +634,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                             @Override public void onError(String message) { switchToErrorCaptcha(message); }
                         });
                     } else {
-                        final String message;
-                        if (e instanceof HttpRequestException) {
-                            if (((HttpRequestException) e).isSslException()) {
-                                message = getString(R.string.error_ssl);
-                            } else {
-                                message = getString(R.string.error_connection);
-                            }
-                        } else {
-                            message = e.getMessage();
-                        }
+                        final String message = e.getMessage() == null ? "" : e.getMessage();
                         if (currentTask != null && currentTask.isCancelled()) return;
                         handler.post(new Runnable() {
                             @Override

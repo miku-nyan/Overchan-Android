@@ -19,9 +19,11 @@
 package nya.miku.wishmaster.http.streamer;
 
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import javax.net.ssl.SSLException;
 
+import android.os.Build;
 import nya.miku.wishmaster.R;
 
 /**
@@ -31,22 +33,17 @@ import nya.miku.wishmaster.R;
  */
 public class HttpRequestException extends Exception {
     private static final long serialVersionUID = 1L;
-    private final boolean sslException;
     
     public HttpRequestException(Exception e) {
         super(getMessage(e), e);
-        sslException = e instanceof SSLException;
     }
     
     public static String getMessage(Exception e) {
         if (e instanceof SSLException) return getString(R.string.error_ssl, "SSL/HTTPS Error");
         if (e instanceof SocketTimeoutException) return getString(R.string.error_connection_timeout, "Connection timed out");
-        if (e != null && e.getMessage() != null) return e.getMessage();
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1 && e instanceof UnknownHostException) return "Unable to resolve host";
+        if (e != null && e.getMessage() != null) return e.getLocalizedMessage();
         return getString(R.string.error_connection, "Unable to connect to server");
-    }
-    
-    public boolean isSslException() {
-        return sslException;
     }
     
     private static String getString(int resId, String defaultValue) {
