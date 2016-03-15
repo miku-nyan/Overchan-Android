@@ -232,7 +232,7 @@ public class MainApplication extends Application {
         
         registerChanModules();
         
-        Wifi.updateState(this);
+        Wifi.register(this);
     }
     
     private File getAvailableCacheDir() {

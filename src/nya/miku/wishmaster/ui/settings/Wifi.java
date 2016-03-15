@@ -22,6 +22,7 @@ import nya.miku.wishmaster.common.Logger;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -29,6 +30,11 @@ public class Wifi extends BroadcastReceiver {
     private static final String TAG = "Wifi";
     
     private static boolean isWifi;
+    
+    public static void register(Context context) {
+        context.registerReceiver(new Wifi(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        updateState(context);
+    }
     
     public static void updateState(Context context) {
         try {
