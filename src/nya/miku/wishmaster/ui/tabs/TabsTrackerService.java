@@ -58,6 +58,7 @@ import android.support.v4.app.NotificationCompat;
 public class TabsTrackerService extends Service {
     private static final String TAG = "TabsTrackerService";
     
+    public static final String EXTRA_UPDATE_IMMEDIATELY = "UpdateImmediately";
     public static final String BROADCAST_ACTION_NOTIFY = "nya.miku.wishmaster.BROADCAST_ACTION_TRACKER_NOTIFY";
     public static final int TRACKER_NOTIFICATION_ID = 40;
     
@@ -68,10 +69,9 @@ public class TabsTrackerService extends Service {
     /** ID вкладки, которая обновляется в данный момент или -1 */
     public static long currentUpdatingTabId = -1;
     
-    private static boolean updateImmediately = false;
-    
     private Handler handler;
     
+    private ApplicationSettings settings;
     private TabsState tabsState;
     private TabsSwitcher tabsSwitcher;
     private PagesCache pagesCache;
@@ -82,13 +82,9 @@ public class TabsTrackerService extends Service {
     private boolean enableNotification;
     private boolean backgroundTabs;
     
-    private CancellableTask task = null;
+    private boolean immediately = false;
     
-    /** запустить автообновление немедленно */
-    public static void updateImmediately() {
-        if (!running) throw new IllegalStateException("service not running");
-        updateImmediately = true;
-    }
+    private CancellableTask task = null;
     
     private void notifyForeground(int id, Notification notification) {
         if (!isForeground) {
@@ -142,6 +138,7 @@ public class TabsTrackerService extends Service {
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         handler = new Handler();
+        settings = MainApplication.getInstance().settings;
         tabsState = MainApplication.getInstance().tabsState;
         tabsSwitcher = MainApplication.getInstance().tabsSwitcher;
         pagesCache = MainApplication.getInstance().pagesCache;
@@ -157,11 +154,14 @@ public class TabsTrackerService extends Service {
     @Override
     public void onStart(Intent intent, int startId) {
         Logger.d(TAG, "TabsTrackerService starting");
-        if (task != null) task.cancel();
-        ApplicationSettings settings = MainApplication.getInstance().settings;
         enableNotification = settings.isAutoupdateNotification();
+        immediately = intent != null && intent.getBooleanExtra(EXTRA_UPDATE_IMMEDIATELY, false);
         backgroundTabs = settings.isAutoupdateBackground();
         timerDelay = settings.getAutoupdateDelay();
+        if (running) {
+            Logger.d(TAG, "TabsTrackerService service already running");
+            return;
+        }
         TrackerLoop loop = new TrackerLoop();
         task = loop;
         PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(loop).start();
@@ -169,13 +169,13 @@ public class TabsTrackerService extends Service {
     }
     
     private void doUpdate(final CancellableTask task) {
-        if (backgroundTabs) {
+        if (backgroundTabs || immediately) {
             int tabsArrayLength = tabsState.tabsArray.size();
             TabModel[] tabsArray = new TabModel[tabsArrayLength]; //avoid of java.util.ConcurrentModificationException
             for (int i=0; i<tabsArrayLength; ++i) tabsArray[i] = tabsState.tabsArray.get(i);
             for (final TabModel tab : tabsArray) {
                 if (task.isCancelled()) return;
-                if (MainApplication.getInstance().settings.isAutoupdateWifiOnly() && !Wifi.isConnected()) return;
+                if (settings.isAutoupdateWifiOnly() && !Wifi.isConnected() && !immediately) return;
                 if (tab.type == TabModel.TYPE_NORMAL && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE && tab.autoupdateBackground) {
                     if (tabsSwitcher.currentId != null && tabsSwitcher.currentId.equals(tab.id)) continue;
                     final String hash = tab.hash;
@@ -227,7 +227,7 @@ public class TabsTrackerService extends Service {
             currentUpdatingTabId = -1;
         }
         if (task.isCancelled()) return;
-        if (MainApplication.getInstance().settings.isAutoupdateWifiOnly() && !Wifi.isConnected()) return;
+        if (settings.isAutoupdateWifiOnly() && !Wifi.isConnected() && !immediately) return;
         if (tabsSwitcher.currentFragment instanceof BoardFragment) {
             TabModel tab = tabsState.findTabById(tabsSwitcher.currentId);
             if (tab != null && tab.pageModel != null && tab.type == TabModel.TYPE_NORMAL && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
@@ -260,14 +260,14 @@ public class TabsTrackerService extends Service {
                     return;
                 }
                 notifBuilder.setContentTitle(getString(unread ? R.string.tabs_tracker_title_unread : R.string.tabs_tracker_title));
-                if (++timerCounter > timerDelay || updateImmediately) {
+                if (++timerCounter > timerDelay || immediately) {
                     timerCounter = 0;
                     if (enableNotification) {
                         notifyForeground(TRACKER_NOTIFICATION_ID, notifBuilder.setContentText(getString(R.string.tabs_tracker_updating)).build());
                     }
-                    if (!MainApplication.getInstance().settings.isAutoupdateWifiOnly() || Wifi.isConnected() || updateImmediately) {
+                    if (!settings.isAutoupdateWifiOnly() || Wifi.isConnected() || immediately) {
                         doUpdate(this);
-                        updateImmediately = false;
+                        immediately = false;
                     }
                     
                     if (isCancelled()) {
@@ -276,6 +276,8 @@ public class TabsTrackerService extends Service {
                     } else {
                         sendBroadcast(new Intent(BROADCAST_ACTION_NOTIFY));
                     }
+                    
+                    if (!settings.isAutoupdateEnabled()) stopSelf();
                     
                 } else {
                    if (enableNotification) {

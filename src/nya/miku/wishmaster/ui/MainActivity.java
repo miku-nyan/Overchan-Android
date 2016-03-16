@@ -254,13 +254,16 @@ public class MainActivity extends FragmentActivity {
                 menu.add(Menu.NONE, R.id.context_menu_favorites, 4,
                         isFavorite(model) ? R.string.context_menu_remove_favorites : R.string.context_menu_add_favorites);
             }
-            if (MainApplication.getInstance().settings.isAutoupdateEnabled() && MainApplication.getInstance().settings.isAutoupdateBackground() &&
-                    model.type == TabModel.TYPE_NORMAL && model.pageModel != null && model.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
-                menu.add(Menu.NONE, R.id.context_menu_autoupdate_background, 5, R.string.context_menu_autoupdate_background).
+            if (model.type == TabModel.TYPE_NORMAL && model.pageModel != null && model.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
+                boolean backgroundAutoupdateEnabled =
+                        MainApplication.getInstance().settings.isAutoupdateEnabled() &&
+                        MainApplication.getInstance().settings.isAutoupdateBackground();
+                menu.add(Menu.NONE, R.id.context_menu_autoupdate_background, 5,
+                        backgroundAutoupdateEnabled ? R.string.context_menu_autoupdate_background : R.string.context_menu_autoupdate_background_off).
                         setCheckable(true).setChecked(model.autoupdateBackground);
-                if (model.autoupdateBackground) {
-                    menu.add(Menu.NONE, R.id.context_menu_autoupdate_now, 6, R.string.context_menu_autoupdate_now);
-                }
+            }
+            if (model.autoupdateBackground) {
+                menu.add(Menu.NONE, R.id.context_menu_autoupdate_now, 6, R.string.context_menu_autoupdate_now);
             }
         }
     }
@@ -297,12 +300,7 @@ public class MainActivity extends FragmentActivity {
                 tabsAdapter.notifyDataSetChanged();
                 return true;
             case R.id.context_menu_autoupdate_now:
-                try {
-                    TabsTrackerService.updateImmediately();
-                } catch (Exception e) {
-                    Logger.e(TAG, e);
-                    Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_LONG).show();
-                }
+                startService(new Intent(this, TabsTrackerService.class).putExtra(TabsTrackerService.EXTRA_UPDATE_IMMEDIATELY, true));
                 return true;
         }
         return false;

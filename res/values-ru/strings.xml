@@ -172,6 +172,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_remove_history">Удалить из истории</string>
     <string name="context_menu_open_browser">Открыть в браузере</string>
     <string name="context_menu_autoupdate_background">Автообновление</string>
+    <string name="context_menu_autoupdate_background_off">Автообновление (откл.)</string>
     <string name="context_menu_autoupdate_now">Запустить автообновление</string>
     <string name="context_menu_open_in_new_tab">Открыть в новой вкладке</string>
     <string name="context_menu_thread_preview">Предпросмотр треда</string>
