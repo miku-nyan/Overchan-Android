@@ -262,7 +262,7 @@ public class MainActivity extends FragmentActivity {
                         backgroundAutoupdateEnabled ? R.string.context_menu_autoupdate_background : R.string.context_menu_autoupdate_background_off).
                         setCheckable(true).setChecked(model.autoupdateBackground);
             }
-            if (model.autoupdateBackground) {
+            if (model.autoupdateBackground && TabsTrackerService.currentUpdatingTabId == -1) {
                 menu.add(Menu.NONE, R.id.context_menu_autoupdate_now, 6, R.string.context_menu_autoupdate_now);
             }
         }
