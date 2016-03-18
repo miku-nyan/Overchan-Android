@@ -249,8 +249,8 @@ public class PonyachModule extends AbstractWakabaModule {
         preferenceGroup.addPreference(passcodePref);
         
         ListPreference domainPref = new ListPreference(context);
-        domainPref.setTitle(R.string.ponyach_prefs_domain);
-        domainPref.setDialogTitle(R.string.ponyach_prefs_domain);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setDialogTitle(R.string.pref_domain);
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
         domainPref.setEntryValues(DOMAINS);
         domainPref.setEntries(DOMAINS);

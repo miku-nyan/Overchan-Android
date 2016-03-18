@@ -406,27 +406,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="makaba_prefs_mobile_api">Мобільний API</string>
     <string name="makaba_prefs_captcha_category">Капча</string>
     <string name="makaba_prefs_domain_category">Домен</string>
-    <string name="makaba_prefs_domain">Домен</string>
-    <string name="makaba_prefs_domain_summary">Резервні адреси: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
     <string name="makaba_prefs_skip_captcha">Пропустити капчу</string>
     
     <string name="mikuba_password_ignored">(ігнорується)</string>
     
-    <string name="dobrochan_prefs_domain">Домен</string>
-    <string name="dobrochan_prefs_domain_summary">Резрвні адреси: dobrochan.com, dobrochan.org, dobrochan.ru</string>
     <string name="dobrochan_prefs_max_rating">Максимальний рейтинг</string>
     <string name="dobrochan_prefs_show_captcha">Завжди показувати капчу</string>
     <string name="dobrochan_prefs_show_captcha_summary">Показувати капчу, коли її вводити не потрібно</string>
     
-    <string name="dvach_prefs_domain">Домен</string>
-    <string name="dvach_prefs_domain_summary">Резервні адреси: 2-chru.net, mirror.2-chru.net, bypass.2-chru.net</string>
-    
-    <string name="ponyach_prefs_domain">Домен</string>
     <string name="ponyach_prefs_passcode">Пасскод</string>
     <string name="ponyach_prefs_captcha">Капча</string>
-    
-    <string name="synch_prefs_domain">Домен</string>
-    <string name="synch_prefs_domain_summary">Резервні адреси: syn-ch.com, syn-ch.org, syn-ch.ru, syn-ch.com.ua</string>
     
     <string name="infinity_tor_message">Домен .onion потрібен, щоб постити на 8ch через Tor.</string>
     
@@ -464,6 +453,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_use_https_summary">Захищене шифроване з’єднання</string>
     <string name="pref_cf_recaptcha_fallback">Cloudflare Recaptcha fallback</string>
     <string name="pref_cf_recaptcha_fallback_summary">Використовувати капчу Cloudflare в режимі сумісності</string>
+    <string name="pref_domain">Домен</string>
+    <string name="pref_domain_summary">Резервні адреси: %s</string>
     <string name="pref_only_new_posts">Лише нові пости</string>
     <string name="pref_only_new_posts_summary">Запитувати лише нові пости, а не цілий тред</string>
     <string name="pref_captcha_type">Тип капчі</string>

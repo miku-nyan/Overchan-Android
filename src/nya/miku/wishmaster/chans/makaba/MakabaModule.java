@@ -248,9 +248,9 @@ public class MakabaModule extends CloudflareChanModule {
         domainCat.setTitle(R.string.makaba_prefs_domain_category);
         group.addPreference(domainCat);
         EditTextPreference domainPref = new EditTextPreference(context); //поле ввода домена
-        domainPref.setTitle(R.string.makaba_prefs_domain);
-        domainPref.setDialogTitle(R.string.makaba_prefs_domain);
-        domainPref.setSummary(R.string.makaba_prefs_domain_summary);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
         domainPref.getEditText().setHint(DEFAULT_DOMAIN);
         domainPref.getEditText().setSingleLine();

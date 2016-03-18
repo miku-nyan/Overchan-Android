@@ -39,6 +39,7 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class SynchModule extends AbstractVichanModule {
     
     private static final String CHAN_NAME = "syn-ch";
+    private static final String DOMAINS_HINT = "syn-ch.com, syn-ch.org, syn-ch.ru, syn-ch.com.ua";
     private static final String[] DOMAINS = new String[] { "syn-ch.com", "syn-ch.org", "syn-ch.ru", "syn-ch.com.ua" };
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бардак", "Основные", true),
@@ -106,9 +107,9 @@ public class SynchModule extends AbstractVichanModule {
         Context context = preferenceGroup.getContext();
         ListPreference domainPref = new ListPreference(context);
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
-        domainPref.setTitle(R.string.synch_prefs_domain);
-        domainPref.setSummary(R.string.synch_prefs_domain_summary);
-        domainPref.setDialogTitle(R.string.synch_prefs_domain);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
+        domainPref.setDialogTitle(R.string.pref_domain);
         domainPref.setEntries(DOMAINS);
         domainPref.setEntryValues(DOMAINS);
         domainPref.setDefaultValue(DOMAINS[0]);

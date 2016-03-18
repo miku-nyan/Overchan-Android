@@ -78,6 +78,7 @@ public class DvachModule extends AbstractWakabaModule {
     static final String CHAN_NAME = "2-chru.net";
     private static final String DEFAULT_DOMAIN = "2-chru.net";
     private static final String ONION_DOMAIN = "dmirrgetyojz735v.onion";
+    private static final String DOMAINS_HINT = "2-chru.net, mirror.2-chru.net, bypass.2-chru.net";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "mirror.2-chru.net", "bypass.2-chru.net", "2chru.net",
             "2chru.cafe", "2-chru.cafe" };
     private static final String[] FORMATS = new String[] { "jpg", "jpeg", "png", "gif", "webm", "mp4", "ogv", "mp3", "ogg" };
@@ -149,9 +150,9 @@ public class DvachModule extends AbstractWakabaModule {
         onionPref.setDisableDependentsState(true);
         preferenceGroup.addPreference(onionPref);
         EditTextPreference domainPref = new EditTextPreference(context);
-        domainPref.setTitle(R.string.dvach_prefs_domain);
-        domainPref.setDialogTitle(R.string.dvach_prefs_domain);
-        domainPref.setSummary(R.string.dvach_prefs_domain_summary);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
         domainPref.getEditText().setHint(DEFAULT_DOMAIN);
         domainPref.getEditText().setSingleLine();

@@ -86,6 +86,7 @@ public class DobroModule extends AbstractChanModule {
     
     private static final Pattern URL_THREADPAGE_PATTERN = Pattern.compile("(.+?)/res/([0-9]+?)\\.xhtml(.*)");
     
+    private static final String DOMAINS_HINT = "dobrochan.com, dobrochan.org, dobrochan.ru";
     private static final List<String> DOMAINS_LIST = Arrays.asList(new String[] { "dobrochan.ru", "dobrochan.com", "dobrochan.org" });
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
@@ -207,9 +208,9 @@ public class DobroModule extends AbstractChanModule {
             }
         };
         EditTextPreference domainPref = new EditTextPreference(context);
-        domainPref.setTitle(R.string.dobrochan_prefs_domain);
-        domainPref.setDialogTitle(R.string.dobrochan_prefs_domain);
-        domainPref.setSummary(R.string.dobrochan_prefs_domain_summary);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
         domainPref.getEditText().setHint(DEFAULT_DOMAIN);
         domainPref.getEditText().setSingleLine();

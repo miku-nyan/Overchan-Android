@@ -37,6 +37,9 @@ public class MakabaConstants {
             "2ch.hk", "2ch.pm", "2-ch.so", "2ch.re", "2ch.tf", "2ch.wf", "2ch.yt"
     });
     
+    /** подсказка в меню настроек */
+    public static final String DOMAINS_HINT = "2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so";
+    
     /** доски без шок контента (SFW) */
     public static final List<String> SFW_BOARDS = Arrays.asList(new String[] {
             "bi", "bo", "fl", "ftb", "hi", "mlp", "ne", "psy", "sf", "sp", "tv", "w", "wh", "mov", "mu",

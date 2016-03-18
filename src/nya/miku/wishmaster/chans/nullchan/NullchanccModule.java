@@ -46,8 +46,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.InputType;
+import android.text.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractWakabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -74,7 +77,8 @@ public class NullchanccModule extends AbstractWakabaModule {
     private static final String TAG = "NullchanccModule";
     
     private static final String CHAN_NAME = "0chan.cc";
-    private static final String DOMAIN = "0chan.cc";
+    private static final String DEFAULT_DOMAIN = "0chan.cc";
+    private static final String DOMAINS_HINT = "0chan.cc";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "all", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Рисунки", "all", false),
@@ -109,6 +113,7 @@ public class NullchanccModule extends AbstractWakabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fur", "Фурри", "adult", true)
         };
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
+    private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     private static final Pattern PATTERN_EMBEDDED = Pattern.compile("<div (?:[^>]*)data-id=\"([^\"]*)\"(?:[^>]*)>", Pattern.DOTALL);
     private static final Pattern ERROR_POSTING = Pattern.compile("<h2(?:[^>]*)>(.*?)</h2>", Pattern.DOTALL);
     
@@ -133,7 +138,15 @@ public class NullchanccModule extends AbstractWakabaModule {
     
     @Override
     protected String getUsingDomain() {
-        return DOMAIN;
+        String domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN);
+        return TextUtils.isEmpty(domain) ? DEFAULT_DOMAIN : domain;
+    }
+    
+    @Override
+    protected String[] getAllDomains() {
+        if (!getChanName().equals(CHAN_NAME) || getUsingDomain().equals(DEFAULT_DOMAIN))
+            return super.getAllDomains();
+        return new String[] { DEFAULT_DOMAIN, getUsingDomain() };
     }
     
     @Override
@@ -144,6 +157,20 @@ public class NullchanccModule extends AbstractWakabaModule {
     @Override
     protected boolean canCloudflare() {
         return true;
+    }
+    
+    private void addDomainPreference(PreferenceGroup group) {
+        if (!getChanName().equals(CHAN_NAME)) return;
+        Context context = group.getContext();
+        EditTextPreference domainPref = new EditTextPreference(context);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
+        domainPref.getEditText().setHint(DEFAULT_DOMAIN);
+        domainPref.getEditText().setSingleLine();
+        domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        group.addPreference(domainPref);
     }
     
     private void addOnlyNewPostsPreference(PreferenceGroup group) {
@@ -163,6 +190,7 @@ public class NullchanccModule extends AbstractWakabaModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         addOnlyNewPostsPreference(preferenceGroup);
+        addDomainPreference(preferenceGroup);
         super.addPreferencesOnScreen(preferenceGroup);
     }
     
