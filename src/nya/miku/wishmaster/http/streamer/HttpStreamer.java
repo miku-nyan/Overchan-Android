@@ -159,8 +159,10 @@ public class HttpStreamer {
                     Logger.e(TAG, e);
                     responseException = e;
                     if (e.getMessage() == null) break;
-                    if (e.getMessage().indexOf("Connection reset by peer") != -1 ||
-                            e.getMessage().indexOf("I/O error during system call, Broken pipe") != -1) {
+                    String message = e.getMessage();
+                    if (message.indexOf("Connection reset by peer") != -1 ||
+                            message.indexOf("I/O error during system call, Broken pipe") != -1 ||
+                            (message.indexOf("Write error: ssl") != -1 && message.indexOf("I/O error during system call") != -1)) {
                         continue;
                     } else {
                         break;
