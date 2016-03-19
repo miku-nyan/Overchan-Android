@@ -768,32 +768,38 @@ public class DownloadingService extends Service {
             if (isCancelled()) {
                 throw new Exception();
             }
-            if (page == null) {
-                page = new SerializablePage();
-                page.pageModel = item.threadUrlPage;
-                class LoaderCallback implements PageLoaderFromChan.PageLoaderCallback {
-                    public volatile String reason = null;
-                    @Override
-                    public void onSuccess() {
-                        reason = null;
-                    }
-                    @Override
-                    public void onError(String message) {
-                        reason = message;
-                    }
-                    @Override
-                    public void onInteractiveException(InteractiveException e) {
-                        reason = getString(R.string.downloading_error_interactive_format, e.getServiceName());
-                    }
+            if (page != null) {
+                SerializablePage p = new SerializablePage(); //prevent concurrent modification
+                p.pageModel = page.pageModel;
+                p.boardModel = page.boardModel;
+                p.posts = page.posts;
+                p.threads = page.threads;
+                return p;
+            }
+            page = new SerializablePage();
+            page.pageModel = item.threadUrlPage;
+            class LoaderCallback implements PageLoaderFromChan.PageLoaderCallback {
+                public volatile String reason = null;
+                @Override
+                public void onSuccess() {
+                    reason = null;
                 }
-                LoaderCallback cb = new LoaderCallback();
-                new PageLoaderFromChan(page, cb, MainApplication.getInstance().getChanModule(item.chanName), this).run();
-                if (isCancelled()) {
-                    throw new Exception();
+                @Override
+                public void onError(String message) {
+                    reason = message;
                 }
-                if (cb.reason != null) {
-                    throw new Exception(cb.reason);
+                @Override
+                public void onInteractiveException(InteractiveException e) {
+                    reason = getString(R.string.downloading_error_interactive_format, e.getServiceName());
                 }
+            }
+            LoaderCallback cb = new LoaderCallback();
+            new PageLoaderFromChan(page, cb, MainApplication.getInstance().getChanModule(item.chanName), this).run();
+            if (isCancelled()) {
+                throw new Exception();
+            }
+            if (cb.reason != null) {
+                throw new Exception(cb.reason);
             }
             return page;
         }
