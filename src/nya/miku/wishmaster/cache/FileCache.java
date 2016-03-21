@@ -151,6 +151,7 @@ public class FileCache {
      */
     public void clearCache() {
         ensureInitialized();
+        database.put("_clear_cache", -1); //database will reset if app crash
         for (File f : filesOfDir(directory)) {
             if (!isUndeletable(f)) f.delete();
         }
