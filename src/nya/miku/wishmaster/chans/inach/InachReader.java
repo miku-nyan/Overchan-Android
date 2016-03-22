@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
+import nya.miku.wishmaster.api.util.ReplacingReader;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.Logger;
 

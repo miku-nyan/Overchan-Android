@@ -18,9 +18,12 @@
 
 package nya.miku.wishmaster.chans.nullchan;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.SequenceInputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -65,6 +68,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.ReplacingReader;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
@@ -78,7 +82,7 @@ public class NullchanccModule extends AbstractWakabaModule {
     
     private static final String CHAN_NAME = "0chan.cc";
     private static final String DEFAULT_DOMAIN = "0chan.cc";
-    private static final String DOMAINS_HINT = "0chan.cc";
+    private static final String DOMAINS_HINT = "0chan.cc, 31.220.3.61";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "all", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Рисунки", "all", false),
@@ -225,10 +229,18 @@ public class NullchanccModule extends AbstractWakabaModule {
     @SuppressLint("SimpleDateFormat")
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
+        Reader reader;
         if (urlModel != null && urlModel.chanName != null && urlModel.chanName.equals("expand")) {
             stream = new SequenceInputStream(new ByteArrayInputStream("<form id=\"delform\">".getBytes()), stream);
+            reader = new BufferedReader(new InputStreamReader(stream));
+        } else {
+            if (getChanName().equals(CHAN_NAME)) {
+                reader = new ReplacingReader(new BufferedReader(new InputStreamReader(stream)), "<form id=\"delform20\"", "<form id=\"delform\"");
+            } else {
+                reader = new BufferedReader(new InputStreamReader(stream));
+            }
         }
-        return new WakabaReader(stream, null, true) {
+        return new WakabaReader(reader, null, true) {
             private final DateFormat dateFormat;
             {
                 DateFormatSymbols symbols = new DateFormatSymbols();

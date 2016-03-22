@@ -16,11 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans.inach;
+package nya.miku.wishmaster.api.util;
 
 import java.io.IOException;
 import java.io.Reader;
 
+/**
+ * Обёртка Reader, заменяющая при чтении одну последовательность символов на другую.
+ * Рекомендуется использовать с буферизованным ридером (этот класс не содержит в себе буфер и читает по одному символу). 
+ * @author miku-nyan
+ *
+ */
 public class ReplacingReader extends Reader {
     
     private final Reader in;
@@ -34,6 +40,12 @@ public class ReplacingReader extends Reader {
     private boolean replacementReading = false;
     private int replacementReadingPos = 0;
     
+    /**
+     * Конструктор
+     * @param in исходный Reader
+     * @param from последовательность символов, которую требуется заменять
+     * @param to последовательность, на которую требуется заменять from
+     */
     public ReplacingReader(Reader in, CharSequence from, CharSequence to) {
         this.in = in;
         this.from = from;
