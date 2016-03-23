@@ -438,37 +438,67 @@ public class MainActivity extends FragmentActivity {
         super.onResume();
         isPaused = false;
         TabsTrackerService.unread = false;
+        
         StaticSettingsContainer newSettings = MainApplication.getInstance().settings.getStaticSettings();
+        
+        boolean shouldClearCache = false;
+        boolean shouldReloadBoardFragment = false;
+        boolean shouldRestartActivity = false;
+        
         if (!MainApplication.getInstance().settings.getTheme().equals(theme) ||
-                settings.isDisplayDate != newSettings.isDisplayDate ||
+                MainApplication.getInstance().settings.getRootViewWeight() != rootViewWeight) {
+            shouldClearCache = true;
+            shouldRestartActivity = true;
+        }
+        
+        if (MainApplication.getInstance().settings.isTabsPanelOnRight() != tabsPanelRight) {
+            shouldRestartActivity = true;
+        }
+        
+        if (settings.isDisplayDate != newSettings.isDisplayDate ||
                 (settings.isDisplayDate && (settings.isLocalTime != newSettings.isLocalTime)) ||
                 MainApplication.getInstance().settings.getAutohideRulesJson().hashCode() != autohideRulesHash ||
-                MainApplication.getInstance().settings.getRootViewWeight() != rootViewWeight ||
                 MainApplication.getInstance().settings.openSpoilers() != openSpoilers) {
-            Logger.d(TAG, "appearance settings were changed; clearing LRU cache and restarting activity");
-            restartActivityClearCache();
-            return;
-        } else if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
-                settings.showHiddenItems != newSettings.showHiddenItems ||
-                MainApplication.getInstance().settings.isTabsPanelOnRight() != tabsPanelRight) {
-            Logger.d(TAG, "appearance settings were changed; restarting activity");
-            restartActivity(false);
-            return;
-        } else {
-            MainApplication.getInstance().settings.updateStaticSettings(settings);
-            updateTabPanelTabletWeight();
+            shouldClearCache = true;
+            shouldReloadBoardFragment = true;
         }
-        handleOrientationChange(getResources().getConfiguration());
+        
+        if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
+                settings.showHiddenItems != newSettings.showHiddenItems) {
+            shouldReloadBoardFragment = true;
+        }
+        
+        if (shouldClearCache) clearCache();
+        if (shouldRestartActivity) {
+            restartActivity();
+            return;
+        }
+        
+        MainApplication.getInstance().settings.updateStaticSettings(settings);
+        updateTabPanelTabletWeight();
+        
+        if (shouldReloadBoardFragment) reloadCurrentBoardFragment();
+        handleOrientationChange(getResources().getConfiguration(), shouldReloadBoardFragment);
     }
     
-    private void restartActivityClearCache() {
-        restartActivity(true);
+    private void clearCache() {
+        MainApplication.getInstance().pagesCache.clearLru();
     }
     
-    private void restartActivity(boolean clearCache) {
+    private void reloadCurrentBoardFragment() {
+        Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+        if (currentFragment instanceof BoardFragment) {
+            Long id = MainApplication.getInstance().tabsSwitcher.currentId;
+            if (id != null) {
+                TabModel tab = MainApplication.getInstance().tabsState.findTabById(id);
+                MainApplication.getInstance().tabsSwitcher.switchTo(tab, getSupportFragmentManager(), true);
+            }
+        }
+    }
+    
+    private void restartActivity() {
         MainApplication.getInstance().tabsSwitcher.currentId = null;
         MainApplication.getInstance().tabsSwitcher.currentFragment = null;
-        if (clearCache) MainApplication.getInstance().pagesCache.clearLru();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             // https://code.google.com/p/android/issues/detail?id=93731
             PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
@@ -504,20 +534,18 @@ public class MainActivity extends FragmentActivity {
     }
     
     private void handleOrientationChange(Configuration configuration) {
+        handleOrientationChange(configuration, false);
+    }
+    
+    private void handleOrientationChange(Configuration configuration, boolean doNotReloadBoardFragment) {
         boolean newOrientation = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (newOrientation != isHorizontalOrientation) {
             if (rootViewWeight != 1.0f) {
-                restartActivityClearCache();
+                clearCache();
+                restartActivity();
             } else {
-                if (FlowTextHelper.IS_AVAILABLE) {
-                    Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
-                    if (currentFragment instanceof BoardFragment) {
-                        Long id = MainApplication.getInstance().tabsSwitcher.currentId;
-                        if (id != null) {
-                            TabModel tab = MainApplication.getInstance().tabsState.findTabById(id);
-                            MainApplication.getInstance().tabsSwitcher.switchTo(tab, getSupportFragmentManager(), true);
-                        }
-                    }
+                if (!doNotReloadBoardFragment && FlowTextHelper.IS_AVAILABLE) {
+                    reloadCurrentBoardFragment();
                 }
                 isHorizontalOrientation = newOrientation;
             }
