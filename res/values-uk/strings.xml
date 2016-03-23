@@ -476,6 +476,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_show_all_chans_list_summary">Показувати список всіх підтримуваних іміджбордів на новій вкладці</string>
     <string name="pref_show_nsfw_boards_title">Усі дошки</string>
     <string name="pref_show_nsfw_boards_summary">Показувати дошки без модерації</string>
+    <string name="pref_mask_pictures_title">SFW режим</string>
+    <string name="pref_mask_pictures_summary">Маскувати всі картинки</string>
     <string name="pref_autohide_title">Автосхов</string>
     <string name="pref_autohide_summary">Автоматично ховати пости за регулярними виразами</string>
     <!-- <string name="pref_hide_completely_title">Ховати повністю</string>

@@ -354,6 +354,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_nsfw_boards), false);
     }
     
+    public boolean maskPictures() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_mask_pictures), false);
+    }
+    
     public boolean isUnlockedChan(String chanName) {
         if (chanName == null) return false;
         if (!isSFWRelease()) return true;
@@ -419,6 +423,7 @@ public class ApplicationSettings {
         public boolean isLocalTime;
         public boolean repliesOnlyQuantity;
         public boolean showHiddenItems;
+        public boolean maskPictures;
         public boolean hideActionBar;
     }
 
@@ -429,6 +434,7 @@ public class ApplicationSettings {
         container.isLocalTime = isLocalTime();
         container.repliesOnlyQuantity = repliesOnlyQuantity();
         container.showHiddenItems = showHiddenItems();
+        container.maskPictures = maskPictures();
         container.hideActionBar = hideActionBar();
     }
     

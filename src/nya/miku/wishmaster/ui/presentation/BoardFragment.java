@@ -2167,7 +2167,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             ImageView thumbnailPic = (ImageView) thumbnailView.findViewById(R.id.post_thumbnail_image);
             TextView size = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_size);
             TextView type = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
-            setImageViewSpoiler(thumbnailPic, attachment.isSpoiler);
+            setImageViewSpoiler(thumbnailPic, attachment.isSpoiler || fragment().staticSettings.maskPictures);
             switch (attachment.type) {
                 case AttachmentModel.TYPE_IMAGE_GIF:
                     type.setText(R.string.postitem_gif);

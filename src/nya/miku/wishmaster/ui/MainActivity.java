@@ -464,7 +464,8 @@ public class MainActivity extends FragmentActivity {
         }
         
         if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
-                settings.showHiddenItems != newSettings.showHiddenItems) {
+                settings.showHiddenItems != newSettings.showHiddenItems ||
+                settings.maskPictures != newSettings.maskPictures) {
             shouldReloadBoardFragment = true;
         }
         
