@@ -188,6 +188,10 @@ public class MainActivity extends FragmentActivity {
             }
         }
         menu.add(Menu.NONE, R.id.menu_settings, 203, R.string.menu_preferences).setIcon(android.R.drawable.ic_menu_preferences);
+        Menu subMenu = menu.addSubMenu(Menu.NONE, R.id.menu_sub_settings, 203, R.string.menu_preferences);
+        subMenu.add(Menu.NONE, R.id.menu_sub_settings_autoupdate, 1, R.string.menu_sub_preferences_autoupdate).setCheckable(true);
+        subMenu.add(Menu.NONE, R.id.menu_sub_settings_maskpictures, 2, R.string.menu_sub_preferences_maskpictures).setCheckable(true);
+        subMenu.add(Menu.NONE, R.id.menu_sub_settings_all, 3, R.string.menu_sub_preferences_all);
         return super.onCreateOptionsMenu(menu);
     }
     
@@ -201,6 +205,22 @@ public class MainActivity extends FragmentActivity {
         if (favoritesMenuItem != null && tabsAdapter != null && tabsAdapter.getSelectedItem() >= 0) {
             TabModel tab = tabsAdapter.getItem(tabsAdapter.getSelectedItem());
             favoritesMenuItem.setTitle(isFavorite(tab) ? R.string.menu_remove_favorites : R.string.menu_add_favorites);
+        }
+        MenuItem preferencesMenuItem = menu.findItem(R.id.menu_settings);
+        MenuItem preferencesSubMenuItem = menu.findItem(R.id.menu_sub_settings);
+        try {
+            if (MainApplication.getInstance().settings.preferencesSubmenu()) {
+                preferencesSubMenuItem.setVisible(true);
+                preferencesMenuItem.setVisible(false);
+                Menu subMenu = preferencesSubMenuItem.getSubMenu();
+                subMenu.findItem(R.id.menu_sub_settings_autoupdate).setChecked(MainApplication.getInstance().settings.isAutoupdateEnabled());
+                subMenu.findItem(R.id.menu_sub_settings_maskpictures).setChecked(MainApplication.getInstance().settings.maskPictures());
+            } else {
+                preferencesMenuItem.setVisible(true);
+                preferencesSubMenuItem.setVisible(false);
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, e);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -223,8 +243,19 @@ public class MainActivity extends FragmentActivity {
                 }
                 return true;
             case R.id.menu_settings:
+            case R.id.menu_sub_settings_all:
                 Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
                 this.startActivity(preferencesIntent);
+                return true;
+            case R.id.menu_sub_settings_autoupdate:
+                MainApplication.getInstance().settings.setAutoupdateEnabled(!MainApplication.getInstance().settings.isAutoupdateEnabled());
+                if (TabsTrackerService.running) stopService(new Intent(this, TabsTrackerService.class));
+                if (MainApplication.getInstance().settings.isAutoupdateEnabled()) startService(new Intent(this, TabsTrackerService.class));
+                return true;
+            case R.id.menu_sub_settings_maskpictures:
+                MainApplication.getInstance().settings.setMaskPictures(!MainApplication.getInstance().settings.maskPictures());
+                MainApplication.getInstance().settings.updateStaticSettings(settings);
+                reloadCurrentBoardFragment();
                 return true;
             case R.id.menu_open_close_drawer:
                 if (drawerLayout.isDrawerOpen(DRAWER_GRAVITY)) {

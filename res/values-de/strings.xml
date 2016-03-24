@@ -137,6 +137,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_open_drawer">Drawer öffnen</string>
     <string name="menu_close_drawer">Drawer schließen</string>
     <string name="menu_preferences">Einstellungen</string>
+    <string name="menu_sub_preferences_autoupdate">Auto-Update</string>
+    <string name="menu_sub_preferences_maskpictures">SFW-Modus</string>
+    <string name="menu_sub_preferences_all">Alle Einstellungen</string>
     <string name="menu_add_post">Antwort schreiben</string>
     <string name="menu_add_thread">Neuer Thread</string>
     <string name="menu_update">Aktualisieren</string>
@@ -476,6 +479,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Bestätigen Sie, bevor Sie externe Links öffnen</string>
     <string name="pref_do_not_close_tabs_title">Tabs nicht schließen</string>
     <string name="pref_do_not_close_tabs_summary">Tabs durch Drücken der Zurück-Taste nicht schließen</string>
+    <string name="pref_preferences_submenu_title">Einstellungsmenü</string>
+    <string name="pref_preferences_submenu_summary">Einige Einstellungen im Anwendungsmenü zeigen</string>
     <string name="pref_pin_markup_title">Markup-Buttons stecken</string>
     <string name="pref_pin_markup_summary">Markup-Buttons in Postform stecken</string>
     <string name="pref_show_date_title">Die Zeit anzeigen</string>

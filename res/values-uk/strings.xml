@@ -147,6 +147,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_open_drawer">Вкладки</string>
     <string name="menu_close_drawer">Назад</string>
     <string name="menu_preferences">Опції</string>
+    <string name="menu_sub_preferences_autoupdate">Автооновлення</string>
+    <string name="menu_sub_preferences_maskpictures">SFW режим</string>
+    <string name="menu_sub_preferences_all">Всі опції</string>
     <string name="menu_add_post">Відповісти</string>
     <string name="menu_add_thread">Створити тред</string>
     <string name="menu_update">Оновити</string>
@@ -486,6 +489,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Запит перед відкриттям лінків назовні</string>
     <string name="pref_do_not_close_tabs_title">Не закривати вкладки</string>
     <string name="pref_do_not_close_tabs_summary">Дія кнопки Назад</string>
+    <string name="pref_preferences_submenu_title">Меню опцій</string>
+    <string name="pref_preferences_submenu_summary">Показувати деякі опції в меню програми</string>
     <string name="pref_pin_markup_title">Закріпити кнопки розмітки</string>
     <string name="pref_pin_markup_summary">Закріпити кнопки розмітки у формі відправки</string>
     <string name="pref_show_date_title">Дата й час</string>

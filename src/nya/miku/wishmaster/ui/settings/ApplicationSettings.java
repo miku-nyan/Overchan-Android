@@ -358,6 +358,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_mask_pictures), false);
     }
     
+    public void setMaskPictures(boolean value) {
+        preferences.edit().putBoolean(resources.getString(R.string.pref_key_mask_pictures), value).commit();
+    }
+    
     public boolean isUnlockedChan(String chanName) {
         if (chanName == null) return false;
         if (!isSFWRelease()) return true;
@@ -377,12 +381,20 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_do_not_close_tabs), false);
     }
     
+    public boolean preferencesSubmenu() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_preferences_submenu), false);
+    }
+    
     public boolean isPinnedMarkup() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_pin_markup), false);
     }
     
     public boolean isAutoupdateEnabled() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_enable_autoupdate), false);
+    }
+    
+    public void setAutoupdateEnabled(boolean value) {
+        preferences.edit().putBoolean(resources.getString(R.string.pref_key_enable_autoupdate), value).commit();
     }
     
     public boolean isAutoupdateWifiOnly() {

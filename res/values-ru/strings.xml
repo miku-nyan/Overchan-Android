@@ -142,6 +142,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_open_drawer">Панель вкладок</string>
     <string name="menu_close_drawer">Закрыть панель</string>
     <string name="menu_preferences">Настройки</string>
+    <string name="menu_sub_preferences_autoupdate">Автообновление</string>
+    <string name="menu_sub_preferences_maskpictures">SFW режим</string>
+    <string name="menu_sub_preferences_all">Все настройки</string>
     <string name="menu_add_post">Ответить</string>
     <string name="menu_add_thread">Создать тред</string>
     <string name="menu_update">Обновить</string>
@@ -483,6 +486,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Спрашивать, прежде чем открывать внешние ссылки</string>
     <string name="pref_do_not_close_tabs_title">Не закрывать вкладки</string>
     <string name="pref_do_not_close_tabs_summary">Не закрывать вкладки по нажатию кнопки Назад</string>
+    <string name="pref_preferences_submenu_title">Меню настроек</string>
+    <string name="pref_preferences_submenu_summary">Показывать некоторые настройки в меню приложения</string>
     <string name="pref_pin_markup_title">Закрепить кнопки разметки</string>
     <string name="pref_pin_markup_summary">Закрепить кнопки разметки в форме отправки</string>
     <string name="pref_show_date_title">Показывать время</string>

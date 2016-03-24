@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item name="menu_open_browser" type="id"/>
     <item name="menu_favorites" type="id"/>
     <item name="menu_settings" type="id"/>
+    <item name="menu_sub_settings" type="id"/>
+    <item name="menu_sub_settings_autoupdate" type="id"/>
+    <item name="menu_sub_settings_maskpictures" type="id"/>
+    <item name="menu_sub_settings_all" type="id"/>
     <item name="menu_add_post" type="id"/>
     <item name="menu_update" type="id"/>
     <item name="menu_catalog" type="id"/>

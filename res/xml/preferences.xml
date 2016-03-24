@@ -228,6 +228,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         <CheckBoxPreference
             android:defaultValue="false"
+            android:key="@string/pref_key_preferences_submenu"
+            android:title="@string/pref_preferences_submenu_title"
+            android:summary="@string/pref_preferences_submenu_summary" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="@string/pref_key_pin_markup"
             android:title="@string/pref_pin_markup_title"
             android:summary="@string/pref_pin_markup_summary" />
