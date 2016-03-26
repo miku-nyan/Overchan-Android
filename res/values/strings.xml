@@ -137,6 +137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_open_drawer">Open drawer</string>
     <string name="menu_close_drawer">Close drawer</string>
     <string name="menu_preferences">Preferences</string>
+    <string name="menu_sub_preferences_suspend">Suspend</string>
     <string name="menu_sub_preferences_autoupdate">Auto-Update</string>
     <string name="menu_sub_preferences_maskpictures">SFW mode</string>
     <string name="menu_sub_preferences_all">All preferences</string>
@@ -350,6 +351,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_download_exists_or_in_queue">Some files are already downloaded or in the queue</string>
     <string name="notification_not_found">Not found</string>
     <string name="notifacation_updating_now">The list is updated at the moment, try again later</string>
+    <string name="notification_suspend">Auto-update is disabled until you open the application</string>
     
     <string name="error_unknown">An unknown error occurred</string>
     <string name="error_deserialization">Error while deserialization</string>

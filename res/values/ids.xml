@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item name="menu_favorites" type="id"/>
     <item name="menu_settings" type="id"/>
     <item name="menu_sub_settings" type="id"/>
+    <item name="menu_sub_settings_suspend" type="id"/>
     <item name="menu_sub_settings_autoupdate" type="id"/>
     <item name="menu_sub_settings_maskpictures" type="id"/>
     <item name="menu_sub_settings_all" type="id"/>

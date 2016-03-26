@@ -142,6 +142,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_open_drawer">Панель вкладок</string>
     <string name="menu_close_drawer">Закрыть панель</string>
     <string name="menu_preferences">Настройки</string>
+    <string name="menu_sub_preferences_suspend">Приостановить</string>
     <string name="menu_sub_preferences_autoupdate">Автообновление</string>
     <string name="menu_sub_preferences_maskpictures">SFW режим</string>
     <string name="menu_sub_preferences_all">Все настройки</string>
@@ -357,6 +358,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_download_exists_or_in_queue">Некоторые файлы уже загружены или в очереди загрузок</string>
     <string name="notification_not_found">Ничего не найдено</string>
     <string name="notifacation_updating_now">В данный момент список обновляется, попробуйте позже</string>
+    <string name="notification_suspend">Автообновление отключено, пока вы не откроете приложение</string>
     
     <string name="error_unknown">Неизвестная ошибка</string>
     <string name="error_deserialization">Ошибка десериализации</string>

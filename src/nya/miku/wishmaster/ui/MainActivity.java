@@ -189,9 +189,10 @@ public class MainActivity extends FragmentActivity {
         }
         menu.add(Menu.NONE, R.id.menu_settings, 203, R.string.menu_preferences).setIcon(android.R.drawable.ic_menu_preferences);
         Menu subMenu = menu.addSubMenu(Menu.NONE, R.id.menu_sub_settings, 203, R.string.menu_preferences);
-        subMenu.add(Menu.NONE, R.id.menu_sub_settings_autoupdate, 1, R.string.menu_sub_preferences_autoupdate).setCheckable(true);
-        subMenu.add(Menu.NONE, R.id.menu_sub_settings_maskpictures, 2, R.string.menu_sub_preferences_maskpictures).setCheckable(true);
-        subMenu.add(Menu.NONE, R.id.menu_sub_settings_all, 3, R.string.menu_sub_preferences_all);
+        subMenu.add(Menu.NONE, R.id.menu_sub_settings_suspend, 1, R.string.menu_sub_preferences_suspend);
+        subMenu.add(Menu.NONE, R.id.menu_sub_settings_autoupdate, 2, R.string.menu_sub_preferences_autoupdate).setCheckable(true);
+        subMenu.add(Menu.NONE, R.id.menu_sub_settings_maskpictures, 3, R.string.menu_sub_preferences_maskpictures).setCheckable(true);
+        subMenu.add(Menu.NONE, R.id.menu_sub_settings_all, 4, R.string.menu_sub_preferences_all);
         return super.onCreateOptionsMenu(menu);
     }
     
@@ -213,6 +214,7 @@ public class MainActivity extends FragmentActivity {
                 preferencesSubMenuItem.setVisible(true);
                 preferencesMenuItem.setVisible(false);
                 Menu subMenu = preferencesSubMenuItem.getSubMenu();
+                subMenu.findItem(R.id.menu_sub_settings_suspend).setVisible(MainApplication.getInstance().settings.isAutoupdateEnabled());
                 subMenu.findItem(R.id.menu_sub_settings_autoupdate).setChecked(MainApplication.getInstance().settings.isAutoupdateEnabled());
                 subMenu.findItem(R.id.menu_sub_settings_maskpictures).setChecked(MainApplication.getInstance().settings.maskPictures());
             } else {
@@ -246,6 +248,11 @@ public class MainActivity extends FragmentActivity {
             case R.id.menu_sub_settings_all:
                 Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
                 this.startActivity(preferencesIntent);
+                return true;
+            case R.id.menu_sub_settings_suspend:
+                Toast.makeText(this, R.string.notification_suspend, Toast.LENGTH_LONG).show();
+                if (TabsTrackerService.running) stopService(new Intent(MainActivity.this, TabsTrackerService.class));
+                finish();
                 return true;
             case R.id.menu_sub_settings_autoupdate:
                 MainApplication.getInstance().settings.setAutoupdateEnabled(!MainApplication.getInstance().settings.isAutoupdateEnabled());

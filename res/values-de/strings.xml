@@ -137,6 +137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_open_drawer">Drawer öffnen</string>
     <string name="menu_close_drawer">Drawer schließen</string>
     <string name="menu_preferences">Einstellungen</string>
+    <string name="menu_sub_preferences_suspend">Aussetzen</string>
     <string name="menu_sub_preferences_autoupdate">Auto-Update</string>
     <string name="menu_sub_preferences_maskpictures">SFW-Modus</string>
     <string name="menu_sub_preferences_all">Alle Einstellungen</string>
@@ -350,6 +351,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_download_exists_or_in_queue">Einige Dateien bereits heruntergeladen oder in der Warteschlange</string>
     <string name="notification_not_found">Nicht gefunden</string>
     <string name="notifacation_updating_now">Die Liste wird im Moment aktualisiert, versuchen Sie es später</string>
+    <string name="notification_suspend">Auto-Update ist deaktiviert, bis Sie die Anwendung öffnen</string>
     
     <string name="error_unknown">Ein unbekannter Fehler</string>
     <string name="error_deserialization">Fehler bei Deserialisierung</string>

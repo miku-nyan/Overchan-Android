@@ -147,6 +147,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_open_drawer">Вкладки</string>
     <string name="menu_close_drawer">Назад</string>
     <string name="menu_preferences">Опції</string>
+    <string name="menu_sub_preferences_suspend">Призупинити</string>
     <string name="menu_sub_preferences_autoupdate">Автооновлення</string>
     <string name="menu_sub_preferences_maskpictures">SFW режим</string>
     <string name="menu_sub_preferences_all">Всі опції</string>
@@ -360,6 +361,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_download_exists_or_in_queue">Деякі файли вже звантажені або на черзі</string>
     <string name="notification_not_found">Не знайдено</string>
     <string name="notifacation_updating_now">Список оновлюється, спробуйте пізніше</string>
+    <string name="notification_suspend">Автооновлення відключено, поки ви не відкриєте програму</string>
     
     <string name="error_unknown">Невідома помилка</string>
     <string name="error_deserialization">Помилка десеріалізації</string>
