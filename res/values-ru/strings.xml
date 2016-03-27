@@ -240,6 +240,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_switch_page_go">Перейти</string>
     <string name="dialog_switch_page_incorrect">Недопустимый номер страницы</string>
     
+    <string name="dialog_wait">Подождите</string>
+    
     <string name="grid_gallery_select">Выбрать для загрузки</string>
     <string name="grid_gallery_download">Скачать</string>
     <string name="grid_gallery_dlg_title">Загрузка</string>

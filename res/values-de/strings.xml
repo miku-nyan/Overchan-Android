@@ -233,6 +233,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_switch_page_go">Gehen</string>
     <string name="dialog_switch_page_incorrect">Ungültige Seitennummer</string>
     
+    <string name="dialog_wait">Warten Sie</string>
+    
     <string name="grid_gallery_select">Für das Herunterladen wählen</string>
     <string name="grid_gallery_download">Herunterladen</string>
     <string name="grid_gallery_dlg_title">Herunterladen</string>

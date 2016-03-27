@@ -31,6 +31,7 @@ import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -87,9 +88,21 @@ public class PreferencesActivity extends PreferenceActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == DialogInterface.BUTTON_POSITIVE) {
-                            MainApplication.getInstance().fileCache.clearCache();
-                            clearCachePreference.setSummary(getString(R.string.pref_clear_cache_summary,
-                                    MainApplication.getInstance().fileCache.getCurrentSizeMB()));
+                            final ProgressDialog progressDlg = ProgressDialog.show(PreferencesActivity.this, null, getString(R.string.dialog_wait));
+                            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MainApplication.getInstance().fileCache.clearCache();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            progressDlg.dismiss();
+                                            clearCachePreference.setSummary(getString(R.string.pref_clear_cache_summary,
+                                                    MainApplication.getInstance().fileCache.getCurrentSizeMB()));
+                                        }
+                                    });
+                                }
+                            }).start();
                         }
                     }
                 };

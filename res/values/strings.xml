@@ -233,6 +233,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_switch_page_go">Go</string>
     <string name="dialog_switch_page_incorrect">Invalid page number</string>
     
+    <string name="dialog_wait">Wait</string>
+    
     <string name="grid_gallery_select">Select for downloading</string>
     <string name="grid_gallery_download">Download</string>
     <string name="grid_gallery_dlg_title">Downloading</string>

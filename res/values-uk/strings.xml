@@ -243,6 +243,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="dialog_switch_page_go">Перейти</string>
     <string name="dialog_switch_page_incorrect">Хибний номер сторінки</string>
     
+    <string name="dialog_wait">Зачекайте</string>
+    
     <string name="grid_gallery_select">Обрати для звантаження</string>
     <string name="grid_gallery_download">Звантажити</string>
     <string name="grid_gallery_dlg_title">Звантаження</string>
