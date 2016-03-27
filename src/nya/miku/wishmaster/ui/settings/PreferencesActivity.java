@@ -160,6 +160,8 @@ public class PreferencesActivity extends PreferenceActivity {
                     newSize = 50;
                 }
                 MainApplication.getInstance().fileCache.setMaxSize(newSize * 1024 * 1024);
+                clearCachePreference.setSummary(getString(R.string.pref_clear_cache_summary,
+                        MainApplication.getInstance().fileCache.getCurrentSizeMB()));
                 return true;
             }
         });
