@@ -39,9 +39,11 @@ public class CirnoBoards {
     private static final SimpleBoardModel[] SIMPLE_ARRAY_IICHAN;
     
     static {
-        addBoard("es", "Бесконечное лето", "На пробу", "Пионер", false);
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
+        addBoard("azu", "Azumanga Daioh", "К удалению", "Осака", false);
+        addBoard("me", "Меха", "К удалению", "Лакс Кляйн", false);
         addBoard("au", "Автомобили", "Общее", "Джереми Кларксон", false);
+        addBoard("es", "Бесконечное лето", "Общее", "Пионер", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
         addBoard("vg", "Видеоигры", "Общее", "Марио", false);
         addBoard("hr", "Высокое разрешение", "Общее", "Аноним", false);
@@ -60,11 +62,11 @@ public class CirnoBoards {
         addBoard("mu", "Музыка", "Общее", "Виктор Цой", false);
         addBoard("bg", "Настольные игры", "Общее", "Аноним", false);
         addBoard("sci", "Наука", "Общее", "Гриша Перельман", false);
-        addBoard("w", "Обои", "Общее", "Аноним", false);
+        //addBoard("w", "Обои", "Общее", "Аноним", false);
         addBoard("mi", "Оружие", "Общее", "Й. Швейк", false);
         addBoard("o", "Оэкаки", "Общее", "Аноним", false);
         addBoard("x", "Паранормальные явления", "Общее", "Эмма Ай", false);
-        addBoard("p", "Политика", "Общее", "Аноним", true); //???
+        //addBoard("p", "Политика", "Общее", "Аноним", true); //???
         addBoard("r", "Просьбы", "Общее", "Аноним", false);
         addBoard("dev", "Разработка", "Общее", "Стив Балмер", false);
         addBoard("maid", "Служанки", "Общее", "Госюдзин-сама", false);
@@ -76,7 +78,6 @@ public class CirnoBoards {
         addBoard("s", "Электроника и ПО", "Общее", "Чии", false);
         addBoard("a", "Аниме и манга", "Японская культура", "Мокона", false);
         addBoard("aa", "Аниме-арт", "Японская культура", "Ракка", false);
-        addBoard("azu", "Azumanga Daioh", "Японская культура", "Осака", false);
         addBoard("vn", "Визуальные новеллы", "Японская культура", "Сэйбер", false);
         addBoard("vo", "Vocaloid", "Японская культура", "", false); //hatsune
         addBoard("gnx", "Gainax", "Японская культура", "Ноно", false);
@@ -84,7 +85,6 @@ public class CirnoBoards {
         addBoard("c", "Косплей", "Японская культура", "Аноним", false);
         addBoard("ls", "Lucky☆Star", "Японская культура", "Цукаса", false);
         //addBoard("ma", "Манга", "Японская культура", "Иноуэ Орихимэ", false);
-        addBoard("me", "Меха", "Японская культура", "Лакс Кляйн", false);
         addBoard("rm", "Rozen Maiden", "Японская культура", "Суйгинто", false);
         addBoard("tan", "Сетевые персонажи", "Японская культура", "Уныл-тян", false);
         addBoard("sos", "Suzumiya Haruhi no Yūutsu", "Японская культура", "Кёнко", false);

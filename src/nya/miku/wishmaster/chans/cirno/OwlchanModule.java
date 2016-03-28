@@ -73,7 +73,9 @@ public class OwlchanModule extends AbstractWakabaModule {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ussr", "СССР", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аниме", "Японская культура", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vn", "Визуальные новеллы", "Японская культура", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ra", "OwlChan Radio", "Радио", false)
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ra", "OwlChan Radio", "Радио", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ph", "Философия", "На пробу", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rf", "Убежище", "На пробу", false)
     };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
     
