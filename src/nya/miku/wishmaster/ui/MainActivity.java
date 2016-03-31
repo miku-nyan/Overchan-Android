@@ -188,7 +188,8 @@ public class MainActivity extends FragmentActivity {
             }
         }
         menu.add(Menu.NONE, R.id.menu_settings, 203, R.string.menu_preferences).setIcon(android.R.drawable.ic_menu_preferences);
-        Menu subMenu = menu.addSubMenu(Menu.NONE, R.id.menu_sub_settings, 203, R.string.menu_preferences);
+        Menu subMenu = menu.addSubMenu(Menu.NONE, R.id.menu_sub_settings, 203, R.string.menu_preferences).
+                setIcon(android.R.drawable.ic_menu_preferences);
         subMenu.add(Menu.NONE, R.id.menu_sub_settings_suspend, 1, R.string.menu_sub_preferences_suspend);
         subMenu.add(Menu.NONE, R.id.menu_sub_settings_autoupdate, 2, R.string.menu_sub_preferences_autoupdate).setCheckable(true);
         subMenu.add(Menu.NONE, R.id.menu_sub_settings_maskpictures, 3, R.string.menu_sub_preferences_maskpictures).setCheckable(true);
