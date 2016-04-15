@@ -53,7 +53,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -104,7 +103,6 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     private SendPostModel sendPostModel;
     
     private ChanModule chan;
-    private Handler handler;
     private volatile CancellableTask currentTask;
     
     private ArrayList<File> attachments;
@@ -161,7 +159,6 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         settings = MainApplication.getInstance().settings;
         settings.getTheme().setTo(this);
         super.onCreate(savedInstanceState);
-        handler = new Handler();
         attachments = new ArrayList<File>();
         currentPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         
@@ -618,7 +615,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     currentTask = new CancellableTask.BaseCancellableTask();
                     final CaptchaModel bmp = chan.getNewCaptcha(sendPostModel.boardName, sendPostModel.threadNumber, null, currentTask);
                     if (currentTask != null && currentTask.isCancelled()) return;
-                    handler.post(new Runnable() {
+                    Async.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             switchToCaptcha(bmp);
@@ -636,7 +633,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     } else {
                         final String message = e.getMessage() == null ? "" : e.getMessage();
                         if (currentTask != null && currentTask.isCancelled()) return;
-                        handler.post(new Runnable() {
+                        Async.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 switchToErrorCaptcha(message);

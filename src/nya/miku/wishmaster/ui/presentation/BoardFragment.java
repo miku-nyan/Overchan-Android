@@ -94,7 +94,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
@@ -162,7 +161,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private StaticSettingsContainer staticSettings;
     private Resources resources;
     private Database database;
-    private Handler handler;
     private ReadableContainer localFile;
     private ChanModule chan;
     
@@ -273,7 +271,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         staticSettings = activity.settings;
         resources = MainApplication.getInstance().resources;
         database = MainApplication.getInstance().database;
-        handler = new Handler();
         Wifi.updateState(activity);
         
         TabsState tabsState = MainApplication.getInstance().tabsState;
@@ -363,7 +360,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         BitmapCache bitmapCache = MainApplication.getInstance().bitmapCache;
         imageGetter = new AsyncImageGetter(resources, R.dimen.inpost_image_size, bitmapCache,
-                chan, imagesDownloadExecutor, imagesDownloadTask, listView, handler, staticSettings);
+                chan, imagesDownloadExecutor, imagesDownloadTask, listView, Async.UI_HANDLER, staticSettings);
         spanClickListener = new VolatileSpanClickListener(this);
         floatingModels = measureFloatingModels(inflater);
         
@@ -695,7 +692,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         imagesDownloadTask,
                         (ImageView) lastContextMenuAttachment.findViewById(R.id.post_thumbnail_image),
                         imagesDownloadExecutor,
-                        handler,
+                        Async.UI_HANDLER,
                         true,
                         R.drawable.thumbnail_error);
                 return true;
@@ -1092,7 +1089,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     presentationModel = pagesCache.getPresentationModel(tabModel.hash);
                     if (presentationModel != null) {
                         ((AsyncImageGetter)presentationModel.imageGetter).setObjects(
-                                imagesDownloadExecutor, imagesDownloadTask, listView, handler, staticSettings);
+                                imagesDownloadExecutor, imagesDownloadTask, listView, Async.UI_HANDLER, staticSettings);
                         ((VolatileSpanClickListener)presentationModel.spanClickListener).setListener(BoardFragment.this);
                         presentationModel.setFloatingModels(floatingModels);
                         if (presentationModel == null) return;
@@ -1114,7 +1111,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         return;
                     }
                 }
-                handler.post(new Runnable() {
+                Async.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         switchToErrorView(resources.getString(R.string.error_open_local));
@@ -1131,7 +1128,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 presentationModel = pagesCache.getPresentationModel(tabModel.hash);
                 if (presentationModel != null) {
                     ((AsyncImageGetter)presentationModel.imageGetter).setObjects(
-                            imagesDownloadExecutor, imagesDownloadTask, listView, handler, staticSettings);
+                            imagesDownloadExecutor, imagesDownloadTask, listView, Async.UI_HANDLER, staticSettings);
                     ((VolatileSpanClickListener)presentationModel.spanClickListener).setListener(BoardFragment.this);
                     presentationModel.setFloatingModels(floatingModels);
                     if (presentationModel == null) return;
@@ -1202,7 +1199,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         }
                         startItem = null; //уже загрузили с чана а не из кэша, так что дальше искать якорь на данный пост смысла нет
                         if (isCancelled()) return;
-                        handler.post(new Runnable() {
+                        Async.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (presentationModel == null || presentationModel.isNotReady() || adapter == null)
@@ -1256,7 +1253,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 @Override
                 public void onError(final String message) {
                     if (isCancelled()) return;
-                    handler.post(new Runnable() {
+                    Async.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             switchToErrorView(message, silent);
@@ -1267,7 +1264,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 public void onInteractiveException(final InteractiveException e) {
                     if (isCancelled()) return;
                     if (silent && activity.isPaused()) {
-                        handler.post(new Runnable() {
+                        Async.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 setPullableNoRefreshing();
@@ -1310,7 +1307,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         /** обнулить адаптер listView (пока производятся манипуляции с внутренним list), из не-UI потока */
         private void nullAdapter() {
             nullAdapterFlag = true;
-            handler.post(new Runnable() {
+            Async.runOnUiThread(new Runnable() {
                 public void run() {
                     listView.setAdapter(null);
                     nullAdapterFlag = false;
@@ -1357,7 +1354,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
             }
             listLoaded = true;
-            handler.post(new Runnable() {
+            Async.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (presentationModel == null || presentationModel.isNotReady())
@@ -2211,7 +2208,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         fragment().imagesDownloadTask,
                         thumbnailPic,
                         fragment().imagesDownloadExecutor,
-                        fragment().handler,
+                        Async.UI_HANDLER,
                         fragment().downloadThumbnails() && !curBusy,
                         fragment().downloadThumbnails() ? (curBusy ? 0 : R.drawable.thumbnail_error) :
                             Attachments.getDefaultThumbnailResId(attachment.type));
@@ -2240,7 +2237,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     fragment().imagesDownloadTask,
                     badgeIcon,
                     fragment().imagesDownloadExecutor,
-                    fragment().handler,
+                    Async.UI_HANDLER,
                     fragment().downloadThumbnails() && !curBusy,
                     0);
         }
@@ -2321,7 +2318,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         pullableLayoutSetRefreshingTime = 0;
         if (time >= PULLABLE_ANIMATION_DELAY) {
             pullableLayout.setRefreshing(false);
-        } else handler.postDelayed(new Runnable() {
+        } else Async.runOnUiThreadDelayed(new Runnable() {
             @Override
             public void run() {
                 pullableLayout.setRefreshing(false);
@@ -3252,7 +3249,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         imagesDownloadTask,
                         tnImage,
                         imagesDownloadExecutor,
-                        handler,
+                        Async.UI_HANDLER,
                         downloadThumbnails() && !isBusy,
                         downloadThumbnails() ? (isBusy ? 0 : R.drawable.thumbnail_error) :
                             Attachments.getDefaultThumbnailResId(attachment.type));
@@ -3480,7 +3477,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         if (deleteTask.isCancelled()) return;
                         final boolean success = error == null;
                         final String result = success ? targetUrl : error;
-                        handler.post(new Runnable() {
+                        Async.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (deleteTask.isCancelled()) return;
@@ -3574,7 +3571,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         if (reportTask.isCancelled()) return;
                         final boolean success = error == null;
                         final String result = success ? targetUrl : error;
-                        handler.post(new Runnable() {
+                        Async.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (reportTask.isCancelled()) return;

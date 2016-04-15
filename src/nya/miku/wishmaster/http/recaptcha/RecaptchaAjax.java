@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -42,8 +43,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -59,18 +58,6 @@ public class RecaptchaAjax {
     private static final String CHALLENGE_FILTER = "/recaptcha/api/image?c=";
     
     private RecaptchaAjax() {}
-    
-    private static volatile Handler sHandler = null;
-    private static Handler getHandler() {
-        if (sHandler == null) {
-            synchronized (RecaptchaAjax.class) {
-                if (sHandler == null) {
-                    sHandler = new Handler(Looper.getMainLooper());
-                }
-            }
-        }
-        return sHandler;
-    }
     
     static String getChallenge(String key, CancellableTask task, HttpClient httpClient, String scheme) throws Exception {
         if (scheme == null) scheme = "http";
@@ -127,7 +114,7 @@ public class RecaptchaAjax {
         final Context context = MainApplication.getInstance();
         final Holder holder = new Holder();
         
-        getHandler().post(new Runnable() {
+        Async.runOnUiThread(new Runnable() {
             @SuppressLint("SetJavaScriptEnabled")
             @Override
             public void run() {
@@ -153,7 +140,7 @@ public class RecaptchaAjax {
             Thread.yield();
         }
         
-        getHandler().post(new Runnable() {
+        Async.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -179,7 +166,7 @@ public class RecaptchaAjax {
             Header[] uaHeader = new Header[] { new BasicHeader(HttpHeaders.USER_AGENT, CUSTOM_UA) };
             final HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCustomHeaders(uaHeader).build();
             
-            getHandler().post(new Runnable() {
+            Async.runOnUiThread(new Runnable() {
                 @SuppressLint("SetJavaScriptEnabled")
                 @Override
                 public void run() {
@@ -224,7 +211,7 @@ public class RecaptchaAjax {
                 Thread.yield();
             }
             
-            getHandler().post(new Runnable() {
+            Async.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     try {

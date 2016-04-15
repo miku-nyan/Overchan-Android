@@ -43,7 +43,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -75,7 +74,6 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
     private Resources resources;
     private ApplicationSettings settings;
     private Database database;
-    private Handler handler;
     private CancellableTask currentTask;
     
     private TabModel tabModel;
@@ -119,7 +117,6 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         resources = MainApplication.getInstance().resources;
         settings = MainApplication.getInstance().settings;
         database = MainApplication.getInstance().database;
-        handler = new Handler();
         
         TabsState tabsState = MainApplication.getInstance().tabsState;
         if (tabsState == null) throw new IllegalStateException("tabsState was not initialized in the MainApplication singleton");
@@ -467,7 +464,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                         });
                     } else {
                         final String message = e.getMessage();
-                        handler.post(new Runnable() {
+                        Async.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (boardsList == null) {
@@ -496,7 +493,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
                 startItem = null;
             }
             final int startItemPosition = startItemSearch;
-            handler.post(new Runnable() {
+            Async.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     listView.setAdapter(adapter);

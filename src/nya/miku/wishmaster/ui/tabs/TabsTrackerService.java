@@ -46,7 +46,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -68,8 +67,6 @@ public class TabsTrackerService extends Service {
     public static boolean unread = false;
     /** ID вкладки, которая обновляется в данный момент или -1 */
     public static long currentUpdatingTabId = -1;
-    
-    private Handler handler;
     
     private ApplicationSettings settings;
     private TabsState tabsState;
@@ -137,7 +134,6 @@ public class TabsTrackerService extends Service {
         Logger.d(TAG, "TabsTrackerService creating");
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        handler = new Handler();
         settings = MainApplication.getInstance().settings;
         tabsState = MainApplication.getInstance().tabsState;
         tabsSwitcher = MainApplication.getInstance().tabsSwitcher;
@@ -231,7 +227,7 @@ public class TabsTrackerService extends Service {
         if (tabsSwitcher.currentFragment instanceof BoardFragment) {
             TabModel tab = tabsState.findTabById(tabsSwitcher.currentId);
             if (tab != null && tab.pageModel != null && tab.type == TabModel.TYPE_NORMAL && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
-                handler.post(new Runnable() {
+                Async.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try {

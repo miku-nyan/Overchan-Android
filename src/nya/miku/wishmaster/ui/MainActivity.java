@@ -58,7 +58,6 @@ import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
@@ -556,13 +555,12 @@ public class MainActivity extends FragmentActivity {
         } else {
             final Intent i = new Intent(this.getIntent());
             this.finish();
-            final Handler handler = new Handler();
             Async.runAsync(new Runnable() {
                 @Override
                 public void run() {
                     //сначала должно уничтожиться старое activity; onDestroy() старого -> onCreate() нового
                     while (!isDestroyed) Thread.yield();
-                    handler.post(new Runnable() {
+                    Async.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             MainActivity.this.startActivity(i);

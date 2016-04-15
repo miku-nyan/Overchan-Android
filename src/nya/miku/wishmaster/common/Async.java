@@ -22,6 +22,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import android.os.Handler;
+import android.os.Looper;
+
 public class Async {
     
     /** Фабрика потоков с низким приоритетом */
@@ -36,8 +39,21 @@ public class Async {
     
     private static final ExecutorService LOW_PRIORITY_EXECUTOR = Executors.newCachedThreadPool(LOW_PRIORITY_FACTORY);
     
-    /** выполнить задание асинхронно в потоке с низким приоритетом */
+    /** Handler основного (UI) потока */
+    public static final Handler UI_HANDLER = new Handler(Looper.getMainLooper());
+    
+    /** Выполнить задание (Runnable) асинхронно в потоке с низким приоритетом. */
     public static void runAsync(Runnable task) {
         LOW_PRIORITY_EXECUTOR.execute(task);
+    }
+    
+    /** Выполнить задание (Runnable) в UI потоке. Задание добавится в очередь UI Handler. */
+    public static void runOnUiThread(Runnable task) {
+        UI_HANDLER.post(task);
+    }
+    
+    /** Выполнить задание (Runnable) в UI потоке с задержкой (через delayMillis мс). */
+    public static void runOnUiThreadDelayed(Runnable task, long delayMillis) {
+        UI_HANDLER.postDelayed(task, delayMillis);
     }
 }

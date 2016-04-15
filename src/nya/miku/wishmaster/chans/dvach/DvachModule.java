@@ -39,8 +39,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceGroup;
@@ -63,6 +61,7 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.api.util.WakabaUtils;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -89,11 +88,8 @@ public class DvachModule extends AbstractWakabaModule {
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2>(.*?)</h2>", Pattern.DOTALL);
     private static final Pattern REDIRECT_PATTERN = Pattern.compile("url=res/(\\d+)\\.html");
     
-    private final Handler handler;
-    
     public DvachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
-        handler = new Handler(Looper.getMainLooper());
     }
     
     @Override
@@ -369,7 +365,7 @@ public class DvachModule extends AbstractWakabaModule {
                 HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
         long startTime = System.currentTimeMillis();
         
-        handler.post(new Runnable() {
+        Async.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 wv.webView = new WebView(MainApplication.getInstance());
@@ -391,7 +387,7 @@ public class DvachModule extends AbstractWakabaModule {
             Thread.yield();
         }
         
-        handler.post(new Runnable() {
+        Async.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {

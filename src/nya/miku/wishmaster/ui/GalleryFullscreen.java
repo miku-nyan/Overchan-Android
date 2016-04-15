@@ -26,12 +26,12 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.ui.theme.ThemeUtils;
 
 public class GalleryFullscreen {
@@ -61,7 +61,6 @@ public class GalleryFullscreen {
                     View.SYSTEM_UI_FLAG_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LOW_PROFILE;
         
-        private final Handler handler;
         private final Window window;
         private final View decorView;
         private final ActionBar actionBar;
@@ -72,7 +71,6 @@ public class GalleryFullscreen {
         private volatile boolean isLocked = false;
         
         private GalleryFullscreenImpl(Activity activity) {
-            handler = new Handler();
             window = activity.getWindow();
             decorView = activity.getWindow().getDecorView();
             decorView.setOnSystemUiVisibilityChangeListener(this);
@@ -168,7 +166,7 @@ public class GalleryFullscreen {
                 }
                 long time = System.currentTimeMillis() - lastTouchEvent;
                 if (time < DELAY) {
-                    handler.postDelayed(this, DELAY - time);
+                    Async.runOnUiThreadDelayed(this, DELAY - time);
                 } else {
                     setSystemUiHidden();
                     delayedTask = false;
@@ -181,7 +179,7 @@ public class GalleryFullscreen {
         private synchronized void hideUIdelayed() {
             if (delayedTask) return;
             delayedTask = true;
-            handler.postDelayed(delayedHideUI, DELAY);
+            Async.runOnUiThreadDelayed(delayedHideUI, DELAY);
         }
         
         private void setSystemUiVisible() {
