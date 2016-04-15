@@ -48,7 +48,7 @@ public class AsyncImageGetter implements HtmlParser.ImageGetter {
     private final Resources res;
     private final BitmapCache bmpCache;
     private final ChanModule chan;
-    private Executor executor;
+    private WeakReference<Executor> executor;
     private CancellableTask task;
     private WeakReference<View> view;
     private Handler handler;
@@ -71,9 +71,9 @@ public class AsyncImageGetter implements HtmlParser.ImageGetter {
         this.res = res;
         this.bmpCache = bmpCache;
         this.chan = chan;
-        this.executor = executor;
+        this.executor = new WeakReference<>(executor);
         this.task = task;
-        this.view = new WeakReference<View>(view);
+        this.view = new WeakReference<>(view);
         this.handler = handler;
         this.staticSettings = staticSettings;
         this.maxSize = res.getDimensionPixelSize(maxSizeRes);
@@ -87,9 +87,9 @@ public class AsyncImageGetter implements HtmlParser.ImageGetter {
      * @param handler Handler основного UI потока
      */
     public void setObjects(Executor executor, CancellableTask task, View view, Handler handler, StaticSettingsContainer staticSettings) {
-        this.executor = executor;
+        this.executor = new WeakReference<>(executor);
         this.task = task;
-        this.view = new WeakReference<View>(view);
+        this.view = new WeakReference<>(view);
         this.handler = handler;
         this.staticSettings = staticSettings;
     }
@@ -113,7 +113,8 @@ public class AsyncImageGetter implements HtmlParser.ImageGetter {
             default: canDownload = false; break;
         }
         if (canDownload) {
-            executor.execute(new Downloader(hash, source, drawable, task));
+            Executor executor = this.executor.get();
+            if (executor != null) executor.execute(new Downloader(hash, source, drawable, task));
         }
         return drawable;
     }

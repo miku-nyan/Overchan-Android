@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -117,7 +117,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private DownloadingLocker downloadingLocker;
     private LayoutInflater inflater;
     private CancellableTask tnDownloadingTask;
-    private Executor tnDownloadingExecutor;
+    private ExecutorService tnDownloadingExecutor;
     
     private BoardModel boardModel;
     private ReadableContainer localFile;
@@ -302,6 +302,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 Logger.e(TAG, "cannot close local file", e);
             }
         }
+        tnDownloadingExecutor.shutdown();
     }
     
     @Override

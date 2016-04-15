@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -213,7 +213,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private URLSpanClickListener spanClickListener;
     private CancellableTask currentTask;
     private CancellableTask imagesDownloadTask = new CancellableTask.BaseCancellableTask();
-    private Executor imagesDownloadExecutor = Executors.newFixedThreadPool(4, PriorityThreadFactory.LOW_PRIORITY_FACTORY);
+    private ExecutorService imagesDownloadExecutor = Executors.newFixedThreadPool(4, PriorityThreadFactory.LOW_PRIORITY_FACTORY);
     
     /** измеряется при вызове {@link #measureFloatingModels(LayoutInflater)} */
     private int postItemWidth = 0;
@@ -399,6 +399,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 Logger.e(TAG, "cannot close local file", e);
             }
         }
+        
+        imagesDownloadExecutor.shutdown();
     }
     
     private void saveHistory() {
