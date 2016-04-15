@@ -68,8 +68,11 @@ import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -110,6 +113,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "GalleryActivity";
     
     public static final String EXTRA_ATTACHMENT = "attachment";
+    public static final String EXTRA_SAVED_ATTACHMENTHASH = "attachmenthash";
     public static final String EXTRA_BOARDMODEL = "boardmodel";
     public static final String EXTRA_PAGEHASH = "pagehash";
     public static final String EXTRA_LOCALFILENAME = "localfilename";
@@ -126,6 +130,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private ViewPager viewPager;
     private TextView navigationInfo;
     private SparseArray<View> instantiatedViews;
+    
+    private BroadcastReceiver broadcastReceiver;
     
     private ChanModule chan;
     private ApplicationSettings settings;
@@ -231,7 +237,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             presentationModel = null;
             if (list != null) {
                 int index = -1;
-                String attachmentHash = ChanModels.hashAttachmentModel(attachment);
+                String attachmentHash = getIntent().getStringExtra(EXTRA_SAVED_ATTACHMENTHASH);
+                if (attachmentHash == null) attachmentHash = ChanModels.hashAttachmentModel(attachment);
                 for (int i=0; i<list.size(); ++i) {
                     if (list.get(i).getMiddle().equals(attachmentHash)) {
                         index = i;
@@ -252,6 +259,24 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     }
                 }
             }
+        } else /* if (presentationModel == null) */ {
+            final String savedHash = savedInstanceState != null ? savedInstanceState.getString(EXTRA_SAVED_ATTACHMENTHASH) : null;
+            if (savedHash != null) registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction() != null && intent.getAction().equals(BoardFragment.BROADCAST_PAGE_LOADED)) {
+                        unregisterReceiver(this);
+                        broadcastReceiver = null;
+                        
+                        Intent activityIntent = getIntent();
+                        String pagehash = activityIntent.getStringExtra(EXTRA_PAGEHASH);
+                        if (pagehash != null && MainApplication.getInstance().pagesCache.getPresentationModel(pagehash) != null) {
+                            startActivity(activityIntent.putExtra(EXTRA_SAVED_ATTACHMENTHASH, savedHash));
+                            finish();
+                        }
+                    }
+                }
+            }, new IntentFilter(BoardFragment.BROADCAST_PAGE_LOADED));
         }
         if (attachments == null) {
             attachments = Collections.singletonList(Triple.of(attachment, ChanModels.hashAttachmentModel(attachment), (String)null));
@@ -278,6 +303,19 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 updateItem();
             }
         });
+    }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(EXTRA_SAVED_ATTACHMENTHASH, attachments.get(currentPosition).getMiddle());
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        BroadcastReceiver receiver = broadcastReceiver;
+        if (receiver != null) unregisterReceiver(receiver);
     }
     
     @Override

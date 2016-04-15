@@ -152,6 +152,8 @@ import android.widget.Toast;
 public class BoardFragment extends Fragment implements AdapterView.OnItemClickListener, VolatileSpanClickListener.Listener {
     private static final String TAG = "BoardFragment";
     
+    public static final String BROADCAST_PAGE_LOADED = "nya.miku.wishmaster.BROADCAST_ACTION_PAGE_LOADED";
+    
     private boolean isFailInstance = false;
     
     private PagesCache pagesCache = MainApplication.getInstance().pagesCache;
@@ -1300,6 +1302,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             presentationModel.updateViewModels(isThreadPage, PageGetter.this, null);
             pagesCache.putPresentationModel(tabModel.hash, presentationModel, putToFileCache);
             if (isCancelled()) return;
+            activity.sendBroadcast(new Intent(BROADCAST_PAGE_LOADED));
             toListView(needUpdateAfter);
         }
         
