@@ -35,10 +35,10 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.lib.KryoOutputHC;
 import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsIdStack;
@@ -158,7 +158,7 @@ public class Serializer {
     public void serialize(String filename, Object obj, boolean async) {
         Runnable task = new SerializeTask(filename, obj);
         if (async) {
-            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(task).start();
+            Async.runAsync(task);
         } else {
             task.run();
         }
@@ -192,13 +192,13 @@ public class Serializer {
     }
     
     public void serializeTabsState(final TabsState state) {
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+        Async.runAsync(new Runnable() {
             @Override
             public void run() {
                 serialize(FileCache.TABS_FILENAME, state, false);
                 serialize(FileCache.TABS_FILENAME_2, state, false);
             }
-        }).start();
+        });
     }
     
     public TabsState deserializeTabsState() {

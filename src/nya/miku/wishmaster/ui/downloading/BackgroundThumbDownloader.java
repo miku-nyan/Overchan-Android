@@ -30,13 +30,13 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.SerializablePage;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 
 public class BackgroundThumbDownloader implements Runnable {
-    private static final Executor EXECUTOR = Executors.newSingleThreadExecutor(PriorityThreadFactory.LOW_PRIORITY_FACTORY);
+    private static final Executor EXECUTOR = Executors.newSingleThreadExecutor(Async.LOW_PRIORITY_FACTORY);
 
     private static final String TAG = "NotLazyDownloader";
     

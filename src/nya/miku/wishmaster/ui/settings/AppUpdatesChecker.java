@@ -20,8 +20,8 @@ package nya.miku.wishmaster.ui.settings;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -51,7 +51,7 @@ public class AppUpdatesChecker {
             }
         });
         progressDialog.show();
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+        Async.runAsync(new Runnable() {
             @Override
             public void run() {
                 JSONObject response;
@@ -104,6 +104,6 @@ public class AppUpdatesChecker {
                     }
                 });
             }
-        }).start();
+        });
     }
 }

@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -246,7 +246,7 @@ public class Recaptcha2fallback extends InteractiveException {
                                 public void onClick(View v) {
                                     dialog.dismiss();
                                     if (task.isCancelled()) return;
-                                    PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                                    Async.runAsync(new Runnable() {
                                         @Override
                                         public void run() {
                                             try {
@@ -285,7 +285,7 @@ public class Recaptcha2fallback extends InteractiveException {
                                                 handle(activity, task, callback);
                                             }
                                         }
-                                    }).start();
+                                    });
                                 }
                             });
                         }

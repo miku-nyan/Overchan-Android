@@ -29,9 +29,9 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.lib.UriFileUtils;
@@ -415,7 +415,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             }
         });
         cfDialog.show();
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+        Async.runAsync(new Runnable() {
             @Override
             public void run() {
                 e.handle(PostFormActivity.this, currentTask, new InteractiveException.Callback() {
@@ -423,7 +423,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     @Override public void onError(String message) { cfDialog.dismiss(); switchToErrorCaptcha(message); }
                 });
             }
-        }).start();
+        });
     }
 
     private void setViews() {
@@ -611,7 +611,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         switchToLoadingCaptcha();
         if (currentTask != null) currentTask.cancel();
         MainApplication.getInstance().draftsCache.clearLastCaptcha();
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+        Async.runAsync(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -645,7 +645,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     }
                 }
             }
-        }).start();
+        });
         
     }
     

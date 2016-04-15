@@ -28,9 +28,9 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.PageLoaderFromChan;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.SerializablePage;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.ui.MainActivity;
 import nya.miku.wishmaster.ui.downloading.BackgroundThumbDownloader;
@@ -164,7 +164,7 @@ public class TabsTrackerService extends Service {
         }
         TrackerLoop loop = new TrackerLoop();
         task = loop;
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(loop).start();
+        Async.runAsync(loop);
         running = true;
     }
     

@@ -24,9 +24,9 @@ import android.app.Dialog;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -37,7 +37,7 @@ public class NewsReader {
     private static final String URL = "http://miku-nyan.github.io/Overchan-Android/news/1.html";
     
     public static void checkNews(final Activity activity) {
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+        Async.runAsync(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -70,6 +70,6 @@ public class NewsReader {
                     }
                 }
             }
-        }).start();
+        });
     }
 }

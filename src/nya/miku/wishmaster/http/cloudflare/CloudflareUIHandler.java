@@ -21,7 +21,7 @@ package nya.miku.wishmaster.http.cloudflare;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
@@ -96,7 +96,7 @@ import android.app.Activity;
                     handle(activity, cfTask, new InteractiveException.Callback() {
                 @Override
                 public void onSuccess() {
-                    PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                    Async.runAsync(new Runnable() {
                         @Override
                         public void run() {
                             String url = String.format(Locale.US, e.getCheckCaptchaUrlFormat(), Recaptcha2solved.pop(e.getRecaptchaPublicKey()));
@@ -117,7 +117,7 @@ import android.app.Activity;
                                 handleCloudflare(e, chan, activity, cfTask, callback);
                             }
                         }
-                    }).start();
+                    });
                 }
                 @Override
                 public void onError(String message) {

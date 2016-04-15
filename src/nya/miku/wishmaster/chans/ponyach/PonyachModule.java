@@ -78,10 +78,10 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.http.streamer.HttpRequestException;
@@ -218,7 +218,7 @@ public class PonyachModule extends AbstractWakabaModule {
                 });
                 passAuthProgressDialog.setCanceledOnTouchOutside(false);
                 passAuthProgressDialog.show();
-                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                Async.runAsync(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -242,7 +242,7 @@ public class PonyachModule extends AbstractWakabaModule {
                             passAuthProgressDialog.dismiss();
                         }
                     }
-                }).start();
+                });
                 return false;
             }
         });
@@ -543,12 +543,12 @@ public class PonyachModule extends AbstractWakabaModule {
                             public void onClick(View v) {
                                 dialog.dismiss();
                                 if (task.isCancelled()) return;
-                                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                                Async.runAsync(new Runnable() {
                                     @Override
                                     public void run() {
                                         handle(activity, task, callback);
                                     }
-                                }).start();
+                                });
                             }
                         });
                         mainLayout.addView(captchaView);
@@ -569,7 +569,7 @@ public class PonyachModule extends AbstractWakabaModule {
                                 public void onClick(final View v) {
                                     dialog.dismiss();
                                     if (task.isCancelled()) return;
-                                    PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                                    Async.runAsync(new Runnable() {
                                         @Override
                                         public void run() {
                                             String checkUrl = ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).getUsingUrl() +
@@ -609,7 +609,7 @@ public class PonyachModule extends AbstractWakabaModule {
                                                 handle(activity, task, callback);
                                             }
                                         }
-                                    }).start();
+                                    });
                                 }
                             });
                             answersLayout.addView(answer);

@@ -29,9 +29,9 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.SerializableBoardsList;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
@@ -428,7 +428,7 @@ public class BoardsListFragment extends Fragment implements AdapterView.OnItemCl
         }
         BoardsListGetter boardsListGetter = new BoardsListGetter(forceUpdate);
         currentTask = boardsListGetter;
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(boardsListGetter).start();
+        Async.runAsync(boardsListGetter);
     }
     
     private class BoardsListGetter extends CancellableTask.BaseCancellableTask implements Runnable {

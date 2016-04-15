@@ -30,7 +30,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
+import nya.miku.wishmaster.common.Async;
 
 public abstract class SimpleCaptchaException extends InteractiveException {
     private static final long serialVersionUID = 1L;
@@ -93,12 +93,12 @@ public abstract class SimpleCaptchaException extends InteractiveException {
                         public void onClick(View v) {
                             recaptchaDialog.dismiss();
                             if (task.isCancelled()) return;
-                            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                            Async.runAsync(new Runnable() {
                                 @Override
                                 public void run() {
                                     handle(activity, task, callback);
                                 }
-                            }).start();
+                            });
                         }
                     });
                 }

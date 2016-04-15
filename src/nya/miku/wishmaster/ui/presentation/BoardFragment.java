@@ -47,9 +47,9 @@ import nya.miku.wishmaster.api.util.PageLoaderFromChan;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.PagesCache;
 import nya.miku.wishmaster.cache.SerializablePage;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.ReadableContainer;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.lib.ClickableLinksTextView;
@@ -213,7 +213,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private URLSpanClickListener spanClickListener;
     private CancellableTask currentTask;
     private CancellableTask imagesDownloadTask = new CancellableTask.BaseCancellableTask();
-    private ExecutorService imagesDownloadExecutor = Executors.newFixedThreadPool(4, PriorityThreadFactory.LOW_PRIORITY_FACTORY);
+    private ExecutorService imagesDownloadExecutor = Executors.newFixedThreadPool(4, Async.LOW_PRIORITY_FACTORY);
     
     /** измеряется при вызове {@link #measureFloatingModels(LayoutInflater)} */
     private int postItemWidth = 0;
@@ -2304,7 +2304,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         PageGetter pageGetter = new PageGetter(forceUpdate, silent);
         currentTask = pageGetter;
         if (listLoaded) {
-            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(pageGetter).start();
+            Async.runAsync(pageGetter);
         } else {
             new Thread(pageGetter).start();
         }
@@ -3273,7 +3273,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             public void downloadSelected(final Runnable onFinish) {
                 final Dialog progressDialog = ProgressDialog.show(activity,
                         resources.getString(R.string.grid_gallery_dlg_title), resources.getString(R.string.grid_gallery_dlg_message), true, false);
-                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                Async.runAsync(new Runnable() {
                     @Override
                     public void run() {
                         boolean flag = false;
@@ -3291,7 +3291,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             }
                         });
                     }
-                }).start();
+                });
             }
         }
         
@@ -3443,7 +3443,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 progressDlg.setCanceledOnTouchOutside(false);
                 progressDlg.setMessage(resources.getString(R.string.dialog_delete_progress));
                 progressDlg.show();
-                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                Async.runAsync(new Runnable() {
                     @Override
                     public void run() {
                         String error = null;
@@ -3498,7 +3498,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             }
                         });
                     }
-                }).start();
+                });
             }
         };
         new AlertDialog.Builder(activity).
@@ -3537,7 +3537,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 progressDlg.setCanceledOnTouchOutside(false);
                 progressDlg.setMessage(resources.getString(R.string.dialog_report_progress));
                 progressDlg.show();
-                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                Async.runAsync(new Runnable() {
                     @Override
                     public void run() {
                         String error = null;
@@ -3592,7 +3592,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                             }
                         });
                     }
-                }).start();
+                });
             }
         };
         new AlertDialog.Builder(activity).

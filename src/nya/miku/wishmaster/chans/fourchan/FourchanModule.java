@@ -68,7 +68,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.interactive.SimpleCaptchaException;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
@@ -183,7 +183,7 @@ public class FourchanModule extends AbstractChanModule {
                 });
                 passAuthProgressDialog.setCanceledOnTouchOutside(false);
                 passAuthProgressDialog.show();
-                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                Async.runAsync(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -256,7 +256,7 @@ public class FourchanModule extends AbstractChanModule {
                             });
                         }
                     }
-                }).start();
+                });
                 return true;
             }
         });

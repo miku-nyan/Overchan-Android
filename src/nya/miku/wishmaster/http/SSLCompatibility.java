@@ -22,8 +22,8 @@ import java.lang.reflect.Method;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 
 public class SSLCompatibility {
     private static final String TAG = "SSLCompatibility";
@@ -35,7 +35,7 @@ public class SSLCompatibility {
      */
     public static void fixSSLs(final Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            workingThread = PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+            workingThread = Async.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
                 @Override
                 public void run() {
                     installProviderImpl(context);

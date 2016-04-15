@@ -21,9 +21,9 @@ package nya.miku.wishmaster.ui.settings;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.NewTabFragment;
@@ -89,7 +89,7 @@ public class PreferencesActivity extends PreferenceActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == DialogInterface.BUTTON_POSITIVE) {
                             final ProgressDialog progressDlg = ProgressDialog.show(PreferencesActivity.this, null, getString(R.string.dialog_wait));
-                            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                            Async.runAsync(new Runnable() {
                                 @Override
                                 public void run() {
                                     MainApplication.getInstance().fileCache.clearCache();
@@ -102,7 +102,7 @@ public class PreferencesActivity extends PreferenceActivity {
                                         }
                                     });
                                 }
-                            }).start();
+                            });
                         }
                     }
                 };
@@ -345,7 +345,7 @@ public class PreferencesActivity extends PreferenceActivity {
                             if (openPreference(key)) return;
                             updateChansScreen(chansCat);
                             //need wait for Root Adapter synchronization (it will be called from UI thread)
-                            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                            Async.runAsync(new Runnable() {
                                 @Override
                                 public void run() {
                                     try {
@@ -360,7 +360,7 @@ public class PreferencesActivity extends PreferenceActivity {
                                         Logger.e(TAG, e);
                                     }
                                 }
-                            }).start();
+                            });
                         }
                     }
                 };

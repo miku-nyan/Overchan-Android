@@ -46,10 +46,10 @@ import nya.miku.wishmaster.api.util.PageLoaderFromChan;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.FileCache;
 import nya.miku.wishmaster.cache.SerializablePage;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.WriteableContainer;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.ui.Attachments;
@@ -219,7 +219,7 @@ public class DownloadingService extends Service {
             nowTaskRunning = true;
             currentTask = new DownloadingTask(startId);
             sCurrentTask = currentTask;
-            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(currentTask).start();
+            Async.runAsync(currentTask);
         } else {
             Logger.d(TAG, "item added to download queue");
             if (progressNotifBuilder != null) {

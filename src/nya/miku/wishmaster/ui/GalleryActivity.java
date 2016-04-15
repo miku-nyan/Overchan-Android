@@ -43,10 +43,10 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.cache.BitmapCache;
 import nya.miku.wishmaster.cache.FileCache;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.containers.ReadableContainer;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.lib.gallery.FixedSubsamplingScaleImageView;
@@ -205,7 +205,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         inflater = getLayoutInflater();
         instantiatedViews = new SparseArray<View>();
         tnDownloadingTask = new CancellableTask.BaseCancellableTask();
-        tnDownloadingExecutor = Executors.newFixedThreadPool(4, PriorityThreadFactory.LOW_PRIORITY_FACTORY);
+        tnDownloadingExecutor = Executors.newFixedThreadPool(4, Async.LOW_PRIORITY_FACTORY);
         fileCache = MainApplication.getInstance().fileCache;
         bitmapCache = MainApplication.getInstance().bitmapCache;
         
@@ -679,7 +679,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         tag.downloadingTask = new AttachmentGetter(tag);
         tag.loadingView.setVisibility(View.VISIBLE);
         hideProgress();
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread((Runnable) tag.downloadingTask).start();
+        Async.runAsync((Runnable) tag.downloadingTask);
     }
     
     private class AttachmentGetter extends CancellableTask.BaseCancellableTask implements Runnable {
@@ -770,7 +770,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                                         AttachmentGetter.this.cancel();
                                     }
                                 });
-                                PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+                                Async.runAsync(new Runnable() {
                                     @Override
                                     public void run() {
                                         ((InteractiveException) e).handle(GalleryActivity.this, AttachmentGetter.this,
@@ -789,7 +789,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                                             }
                                         });
                                     }
-                                }).start();
+                                });
                             }
                         });
                     } else if (IOUtils.isENOSPC(e)) {

@@ -33,10 +33,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -71,7 +71,7 @@ public class CustomThemeListActivity extends ListActivity {
         
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = showProgressDialog(task);
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+        Async.runAsync(new Runnable() {
             @Override
             public void run() {
                 JSONArray r;
@@ -106,7 +106,7 @@ public class CustomThemeListActivity extends ListActivity {
                     }
                 });
             }
-        }).start();
+        });
     }
     
     @Override
@@ -124,7 +124,7 @@ public class CustomThemeListActivity extends ListActivity {
         final String url = URL_PATH + files.get(position);
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = showProgressDialog(task);
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+        Async.runAsync(new Runnable() {
             @Override
             public void run() {
                 String r;
@@ -153,7 +153,7 @@ public class CustomThemeListActivity extends ListActivity {
                     }
                 });
             }
-        }).start();
+        });
     }
     
     @Override

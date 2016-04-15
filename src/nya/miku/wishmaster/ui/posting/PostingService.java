@@ -24,9 +24,9 @@ import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.ui.MainActivity;
 import android.annotation.SuppressLint;
@@ -117,7 +117,7 @@ public class PostingService extends Service {
                 intent.getStringExtra(EXTRA_PAGE_HASH),
                 (SendPostModel) intent.getSerializableExtra(EXTRA_SEND_POST_MODEL),
                 (BoardModel) intent.getSerializableExtra(EXTRA_BOARD_MODEL));
-        PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(currentTask).start();
+        Async.runAsync(currentTask);
     }
     
     public class PostingTask extends CancellableTask.BaseCancellableTask implements Runnable {

@@ -22,9 +22,9 @@ import java.io.Serializable;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.common.PriorityThreadFactory;
 import nya.miku.wishmaster.http.client.ExtendedTrustManager;
 import nya.miku.wishmaster.lib.appcompat_v7_actionbartoogle.wrappers.ActionBarDrawerToogleCompat;
 import nya.miku.wishmaster.lib.appcompat_v7_actionbartoogle.wrappers.ActionBarDrawerToogleV4;
@@ -541,7 +541,7 @@ public class MainActivity extends FragmentActivity {
         MainApplication.getInstance().tabsSwitcher.currentFragment = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             // https://code.google.com/p/android/issues/detail?id=93731
-            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+            Async.runAsync(new Runnable() {
                 @Override
                 public void run() {
                     try { Thread.sleep(10); } catch (Exception e) {}
@@ -552,12 +552,12 @@ public class MainActivity extends FragmentActivity {
                         }
                     });
                 }
-            }).start();
+            });
         } else {
             final Intent i = new Intent(this.getIntent());
             this.finish();
             final Handler handler = new Handler();
-            PriorityThreadFactory.LOW_PRIORITY_FACTORY.newThread(new Runnable() {
+            Async.runAsync(new Runnable() {
                 @Override
                 public void run() {
                     //сначала должно уничтожиться старое activity; onDestroy() старого -> onCreate() нового
@@ -569,7 +569,7 @@ public class MainActivity extends FragmentActivity {
                         }
                     });
                 }
-            }).start();
+            });
         }
     }
     
