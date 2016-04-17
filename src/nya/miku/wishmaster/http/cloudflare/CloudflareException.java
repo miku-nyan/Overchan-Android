@@ -69,6 +69,7 @@ public class CloudflareException extends InteractiveException {
     public static CloudflareException antiDDOS(String url, String chanName) {
         CloudflareException e = new CloudflareException();
         e.url = url;
+        e.chanName = chanName;
         e.recaptcha = false;
         return e;
     }
