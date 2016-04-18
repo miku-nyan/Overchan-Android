@@ -70,7 +70,6 @@ public class CustomThemeHelper implements LayoutInflaterFactory {
         this.textColorPrimaryOverridden = textColorPrimaryOverridden;
         this.resources = context.getResources();
         this.inflater = LayoutInflater.from(context);
-        LayoutInflaterCompat.setFactory(inflater, this);
     }
     
     private final Object[] constructorArgs = new Object[2];
@@ -199,7 +198,9 @@ public class CustomThemeHelper implements LayoutInflaterFactory {
             Logger.e(TAG, e);
         }
         
-        currentInstance = new CustomThemeHelper(context, customAttrs, textColorPrimaryOriginal, textColorPrimaryOverridden);
+        CustomThemeHelper instance = new CustomThemeHelper(context, customAttrs, textColorPrimaryOriginal, textColorPrimaryOverridden);
+        LayoutInflaterCompat.setFactory(instance.inflater, instance);
+        currentInstance = instance;
     }
     
     private static void processWindow(Context context, SparseIntArray attrs, int textColorPrimaryOriginal, int textColorPrimaryOverridden) {
