@@ -26,6 +26,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.provider.BaseColumns;
@@ -338,8 +339,7 @@ public class FileCache {
         }
         
         public boolean isExists(String filename) {
-            Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, COL_FILENAME + " = ?",
-                    new String[] { filename }, null, null, null);
+            Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, COL_FILENAME + " = ?", new String[] { filename }, null, null, null);
             boolean result = false;
             if (c != null && c.moveToFirst()) result = true;
             if (c != null) c.close();
@@ -406,6 +406,20 @@ public class FileCache {
         }
         
         public long[] getSize() {
+            try {
+                return getSizeInternal();
+            } catch (SQLiteException e) {
+                if (e.getMessage() != null && e.getMessage().contains("no such table")) {
+                    Logger.e(TAG, "table in database not exists", e);
+                    resetDB();
+                    return getSizeInternal();
+                } else {
+                    throw e;
+                }
+            }
+        }
+        
+        private long[] getSizeInternal() {
             long[] result = new long[] { 0, 0 };
             Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, COL_FILESIZE + " = -1", null, null, null, null);
             if (c != null) {
