@@ -60,21 +60,7 @@ public class Serializer {
     
     private final FileCache fileCache;
     private final Kryo kryo;
-    
-    private class FileSerializer extends com.esotericsoftware.kryo.Serializer<java.io.File> {
-        @Override
-        public void write (Kryo kryo, Output output, File object) {
-            output.writeString(object.getPath());
-        }
-        @Override
-        public File read (Kryo kryo, Input input, Class<File> type) {
-            return new File(input.readString());
-        }
-    };
-    
-    private static boolean isHoneycomb() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR2;
-    }
+    private final Object kryoLock = new Object();
     
     /**
      * Конструктор
@@ -120,48 +106,38 @@ public class Serializer {
         this.kryo.register(java.io.File[].class, 26);
     }
     
-    private Object serializeLock = new Object();
-    private class SerializeTask implements Runnable {
-        private final String filename;
-        private final Object obj;
-        
-        public SerializeTask(String filename, Object obj) {
-            this.filename = filename;
-            this.obj = obj;
-        }
-        
-        @Override
-        public void run() {
-            synchronized (serializeLock) {
-                File file = fileCache.create(filename);
-                Output output = null;
-                try {
-                    output = isHoneycomb() ? new KryoOutputHC(new FileOutputStream(file)) : new Output(new FileOutputStream(file));
-                    kryo.writeObject(output, obj);
-                } catch (Exception e) {
-                    Logger.e(TAG, e);
-                } catch (OutOfMemoryError oom) {
-                    MainApplication.freeMemory();
-                    Logger.e(TAG, oom);
-                } finally {
-                    IOUtils.closeQuietly(output);
-                }
-                fileCache.put(file);
+    private void serialize(File file, Object obj) {
+        synchronized (kryoLock) {
+            Output output = null;
+            try {
+                output = createOutput(new FileOutputStream(file));
+                kryo.writeObject(output, obj);
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            } catch (OutOfMemoryError oom) {
+                MainApplication.freeMemory();
+                Logger.e(TAG, oom);
+            } finally {
+                IOUtils.closeQuietly(output);
             }
         }
     }
     
-    public void serialize(String filename, Object obj) {
-        serialize(filename, obj, true);
+    private void serialize(String filename, Object obj) {
+        synchronized (kryoLock) {
+            File file = fileCache.create(filename);
+            serialize(file, obj);
+            fileCache.put(file);
+        }
     }
     
-    public void serialize(String filename, Object obj, boolean async) {
-        Runnable task = new SerializeTask(filename, obj);
-        if (async) {
-            Async.runAsync(task);
-        } else {
-            task.run();
-        }
+    private void serializeAsync(final String filename, final Object obj) {
+        Async.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                serialize(filename, obj);
+            }
+        });
     }
     
     private <T> T deserialize(File file, Class<T> type) {
@@ -169,7 +145,7 @@ public class Serializer {
             return null;
         }
         
-        synchronized (serializeLock) {
+        synchronized (kryoLock) {
             Input input = null;
             try {
                 input = new Input(new FileInputStream(file));
@@ -195,8 +171,8 @@ public class Serializer {
         Async.runAsync(new Runnable() {
             @Override
             public void run() {
-                serialize(FileCache.TABS_FILENAME, state, false);
-                serialize(FileCache.TABS_FILENAME_2, state, false);
+                serialize(FileCache.TABS_FILENAME, state);
+                serialize(FileCache.TABS_FILENAME_2, state);
             }
         });
     }
@@ -222,7 +198,7 @@ public class Serializer {
     }
     
     public void serializePage(String hash, SerializablePage page) {
-        serialize(FileCache.PREFIX_PAGES + hash, page);
+        serializeAsync(FileCache.PREFIX_PAGES + hash, page);
     }
     
     public SerializablePage deserializePage(String hash) {
@@ -235,7 +211,7 @@ public class Serializer {
     }
     
     public void serializeBoardsList(String hash, SerializableBoardsList boardsList) {
-        serialize(FileCache.PREFIX_BOARDS + hash, boardsList);
+        serializeAsync(FileCache.PREFIX_BOARDS + hash, boardsList);
     }
     
     public SerializableBoardsList deserializeBoardsList(String hash) {
@@ -248,7 +224,7 @@ public class Serializer {
     }
     
     public void serializeDraft(String hash, SendPostModel draft) {
-        serialize(FileCache.PREFIX_DRAFTS + hash, draft);
+        serializeAsync(FileCache.PREFIX_DRAFTS + hash, draft);
     }
     
     public SendPostModel deserializeDraft(String hash) {
@@ -269,10 +245,10 @@ public class Serializer {
     
     
     public void savePage(OutputStream out, String title, UrlPageModel pageModel, SerializablePage page) {
-        synchronized (serializeLock) {
+        synchronized (kryoLock) {
             Output output = null;
             try {
-                output = isHoneycomb() ? new KryoOutputHC(out) : new Output(out);
+                output = createOutput(out);
                 output.writeString(title);
                 kryo.writeObject(output, pageModel);
                 kryo.writeObject(output, page);
@@ -283,7 +259,7 @@ public class Serializer {
     }
     
     public Pair<String, UrlPageModel> loadPageInfo(InputStream in) {
-        synchronized (serializeLock) {
+        synchronized (kryoLock) {
             Input input = null;
             try {
                 input = new Input(in);
@@ -297,7 +273,7 @@ public class Serializer {
     }
     
     public SerializablePage loadPage(InputStream in) {
-        synchronized (serializeLock) {
+        synchronized (kryoLock) {
             Input input = null;
             try {
                 input = new Input(in);
@@ -308,5 +284,24 @@ public class Serializer {
                 IOUtils.closeQuietly(input);
             }
         }
+    }
+    
+    private class FileSerializer extends com.esotericsoftware.kryo.Serializer<java.io.File> {
+        @Override
+        public void write (Kryo kryo, Output output, File object) {
+            output.writeString(object.getPath());
+        }
+        @Override
+        public File read (Kryo kryo, Input input, Class<File> type) {
+            return new File(input.readString());
+        }
+    }
+    
+    private static Output createOutput(OutputStream stream) {
+        return isHoneycomb() ? new KryoOutputHC(stream) : new Output(stream);
+    }
+    
+    private static boolean isHoneycomb() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR2;
     }
 }
