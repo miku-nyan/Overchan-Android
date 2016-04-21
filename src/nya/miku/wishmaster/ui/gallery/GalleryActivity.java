@@ -16,14 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.ui;
+package nya.miku.wishmaster.ui.gallery;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -34,21 +30,12 @@ import java.util.concurrent.Executors;
 import org.apache.commons.lang3.tuple.Triple;
 
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
-import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.cache.BitmapCache;
-import nya.miku.wishmaster.cache.FileCache;
 import nya.miku.wishmaster.common.Async;
-import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
-import nya.miku.wishmaster.common.MainApplication;
-import nya.miku.wishmaster.containers.ReadableContainer;
-import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.lib.gallery.FixedSubsamplingScaleImageView;
 import nya.miku.wishmaster.lib.gallery.JSWebView;
 import nya.miku.wishmaster.lib.gallery.Jpeg;
@@ -56,23 +43,22 @@ import nya.miku.wishmaster.lib.gallery.TouchGifView;
 import nya.miku.wishmaster.lib.gallery.WebViewFixed;
 import nya.miku.wishmaster.lib.gallery.verticalviewpager.VerticalViewPagerFixed;
 import nya.miku.wishmaster.lib.gifdrawable.GifDrawable;
-import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
+import nya.miku.wishmaster.ui.AppearanceUtils;
+import nya.miku.wishmaster.ui.Attachments;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
-import nya.miku.wishmaster.ui.presentation.PresentationModel;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
-import nya.miku.wishmaster.ui.tabs.TabModel;
-import nya.miku.wishmaster.ui.tabs.TabsState;
-import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import nya.miku.wishmaster.ui.theme.ThemeUtils;
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -82,7 +68,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -118,13 +107,14 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     public static final String EXTRA_PAGEHASH = "pagehash";
     public static final String EXTRA_LOCALFILENAME = "localfilename";
     
-    private DownloadingLocker downloadingLocker;
+    @SuppressLint("InlinedApi")
+    private static final int BINDING_FLAGS = Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT;
+    
     private LayoutInflater inflater;
-    private CancellableTask tnDownloadingTask;
     private ExecutorService tnDownloadingExecutor;
     
     private BoardModel boardModel;
-    private ReadableContainer localFile;
+    private String chan;
     
     private ProgressBar progressBar;
     private ViewPager viewPager;
@@ -132,16 +122,13 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private SparseArray<View> instantiatedViews;
     
     private BroadcastReceiver broadcastReceiver;
+    private ServiceConnection serviceConnection;
+    private GalleryRemote remote;
     
-    private ChanModule chan;
     private ApplicationSettings settings;
-    private FileCache fileCache;
-    private BitmapCache bitmapCache;
     private List<Triple<AttachmentModel, String, String>> attachments = null;
     private int currentPosition = 0;
     private int previousPosition = -1;
-    
-    private String customSubdir = null;
     
     private boolean firstScroll = true;
     
@@ -198,90 +185,40 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         progressListener.setProgress(1);
     }
     
+    private abstract class AbstractGetterCallback extends GalleryGetterCallback.Stub {
+        private final CancellableTask task;
+        public AbstractGetterCallback(CancellableTask task) {
+            this.task = task;
+        }
+        @Override
+        public boolean isTaskCancelled() throws RemoteException {
+            return task.isCancelled();
+        }
+        @Override
+        public void setProgress(long value) throws RemoteException {
+            progressListener.setProgress(value);
+        }
+        @Override
+        public void setProgressIndeterminate() throws RemoteException {
+            progressListener.setIndeterminate();
+        }
+        @Override
+        public void setProgressMaxValue(long value) throws RemoteException {
+            progressListener.setMaxValue(value);
+        }
+    }
+    
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) requestWindowFeature(Window.FEATURE_PROGRESS);
-        settings = MainApplication.getInstance().settings;
+        settings = new ApplicationSettings(PreferenceManager.getDefaultSharedPreferences(getApplication()), getResources());
         settings.getTheme().setTo(this, R.style.Transparent);
-        
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.setActionBarNoIcon(this);
         
-        downloadingLocker = MainApplication.getInstance().downloadingLocker;
         inflater = getLayoutInflater();
         instantiatedViews = new SparseArray<View>();
-        tnDownloadingTask = new CancellableTask.BaseCancellableTask();
         tnDownloadingExecutor = Executors.newFixedThreadPool(4, Async.LOW_PRIORITY_FACTORY);
-        fileCache = MainApplication.getInstance().fileCache;
-        bitmapCache = MainApplication.getInstance().bitmapCache;
-        
-        AttachmentModel attachment = (AttachmentModel) getIntent().getSerializableExtra(EXTRA_ATTACHMENT);
-        boardModel = (BoardModel) getIntent().getSerializableExtra(EXTRA_BOARDMODEL);
-        if (boardModel == null) return;
-        String pagehash = getIntent().getStringExtra(EXTRA_PAGEHASH);
-        String localFilename = getIntent().getStringExtra(EXTRA_LOCALFILENAME);
-        if (localFilename != null) {
-            try {
-                localFile = ReadableContainer.obtain(new File(localFilename));
-            } catch (Exception e) {
-                Logger.e(TAG, "cannot open local file", e);
-            }
-        }
-        
-        chan = MainApplication.getInstance().getChanModule(boardModel.chan);
-        PresentationModel presentationModel = MainApplication.getInstance().pagesCache.getPresentationModel(pagehash);
-        if (presentationModel != null) {
-            boolean isThread = presentationModel.source.pageModel.type == UrlPageModel.TYPE_THREADPAGE;
-            customSubdir = BoardFragment.getCustomSubdir(presentationModel.source.pageModel);
-            List<Triple<AttachmentModel, String, String>> list = presentationModel.getAttachments();
-            presentationModel = null;
-            if (list != null) {
-                int index = -1;
-                String attachmentHash = getIntent().getStringExtra(EXTRA_SAVED_ATTACHMENTHASH);
-                if (attachmentHash == null) attachmentHash = ChanModels.hashAttachmentModel(attachment);
-                for (int i=0; i<list.size(); ++i) {
-                    if (list.get(i).getMiddle().equals(attachmentHash)) {
-                        index = i;
-                        break;
-                    }
-                }
-                if (index != -1) {
-                    if (isThread) {
-                        attachments = list;
-                        currentPosition = index;
-                    } else {
-                        int leftOffset = 0, rightOffset = 0;
-                        String threadNumber = list.get(index).getRight();
-                        int it = index; while (it > 0 && list.get(--it).getRight().equals(threadNumber)) ++leftOffset;
-                        it = index; while (it < (list.size()-1) && list.get(++it).getRight().equals(threadNumber)) ++rightOffset;
-                        attachments = list.subList(index - leftOffset, index + rightOffset + 1);
-                        currentPosition = leftOffset;
-                    }
-                }
-            }
-        } else /* if (presentationModel == null) */ {
-            final String savedHash = savedInstanceState != null ? savedInstanceState.getString(EXTRA_SAVED_ATTACHMENTHASH) : null;
-            if (savedHash != null) registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    if (intent.getAction() != null && intent.getAction().equals(BoardFragment.BROADCAST_PAGE_LOADED)) {
-                        unregisterReceiver(this);
-                        broadcastReceiver = null;
-                        
-                        Intent activityIntent = getIntent();
-                        String pagehash = activityIntent.getStringExtra(EXTRA_PAGEHASH);
-                        if (pagehash != null && MainApplication.getInstance().pagesCache.getPresentationModel(pagehash) != null) {
-                            startActivity(activityIntent.putExtra(EXTRA_SAVED_ATTACHMENTHASH, savedHash));
-                            finish();
-                        }
-                    }
-                }
-            }, new IntentFilter(BoardFragment.BROADCAST_PAGE_LOADED));
-        }
-        if (attachments == null) {
-            attachments = Collections.singletonList(Triple.of(attachment, ChanModels.hashAttachmentModel(attachment), (String)null));
-            currentPosition = 0;
-        }
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && settings.fullscreenGallery()) {
             setContentView(R.layout.gallery_layout_fullscreen);
@@ -289,26 +226,77 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         } else {
             setContentView(R.layout.gallery_layout);
         }
+        
         progressBar = (ProgressBar) findViewById(android.R.id.progress);
         progressBar.setMax(Window.PROGRESS_END);
         viewPager = (ViewPager) findViewById(R.id.gallery_viewpager);
         navigationInfo = (TextView) findViewById(R.id.gallery_navigation_info);
         for (int id : new int[] { R.id.gallery_navigation_previous, R.id.gallery_navigation_next }) findViewById(id).setOnClickListener(this);
-        viewPager.setAdapter(new GalleryAdapter());
-        viewPager.setCurrentItem(currentPosition);
-        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        
+        bindService(new Intent(this, GalleryBackend.class), new ServiceConnection() {
+            { serviceConnection = this; }
+            
             @Override
-            public void onPageSelected(int position) {
-                currentPosition = position;
-                updateItem();
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                GalleryBinder galleryBinder = GalleryBinder.Stub.asInterface(service);
+                try {
+                    GalleryInitData initData = new GalleryInitData(getIntent(), savedInstanceState);
+                    boardModel = initData.boardModel;
+                    chan = boardModel.chan;
+                    GalleryInitResult init = galleryBinder.initContext(initData);
+                    remote = new GalleryRemote(galleryBinder, init.contextId);
+                    attachments = init.attachments;
+                    currentPosition = init.initPosition;
+                    if (init.shouldWaitForPageLoaded) waitForPageLoaded(savedInstanceState);
+                    
+                    viewPager.setAdapter(new GalleryAdapter());
+                    viewPager.setCurrentItem(currentPosition);
+                    viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                        @Override
+                        public void onPageSelected(int position) {
+                            currentPosition = position;
+                            updateItem();
+                        }
+                    });
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                    finish();
+                }
             }
-        });
+            
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                Logger.e(TAG, "backend service disconnected");
+                remote = null;
+                System.exit(0);
+            }
+        }, BINDING_FLAGS);
     }
     
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(EXTRA_SAVED_ATTACHMENTHASH, attachments.get(currentPosition).getMiddle());
+    }
+    
+    private void waitForPageLoaded(Bundle savedInstanceState) {
+        final String savedHash = savedInstanceState != null ? savedInstanceState.getString(EXTRA_SAVED_ATTACHMENTHASH) : null;
+        if (savedHash != null) registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction() != null && intent.getAction().equals(BoardFragment.BROADCAST_PAGE_LOADED)) {
+                    unregisterReceiver(this);
+                    broadcastReceiver = null;
+                    
+                    Intent activityIntent = getIntent();
+                    String pagehash = activityIntent.getStringExtra(EXTRA_PAGEHASH);
+                    if (pagehash != null && remote.isPageLoaded(pagehash)) {
+                        startActivity(activityIntent.putExtra(EXTRA_SAVED_ATTACHMENTHASH, savedHash));
+                        finish();
+                    }
+                }
+            }
+        }, new IntentFilter(BoardFragment.BROADCAST_PAGE_LOADED));
     }
     
     @Override
@@ -321,7 +309,6 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (tnDownloadingTask != null) tnDownloadingTask.cancel();
         if (instantiatedViews != null) {
             for (int i=0; i<instantiatedViews.size(); ++i) {
                 View v = instantiatedViews.valueAt(i);
@@ -333,14 +320,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 }
             }
         }
-        if (localFile != null) {
-            try {
-                if (localFile != null) localFile.close();
-            } catch (Exception e) {
-                Logger.e(TAG, "cannot close local file", e);
-            }
-        }
         tnDownloadingExecutor.shutdown();
+        if (serviceConnection != null) unbindService(serviceConnection);
     }
     
     @Override
@@ -437,7 +418,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private GalleryItemViewTag getCurrentTag() {
         View current = instantiatedViews.get(currentPosition);
         if (current == null) {
-            Logger.e(TAG, "VIEW == NULL");
+            Logger.e(TAG, "VIEW == NULL (position=" + currentPosition + ")");
             return null;
         }
         return (GalleryItemViewTag) current.getTag();
@@ -452,7 +433,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         if (DownloadingService.isInQueue(queueItem)) {
             Toast.makeText(this, getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
         } else {
-            if (new File(new File(settings.getDownloadDirectory(), chan.getChanName()), fileName).exists()) {
+            if (new File(new File(settings.getDownloadDirectory(), chan), fileName).exists()) {
                 Toast.makeText(this, getString(R.string.notification_download_already_exists, fileName), Toast.LENGTH_LONG).show();
             } else {
                 Intent downloadIntent = new Intent(this, DownloadingService.class);
@@ -549,24 +530,30 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private void shareLink() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
+        String absoluteUrl = remote.getAbsoluteUrl(tag.attachmentModel.path);
+        if (absoluteUrl == null) return;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, chan.fixRelativeUrl(tag.attachmentModel.path));
-        shareIntent.putExtra(Intent.EXTRA_TEXT, chan.fixRelativeUrl(tag.attachmentModel.path));
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, absoluteUrl);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, absoluteUrl);
         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_via)));
     }
     
     private void openGoogle() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
-        String googleUrl = "http://www.google.com/searchbyimage?image_url=" + chan.fixRelativeUrl(tag.attachmentModel.path);
+        String absoluteUrl = remote.getAbsoluteUrl(tag.attachmentModel.path);
+        if (absoluteUrl == null) return;
+        String googleUrl = "http://www.google.com/searchbyimage?image_url=" + absoluteUrl;
         UrlHandler.launchExternalBrowser(this, googleUrl);
     }
     
     private void openBrowser() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
-        UrlHandler.launchExternalBrowser(this, chan.fixRelativeUrl(tag.attachmentModel.path));
+        String absoluteUrl = remote.getAbsoluteUrl(tag.attachmentModel.path);
+        if (absoluteUrl == null) return;
+        UrlHandler.launchExternalBrowser(this, absoluteUrl);
     }
     
     private class GalleryAdapter extends PagerAdapter {
@@ -608,7 +595,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             instantiatedViews.put(position, v);
             
             String hash = tag.attachmentHash;
-            Bitmap bmp = bitmapCache.getFromMemory(hash);
+            Bitmap bmp = remote.getBitmapFromMemory(hash);
             if (bmp != null) {
                 tag.thumbnailView.setImageBitmap(bmp);
             } else {
@@ -616,7 +603,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             }
             if (settings.swipeToCloseGallery()) v = VerticalViewPagerFixed.wrap(v, finishCallback, settings.fullscreenGallery());
             container.addView(v);
-            if (firstTime) {
+            if (firstTime && position == currentPosition) {
                 updateItem();
                 firstTime = false;
             }
@@ -646,14 +633,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             
             @Override
             public void run() {
-                Bitmap bmp = bitmapCache.getFromCache(hash);
-                if (bmp == null && localFile != null) {
-                    bmp = bitmapCache.getFromContainer(hash, localFile);
-                }
-                if (bmp == null && url != null && url.length() != 0) {
-                    bmp = bitmapCache.download(hash, url, getResources().getDimensionPixelSize(R.dimen.post_thumbnail_size), chan, tnDownloadingTask);
-                }
-                if (tnDownloadingTask.isCancelled()) return;
+                Bitmap bmp = remote.getBitmap(hash, url);
                 if (bmp != null) {
                     View v = instantiatedViews.get(position);
                     if (v != null) {
@@ -673,24 +653,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         }
     }
     
-    private void tryScrollParent(String attachmentHash) {
-        try {
-            TabsState tabsState = MainApplication.getInstance().tabsState;
-            TabsSwitcher tabsSwitcher = MainApplication.getInstance().tabsSwitcher;
-            if (tabsSwitcher.currentFragment instanceof BoardFragment) {
-                TabModel tab = tabsState.findTabById(tabsSwitcher.currentId);
-                if (tab != null && tab.pageModel != null && tab.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
-                    ((BoardFragment) tabsSwitcher.currentFragment).scrollToItem(attachmentHash);
-                }
-            }
-        } catch (Exception e) {
-            Logger.e(TAG, e);
-        }
-    }
-    
     private void updateItem() {
         AttachmentModel attachment = attachments.get(currentPosition).getLeft();
-        if (settings.scrollThreadFromGallery() && !firstScroll) tryScrollParent(attachments.get(currentPosition).getRight());
+        if (settings.scrollThreadFromGallery() && !firstScroll) remote.tryScrollParent(attachments.get(currentPosition).getRight());
         firstScroll = false;
         String navText = attachment.size == -1 ? (currentPosition + 1) + "/" + attachments.size() :
                 (currentPosition + 1) + "/" + attachments.size() + " (" + Attachments.getAttachmentSizeString(attachment, getResources()) + ")";
@@ -736,114 +701,32 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 showError(tag, getString(R.string.gallery_error_incorrect_attachment));
                 return;
             }
-            File file = fileCache.get(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + Attachments.getAttachmentExtention(tag.attachmentModel));
-            if (file != null) {
-                String filename = file.getAbsolutePath();
-                while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
-                if (isCancelled()) return;
-            }
-            if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
-                File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
-                file = new File(dir, Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
-                String filename = file.getAbsolutePath();
-                while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
-                if (isCancelled()) return;
-            }
-            if (customSubdir != null) {
-                if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
-                    File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
-                    dir = new File(dir, customSubdir);
-                    file = new File(dir, Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel));
-                    String filename = file.getAbsolutePath();
-                    while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
-                    if (isCancelled()) return;
-                }
-            }
-            if (!file.exists() || file.isDirectory() || file.length() == 0) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        tag.loadingView.setVisibility(View.VISIBLE);
-                    }
-                });
-                file = fileCache.create(FileCache.PREFIX_ORIGINALS + tag.attachmentHash + Attachments.getAttachmentExtention(tag.attachmentModel));
-                String filename = file.getAbsolutePath();
-                while (!downloadingLocker.lock(filename)) downloadingLocker.waitUnlock(filename);
-                InputStream fromLocal = null;
-                OutputStream out = null;
-                boolean success = false;
-                try {
-                    out = new FileOutputStream(file);
-                    String localName = DownloadingService.ORIGINALS_FOLDER + "/" +
-                            Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel);
-                    if (localFile != null && localFile.hasFile(localName)) {
-                        fromLocal = IOUtils.modifyInputStream(localFile.openStream(localName), null, this);
-                        IOUtils.copyStream(fromLocal, out);
-                    } else {
-                        chan.downloadFile(tag.attachmentModel.path, out, progressListener, this);
-                    }
-                    fileCache.put(file);
-                    success = true;
-                } catch (final Exception e) {
-                    if (isCancelled()) return;
+            final String[] exception = new String[1];
+            File file = remote.getAttachment(new GalleryAttachmentInfo(tag.attachmentModel, tag.attachmentHash), new AbstractGetterCallback(this) {
+                @Override
+                public void showLoading() {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (isCancelled()) return;
-                            hideProgress();
+                            tag.loadingView.setVisibility(View.VISIBLE);
                         }
                     });
-                    if (e instanceof InteractiveException) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (isCancelled()) return;
-                                String cfMessage = getString(R.string.error_interactive_dialog_format, ((InteractiveException)e).getServiceName());
-                                final ProgressDialog cfProgressDialog = ProgressDialog.show(
-                                        GalleryActivity.this, null, cfMessage, true, true, new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        String m = getString(R.string.error_interactive_cancelled_format, ((InteractiveException)e).getServiceName());
-                                        showError(tag, m);
-                                        AttachmentGetter.this.cancel();
-                                    }
-                                });
-                                Async.runAsync(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        ((InteractiveException) e).handle(GalleryActivity.this, AttachmentGetter.this,
-                                                new InteractiveException.Callback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                if (isCancelled()) return;
-                                                cfProgressDialog.dismiss();
-                                                updateItem();
-                                            }
-                                            @Override
-                                            public void onError(String message) {
-                                                if (isCancelled()) return;
-                                                cfProgressDialog.dismiss();
-                                                showError(tag, message);
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    } else if (IOUtils.isENOSPC(e)) {
-                        showError(tag, getString(R.string.error_no_space));
-                    } else {
-                        showError(tag, e.getMessage());
-                    }
-                    return;
-                } finally {
-                    IOUtils.closeQuietly(fromLocal);
-                    IOUtils.closeQuietly(out);
-                    if (file != null && !success) file.delete();
-                    downloadingLocker.unlock(filename);
                 }
-            }
+                @Override
+                public void onException(String message) {
+                    exception[0] = message;
+                }
+                @Override
+                public void onInteractiveException(GalleryInteractiveExceptionHolder holder) {
+                    //TODO
+                }
+            });
+            
             if (isCancelled()) return;
+            if (file == null) {
+                showError(tag, exception[0]);
+                return;
+            }
             tag.file = file;
             runOnUiThread(new Runnable() {
                 @Override
@@ -1313,7 +1196,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     tag.loadingView.setVisibility(View.GONE);
                     tag.layout.setVisibility(View.VISIBLE);
                 } catch (OutOfMemoryError oom) {
-                    MainApplication.freeMemory();
+                    System.gc();
                     Logger.e(TAG, oom);
                     if (!oomFlag) {
                         oomFlag = true;

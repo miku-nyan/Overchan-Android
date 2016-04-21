@@ -48,6 +48,8 @@ import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -245,10 +247,27 @@ public class MainApplication extends Application {
         return externalCacheDir != null ? externalCacheDir : getCacheDir();
     }
     
+    private String getProcessName() {
+        int myPid = android.os.Process.myPid();
+        for (RunningAppProcessInfo process : ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getRunningAppProcesses()) {
+            if (myPid == process.pid) return process.processName;
+        }
+        return null;
+    }
+    
+    private boolean isGalleryProcess() {
+        try {
+            return getProcessName().endsWith(":Gallery");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
     @Override
     public void onCreate() {
         super.onCreate();
         if (ACRAConstants.ACRA_ENABLED) ACRA.init(this);
+        if (isGalleryProcess()) return;
         initObjects();
         instance = this;
     }

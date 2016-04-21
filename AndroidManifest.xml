@@ -203,9 +203,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:configChanges="keyboardHidden|orientation|screenSize" />
         
         <activity
-            android:name="nya.miku.wishmaster.ui.GalleryActivity"
+            android:name="nya.miku.wishmaster.ui.gallery.GalleryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/Transparent" />
+            android:theme="@style/Transparent"
+            android:process=":Gallery" />
         
         <activity
             android:name="nya.miku.wishmaster.ui.posting.PostingProgressActivity"
@@ -248,6 +249,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <service android:name="nya.miku.wishmaster.ui.posting.PostingService" />
         <service android:name="nya.miku.wishmaster.ui.downloading.DownloadingService" />
         <service android:name="nya.miku.wishmaster.ui.tabs.TabsTrackerService" />
+        <service android:name="nya.miku.wishmaster.ui.gallery.GalleryBackend" />
         
     </application>
 

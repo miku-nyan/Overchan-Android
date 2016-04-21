@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.ui;
+package nya.miku.wishmaster.ui.gallery;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -32,6 +32,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.common.Async;
+import nya.miku.wishmaster.ui.AppearanceUtils;
 import nya.miku.wishmaster.ui.theme.ThemeUtils;
 
 public class GalleryFullscreen {
