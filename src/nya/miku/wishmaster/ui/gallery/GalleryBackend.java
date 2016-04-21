@@ -136,6 +136,7 @@ public class GalleryBackend extends Service {
         public String getAttachment(int contextId, GalleryAttachmentInfo attachment, GalleryGetterCallback callback) {
             try {
                 File file = contexts.get(contextId).getFile(attachment.hash, attachment.attachment, callback);
+                if (file == null) return null;
                 return file.getPath();
             } catch (Exception e) {
                 Logger.e(TAG, e);

@@ -110,6 +110,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     @SuppressLint("InlinedApi")
     private static final int BINDING_FLAGS = Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT;
     
+    private static final int REQUEST_HANDLE_INTERACTIVE_EXCEPTION = 1;
+    
     private LayoutInflater inflater;
     private ExecutorService tnDownloadingExecutor;
     
@@ -653,6 +655,11 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         }
     }
     
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_HANDLE_INTERACTIVE_EXCEPTION && resultCode == RESULT_OK) updateItem();
+    }
+    
     private void updateItem() {
         AttachmentModel attachment = attachments.get(currentPosition).getLeft();
         if (settings.scrollThreadFromGallery() && !firstScroll) remote.tryScrollParent(attachments.get(currentPosition).getRight());
@@ -718,7 +725,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 }
                 @Override
                 public void onInteractiveException(GalleryInteractiveExceptionHolder holder) {
-                    //TODO
+                    if (holder.e == null) return;
+                    exception[0] = getString(R.string.error_interactive_cancelled_format, holder.e.getServiceName());
+                    startActivityForResult(new Intent(GalleryActivity.this, GalleryInteractiveExceptionHandler.class).
+                            putExtra(GalleryInteractiveExceptionHandler.EXTRA_INTERACTIVE_EXCEPTION, holder.e), REQUEST_HANDLE_INTERACTIVE_EXCEPTION);
                 }
             });
             

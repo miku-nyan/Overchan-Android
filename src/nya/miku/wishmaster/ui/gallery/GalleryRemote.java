@@ -63,7 +63,9 @@ public class GalleryRemote {
     
     public File getAttachment(GalleryAttachmentInfo attachment, GalleryGetterCallback callback) {
         try {
-            return new File(binder.getAttachment(contextId, attachment, callback));
+            String path = binder.getAttachment(contextId, attachment, callback);
+            if (path == null) return null;
+            return new File(path);
         } catch (Exception e) {
             Logger.e(TAG, e);
             return null;

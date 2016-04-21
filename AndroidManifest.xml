@@ -209,6 +209,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:process=":Gallery" />
         
         <activity
+            android:name="nya.miku.wishmaster.ui.gallery.GalleryInteractiveExceptionHandler"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/Transparent" />
+        
+        <activity
             android:name="nya.miku.wishmaster.ui.posting.PostingProgressActivity"
             android:theme="@style/Theme_Dialog_Switch"
             android:launchMode="singleTask" />
