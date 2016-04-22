@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -135,7 +136,7 @@ public class DownloadingService extends Service {
         super.onCreate();
         downloadingQueue = new LinkedBlockingQueue<DownloadingQueueItem>();
         sQueue = downloadingQueue;
-        binder = new DownloadingServiceBinder();
+        binder = new DownloadingServiceBinder(this);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         settings = MainApplication.getInstance().settings;
         fileCache = MainApplication.getInstance().fileCache;
@@ -916,22 +917,34 @@ public class DownloadingService extends Service {
         }
     }
     
-    public class DownloadingServiceBinder extends Binder {
+    public static class DownloadingServiceBinder extends Binder {
+        private final WeakReference<DownloadingService> service;
+        private DownloadingServiceBinder(DownloadingService service) {
+            this.service = new WeakReference<>(service);
+        }
         public void cancel() {
-            if (currentTask != null) currentTask.cancel();
-            if (!downloadingQueue.isEmpty()) downloadingQueue.clear();
+            DownloadingService service = this.service.get();
+            if (service == null) return;
+            if (service.currentTask != null) service.currentTask.cancel();
+            if (!service.downloadingQueue.isEmpty()) service.downloadingQueue.clear();
         }
         public int getCurrentProgress() {
-            if (currentTask == null) return -1; 
-            return currentTask.getCurrentProgress();
+            DownloadingService service = this.service.get();
+            if (service == null) return -1;
+            if (service.currentTask == null) return -1; 
+            return service.currentTask.getCurrentProgress();
         }
         public int getQueueSize() {
-            if (downloadingQueue == null) return 0;
-            return downloadingQueue.size();
+            DownloadingService service = this.service.get();
+            if (service == null) return 0;
+            if (service.downloadingQueue == null) return 0;
+            return service.downloadingQueue.size();
         }
         public String getCurrentItemName() {
-            if (currentTask == null) return null;
-            return currentTask.getCurrentItemName();
+            DownloadingService service = this.service.get();
+            if (service == null) return null;
+            if (service.currentTask == null) return null;
+            return service.currentTask.getCurrentItemName();
         }
     }
 }

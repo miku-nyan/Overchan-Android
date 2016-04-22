@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,7 +83,7 @@ public class GalleryBackend extends Service {
         fileCache = MainApplication.getInstance().fileCache;
         bitmapCache = MainApplication.getInstance().bitmapCache;
         contexts = new ArrayList<>();
-        binder = new MyBinder().asBinder();
+        binder = new MyBinder(this).asBinder();
     }
     
     @Override
@@ -105,7 +106,12 @@ public class GalleryBackend extends Service {
         return binder;
     }
     
-    private class MyBinder extends GalleryBinder.Stub {
+    private static class MyBinder extends GalleryBinder.Stub {
+        private final WeakReference<GalleryBackend> service;
+        private MyBinder(GalleryBackend service) {
+            this.service = new WeakReference<>(service);
+        }
+        
         @Override
         public boolean isPageLoaded(String pagehash) {
             return MainApplication.getInstance().pagesCache.getPresentationModel(pagehash) != null;
@@ -113,29 +119,41 @@ public class GalleryBackend extends Service {
         
         @Override
         public GalleryInitResult initContext(GalleryInitData initData) {
-            GalleryContext context = new GalleryContext();
+            GalleryBackend service = this.service.get();
+            if (service == null) return null;
+            
+            GalleryContext context = service.new GalleryContext();
             GalleryInitResult result = context.init(initData);
-            synchronized (contexts) {
-                result.contextId = contexts.size();
-                contexts.add(context);
+            synchronized (service.contexts) {
+                result.contextId = service.contexts.size();
+                service.contexts.add(context);
             }
             return result;
         }
         
         @Override
         public Bitmap getBitmapFromMemory(int contextId, String hash) {
-            return contexts.get(contextId).getBitmapFromMemory(hash);
+            GalleryBackend service = this.service.get();
+            if (service == null) return null;
+            
+            return service.contexts.get(contextId).getBitmapFromMemory(hash);
         }
         
         @Override
         public Bitmap getBitmap(int contextId, String hash, String url) {
-            return contexts.get(contextId).getBitmap(hash, url);
+            GalleryBackend service = this.service.get();
+            if (service == null) return null;
+            
+            return service.contexts.get(contextId).getBitmap(hash, url);
         }
         
         @Override
         public String getAttachment(int contextId, GalleryAttachmentInfo attachment, GalleryGetterCallback callback) {
+            GalleryBackend service = this.service.get();
+            if (service == null) return null;
+            
             try {
-                File file = contexts.get(contextId).getFile(attachment.hash, attachment.attachment, callback);
+                File file = service.contexts.get(contextId).getFile(attachment.hash, attachment.attachment, callback);
                 if (file == null) return null;
                 return file.getPath();
             } catch (Exception e) {
@@ -146,12 +164,18 @@ public class GalleryBackend extends Service {
         
         @Override
         public String getAbsoluteUrl(int contextId, String url) {
-            return contexts.get(contextId).getAbsoluteUrl(url);
+            GalleryBackend service = this.service.get();
+            if (service == null) return null;
+            
+            return service.contexts.get(contextId).getAbsoluteUrl(url);
         }
         
         @Override
         public void tryScrollParent(int contextId, String postNumber) {
-            contexts.get(contextId).tryScrollParent(postNumber);
+            GalleryBackend service = this.service.get();
+            if (service == null) return;
+            
+            service.contexts.get(contextId).tryScrollParent(postNumber);
         }
     }
     

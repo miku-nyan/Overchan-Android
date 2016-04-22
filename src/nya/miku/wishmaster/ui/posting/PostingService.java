@@ -29,6 +29,9 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.ui.MainActivity;
+
+import java.lang.ref.WeakReference;
+
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -82,7 +85,7 @@ public class PostingService extends Service {
     @Override
     public void onCreate() {
       super.onCreate();
-      binder = new PostingServiceBinder();
+      binder = new PostingServiceBinder(this);
       notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
       Logger.d(TAG, "created posting service");
     }
@@ -303,13 +306,21 @@ public class PostingService extends Service {
         }
     }
     
-    public class PostingServiceBinder extends Binder {
+    public static class PostingServiceBinder extends Binder {
+        private final WeakReference<PostingService> service;
+        private PostingServiceBinder(PostingService service) {
+            this.service = new WeakReference<>(service);
+        }
         public void cancel() {
-            if (currentTask != null) currentTask.cancel();
+            PostingService service = this.service.get();
+            if (service == null) return;
+            if (service.currentTask != null) service.currentTask.cancel();
         }
         public int getCurrentProgress() {
-            if (currentTask == null) return -1;
-            return currentTask.getCurrentProgress();
+            PostingService service = this.service.get();
+            if (service == null) return -1;
+            if (service.currentTask == null) return -1;
+            return service.currentTask.getCurrentProgress();
         }
     }
 }
