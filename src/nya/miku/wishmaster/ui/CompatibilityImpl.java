@@ -28,7 +28,6 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -175,8 +174,13 @@ public class CompatibilityImpl {
     }
     
     @TargetApi(Build.VERSION_CODES.FROYO)
-    public static File getExternalCacheDir(ContextWrapper context) {
+    public static File getExternalCacheDir(Context context) {
         return context.getExternalCacheDir();
+    }
+    
+    @TargetApi(Build.VERSION_CODES.FROYO)
+    public static File getExternalFilesDir(Context context) {
+        return context.getExternalFilesDir(null);
     }
     
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

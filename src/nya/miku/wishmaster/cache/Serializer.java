@@ -44,6 +44,7 @@ import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsIdStack;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import android.os.Build;
+import android.support.v4.util.AtomicFile;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -59,6 +60,7 @@ public class Serializer {
     private static final String TAG = "Serializer";
     
     private final FileCache fileCache;
+    private final AtomicFile tabsStateFile;
     private final Kryo kryo;
     private final Object kryoLock = new Object();
     
@@ -68,6 +70,7 @@ public class Serializer {
      */
     public Serializer(FileCache fileCache) {
         this.fileCache = fileCache;
+        this.tabsStateFile = new AtomicFile(new File(fileCache.getFilesDirectory(), FileCache.TABS_FILENAME));
         
         this.kryo = new Kryo();
         this.kryo.setReferences(false);
@@ -106,8 +109,9 @@ public class Serializer {
         this.kryo.register(java.io.File[].class, 26);
     }
     
-    private void serialize(File file, Object obj) {
+    private void serialize(String filename, Object obj) {
         synchronized (kryoLock) {
+            File file = fileCache.create(filename);
             Output output = null;
             try {
                 output = createOutput(new FileOutputStream(file));
@@ -120,13 +124,6 @@ public class Serializer {
             } finally {
                 IOUtils.closeQuietly(output);
             }
-        }
-    }
-    
-    private void serialize(String filename, Object obj) {
-        synchronized (kryoLock) {
-            File file = fileCache.create(filename);
-            serialize(file, obj);
             fileCache.put(file);
         }
     }
@@ -165,36 +162,6 @@ public class Serializer {
     
     public <T> T deserialize(String fileName, Class<T> type) {
         return deserialize(fileCache.get(fileName), type);
-    }
-    
-    public void serializeTabsState(final TabsState state) {
-        Async.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                serialize(FileCache.TABS_FILENAME, state);
-                serialize(FileCache.TABS_FILENAME_2, state);
-            }
-        });
-    }
-    
-    public TabsState deserializeTabsState() {
-        File file1 = fileCache.getImmediately(FileCache.TABS_FILENAME);
-        File file2 = fileCache.getImmediately(FileCache.TABS_FILENAME_2);
-        File[] files;
-        if (file1 == null && file2 == null) files = new File[0];
-        else if (file1 == null) files = new File[] { file2 };
-        else if (file2 == null) files = new File[] { file1 };
-        else files = file1.lastModified() > file2.lastModified() ? new File[] { file2, file1 } : new File[] { file1, file2 };
-        
-        for (File file : files) {
-            try {
-                TabsState obj = deserialize(file, TabsState.class); 
-                if (obj != null && obj.tabsArray != null && obj.tabsIdStack != null) return obj;
-            } catch (Exception e) {
-                Logger.e(TAG, e);
-            }
-        }
-        return TabsState.obtainDefault();
     }
     
     public void serializePage(String hash, SerializablePage page) {
@@ -243,6 +210,46 @@ public class Serializer {
         }
     }
     
+    public void serializeTabsState(final TabsState state) {
+        Async.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (kryoLock) {
+                    FileOutputStream fileStream = null;
+                    try {
+                        fileStream = tabsStateFile.startWrite();
+                        Output output = createOutput(fileStream);
+                        kryo.writeObject(output, state);
+                        output.flush();
+                        tabsStateFile.finishWrite(fileStream);
+                    } catch (Exception|OutOfMemoryError e) {
+                        if (e instanceof OutOfMemoryError) MainApplication.freeMemory();
+                        Logger.e(TAG, e);
+                        tabsStateFile.failWrite(fileStream);
+                    }
+                }
+            }
+        });
+    }
+    
+    public TabsState deserializeTabsState() {
+        synchronized (kryoLock) {
+            Input input = null;
+            try {
+                input = new Input(tabsStateFile.openRead());
+                TabsState obj = kryo.readObject(input, TabsState.class);
+                if (obj != null && obj.tabsArray != null && obj.tabsIdStack != null) return obj;
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            } catch (OutOfMemoryError e) {
+                MainApplication.freeMemory();
+                Logger.e(TAG, e);
+            } finally {
+                IOUtils.closeQuietly(input);
+            }
+        }
+        return TabsState.obtainDefault();
+    }
     
     public void savePage(OutputStream out, String title, UrlPageModel pageModel, SerializablePage page) {
         synchronized (kryoLock) {

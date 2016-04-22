@@ -19,6 +19,10 @@
 package nya.miku.wishmaster.cache;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -29,8 +33,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.BaseColumns;
+import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.ui.CompatibilityImpl;
 
 /**
  * Общий файловый кэш (LRU)
@@ -47,16 +55,17 @@ public class FileCache {
     /*package*/ static final String PREFIX_DRAFTS = "draft_";
     
     /*package*/ static final String PREFIX_BOARDS = "boards_"; //не удаляются никогда
+    
     /** имя файла для состояния вкладок */
-    /*package*/ static final String TABS_FILENAME = "tabsstate"; //не удаляется никогда
-    /** имя файла для состояния вкладок (копия) */
-    /*package*/ static final String TABS_FILENAME_2 = "tabsstate_2"; //не удаляется никогда
+    /*package*/ static final String TABS_FILENAME = "tabsstate"; //хранятся в отдельной директории (не кэш)
     
-    private static final String NOMEDIA = ".nomedia";
+    private static final String NOMEDIA = ".nomedia"; //не удаляется никогда
     
-    private static final float PAGES_QUOTE = 0.1f;
+    private static final float PAGES_QUOTA = 0.1f;
     
     private final FileCacheDB database;
+    
+    private final File filesDirectory;
     
     private final File directory;
     private long maxSize;
@@ -70,13 +79,14 @@ public class FileCache {
     
     /**
      * Конструктор
-     * @param directory директория кэша
+     * @param context контекст приложения
      * @param maxSize максимальный размер в байтах (0 - неограниченный)
-     * @param dbContext контекст для доступа к базе данных
      */
-    public FileCache(File directory, final long maxSize, Context dbContext) {
-        this.directory = directory;
-        this.database = new FileCacheDB(dbContext);
+    public FileCache(Context context, final long maxSize) {
+        this.filesDirectory = getAvailableFilesDir(context);
+        this.directory = getAvailableCacheDir(context);
+        this.database = new FileCacheDB(context);
+        transferTabsState(); //legacy
         makeDir();
         makeNomedia();
         
@@ -127,7 +137,7 @@ public class FileCache {
     
     private void setMaxSizeValues(long maxSize) {
         this.maxSize = maxSize;
-        this.maxPagesSize = (long) (maxSize * PAGES_QUOTE);
+        this.maxPagesSize = (long) (maxSize * PAGES_QUOTA);
     }
     
     /**
@@ -160,6 +170,14 @@ public class FileCache {
     }
     
     /**
+     * Получить директорию для хранения файлов (не являющуюся кэшем).
+     * Данная директория не очищается вместе с кэшем, её размер не контролируется.
+     */
+    public File getFilesDirectory() {
+        return filesDirectory;
+    }
+    
+    /**
      * Получить файл из кэша
      * @param fileName имя файла
      * @return полученный файл, если файл существует, или null, если файл отсутствует
@@ -175,15 +193,6 @@ public class FileCache {
             }
             return null;
         }
-    }
-    
-    /**
-     * Получить файл из кэша немедленно (даже если кэш не инициализирован), но время доступа не обновляется, ни в базе данных, ни в файловой системе.
-     */
-    File getImmediately(String fileName) {
-        File file = pathToFile(fileName);
-        if (file.exists() && !file.isDirectory()) return file;
-        return null;
     }
     
     /**
@@ -306,7 +315,7 @@ public class FileCache {
     }
     
     private static boolean isUndeletable(String filename) {
-        return filename.equals(TABS_FILENAME) || filename.equals(TABS_FILENAME_2) || filename.startsWith(PREFIX_BOARDS) || filename.equals(NOMEDIA);
+        return filename.startsWith(PREFIX_BOARDS) || filename.equals(NOMEDIA);
     }
     
     private static boolean isPageFile(File file) {
@@ -503,4 +512,62 @@ public class FileCache {
         }
     }
     
+    private static File getAvailableCacheDir(Context context) {
+        File externalCacheDir = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+            externalCacheDir = CompatibilityImpl.getExternalCacheDir(context);
+        } else if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            externalCacheDir = new File(Environment.getExternalStorageDirectory(), "/Android/data/" + context.getPackageName() + "/cache/");
+        }
+        return externalCacheDir != null ? externalCacheDir : context.getCacheDir();
+    }
+    
+    private static File getAvailableFilesDir(Context context) {
+        File externalFilesDir = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+            externalFilesDir = CompatibilityImpl.getExternalFilesDir(context);
+        } else if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            externalFilesDir = new File(Environment.getExternalStorageDirectory(), "/Android/data/" + context.getPackageName() + "/files/");
+        }
+        return externalFilesDir != null ? externalFilesDir : context.getFilesDir();
+    }
+    
+    private void transferTabsState() {
+        File to = new File(filesDirectory, TABS_FILENAME);
+        if (to.exists()) return;
+        
+        File from;
+        File file1 = new File(directory, "tabsstate");
+        File file2 = new File(directory, "tabsstate_2");
+        boolean file1Exists = file1.exists() && !file1.isDirectory();
+        boolean file2Exists = file2.exists() && !file2.isDirectory();
+        if (!file1Exists && !file2Exists) return;
+        else if (!file1Exists) from = file2;
+        else if (!file2Exists) from = file1;
+        else from = file1.lastModified() > file2.lastModified() ? file2 : file1;
+        copyFile(from, to);
+        try {
+            if (file1Exists && file1.delete()) database.remove("tabsstate");
+            if (file2Exists && file2.delete()) database.remove("tabsstate_2");
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+    }
+    
+    private static void copyFile(File from, File to) {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            File parent = to.getParentFile();
+            if (!parent.exists() || !parent.isDirectory()) parent.mkdirs();
+            in = new FileInputStream(from);
+            out = new FileOutputStream(to);
+            IOUtils.copyStream(in, out);
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        } finally {
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(out);
+        }
+    }
 }

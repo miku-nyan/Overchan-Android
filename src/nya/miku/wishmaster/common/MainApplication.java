@@ -18,7 +18,6 @@
 
 package nya.miku.wishmaster.common;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +36,6 @@ import nya.miku.wishmaster.http.SSLCompatibility;
 import nya.miku.wishmaster.http.client.ExtendedTrustManager;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
-import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
@@ -53,8 +51,6 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.os.Build;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 
 /**
@@ -219,7 +215,7 @@ public class MainApplication extends Application {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         resources = this.getResources();
         settings = new ApplicationSettings(preferences, resources);
-        fileCache = new FileCache(getAvailableCacheDir(), settings.getMaxCacheSize(), this);
+        fileCache = new FileCache(this, settings.getMaxCacheSize());
         serializer = new Serializer(fileCache);
         tabsState = serializer.deserializeTabsState();
         tabsSwitcher = new TabsSwitcher();
@@ -235,16 +231,6 @@ public class MainApplication extends Application {
         registerChanModules();
         
         Wifi.register(this);
-    }
-    
-    private File getAvailableCacheDir() {
-        File externalCacheDir = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-            externalCacheDir = CompatibilityImpl.getExternalCacheDir(this);
-        } else if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            externalCacheDir = new File(Environment.getExternalStorageDirectory(), "/Android/data/" + getPackageName() + "/cache/");
-        }
-        return externalCacheDir != null ? externalCacheDir : getCacheDir();
     }
     
     private String getProcessName() {
