@@ -28,7 +28,6 @@ import android.os.Parcelable;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 
 public class GalleryInitResult implements Parcelable {
-    public int contextId;
     public List<Triple<AttachmentModel, String, String>> attachments;
     public int initPosition;
     public boolean shouldWaitForPageLoaded;
@@ -37,7 +36,6 @@ public class GalleryInitResult implements Parcelable {
     }
     
     public GalleryInitResult(Parcel parcel) {
-        contextId = parcel.readInt();
         initPosition = parcel.readInt();
         shouldWaitForPageLoaded = parcel.readInt() == 1;
         int n = parcel.readInt();
@@ -60,7 +58,6 @@ public class GalleryInitResult implements Parcelable {
     
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(contextId);
         dest.writeInt(initPosition);
         dest.writeInt(shouldWaitForPageLoaded ? 1 : 0);
         dest.writeInt(attachments.size());
@@ -82,6 +79,22 @@ public class GalleryInitResult implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
+    }
+    
+    public int getParcelSize() {
+        int total = 12;
+        for (Triple<AttachmentModel, String, String> tuple : attachments) {
+            total += 40;
+            AttachmentModel attachment = tuple.getLeft();
+            String hash = tuple.getMiddle();
+            String post = tuple.getRight();
+            if (attachment.thumbnail != null) total += attachment.thumbnail.length()*2;
+            if (attachment.path != null) total += attachment.path.length()*2;
+            if (attachment.originalName != null) total += attachment.originalName.length()*2;
+            if (hash != null) total += hash.length()*2;
+            if (post != null) total += post.length()*2;
+        }
+        return total;
     }
     
     public static final Parcelable.Creator<GalleryInitResult> CREATOR = new Parcelable.Creator<GalleryInitResult>() {

@@ -25,7 +25,8 @@ import nya.miku.wishmaster.ui.gallery.GalleryInitData;
 import nya.miku.wishmaster.ui.gallery.GalleryInitResult;
 
 interface GalleryBinder {
-    GalleryInitResult initContext(in GalleryInitData initData);
+    int initContext(in GalleryInitData initData);
+    GalleryInitResult getInitResult(int contextId);
     Bitmap getBitmapFromMemory(int contextId, String hash);
     Bitmap getBitmap(int contextId, String hash, String url);
     String getAttachment(int contextId, in GalleryAttachmentInfo attachment, GalleryGetterCallback callback);

@@ -20,6 +20,7 @@ package nya.miku.wishmaster.ui.gallery;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -245,11 +246,16 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                     GalleryInitData initData = new GalleryInitData(getIntent(), savedInstanceState);
                     boardModel = initData.boardModel;
                     chan = boardModel.chan;
-                    GalleryInitResult init = galleryBinder.initContext(initData);
-                    remote = new GalleryRemote(galleryBinder, init.contextId);
-                    attachments = init.attachments;
-                    currentPosition = init.initPosition;
-                    if (init.shouldWaitForPageLoaded) waitForPageLoaded(savedInstanceState);
+                    remote = new GalleryRemote(galleryBinder, galleryBinder.initContext(initData));
+                    GalleryInitResult initResult = remote.getInitResult();
+                    if (initResult != null) {
+                        attachments = initResult.attachments;
+                        currentPosition = initResult.initPosition;
+                        if (initResult.shouldWaitForPageLoaded) waitForPageLoaded(savedInstanceState);
+                    } else {
+                        attachments = Collections.singletonList(Triple.of(initData.attachment, initData.attachmentHash, (String)null));
+                        currentPosition = 0;
+                    }
                     
                     viewPager.setAdapter(new GalleryAdapter());
                     viewPager.setCurrentItem(currentPosition);

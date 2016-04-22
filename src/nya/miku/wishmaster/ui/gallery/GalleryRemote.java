@@ -34,6 +34,20 @@ public class GalleryRemote {
         this.contextId = contextId;
     }
     
+    public GalleryInitResult getInitResult() {
+        try {
+            GalleryInitResult result = binder.getInitResult(contextId);
+            if (result == null || result.attachments == null) {
+                Logger.e(TAG, "returned null");
+                return null;
+            }
+            return result;
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            return null;
+        }
+    }
+    
     public boolean isPageLoaded(String pagehash) {
         try {
             return binder.isPageLoaded(pagehash);

@@ -118,17 +118,25 @@ public class GalleryBackend extends Service {
         }
         
         @Override
-        public GalleryInitResult initContext(GalleryInitData initData) {
+        public int initContext(GalleryInitData initData) {
+            int result = -1;
+            GalleryBackend service = this.service.get();
+            if (service != null) {
+                GalleryContext context = service.new GalleryContext(initData);
+                synchronized (service.contexts) {
+                    result = service.contexts.size();
+                    service.contexts.add(context);
+                }
+            }
+            return result;
+        }
+        
+        @Override
+        public GalleryInitResult getInitResult(int contextId) {
             GalleryBackend service = this.service.get();
             if (service == null) return null;
             
-            GalleryContext context = service.new GalleryContext();
-            GalleryInitResult result = context.init(initData);
-            synchronized (service.contexts) {
-                result.contextId = service.contexts.size();
-                service.contexts.add(context);
-            }
-            return result;
+            return service.contexts.get(contextId).getInitResult();
         }
         
         @Override
@@ -184,9 +192,10 @@ public class GalleryBackend extends Service {
         private String customSubdir;
         private BoardModel boardModel;
         private ReadableContainer localFile;
+        private GalleryInitResult initResult;
         
-        public GalleryInitResult init(GalleryInitData initData) {
-            GalleryInitResult result = new GalleryInitResult();
+        public GalleryContext(GalleryInitData initData) {
+            initResult = new GalleryInitResult();
             boardModel = initData.boardModel;
             chan = MainApplication.getInstance().getChanModule(boardModel.chan);
             
@@ -218,27 +227,32 @@ public class GalleryBackend extends Service {
                     }
                     if (index != -1) {
                         if (isThread) {
-                            result.attachments = list;
-                            result.initPosition = index;
+                            initResult.attachments = list;
+                            initResult.initPosition = index;
                         } else {
                             int leftOffset = 0, rightOffset = 0;
                             String threadNumber = list.get(index).getRight();
                             int it = index; while (it > 0 && list.get(--it).getRight().equals(threadNumber)) ++leftOffset;
                             it = index; while (it < (list.size()-1) && list.get(++it).getRight().equals(threadNumber)) ++rightOffset;
-                            result.attachments = list.subList(index - leftOffset, index + rightOffset + 1);
-                            result.initPosition = leftOffset;
+                            initResult.attachments = list.subList(index - leftOffset, index + rightOffset + 1);
+                            initResult.initPosition = leftOffset;
                         }
                     }
                 }
             } else {
-                result.shouldWaitForPageLoaded = true;
+                initResult.shouldWaitForPageLoaded = true;
             }
             
-            if (result.attachments == null) {
-                result.attachments = Collections.singletonList(
+            if (initResult.attachments == null) {
+                initResult.attachments = Collections.singletonList(
                         Triple.of(initData.attachment, ChanModels.hashAttachmentModel(initData.attachment), (String)null));
-                result.initPosition = 0;
+                initResult.initPosition = 0;
             }
+        }
+        
+        public GalleryInitResult getInitResult() {
+            GalleryInitResult result = initResult;
+            initResult = null;
             return result;
         }
         
