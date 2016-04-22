@@ -125,7 +125,8 @@ public class DownloadingService extends Service {
     private static Queue<DownloadingQueueItem> sQueue;
     
     public static boolean isInQueue(DownloadingQueueItem item) {
-        if (sCurrentTask != null && sCurrentTask.getCurrentItem() != null && sCurrentTask.getCurrentItem().equals(item)) {
+        DownloadingTask currentTask = sCurrentTask;
+        if (currentTask != null && currentTask.getCurrentItem() != null && currentTask.getCurrentItem().equals(item)) {
             return true;
         }
         return sQueue != null && sQueue.contains(item);
@@ -148,6 +149,7 @@ public class DownloadingService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        sCurrentTask = null;
         Logger.d(TAG, "destroyed downloading service");
     }
     
