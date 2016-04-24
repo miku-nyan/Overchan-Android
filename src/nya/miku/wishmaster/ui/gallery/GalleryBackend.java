@@ -338,7 +338,7 @@ public class GalleryBackend extends Service {
                 } finally {
                     IOUtils.closeQuietly(fromLocal);
                     IOUtils.closeQuietly(out);
-                    if (file != null && !success) file.delete();
+                    if (file != null && !success) fileCache.abort(file);
                     downloadingLocker.unlock(filename);
                 }
             }

@@ -617,6 +617,7 @@ public class DownloadingService extends Service {
                                         String curFilename = cur.getAbsolutePath();
                                         while (!downloadingLocker.lock(curFilename)) downloadingLocker.waitUnlock(curFilename);
                                         if (isCancelled()) {
+                                            fileCache.abort(cur);
                                             downloadingLocker.unlock(curFilename);
                                             throw new Exception();
                                         }
@@ -641,7 +642,7 @@ public class DownloadingService extends Service {
                                         } finally {
                                             if (out != null) IOUtils.closeQuietly(out);
                                             if (!success && cur != null) {
-                                                cur.delete();
+                                                fileCache.abort(cur);
                                                 cur = null;
                                             }
                                             downloadingLocker.unlock(curFilename);

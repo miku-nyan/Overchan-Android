@@ -258,7 +258,7 @@ public class BitmapCache {
                 Logger.e(TAG, e);
             } finally {
                 IOUtils.closeQuietly(fileStream);
-                if (!success && file != null) file.delete();
+                if (!success && file != null) fileCache.abort(file);
             }
             return bmp;
             

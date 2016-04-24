@@ -197,7 +197,8 @@ public class FileCache {
     
     /**
      * Создать объект для нового файла (если файл с таким именем уже присутствует в кэше, он удаляется).
-     * По окончании действий с файлом (после окончания записи) необходимо вызвать метод {@link #put(File)}, чтобы учесть размер нового файла.
+     * По окончании действий с файлом (после окончания записи) необходимо вызвать метод {@link #put(File)}, чтобы учесть размер нового файла,
+     * или метод {@link #abort(File)}, чтобы отменить создание файла (удалить файл и запись о нём). 
      * Действия при работе с файлами (при необходимости) нужно синхронизировать дополнительно.  
      * @param fileName имя файла
      * @return объект типа {@link File}
@@ -226,6 +227,18 @@ public class FileCache {
             if (isPageFile(file)) pagesSize += file.length();
             database.put(file.getName(), file.length());
             trim();
+        }
+    }
+    
+    /**
+     * Отменить создание файла, удалить файл и запись в базе данных.
+     * @param file объект типа {@link File}
+     */
+    public void abort(File file) {
+        ensureInitialized();
+        synchronized (this) {
+            file.delete();
+            database.remove(file.getName());
         }
     }
     
