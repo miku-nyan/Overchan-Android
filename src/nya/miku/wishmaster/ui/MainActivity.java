@@ -762,13 +762,30 @@ public class MainActivity extends FragmentActivity {
     
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && onBack()) {
-            return true;
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT && focusActionBar()) {
-            return true;
-        } else { 
-            return super.onKeyDown(keyCode, event);
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (true) { //TODO в соответствии с настройками
+                    try {
+                        Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                        if (currentFragment instanceof BoardFragment) {
+                            BoardFragment boardFragment = (BoardFragment) currentFragment;
+                            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) boardFragment.scrollUp(); else boardFragment.scrollDown();
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        Logger.e(TAG, e);
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_BACK:
+                if (onBack()) return true;
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (focusActionBar()) return true;
+                break;
         }
+        return super.onKeyDown(keyCode, event);
     }
     
     private boolean onBack() {

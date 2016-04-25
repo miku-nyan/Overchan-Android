@@ -1795,11 +1795,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 if (params.height != ViewGroup.LayoutParams.WRAP_CONTENT) return;
                                 params.height = tag.commentView.getHeight() + margin;
                                 tag.commentView.setLayoutParams(params);
-                                
-                                ListView listView = fragment().listView;
-                                View topView = listView.getChildAt(0);
-                                int top = topView.getTop();
-                                listView.setSelectionFromTop(listView.getPositionForView(topView), top - margin);
+                                fragment().scrollDown();
                                 
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                                     final int selectionStart = tag.commentView.getSelectionStart();
@@ -1812,11 +1808,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                                 if (params.height != ViewGroup.LayoutParams.WRAP_CONTENT) return;
                                                 params.height = tag.commentView.getHeight() + margin;
                                                 tag.commentView.setLayoutParams(params);
-                                                
-                                                ListView listView = fragment().listView;
-                                                View topView = listView.getChildAt(0);
-                                                int top = topView.getTop();
-                                                listView.setSelectionFromTop(listView.getPositionForView(topView), top - margin);
+                                                fragment().scrollDown();
                                                 
                                                 AppearanceUtils.callWhenLoaded(tag.commentView, new Runnable() {
                                                     @Override
@@ -2407,6 +2399,30 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     break;
                 }
             }
+        }
+    }
+    
+    /**
+     * Проскроллить список вверх на 50 dp
+     */
+    public void scrollUp() {
+        scroll(true);
+    }
+    
+    /**
+     * Проскроллить список вниз на 50 dp
+     */
+    public void scrollDown() {
+        scroll(false);
+    }
+    
+    private void scroll(boolean up) {
+        if (listLoaded) {
+            int step = (int) (50 * resources.getDisplayMetrics().density + 0.5f);
+            View v = listView.getChildAt(0);
+            int position = listView.getPositionForView(v);
+            int top = v.getTop();
+            listView.setSelectionFromTop(position, top + step * (up ? 1 : -1));
         }
     }
     
