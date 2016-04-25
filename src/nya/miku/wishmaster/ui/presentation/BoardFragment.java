@@ -1773,14 +1773,41 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     CompatibilityImpl.setCustomSelectionActionModeMenuCallback(tag.commentView,
                             R.string.context_menu_reply_with_quote,
                             ThemeUtils.getActionbarIcon(fragment().activity.getTheme(), fragment().resources, R.attr.actionAddPost),
-                            new Runnable() {
+                            new CompatibilityImpl.CustomSelectionActionModeCallback() {
                         @Override
-                        public void run() {
+                        public void onClick() {
                             try {
                                 int start = tag.commentView.getSelectionStart();
                                 int end = tag.commentView.getSelectionEnd();
                                 String quote = tag.commentView.getText().subSequence(start, end).toString();
                                 fragment().openReply(tag.position, true, quote);
+                            } catch (Exception e) {
+                                Logger.e(TAG, e);
+                            }
+                        }
+                        @Override
+                        public void onCreate() {
+                            try {
+                                if (tag.position != getCount() - 1) return;
+                                BoardFragment thisFragment = fragment();
+                                int margin = (int) (50 * thisFragment.resources.getDisplayMetrics().density + 0.5f);
+                                ViewGroup.LayoutParams params = tag.commentView.getLayoutParams();
+                                params.height = tag.commentView.getHeight() + margin;
+                                tag.commentView.setLayoutParams(params);
+                                ListView listView = thisFragment.listView;
+                                View topView = listView.getChildAt(0);
+                                int top = topView.getTop();
+                                listView.setSelectionFromTop(listView.getPositionForView(topView), top - margin);
+                            } catch (Exception e) {
+                                Logger.e(TAG, e);
+                            }
+                        }
+                        @Override
+                        public void onDestroy() {
+                            try {
+                                ViewGroup.LayoutParams params = tag.commentView.getLayoutParams();
+                                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                                tag.commentView.setLayoutParams(params);
                             } catch (Exception e) {
                                 Logger.e(TAG, e);
                             }

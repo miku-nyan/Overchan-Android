@@ -136,12 +136,20 @@ public class CompatibilityImpl {
         }
     }
     
+    public static interface CustomSelectionActionModeCallback {
+        void onCreate();
+        void onClick();
+        void onDestroy();
+    }
+    
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static void setCustomSelectionActionModeMenuCallback(TextView textView, final int titleRes, final Drawable icon, final Runnable callback) {
+    public static void setCustomSelectionActionModeMenuCallback(TextView textView, final int titleRes, final Drawable icon,
+            final CustomSelectionActionModeCallback callback) {
         textView.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 try {
+                    callback.onCreate();
                     setShowAsActionAlways(menu.add(Menu.NONE, 1, Menu.FIRST, titleRes).setIcon(icon));
                     menu.removeItem(android.R.id.selectAll);
                     return true;
@@ -156,7 +164,7 @@ public class CompatibilityImpl {
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 if (item.getItemId() == 1) {
-                    callback.run();
+                    callback.onClick();
                     mode.finish();
                     return true;
                 }
@@ -164,6 +172,7 @@ public class CompatibilityImpl {
             }
             @Override
             public void onDestroyActionMode(ActionMode mode) {
+                callback.onDestroy();
             }
         });
     }
