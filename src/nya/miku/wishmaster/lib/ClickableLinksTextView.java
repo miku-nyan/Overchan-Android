@@ -19,6 +19,7 @@ import android.widget.TextView;
 /**
  * Исправленный TextView, корректно работающий с Spanned текстом со ссылками и поддерживает выделение текста.
  * Класс взят из проекта 2ch Browser, с минимальными изменениями.
+ * + исправлена работа с Android 6.0 (API 23)
  * см. также http://stackoverflow.com/questions/14862750/textview-that-is-linkified-and-selectable
  * 
  */
@@ -81,6 +82,16 @@ public class ClickableLinksTextView extends JellyBeanSpanFixTextView {
             performLongClick.invoke(this.mBaseEditor, false);
         } catch (Exception e) {
             Logger.e(TAG, e);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                Method startSelectionActionMode = this.mBaseEditor.getClass().getDeclaredMethod("startSelectionActionMode");
+                startSelectionActionMode.setAccessible(true);
+                startSelectionActionMode.invoke(this.mBaseEditor);
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            }
         }
     }
 
