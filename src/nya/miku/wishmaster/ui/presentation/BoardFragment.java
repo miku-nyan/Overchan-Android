@@ -99,6 +99,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Layout;
+import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -1789,15 +1790,52 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         public void onCreate() {
                             try {
                                 if (tag.position != getCount() - 1) return;
-                                BoardFragment thisFragment = fragment();
-                                int margin = (int) (50 * thisFragment.resources.getDisplayMetrics().density + 0.5f);
+                                final int margin = (int) (50 * fragment().resources.getDisplayMetrics().density + 0.5f);
                                 ViewGroup.LayoutParams params = tag.commentView.getLayoutParams();
+                                if (params.height != ViewGroup.LayoutParams.WRAP_CONTENT) return;
                                 params.height = tag.commentView.getHeight() + margin;
                                 tag.commentView.setLayoutParams(params);
-                                ListView listView = thisFragment.listView;
+                                
+                                ListView listView = fragment().listView;
                                 View topView = listView.getChildAt(0);
                                 int top = topView.getTop();
                                 listView.setSelectionFromTop(listView.getPositionForView(topView), top - margin);
+                                
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                                    final int selectionStart = tag.commentView.getSelectionStart();
+                                    final int selectionEnd = tag.commentView.getSelectionEnd();
+                                    AppearanceUtils.callWhenLoaded(tag.commentView, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                ViewGroup.LayoutParams params = tag.commentView.getLayoutParams();
+                                                if (params.height != ViewGroup.LayoutParams.WRAP_CONTENT) return;
+                                                params.height = tag.commentView.getHeight() + margin;
+                                                tag.commentView.setLayoutParams(params);
+                                                
+                                                ListView listView = fragment().listView;
+                                                View topView = listView.getChildAt(0);
+                                                int top = topView.getTop();
+                                                listView.setSelectionFromTop(listView.getPositionForView(topView), top - margin);
+                                                
+                                                AppearanceUtils.callWhenLoaded(tag.commentView, new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        try {
+                                                            tag.commentView.startSelection();
+                                                            Selection.setSelection(
+                                                                    (Spannable) tag.commentView.getText(), selectionStart, selectionEnd);
+                                                        } catch (Exception e) {
+                                                            Logger.e(TAG, e);
+                                                        }
+                                                    }
+                                                });
+                                            } catch (Exception e) {
+                                                Logger.e(TAG, e);
+                                            }
+                                        }
+                                    });
+                                }
                             } catch (Exception e) {
                                 Logger.e(TAG, e);
                             }
