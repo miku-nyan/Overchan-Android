@@ -493,6 +493,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Запит перед відкриттям лінків назовні</string>
     <string name="pref_do_not_close_tabs_title">Не закривати вкладки</string>
     <string name="pref_do_not_close_tabs_summary">Дія кнопки Назад</string>
+    <string name="pref_scroll_volume_buttons_title">Прокрутка кнопками гучності</string>
+    <string name="pref_scroll_volume_buttons_summary">Використовувати кнопки гучності для прокрутки сторінки</string>
     <string name="pref_preferences_submenu_title">Меню опцій</string>
     <string name="pref_preferences_submenu_summary">Показувати деякі опції в меню програми</string>
     <string name="pref_pin_markup_title">Закріпити кнопки розмітки</string>

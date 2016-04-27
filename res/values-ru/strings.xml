@@ -490,6 +490,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Спрашивать, прежде чем открывать внешние ссылки</string>
     <string name="pref_do_not_close_tabs_title">Не закрывать вкладки</string>
     <string name="pref_do_not_close_tabs_summary">Не закрывать вкладки по нажатию кнопки Назад</string>
+    <string name="pref_scroll_volume_buttons_title">Прокрутка кнопками громкости</string>
+    <string name="pref_scroll_volume_buttons_summary">Использовать кнопки громкости для прокрутки страницы</string>
     <string name="pref_preferences_submenu_title">Меню настроек</string>
     <string name="pref_preferences_submenu_summary">Показывать некоторые настройки в меню приложения</string>
     <string name="pref_pin_markup_title">Закрепить кнопки разметки</string>

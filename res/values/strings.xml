@@ -482,6 +482,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_external_links_confirmation_summary">Ask before going external links</string>
     <string name="pref_do_not_close_tabs_title">Do not close tabs</string>
     <string name="pref_do_not_close_tabs_summary">Do not close tabs by pressing the Back button</string>
+    <string name="pref_scroll_volume_buttons_title">Scroll with volume buttons</string>
+    <string name="pref_scroll_volume_buttons_summary">Use volume buttons for page scrolling</string>
     <string name="pref_preferences_submenu_title">Preferences menu</string>
     <string name="pref_preferences_submenu_summary">Show some preferences in the application menu</string>
     <string name="pref_pin_markup_title">Pin markup buttons</string>

@@ -765,7 +765,7 @@ public class MainActivity extends FragmentActivity {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                if (true) { //TODO в соответствии с настройками
+                if (settings.scrollVolumeButtons) {
                     try {
                         Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
                         if (currentFragment instanceof BoardFragment) {

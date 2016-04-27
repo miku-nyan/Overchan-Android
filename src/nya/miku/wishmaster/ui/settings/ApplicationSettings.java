@@ -381,6 +381,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_do_not_close_tabs), false);
     }
     
+    public boolean scrollVolumeButtons() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_scroll_volume_buttons), false);
+    }
+    
     public boolean preferencesSubmenu() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_preferences_submenu), false);
     }
@@ -437,6 +441,7 @@ public class ApplicationSettings {
         public boolean showHiddenItems;
         public boolean maskPictures;
         public boolean hideActionBar;
+        public boolean scrollVolumeButtons;
     }
 
     public void updateStaticSettings(StaticSettingsContainer container) {
@@ -448,6 +453,7 @@ public class ApplicationSettings {
         container.showHiddenItems = showHiddenItems();
         container.maskPictures = maskPictures();
         container.hideActionBar = hideActionBar();
+        container.scrollVolumeButtons = scrollVolumeButtons();
     }
     
 }
