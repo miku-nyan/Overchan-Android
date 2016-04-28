@@ -52,7 +52,7 @@ public class CustomThemeHelper implements LayoutInflaterFactory {
     private static final Class<?>[] CONSTRUCTOR_SIGNATURE = new Class[] { Context.class, AttributeSet.class };
     private static final HashMap<String, Constructor<? extends View>> CONSTRUCTOR_MAP = new HashMap<>();
     
-    private static CustomThemeHelper currentInstance = null;
+    private static SparseIntArray currentAttrs = null;
     
     private final Resources resources;
     private final LayoutInflater inflater;
@@ -182,7 +182,7 @@ public class CustomThemeHelper implements LayoutInflaterFactory {
     
     public static void setCustomTheme(Context context, SparseIntArray customAttrs) {
         if (customAttrs == null || customAttrs.size() == 0) {
-            currentInstance = null;
+            currentAttrs = null;
             return;
         }
         
@@ -200,7 +200,7 @@ public class CustomThemeHelper implements LayoutInflaterFactory {
         
         CustomThemeHelper instance = new CustomThemeHelper(context, customAttrs, textColorPrimaryOriginal, textColorPrimaryOverridden);
         LayoutInflaterCompat.setFactory(instance.inflater, instance);
-        currentInstance = instance;
+        currentAttrs = customAttrs;
     }
     
     private static void processWindow(Context context, SparseIntArray attrs, int textColorPrimaryOriginal, int textColorPrimaryOverridden) {
@@ -329,8 +329,8 @@ public class CustomThemeHelper implements LayoutInflaterFactory {
     }
     
     public static boolean resolveAttribute(int attrId, TypedValue outValue) {
-        if (currentInstance == null) return false;
-        SparseIntArray customAttrs = currentInstance.customAttrs;
+        SparseIntArray customAttrs = currentAttrs;
+        if (customAttrs == null) return false;
         int index = customAttrs.indexOfKey(attrId);
         if (index < 0) return false;
         outValue.type = TypedValue.TYPE_INT_COLOR_ARGB8;
