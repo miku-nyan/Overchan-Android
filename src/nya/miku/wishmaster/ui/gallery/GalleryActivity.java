@@ -279,6 +279,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 System.exit(0);
             }
         }, BINDING_FLAGS);
+        
+        GalleryExceptionHandler.init();
     }
     
     @Override
