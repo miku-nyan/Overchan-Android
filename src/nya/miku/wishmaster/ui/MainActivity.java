@@ -94,6 +94,7 @@ public class MainActivity extends FragmentActivity {
     private float rootViewWeight = 0;
     private boolean tabsPanelRight;
     private boolean openSpoilers;
+    private boolean highlightSubscriptions;
     private boolean isHorizontalOrientation;
     private boolean isPaused = false;
     private boolean isDestroyed = false;
@@ -251,12 +252,12 @@ public class MainActivity extends FragmentActivity {
                 return true;
             case R.id.menu_sub_settings_suspend:
                 Toast.makeText(this, R.string.notification_suspend, Toast.LENGTH_LONG).show();
-                if (TabsTrackerService.running) stopService(new Intent(MainActivity.this, TabsTrackerService.class));
+                if (TabsTrackerService.isRunning()) stopService(new Intent(MainActivity.this, TabsTrackerService.class));
                 finish();
                 return true;
             case R.id.menu_sub_settings_autoupdate:
                 MainApplication.getInstance().settings.setAutoupdateEnabled(!MainApplication.getInstance().settings.isAutoupdateEnabled());
-                if (TabsTrackerService.running) stopService(new Intent(this, TabsTrackerService.class));
+                if (TabsTrackerService.isRunning()) stopService(new Intent(this, TabsTrackerService.class));
                 if (MainApplication.getInstance().settings.isAutoupdateEnabled()) startService(new Intent(this, TabsTrackerService.class));
                 return true;
             case R.id.menu_sub_settings_maskpictures:
@@ -300,7 +301,7 @@ public class MainActivity extends FragmentActivity {
                         backgroundAutoupdateEnabled ? R.string.context_menu_autoupdate_background : R.string.context_menu_autoupdate_background_off).
                         setCheckable(true).setChecked(model.autoupdateBackground);
             }
-            if (model.autoupdateBackground && TabsTrackerService.currentUpdatingTabId == -1) {
+            if (model.autoupdateBackground && TabsTrackerService.getCurrentUpdatingTabId() == -1) {
                 menu.add(Menu.NONE, R.id.context_menu_autoupdate_now, 6, R.string.context_menu_autoupdate_now);
             }
         }
@@ -361,6 +362,7 @@ public class MainActivity extends FragmentActivity {
         rootViewWeight = MainApplication.getInstance().settings.getRootViewWeight();
         tabsPanelRight = MainApplication.getInstance().settings.isTabsPanelOnRight();
         openSpoilers = MainApplication.getInstance().settings.openSpoilers();
+        highlightSubscriptions = MainApplication.getInstance().settings.highlightSubscriptions();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         (theme = MainApplication.getInstance().settings.getTheme()).setTo(this);
         super.onCreate(savedInstanceState);
@@ -423,7 +425,7 @@ public class MainActivity extends FragmentActivity {
                     }
                 } else if (action.equals(TabsTrackerService.BROADCAST_ACTION_NOTIFY)) {
                     tabsAdapter.notifyDataSetChanged(false);
-                    TabsTrackerService.unread = false;
+                    TabsTrackerService.clearUnread();
                 }
             }
         };
@@ -431,7 +433,7 @@ public class MainActivity extends FragmentActivity {
         intentFilter.addAction(PostingService.BROADCAST_ACTION_STATUS);
         intentFilter.addAction(TabsTrackerService.BROADCAST_ACTION_NOTIFY);
         
-        if (!TabsTrackerService.running && MainApplication.getInstance().settings.isAutoupdateEnabled())
+        if (!TabsTrackerService.isRunning() && MainApplication.getInstance().settings.isAutoupdateEnabled())
             startService(new Intent(this, TabsTrackerService.class));
         
         if (MainApplication.getInstance().settings.isSFWRelease()) NewsReader.checkNews(this);
@@ -475,7 +477,7 @@ public class MainActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         isPaused = false;
-        TabsTrackerService.unread = false;
+        TabsTrackerService.clearUnread();
         
         StaticSettingsContainer newSettings = MainApplication.getInstance().settings.getStaticSettings();
         
@@ -496,10 +498,14 @@ public class MainActivity extends FragmentActivity {
         if (settings.isDisplayDate != newSettings.isDisplayDate ||
                 (settings.isDisplayDate && (settings.isLocalTime != newSettings.isLocalTime)) ||
                 MainApplication.getInstance().settings.getAutohideRulesJson().hashCode() != autohideRulesHash ||
-                MainApplication.getInstance().settings.openSpoilers() != openSpoilers) {
+                MainApplication.getInstance().settings.openSpoilers() != openSpoilers ||
+                MainApplication.getInstance().settings.highlightSubscriptions() != highlightSubscriptions ||
+                MainApplication.getInstance().settings.subscriptionsClear()) {
             shouldClearCache = true;
             shouldReloadBoardFragment = true;
         }
+        
+        MainApplication.getInstance().settings.setSubscriptionsClear(false);
         
         if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
                 settings.showHiddenItems != newSettings.showHiddenItems ||
@@ -514,6 +520,9 @@ public class MainActivity extends FragmentActivity {
         }
         
         MainApplication.getInstance().settings.updateStaticSettings(settings);
+        autohideRulesHash = MainApplication.getInstance().settings.getAutohideRulesJson().hashCode();
+        openSpoilers = MainApplication.getInstance().settings.openSpoilers();
+        highlightSubscriptions = MainApplication.getInstance().settings.highlightSubscriptions();
         updateTabPanelTabletWeight();
         
         if (shouldReloadBoardFragment) reloadCurrentBoardFragment();
@@ -861,7 +870,7 @@ public class MainActivity extends FragmentActivity {
             ((FavoritesFragment) MainApplication.getInstance().tabsSwitcher.currentFragment).update();
         }
     }
-
+    
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -869,8 +878,9 @@ public class MainActivity extends FragmentActivity {
     }
     
     private void handleUriIntent(Intent intent) {
-        TabsTrackerService.unread = false;
+        TabsTrackerService.clearUnread();
         if (intent != null) {
+            if (intent.getBooleanExtra(TabsTrackerService.EXTRA_CLEAR_SUBSCRIPTIONS, false)) TabsTrackerService.clearSubscriptions();
             if (MainApplication.getInstance().settings.useFakeBrowser()) FakeBrowser.dismiss();
             if (intent.getData() != null && URLUtil.isFileUrl(intent.getDataString())) {
                 LocalHandler.open(intent.getData().getPath(), this);

@@ -164,6 +164,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private StaticSettingsContainer staticSettings;
     private Resources resources;
     private Database database;
+    private Subscriptions subscriptions;
     private ReadableContainer localFile;
     private ChanModule chan;
     
@@ -274,6 +275,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         staticSettings = activity.settings;
         resources = MainApplication.getInstance().resources;
         database = MainApplication.getInstance().database;
+        subscriptions = MainApplication.getInstance().subscriptions;
         Wifi.updateState(activity);
         
         TabsState tabsState = MainApplication.getInstance().tabsState;
@@ -292,6 +294,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (tabModel.forceUpdate || tabModel.autoupdateError || tabModel.unreadPostsCount > 0) {
             tabModel.forceUpdate = false;
             tabModel.autoupdateError = false;
+            tabModel.unreadSubscriptions = false;
             tabModel.unreadPostsCount = 0;
             MainApplication.getInstance().serializer.serializeTabsState(tabsState);
             if (activity.tabsAdapter != null) activity.tabsAdapter.notifyDataSetChanged(false);
@@ -636,6 +639,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             menu.add(Menu.NONE, R.id.context_menu_delete, 7, R.string.context_menu_delete_post);
             menu.add(Menu.NONE, R.id.context_menu_delete_files, 8, R.string.context_menu_delete_files);
             menu.add(Menu.NONE, R.id.context_menu_report, 9, R.string.context_menu_report);
+            menu.add(Menu.NONE, R.id.context_menu_subscribe, 10, R.string.context_menu_subscribe);
             if (!isList) {
                 for (int id : new int[] {
                         R.id.context_menu_reply,
@@ -646,7 +650,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         R.id.context_menu_hide,
                         R.id.context_menu_delete,
                         R.id.context_menu_delete_files,
-                        R.id.context_menu_report} ) {
+                        R.id.context_menu_report,
+                        R.id.context_menu_subscribe} ) {
                     menu.findItem(id).setOnMenuItemClickListener(contextMenuListener);
                 }
             }
@@ -669,6 +674,14 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 menu.findItem(R.id.context_menu_download).setVisible(false);
             } else if (model.sourceModel.attachments.length == 1) {
                 menu.findItem(R.id.context_menu_download).setTitle(R.string.context_menu_download_attachment);
+            }
+            if (settings.isSubscriptionsEnabled()) {
+                if (subscriptions.hasSubscription(chan.getChanName(), presentationModel.source.boardModel.boardName,
+                        presentationModel.source.pageModel.threadNumber, model.sourceModel.number)) {
+                    menu.findItem(R.id.context_menu_subscribe).setTitle(R.string.context_menu_unsubscribe);
+                }
+            } else {
+                menu.findItem(R.id.context_menu_subscribe).setVisible(false);
             }
         } else if (pageType == TYPE_THREADSLIST && isList) {
             menu.add(Menu.NONE, R.id.context_menu_open_in_new_tab, 1, R.string.context_menu_open_in_new_tab);
@@ -824,6 +837,20 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 reportModel.threadNumber = tabModel.pageModel.threadNumber;
                 reportModel.postNumber = adapter.getItem(position).sourceModel.number;
                 runReport(reportModel);
+                return true;
+            case R.id.context_menu_subscribe:
+                String chanName = chan.getChanName();
+                String board = tabModel.pageModel.boardName;
+                String thread = tabModel.pageModel.threadNumber;
+                String post = adapter.getItem(position).sourceModel.number;
+                if (subscriptions.hasSubscription(chanName, board, thread, post)) {
+                    subscriptions.removeSubscription(chanName, board, thread, post);
+                    for (int i=position; i<adapter.getCount(); ++i) adapter.getItem(i).onUnsubscribe(post);
+                } else {
+                    subscriptions.addSubscription(chanName, board, thread, post);
+                    for (int i=position; i<adapter.getCount(); ++i) adapter.getItem(i).onSubscribe(post);
+                }
+                adapter.notifyDataSetChanged();
                 return true;
         }
         return false;
@@ -1084,7 +1111,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         public void run() {
             if (forceUpdate) saveHistory();
             
-            while (TabsTrackerService.currentUpdatingTabId == tabModel.id) Thread.yield();
+            while (TabsTrackerService.getCurrentUpdatingTabId() == tabModel.id) Thread.yield();
             
             //обработать случай, когда вкладка - локально сохранённая страница
             if (tabModel.type == TabModel.TYPE_LOCAL) {
@@ -1202,6 +1229,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         }
                         startItem = null; //уже загрузили с чана а не из кэша, так что дальше искать якорь на данный пост смысла нет
                         if (isCancelled()) return;
+                        final boolean newSubscriptions = subscriptions.checkSubscriptions(pageFromChan, itemsCountBefore);
+                        if (isCancelled()) return;
                         Async.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -1232,7 +1261,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                         notification = resources.getQuantityString(
                                                 R.plurals.postslist_new_posts_quantity, newPostsCount, newPostsCount);
                                         toastToNewPosts = true;
-                                        if (silent && activity.isPaused()) TabsTrackerService.unread = true;
+                                        if (silent && activity.isPaused()) {
+                                            TabsTrackerService.setUnread();
+                                            if (newSubscriptions) TabsTrackerService.addSubscriptionNotification(tabModel.webUrl, tabModel.title);
+                                        }
                                     }
                                 } else {
                                     notification = resources.getString(R.string.postslist_list_updated);
@@ -3022,9 +3054,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                 imageGetter,
                                 ThemeUtils.ThemeColors.getInstance(activity.getTheme()),
                                 openSpoilers,
-                                floatingModels);
+                                floatingModels,
+                                null);
                         model.buildSpannedHeader(showIndex ? (i == 0 ? 1 : ++curPostIndex) : -1,
-                                presentationModel.source.boardModel.bumpLimit, presentationModel.source.boardModel.defaultUserName, null);
+                                presentationModel.source.boardModel.bumpLimit, presentationModel.source.boardModel.defaultUserName, null, false);
                         items.add(model);
                     }
                 } else {

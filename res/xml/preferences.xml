@@ -331,6 +331,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:dependency="@string/pref_key_enable_autoupdate" />
     </PreferenceCategory>
     
+    <PreferenceCategory android:title="@string/pref_cat_subscriptions">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_subscriptions_enabled"
+            android:title="@string/pref_subscriptions_enabled_title"
+            android:summary="@string/pref_subscriptions_enabled_summary" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_subscribe_threads"
+            android:title="@string/pref_subscribe_threads_title"
+            android:summary="@string/pref_subscribe_threads_summary"
+            android:dependency="@string/pref_key_subscriptions_enabled" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_highlight_subscriptions"
+            android:title="@string/pref_highlight_subscriptions_title"
+            android:summary="@string/pref_highlight_subscriptions_summary"
+            android:dependency="@string/pref_key_subscriptions_enabled" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_subscribe_own"
+            android:title="@string/pref_subscribe_own_title"
+            android:summary="@string/pref_subscribe_own_summary" />
+        
+        <Preference
+            android:key="@string/pref_key_clear_subscriptions"
+            android:title="@string/pref_clear_subscriptions_title" />
+    </PreferenceCategory>
+    
     <PreferenceCategory android:title="@string/pref_cat_cache">
         <EditTextPreference
             android:key="@string/pref_key_cache_maxsize"

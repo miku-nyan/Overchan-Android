@@ -65,6 +65,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_autoupdate_delay">PREF_KEY_AUTOUPDATE_DELAY</string>
     <string name="pref_key_autoupdate_background">PREF_KEY_AUTOUPDATE_BACKGROUND</string>
     <string name="pref_key_autoupdate_notification">PREF_KEY_AUTOUPDATE_NOTIFICATION</string>
+    <string name="pref_key_subscriptions_enabled">PREF_KEY_SUBSCRIPTIONS_ENABLED</string>
+    <string name="pref_key_subscribe_threads">PREF_KEY_SUBSCRIBE_THREADS</string>
+    <string name="pref_key_highlight_subscriptions">PREF_KEY_HIGHLIGHT_SUBSCRIPTIONS</string>
+    <string name="pref_key_subscribe_own">PREF_KEY_SUBSCRIBE_OWN</string>
+    <string name="pref_key_clear_subscriptions">PREF_KEY_CLEAR_SUBSCRIPTIONS</string>
+    <string name="pref_key_last_clear_subscriptions">PREF_KEY_LAST_CLEAR_SUBSCRIPTIONS</string>
     <string name="pref_key_cache_maxsize">PREF_KEY_CACHE_MAXSIZE</string>
     <string name="pref_key_clear_cache">PREF_KEY_CLEAR_CACHE</string>
     <string name="pref_key_about_version">PREF_KEY_ABOUT_VERSION</string>

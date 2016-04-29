@@ -18,7 +18,11 @@
 
 package nya.miku.wishmaster.ui.tabs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.LockSupport;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
@@ -44,7 +48,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -58,21 +66,81 @@ public class TabsTrackerService extends Service {
     private static final String TAG = "TabsTrackerService";
     
     public static final String EXTRA_UPDATE_IMMEDIATELY = "UpdateImmediately";
+    public static final String EXTRA_CLEAR_SUBSCRIPTIONS = "ClearSubscriptions";
     public static final String BROADCAST_ACTION_NOTIFY = "nya.miku.wishmaster.BROADCAST_ACTION_TRACKER_NOTIFY";
-    public static final int TRACKER_NOTIFICATION_ID = 40;
+    public static final String BROADCAST_ACTION_CLEAR_SUBSCRIPTIONS = "nya.miku.wishmaster.BROADCAST_ACTION_CLEAR_SUBSCRIPTIONS";
+    public static final int TRACKER_NOTIFICATION_UPDATE_ID = 40;
+    public static final int TRACKER_NOTIFICATION_SUBSCRIPTIONS_ID = 50;
     
     /** true, если сервис сейчас работает */
-    public static boolean running = false;
+    private static boolean running = false;
     /** если true, в заголовке уведомления будет написано "есть новые сообщения" */
-    public static boolean unread = false;
+    private static boolean unread = false;
+    /** если true, выведется уведомление об ответе на отслеживаемые посты */
+    private static boolean subscriptions = false;
+    /** список тредов, в которых есть ответы на отслеживаемые посты (пары: url, заголовок вкладки) */
+    private static List<Pair<String, String>> subscriptionsData = null;
     /** ID вкладки, которая обновляется в данный момент или -1 */
-    public static long currentUpdatingTabId = -1;
+    private static long currentUpdatingTabId = -1;
+    
+    /** true, если сервис сейчас работает */
+    public static boolean isRunning() {
+        return running;
+    }
+    
+    /** добавить тред, в котором есть ответы на отслеживаемые посты (будет выведено уведомление) */
+    public static void addSubscriptionNotification(String url, String tabTitle) {
+        List<Pair<String, String>> list = subscriptionsData;
+        if (list == null) list = new ArrayList<>();
+        int index = -1;
+        for (int i=0; i<list.size(); ++i) {
+            Pair<String, String> pair = list.get(i);
+            if (url == null) {
+                if (pair.getLeft() == null && tabTitle.equals(pair.getRight())) {
+                    index = i;
+                    break;
+                }
+            } else {
+                if (url.equals(pair.getLeft())) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        Pair<String, String> newPair = Pair.of(url, tabTitle);
+        if (index == -1) list.add(newPair); else list.set(index, newPair);
+        subscriptionsData = list;
+        subscriptions = true;
+    }
+    
+    /** установить флаг непрочитанных сообщений: в заголовке уведомления об автообновлении будет написано "есть новые сообщения" */
+    public static void setUnread() {
+        unread = true;
+    }
+    
+    /** очистить состояние уведомления об автообновлении: убрать надпись "есть новые сообщения" */
+    public static void clearUnread() {
+        unread = false;
+    }
+    
+    /** очистить список тредов, в которых есть ответы на отслеживаемые посты, в уведомлении об отслеживаемых
+     *  (при этом, если уведомление об отслеживаемых на данный момент не было создано, оно не будет создано) */
+    public static void clearSubscriptions() {
+        subscriptions = false;
+        subscriptionsData = null;
+    }
+    
+    /** получить ID вкладки, которая обновляется в данный момент; вернёт -1, если обновление не выполняется в данный момент */
+    public static long getCurrentUpdatingTabId() {
+        return currentUpdatingTabId;
+    }
     
     private ApplicationSettings settings;
     private TabsState tabsState;
     private TabsSwitcher tabsSwitcher;
     private PagesCache pagesCache;
     private NotificationManager notificationManager;
+    private BroadcastReceiver broadcastReceiver;
     private boolean isForeground = false;
     
     private int timerDelay;
@@ -138,6 +206,13 @@ public class TabsTrackerService extends Service {
         tabsState = MainApplication.getInstance().tabsState;
         tabsSwitcher = MainApplication.getInstance().tabsSwitcher;
         pagesCache = MainApplication.getInstance().pagesCache;
+        registerReceiver(broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Logger.d(TAG, "received BROADCAST_ACTION_CLEAR_SUBSCRIPTIONS");
+                clearSubscriptions();
+            }
+        }, new IntentFilter(BROADCAST_ACTION_CLEAR_SUBSCRIPTIONS));
     }
     
     @SuppressLint("InlinedApi")
@@ -158,6 +233,8 @@ public class TabsTrackerService extends Service {
             Logger.d(TAG, "TabsTrackerService service already running");
             return;
         }
+        clearUnread();
+        clearSubscriptions();
         TrackerLoop loop = new TrackerLoop();
         task = loop;
         Async.runAsync(loop);
@@ -200,7 +277,11 @@ public class TabsTrackerService extends Service {
                             int newCount = serializablePage.posts != null ? serializablePage.posts.length : 0;
                             if (oldCount != newCount) {
                                 if (oldCount != 0) tab.unreadPostsCount += (newCount - oldCount);
-                                unread = true;
+                                setUnread();
+                                if (MainApplication.getInstance().subscriptions.checkSubscriptions(serializablePage, oldCount)) {
+                                    addSubscriptionNotification(tab.webUrl, tab.title);
+                                    tab.unreadSubscriptions = true;
+                                }
                             }
                             if (presentationModel != null) {
                                 presentationModel.setNotReady();
@@ -243,23 +324,22 @@ public class TabsTrackerService extends Service {
     
     private class TrackerLoop extends BaseCancellableTask implements Runnable {
         private int timerCounter = 0;
-        private NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(TabsTrackerService.this).
-                setSmallIcon(R.drawable.ic_launcher).
-                setContentIntent(PendingIntent.getActivity(
-                        TabsTrackerService.this, 0, new Intent(TabsTrackerService.this, MainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT));
         
         @Override
         public void run() {
             while (true) {
                 if (isCancelled()) {
-                    cancelForeground(TRACKER_NOTIFICATION_ID);
+                    cancelForeground(TRACKER_NOTIFICATION_UPDATE_ID);
                     return;
                 }
-                notifBuilder.setContentTitle(getString(unread ? R.string.tabs_tracker_title_unread : R.string.tabs_tracker_title));
+                Notification subscriptionsNotification = getSubscriptionsNotification();
+                if (subscriptionsNotification != null)
+                    notificationManager.notify(TRACKER_NOTIFICATION_SUBSCRIPTIONS_ID, subscriptionsNotification);
+                
                 if (++timerCounter > timerDelay || immediately) {
                     timerCounter = 0;
                     if (enableNotification) {
-                        notifyForeground(TRACKER_NOTIFICATION_ID, notifBuilder.setContentText(getString(R.string.tabs_tracker_updating)).build());
+                        notifyForeground(TRACKER_NOTIFICATION_UPDATE_ID, getUpdateNotification(-1));
                     }
                     if (!settings.isAutoupdateWifiOnly() || Wifi.isConnected() || immediately) {
                         doUpdate(this);
@@ -267,7 +347,7 @@ public class TabsTrackerService extends Service {
                     }
                     
                     if (isCancelled()) {
-                        cancelForeground(TRACKER_NOTIFICATION_ID);
+                        cancelForeground(TRACKER_NOTIFICATION_UPDATE_ID);
                         return;
                     } else {
                         sendBroadcast(new Intent(BROADCAST_ACTION_NOTIFY));
@@ -278,14 +358,61 @@ public class TabsTrackerService extends Service {
                 } else {
                    if (enableNotification) {
                        int remainingTime = timerDelay - timerCounter + 1;
-                       String message = getResources().getQuantityString(R.plurals.tabs_tracker_timer, remainingTime, remainingTime);
-                       notifyForeground(TRACKER_NOTIFICATION_ID, notifBuilder.setContentText(message).build());
+                       notifyForeground(TRACKER_NOTIFICATION_UPDATE_ID, getUpdateNotification(remainingTime));
                    }
                 }
                 
                 LockSupport.parkNanos(1000000000);
             }
         }
+        
+        //если secondsRemaining == -1, текст будет "выполняется обновление"
+        private Notification getUpdateNotification(int secondsRemaining) {
+            return notifUpdate.
+                    setContentTitle(getString(unread ? R.string.tabs_tracker_title_unread : R.string.tabs_tracker_title)).
+                    setContentText(secondsRemaining == -1 ? getString(R.string.tabs_tracker_updating) :
+                        getResources().getQuantityString(R.plurals.tabs_tracker_timer, secondsRemaining, secondsRemaining)).
+                    build();
+        }
+        
+        private Notification getSubscriptionsNotification() {
+            if (!subscriptions) return null;
+            subscriptions = false;
+            List<Pair<String, String>> list = subscriptionsData;
+            if (list == null || list.size() == 0) return null;
+            String url = list.get(0).getLeft();
+            Intent activityIntent = new Intent(TabsTrackerService.this, MainActivity.class).putExtra(EXTRA_CLEAR_SUBSCRIPTIONS, true);
+            if (url != null) activityIntent.setData(Uri.parse(url));
+            NotificationCompat.InboxStyle style = list.size() == 1 ? null : new NotificationCompat.InboxStyle().
+                    addLine(getString(R.string.subscriptions_notification_text_format, list.get(0).getRight())).
+                    addLine(getString(R.string.subscriptions_notification_text_format, list.get(1).getRight()));
+            if (list.size() > 2) style.setSummaryText(getString(R.string.subscriptions_notification_text_more, list.size() - 2));
+            
+            return notifSubscription.
+                    setContentText(list.size() > 1 ?
+                            getString(R.string.subscriptions_notification_text_multiple) :
+                                getString(R.string.subscriptions_notification_text_format, list.get(0).getRight())).
+                    setStyle(style).
+                    setContentIntent(PendingIntent.getActivity(TabsTrackerService.this, 0, activityIntent, PendingIntent.FLAG_CANCEL_CURRENT)).
+                    build();
+        }
+        
+        private NotificationCompat.Builder notifUpdate = new NotificationCompat.Builder(TabsTrackerService.this).
+                setSmallIcon(R.drawable.ic_launcher).
+                setContentIntent(PendingIntent.getActivity(
+                        TabsTrackerService.this, 0, new Intent(TabsTrackerService.this, MainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT));
+        
+        
+        private NotificationCompat.Builder notifSubscription = new NotificationCompat.Builder(TabsTrackerService.this).
+                setSmallIcon(R.drawable.ic_launcher).
+                setDefaults(NotificationCompat.DEFAULT_ALL).
+                setOngoing(false).
+                setAutoCancel(true).
+                setOnlyAlertOnce(true).
+                setContentTitle(getString(R.string.subscriptions_notification_title)).
+                setDeleteIntent(PendingIntent.getBroadcast(
+                        TabsTrackerService.this, 0, new Intent(BROADCAST_ACTION_CLEAR_SUBSCRIPTIONS), PendingIntent.FLAG_CANCEL_CURRENT));
+        
     }
     
     @Override
@@ -293,6 +420,7 @@ public class TabsTrackerService extends Service {
         Logger.d(TAG, "TabsTrackerService destroying");
         if (task != null) task.cancel();
         running = false;
+        unregisterReceiver(broadcastReceiver);
     }
     
     @Override

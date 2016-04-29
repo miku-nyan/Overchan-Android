@@ -190,6 +190,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_delete_post">Delete post</string>
     <string name="context_menu_delete_files">Delete files</string>
     <string name="context_menu_report">Report abuse</string>
+    <string name="context_menu_subscribe">Subscribe</string>
+    <string name="context_menu_unsubscribe">Unsubscribe</string>
     <string name="context_menu_share">Share</string>
     <string name="context_menu_share_link">Share link</string>
     <string name="context_menu_search_google">Search in Google</string>
@@ -345,6 +347,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="custom_themes_local">(Select file)</string>
     <string name="custom_themes_loading">Loading</string>
     
+    <string name="subscriptions_notification_title">Tracked replies</string>
+    <string name="subscriptions_notification_text_format">in thread: %s</string>
+    <string name="subscriptions_notification_text_multiple">in multiple threads</string>
+    <string name="subscriptions_notification_text_more">+ %d more</string>
+    
     <string name="notification_url_copied">Address is copied to the clipboard\n%s</string>
     <string name="notification_post_not_found">The post isn\'t found</string>
     <string name="notification_comment_copied">Message is copied to the clipboard</string>
@@ -434,6 +441,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_personal">Personal Data</string>
     <string name="pref_cat_downloads">Downloads</string>
     <string name="pref_cat_autoupdate">Auto-update</string>
+    <string name="pref_cat_subscriptions">Reply tracking</string>
     <string name="pref_cat_cache">Cache</string>
     <string name="pref_cat_about">About Overchan</string>
     <string name="pref_cat_proxy">Connection</string>
@@ -530,6 +538,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_autoupdate_background_summary">Update tabs marked for auto-update in the background</string>
     <string name="pref_autoupdate_notification_title">In the notification area</string>
     <string name="pref_autoupdate_notification_summary">Does not allow the system to close the process when the application is minimized</string>
+    <string name="pref_subscriptions_enabled_title">Track replies</string>
+    <string name="pref_subscriptions_enabled_summary">Track replies to posts you are subscribed</string>
+    <string name="pref_subscribe_threads_title">Track threads</string>
+    <string name="pref_subscribe_threads_summary">Notify on all posts in thread if first post selected</string>
+    <string name="pref_highlight_subscriptions_title">Highlight numbers</string>
+    <string name="pref_highlight_subscriptions_summary">Highlight numbers of tracked posts</string>
+    <string name="pref_subscribe_own_title">Subscribe to own posts</string>
+    <string name="pref_subscribe_own_summary">Subscribe to own posts automatically</string>
+    <string name="pref_clear_subscriptions_title">Clear subscriptions</string>
+    <plurals name="pref_clear_subscriptions_summary">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
     <string name="pref_cache_maxsize_title">Maximum size (MB)</string>
     <string name="pref_cache_maxsize_summary">The maximum size of the file cache</string>
     <string name="pref_cache_maxsize_hint">0 - unlimited; 50 MB by default</string>

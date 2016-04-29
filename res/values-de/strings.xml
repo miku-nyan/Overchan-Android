@@ -190,6 +190,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_delete_post">Posts löschen</string>
     <string name="context_menu_delete_files">Dateien löschen</string>
     <string name="context_menu_report">Missbrauch melden</string>
+    <string name="context_menu_subscribe">Abonnieren</string>
+    <string name="context_menu_unsubscribe">Deabonnieren</string>
     <string name="context_menu_share">Teile</string>
     <string name="context_menu_share_link">Link teilen</string>
     <string name="context_menu_search_google">In Google suchen</string>
@@ -345,6 +347,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="custom_themes_local">(Datei auswählen)</string>
     <string name="custom_themes_loading">Laden</string>
     
+    <string name="subscriptions_notification_title">Verfolgte Antworten</string>
+    <string name="subscriptions_notification_text_format">in Thread: %s</string>
+    <string name="subscriptions_notification_text_multiple">in mehreren Threads</string>
+    <string name="subscriptions_notification_text_more">+ %d mehr</string>
+    
     <string name="notification_url_copied">Adresse ist in die Zwischenablage kopiert\n%s</string>
     <string name="notification_post_not_found">Post ist nicht gefunden</string>
     <string name="notification_comment_copied">Meldung ist in die Zwischenablage kopiert</string>
@@ -435,6 +442,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_personal">Persönliche Daten</string>
     <string name="pref_cat_downloads">Herunterladen</string>
     <string name="pref_cat_autoupdate">Auto-update</string>
+    <string name="pref_cat_subscriptions">Tracking von Antworten</string>
     <string name="pref_cat_cache">Cache</string>
     <string name="pref_cat_about">Über Overchan</string>
     <string name="pref_cat_proxy">Anschluss</string>
@@ -531,6 +539,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_autoupdate_background_summary">Markierte Tabs für Auto-Update im Hintergrund aktualisieren</string>
     <string name="pref_autoupdate_notification_title">Im Infobereich</string>
     <string name="pref_autoupdate_notification_summary">Das System darf den Prozess nicht schließen, wenn die Anwendung minimiert wird</string>
+    <string name="pref_subscriptions_enabled_title">Antworten verfolgen</string>
+    <string name="pref_subscriptions_enabled_summary">Die Antworten auf jeden von Ihnen abonnierten Post verfolgen</string>
+    <string name="pref_subscribe_threads_title">Threads verfolgen</string>
+    <string name="pref_subscribe_threads_summary">An alle Posts in Thread benachrichtigen, wenn der OP-Post ausgewählt ist</string>
+    <string name="pref_highlight_subscriptions_title">Nummern markieren</string>
+    <string name="pref_highlight_subscriptions_summary">Die Nummern der verfolgten Posts markieren</string>
+    <string name="pref_subscribe_own_title">Eigene Posts abonnieren</string>
+    <string name="pref_subscribe_own_summary">Eigene Posts automatisch abonnieren</string>
+    <string name="pref_clear_subscriptions_title">Abonnements löschen</string>
+    <plurals name="pref_clear_subscriptions_summary">
+        <item quantity="one">%d Eintrag</item>
+        <item quantity="other">%d Einträge</item>
+    </plurals>
     <string name="pref_cache_maxsize_title">Maximale Größe (MB)</string>
     <string name="pref_cache_maxsize_summary">Die maximale Größe der Datei-Cache</string>
     <string name="pref_cache_maxsize_hint">0 - unbegrenzt; 50 MB standardmäßig</string>

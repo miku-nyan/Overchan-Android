@@ -38,6 +38,7 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
+import nya.miku.wishmaster.ui.presentation.Subscriptions;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import nya.miku.wishmaster.ui.settings.Wifi;
 import nya.miku.wishmaster.ui.tabs.TabsState;
@@ -130,6 +131,7 @@ public class MainApplication extends Application {
     public PagesCache pagesCache;
     public DraftsCache draftsCache;
     public Database database;
+    public Subscriptions subscriptions;
     public DownloadingLocker downloadingLocker;
     
     public TabsState tabsState;
@@ -226,6 +228,7 @@ public class MainApplication extends Application {
         draftsCache = new DraftsCache(10, serializer);
         
         database = new Database(this);
+        subscriptions = new Subscriptions(this);
         downloadingLocker = new DownloadingLocker();
         
         registerChanModules();

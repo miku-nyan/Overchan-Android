@@ -195,6 +195,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_delete_post">Удалить сообщение</string>
     <string name="context_menu_delete_files">Удалить файлы</string>
     <string name="context_menu_report">Пожаловаться</string>
+    <string name="context_menu_subscribe">Подписаться</string>
+    <string name="context_menu_unsubscribe">Отписаться</string>
     <string name="context_menu_share">Поделиться</string>
     <string name="context_menu_share_link">Поделиться ссылкой</string>
     <string name="context_menu_search_google">Искать в Google</string>
@@ -352,6 +354,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="custom_themes_local">(Выбрать файл)</string>
     <string name="custom_themes_loading">Загрузка</string>
     
+    <string name="subscriptions_notification_title">Отслеживаемые ответы</string>
+    <string name="subscriptions_notification_text_format">в треде: %s</string>
+    <string name="subscriptions_notification_text_multiple">в нескольких тредах</string>
+    <string name="subscriptions_notification_text_more">+ %d ещё</string>
+    
     <string name="notification_url_copied">Адрес скопирован в буфер обмена\n%s</string>
     <string name="notification_post_not_found">Пост не найден</string>
     <string name="notification_comment_copied">Сообщение скопировано в буфер обмена</string>
@@ -442,6 +449,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_personal">Личные данные</string>
     <string name="pref_cat_downloads">Загрузки</string>
     <string name="pref_cat_autoupdate">Автообновление</string>
+    <string name="pref_cat_subscriptions">Отслеживание ответов</string>
     <string name="pref_cat_cache">Кэширование</string>
     <string name="pref_cat_about">О программе</string>
     <string name="pref_cat_proxy">Настройки соединения</string>
@@ -538,6 +546,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_autoupdate_background_summary">Обновлять вкладки, отмеченные для автообновления, в фоновом режиме</string>
     <string name="pref_autoupdate_notification_title">В области уведомлений</string>
     <string name="pref_autoupdate_notification_summary">Не даёт системе закрыть процесс, когда приложение свёрнуто</string>
+    <string name="pref_subscriptions_enabled_title">Отслеживать ответы</string>
+    <string name="pref_subscriptions_enabled_summary">Отслеживать ответы на сообщения, на которые вы подписаны</string>
+    <string name="pref_subscribe_threads_title">Отслеживать треды</string>
+    <string name="pref_subscribe_threads_summary">Уведомлять обо всех сообщениях в треде, если выбран ОП-пост</string>
+    <string name="pref_highlight_subscriptions_title">Выделять номера</string>
+    <string name="pref_highlight_subscriptions_summary">Выделять номера отслеживаемых сообщений</string>
+    <string name="pref_subscribe_own_title">Подписываться на свои сообщения</string>
+    <string name="pref_subscribe_own_summary">Подписываться на свои сообщения автоматически</string>
+    <string name="pref_clear_subscriptions_title">Очистить подписки</string>
+    <plurals name="pref_clear_subscriptions_summary">
+        <item quantity="one">%d запись</item>
+        <item quantity="many">%d записей</item>
+        <item quantity="other">%d записи</item>
+    </plurals>
     <string name="pref_cache_maxsize_title">Максимальный размер (МБ)</string>
     <string name="pref_cache_maxsize_summary">Максимальный размер файлового кэша</string>
     <string name="pref_cache_maxsize_hint">0 - неограниченный; 50 МБ по умолчанию</string>

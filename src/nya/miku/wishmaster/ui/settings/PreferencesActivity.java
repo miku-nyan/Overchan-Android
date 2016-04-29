@@ -79,6 +79,24 @@ public class PreferencesActivity extends PreferenceActivity {
         updateListSummary(R.string.pref_key_download_thumbs);
         updateListSummary(R.string.pref_key_download_format);
         
+        final Preference clearSubscriptionsPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_clear_subscriptions));
+        int subscriptionsCount = (int) MainApplication.getInstance().subscriptions.getCurrentCount();
+        clearSubscriptionsPreference.setSummary(getResources().getQuantityString(R.plurals.pref_clear_subscriptions_summary,
+                subscriptionsCount, subscriptionsCount));
+        if (subscriptionsCount > 0) {
+            clearSubscriptionsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    MainApplication.getInstance().subscriptions.reset();
+                    int count = (int) MainApplication.getInstance().subscriptions.getCurrentCount();
+                    clearSubscriptionsPreference.setSummary(getResources().getQuantityString(R.plurals.pref_clear_subscriptions_summary,
+                            count, count));
+                    MainApplication.getInstance().settings.setSubscriptionsClear(true);
+                    return true;
+                }
+            });
+        }
+        
         final Preference clearCachePreference = getPreferenceManager().findPreference(getString(R.string.pref_key_clear_cache));
         clearCachePreference.setSummary(getString(R.string.pref_clear_cache_summary, MainApplication.getInstance().fileCache.getCurrentSizeMB()));
         clearCachePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -217,7 +235,7 @@ public class PreferencesActivity extends PreferenceActivity {
                 } else {
                     for (int autoupdateKey : KEYS_AUTOUPDATE) {
                         if (getString(autoupdateKey).equals(key)) {
-                            if (TabsTrackerService.running)
+                            if (TabsTrackerService.isRunning())
                                 stopService(new Intent(PreferencesActivity.this, TabsTrackerService.class));
                             if (MainApplication.getInstance().settings.isAutoupdateEnabled())
                                 startService(new Intent(PreferencesActivity.this, TabsTrackerService.class));

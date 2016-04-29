@@ -21,6 +21,7 @@ package nya.miku.wishmaster.ui.presentation;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -244,6 +245,12 @@ public class PresentationModel {
         
         if (task.isCancelled()) return;
         
+        String[] subscriptions = null;
+        if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE && MainApplication.getInstance().settings.highlightSubscriptions()) {
+            subscriptions = MainApplication.getInstance().subscriptions.getSubscriptions(
+                    source.pageModel.chanName, source.pageModel.boardName, source.pageModel.threadNumber);
+        }
+        
         boolean headersRebuilding = false;
         int indexCounter = 0;
         
@@ -265,7 +272,8 @@ public class PresentationModel {
                         presentationList.get(i).buildSpannedHeader(!posts[i].deleted ? indexCounter : -1,
                                 source.boardModel.bumpLimit,
                                 reduceNames ? source.boardModel.defaultUserName : null,
-                                source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? posts[i].parentThread : null);
+                                source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? posts[i].parentThread : null,
+                                subscriptions != null ? Arrays.binarySearch(subscriptions, posts[i].number) >= 0 : false);
                     }
                 }
                 presentationList.get(i).isDeleted = posts[i].deleted;
@@ -296,7 +304,8 @@ public class PresentationModel {
                     imageGetter,
                     ThemeUtils.ThemeColors.getInstance(theme),
                     openSpoilers,
-                    floatingModels);
+                    floatingModels,
+                    subscriptions);
             postNumbersMap.put(posts[i].number, i);
             if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
                 for (String ref : model.referencesTo) {
@@ -314,7 +323,8 @@ public class PresentationModel {
             model.buildSpannedHeader(showIndex && !posts[i].deleted ? ++indexCounter : -1,
                     source.boardModel.bumpLimit,
                     reduceNames ? source.boardModel.defaultUserName : null,
-                    source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? posts[i].parentThread : null);
+                    source.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE ? posts[i].parentThread : null,
+                    subscriptions != null ? Arrays.binarySearch(subscriptions, posts[i].number) >= 0 : false);
             
             if (source.pageModel.type == UrlPageModel.TYPE_THREADPAGE) {
                 model.hidden = isHiddenDelegate.

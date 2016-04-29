@@ -426,6 +426,30 @@ public class ApplicationSettings {
         }
     }
     
+    public boolean isSubscriptionsEnabled() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_subscriptions_enabled), true);
+    }
+    
+    public boolean subscribeThreads() {
+        return isSubscriptionsEnabled() && preferences.getBoolean(resources.getString(R.string.pref_key_subscribe_threads), false);
+    }
+    
+    public boolean highlightSubscriptions() {
+        return isSubscriptionsEnabled() && preferences.getBoolean(resources.getString(R.string.pref_key_highlight_subscriptions), true);
+    }
+    
+    public boolean subscribeOwnPosts() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_subscribe_own), true);
+    }
+    
+    public boolean subscriptionsClear() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_last_clear_subscriptions), false);
+    }
+    
+    public void setSubscriptionsClear(boolean value) {
+        preferences.edit().putBoolean(resources.getString(R.string.pref_key_last_clear_subscriptions), value).commit();
+    }
+    
     public StaticSettingsContainer getStaticSettings() {
         StaticSettingsContainer container = new StaticSettingsContainer();
         updateStaticSettings(container);

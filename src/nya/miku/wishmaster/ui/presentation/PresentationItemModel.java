@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.ui.presentation;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +42,7 @@ import nya.miku.wishmaster.ui.theme.ThemeUtils.ThemeColors;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Parcel;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
@@ -55,7 +57,7 @@ import android.text.style.StyleSpan;
  *
  */
 public class PresentationItemModel {
-    private static final Pattern REPLY_LINK_FULL_PATTERN = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)(?:.*?)</a>", Pattern.DOTALL);
+    static final Pattern REPLY_LINK_FULL_PATTERN = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)(?:.*?)</a>", Pattern.DOTALL);
     
     public static final String ALL_REFERENCES_URI = "references://all?from=";
     public static final String POST_REFERER = "refpost://";
@@ -137,7 +139,7 @@ public class PresentationItemModel {
      */
     public PresentationItemModel(PostModel source, String chanName, String boardName, String threadNumber, DateFormat dateFormat,
             URLSpanClickListener spanClickListener, ImageGetter imageGetter, ThemeColors themeColors, boolean openSpoilers,
-            FloatingModel[] floatingModels) {
+            FloatingModel[] floatingModels, String[] subscriptions) {
         this.sourceModel = source;
         this.sourceModelHash = ChanModels.hashPostModel(source);
         this.isDeleted = source.deleted;
@@ -155,6 +157,7 @@ public class PresentationItemModel {
                 POST_REFERER + source.number);
         this.dateString = source.timestamp != 0 ? dateFormat.format(source.timestamp) : "";
         parseReferences();
+        if (subscriptions != null) findSubscriptions(subscriptions);
         parseBadge();
         computeThumbnailsHash();
         if (floatingModels != null) {
@@ -273,7 +276,7 @@ public class PresentationItemModel {
      * @param defaultName имя пользователя на данной доске по умолчанию (будет скрываться)
      * @param threadNumber номер треда, только если страница является результатом поиска (в противном случае - null)
      */
-    public void buildSpannedHeader(int index, int bumpLimit, String defaultName, String threadNumber) {
+    public void buildSpannedHeader(int index, int bumpLimit, String defaultName, String threadNumber, boolean isSubscribed) {
         String opMark = resources.getString(R.string.postitem_op_mark);
         String sageMark = resources.getString(R.string.postitem_sage_mark);
         
@@ -301,6 +304,8 @@ public class PresentationItemModel {
         positionEnd = positionStart + numberString.length();
         builder.append(numberString);
         builder.setSpan(new ForegroundColorSpan(themeColors.numberForeground), positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (isSubscribed) builder.setSpan(new SubscriptionSpan(themeColors.subscriptionBackground),
+                positionStart, positionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         
         
         if (sourceModel.op) {
@@ -460,6 +465,94 @@ public class PresentationItemModel {
         if (isClosed) {
             if (isSticky) stickyClosedString += ", " + resources.getString(R.string.postitem_closed_thread);
             else stickyClosedString = resources.getString(R.string.postitem_closed_thread);
+        }
+    }
+    
+    private void findSubscriptions(String[] subscriptions) {
+        char[] buf = null;
+        SpannableStringBuilder spanned = (SpannableStringBuilder) spannedComment;
+        for (String subscription : subscriptions) {
+            if (!referencesTo.contains(subscription)) continue;
+            ClickableURLSpan[] spans = spanned.getSpans(0, spanned.length(), ClickableURLSpan.class);
+            if (spans == null || spans.length == 0) continue;
+            char[] search = (">>" + subscription).toCharArray();
+            if (buf == null || buf.length != search.length) buf = new char[search.length];
+            for (ClickableURLSpan span : spans) {
+                int startIndex = spanned.getSpanStart(span);
+                if (startIndex + buf.length > spanned.length()) continue;
+                spanned.getChars(startIndex, startIndex + buf.length, buf, 0);
+                if (Arrays.equals(search, buf)) {
+                    spanned.setSpan(new SubscriptionSpan(themeColors.subscriptionBackground),
+                            startIndex, startIndex + buf.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+        }
+    }
+    
+    /**
+     * В случае необходимости перестроить комментарий и заголовок поста (если был построен) после добавления подписки на пост newSubscription.
+     * Если этот содержит ссылки на пост newSubscription, они будут выделены в тексте комментария;
+     * если этот пост сам является newSubscription, он будет выделен в заголовке.
+     * @param newSubscription пост, на который добавлена подписка
+     */
+    public void onSubscribe(String newSubscription) {
+        if (spannedHeader != null && newSubscription.equals(sourceModel.number)) {
+            SpannableStringBuilder spanned = (SpannableStringBuilder) spannedHeader;
+            int start = spanned.toString().indexOf(newSubscription);
+            if (start >= 0) spanned.setSpan(new SubscriptionSpan(themeColors.subscriptionBackground),
+                    start, start + newSubscription.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        
+        if (!referencesTo.contains(newSubscription)) return;
+        SpannableStringBuilder spanned = (SpannableStringBuilder) spannedComment;
+        ClickableURLSpan[] spans = spanned.getSpans(0, spanned.length(), ClickableURLSpan.class);
+        if (spans == null || spans.length == 0) return;
+        char[] search = (">>" + newSubscription).toCharArray();
+        char[] buf = new char[search.length];
+        for (ClickableURLSpan span : spans) {
+            int startIndex = spanned.getSpanStart(span);
+            if (startIndex + buf.length > spanned.length()) continue;
+            spanned.getChars(startIndex, startIndex + buf.length, buf, 0);
+            if (Arrays.equals(search, buf)) {
+                spanned.setSpan(new SubscriptionSpan(themeColors.subscriptionBackground),
+                        startIndex, startIndex + buf.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+    }
+    
+    /**
+     * В случае необходимости перестроить комментарий и заголовок поста (если был построен) после удаления подписки на пост oldSubscription.
+     * Если этот содержит выделенные ссылки на пост oldSubscription в тексте комментария, выделение будет снято;
+     * если этот пост сам является oldSubscription, выделение будет снято в заголовке.
+     * @param oldSubscription пост, на который удалена подписка
+     */
+    public void onUnsubscribe(String oldSubscription) {
+        if (spannedHeader != null && oldSubscription.equals(sourceModel.number)) {
+            SpannableStringBuilder spanned = (SpannableStringBuilder) spannedHeader;
+            for (SubscriptionSpan span : spanned.getSpans(0, spanned.length(), SubscriptionSpan.class))
+                spanned.removeSpan(span);
+        }
+        
+        if (!referencesTo.contains(oldSubscription)) return;
+        SpannableStringBuilder spanned = (SpannableStringBuilder) spannedComment;
+        SubscriptionSpan[] spans = spanned.getSpans(0, spanned.length(), SubscriptionSpan.class);
+        if (spans == null || spans.length == 0) return;
+        char[] search = (">>" + oldSubscription).toCharArray();
+        char[] buf = new char[search.length];
+        for (SubscriptionSpan span : spans) {
+            int startIndex = spannedComment.getSpanStart(span);
+            if (startIndex + buf.length > spanned.length()) continue;
+            spanned.getChars(startIndex, startIndex + buf.length, buf, 0);
+            if (Arrays.equals(search, buf)) spanned.removeSpan(span);
+        }
+    }
+    
+    private static class SubscriptionSpan extends BackgroundColorSpan {
+        public SubscriptionSpan(int color) {
+            super(color);
+        }
+        public SubscriptionSpan(Parcel src) {
+            super(src);
         }
     }
 }

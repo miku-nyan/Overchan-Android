@@ -121,6 +121,7 @@ public class ThemeUtils {
         public final int opForeground;
         public final int sageForeground;
         public final int tripForeground;
+        public final int subscriptionBackground;
         public final int quoteForeground;
         public final int spoilerForeground;
         public final int spoilerBackground;
@@ -129,8 +130,8 @@ public class ThemeUtils {
         public final int subjectForeground;
         
         private ThemeColors(int indexForeground, int indexBumpLimit, int numberForeground, int nameForeground, int opForeground, int sageForeground,
-                int tripForeground, int quoteForeground, int spoilerForeground, int spoilerBackground, int urlLinkForeground, int refererForeground,
-                int subjectForeground) {
+                int tripForeground, int subscriptionBackground, int quoteForeground, int spoilerForeground, int spoilerBackground,
+                int urlLinkForeground, int refererForeground, int subjectForeground) {
             this.indexForeground = indexForeground;
             this.indexOverBumpLimit = indexBumpLimit;
             this.numberForeground = numberForeground;
@@ -138,6 +139,7 @@ public class ThemeUtils {
             this.opForeground = opForeground;
             this.sageForeground = sageForeground;
             this.tripForeground = tripForeground;
+            this.subscriptionBackground = subscriptionBackground;
             this.quoteForeground = quoteForeground;
             this.spoilerForeground = spoilerForeground;
             this.spoilerBackground = spoilerBackground;
@@ -162,6 +164,7 @@ public class ThemeUtils {
                 int opColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postOpForeground, Color.parseColor("#008000"));
                 int sageColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postSageForeground, Color.parseColor("#993333"));
                 int tripColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postTripForeground, Color.parseColor("#228854"));
+                int subscriptionBackground = Color.LTGRAY; //TODO
                 int quoteForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.postQuoteForeground, Color.parseColor("#789922"));
                 int spoilerForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.spoilerForeground, Color.BLACK);
                 int spoilerBackground = ThemeUtils.getThemeColor(tmp, theme, R.attr.spoilerBackground, Color.parseColor("#BBBBBB"));
@@ -176,6 +179,7 @@ public class ThemeUtils {
                         opColor,
                         sageColor,
                         tripColor,
+                        subscriptionBackground,
                         quoteForeground,
                         spoilerForeground,
                         spoilerBackground,

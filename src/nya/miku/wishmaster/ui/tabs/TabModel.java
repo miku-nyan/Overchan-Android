@@ -67,6 +67,8 @@ public class TabModel implements Serializable {
     @Tag(12) public int unreadPostsCount;
     /** true, если автообновление завершилось ошибкой */
     @Tag(13) public boolean autoupdateError;
+    /** true, если есть непрочитанные ответы на отвлеживаемые посты */
+    @Tag(14) public boolean unreadSubscriptions;
     
     // "Новая вкладка", "История", "Избранное" - скрытые вкладки,
     // не отображаются в панели, не имеют отдельных объектов TabModel.

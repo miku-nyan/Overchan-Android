@@ -272,6 +272,21 @@ public class PostingService extends Service {
                         model.boardPage = boardModel.firstPage;
                     }
                     targetUrl = MainApplication.getInstance().getChanModule(sendPostModel.chanName).buildUrl(model);
+                } else {
+                    if (MainApplication.getInstance().settings.subscribeOwnPosts()) {
+                        try {
+                            UrlPageModel pageModel = MainApplication.getInstance().getChanModule(sendPostModel.chanName).parseUrl(targetUrl);
+                            if (pageModel.boardName != null && pageModel.threadNumber != null) {
+                                if (pageModel.postNumber != null || sendPostModel.threadNumber == null) {
+                                    String postNumber = pageModel.postNumber != null ? pageModel.postNumber : pageModel.threadNumber;
+                                    MainApplication.getInstance().subscriptions.
+                                            addSubscription(pageModel.chanName, pageModel.boardName, pageModel.threadNumber, postNumber);
+                                }
+                            }
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                        }
+                    }
                 }
                 intentSuccess.setData(Uri.parse(targetUrl));
                 PendingIntent pIntentSuccess = PendingIntent.getActivity(PostingService.this, 0, intentSuccess, PendingIntent.FLAG_CANCEL_CURRENT);

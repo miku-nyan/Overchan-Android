@@ -200,6 +200,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_delete_post">Стерти пост</string>
     <string name="context_menu_delete_files">Стерти файли</string>
     <string name="context_menu_report">Поскаржитися</string>
+    <string name="context_menu_subscribe">Підписатися</string>
+    <string name="context_menu_unsubscribe">Відписатися</string>
     <string name="context_menu_share">Поділитися</string>
     <string name="context_menu_share_link">Поділитися лінком</string>
     <string name="context_menu_search_google">Пошук Google</string>
@@ -355,6 +357,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="custom_themes_local">(Вибрати з файлу)</string>
     <string name="custom_themes_loading">Завантаження</string>
     
+    <string name="subscriptions_notification_title">Відстежувані відповіді</string>
+    <string name="subscriptions_notification_text_format">в треді: %s</string>
+    <string name="subscriptions_notification_text_multiple">в декількох тредах</string>
+    <string name="subscriptions_notification_text_more">+ %d ще</string>
+    
     <string name="notification_url_copied">Адресу скопійовано до буферу\n%s</string>
     <string name="notification_post_not_found">Посту не знайдено</string>
     <string name="notification_comment_copied">Тест скопійовано до буферу</string>
@@ -445,6 +452,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_cat_personal">Особисте</string>
     <string name="pref_cat_downloads">Звантаження</string>
     <string name="pref_cat_autoupdate">Автооновлення</string>
+    <string name="pref_cat_subscriptions">Відстеження відповідей</string>
     <string name="pref_cat_cache">Кеш</string>
     <string name="pref_cat_about">Про Overchan</string>
     <string name="pref_cat_proxy">З’єднання</string>
@@ -541,6 +549,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_autoupdate_background_summary">Оновлювати позначені для автооновлення вкладки незалежно від того, чи вони на передньому плані</string>
     <string name="pref_autoupdate_notification_title">Закріпити у шторці</string>
     <string name="pref_autoupdate_notification_summary">Не дозволяти системі закривати мінімізований процес</string>
+    <string name="pref_subscriptions_enabled_title">Відстежувати відповіді</string>
+    <string name="pref_subscriptions_enabled_summary">Відстежувати відповіді на пости, на які ви підписані</string>
+    <string name="pref_subscribe_threads_title">Відстежувати треди</string>
+    <string name="pref_subscribe_threads_summary">Повідомляти про всі постах в треді, якщо обраний ОП-пост</string>
+    <string name="pref_highlight_subscriptions_title">Виділяти номера</string>
+    <string name="pref_highlight_subscriptions_summary">Виділяти номера відслідковуються постів</string>
+    <string name="pref_subscribe_own_title">Підписуватися на свої пости</string>
+    <string name="pref_subscribe_own_summary">Підписуватися на свої пости автоматично</string>
+    <string name="pref_clear_subscriptions_title">Стерти підписки</string>
+    <plurals name="pref_clear_subscriptions_summary">
+        <item quantity="one">%d запис</item>
+        <item quantity="few">%d записи</item>
+        <item quantity="many">%d записів</item>
+        <item quantity="other">%d записи</item>
+    </plurals>
     <string name="pref_cache_maxsize_title">Максимальний розмір (МБ)</string>
     <string name="pref_cache_maxsize_summary">Розмір кешу файлів</string>
     <string name="pref_cache_maxsize_hint">0 – без обмежень; типово 50 МБ</string>

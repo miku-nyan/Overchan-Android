@@ -214,6 +214,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
                 String titleText = model.title;
                 if (model.unreadPostsCount > 0 || model.autoupdateError) {
                     StringBuilder titleStringBuilder = new StringBuilder();
+                    if (model.unreadSubscriptions) titleStringBuilder.append("[*] ");
                     if (model.autoupdateError) titleStringBuilder.append("[X] ");
                     if (model.unreadPostsCount > 0) titleStringBuilder.append('[').append(model.unreadPostsCount).append("] ");
                     titleText = titleStringBuilder.append(titleText).toString();
