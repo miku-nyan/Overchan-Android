@@ -1821,7 +1821,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         @Override
                         public void onCreate() {
                             try {
-                                if (tag.position != getCount() - 1) return;
+                                if (tag.isPopupDialog || tag.position != getCount() - 1) return;
                                 final int margin = (int) (50 * fragment().resources.getDisplayMetrics().density + 0.5f);
                                 ViewGroup.LayoutParams params = tag.commentView.getLayoutParams();
                                 if (params.height != ViewGroup.LayoutParams.WRAP_CONTENT) return;
@@ -1868,6 +1868,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         public void onDestroy() {
                             try {
                                 ViewGroup.LayoutParams params = tag.commentView.getLayoutParams();
+                                if (params.height == ViewGroup.LayoutParams.WRAP_CONTENT) return;
                                 params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                                 tag.commentView.setLayoutParams(params);
                             } catch (Exception e) {
