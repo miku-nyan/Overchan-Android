@@ -45,6 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <attr name="refererForeground" format="color|reference" />
         <attr name="itemInfoForeground" format="color|reference" />
         <attr name="searchHighlightBackground" format="color|reference" />
+        <attr name="subscriptionBackground" format="color|reference" />
         
         <attr name="iconDrawer" format="reference" />
         <attr name="dialogBackgroundShadow" format="reference" />

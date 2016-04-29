@@ -136,6 +136,7 @@ public class GenericThemeEntry {
                 case R.attr.refererForeground: theme.put("refererForeground", colorToString(customAttrs.valueAt(i))); break;
                 case R.attr.itemInfoForeground: theme.put("itemInfoForeground", colorToString(customAttrs.valueAt(i))); break;
                 case R.attr.searchHighlightBackground: theme.put("searchHighlightBackground", colorToString(customAttrs.valueAt(i))); break;
+                case R.attr.subscriptionBackground: theme.put("subscriptionBackground", colorToString(customAttrs.valueAt(i))); break;
                 default: Logger.e("TAG", "unknown attribute: " + customAttrs.keyAt(i));
             }
         }
@@ -182,6 +183,7 @@ public class GenericThemeEntry {
                 case "refererforeground": parseColor(key, theme.getString(key), R.attr.refererForeground, attrs); break;
                 case "iteminfoforeground": parseColor(key, theme.getString(key), R.attr.itemInfoForeground, attrs); break;
                 case "searchhighlightbackground": parseColor(key, theme.getString(key), R.attr.searchHighlightBackground, attrs); break;
+                case "subscriptionBackground": parseColor(key, theme.getString(key), R.attr.subscriptionBackground, attrs); break;
                 default: throw new IllegalArgumentException("Unknown key: " + key);
             }
         }

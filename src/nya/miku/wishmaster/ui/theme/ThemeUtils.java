@@ -164,7 +164,7 @@ public class ThemeUtils {
                 int opColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postOpForeground, Color.parseColor("#008000"));
                 int sageColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postSageForeground, Color.parseColor("#993333"));
                 int tripColor = ThemeUtils.getThemeColor(tmp, theme, R.attr.postTripForeground, Color.parseColor("#228854"));
-                int subscriptionBackground = Color.LTGRAY; //TODO
+                int subscriptionBackground = ThemeUtils.getThemeColor(tmp, theme, R.attr.subscriptionBackground, Color.parseColor("#CCCCCC"));
                 int quoteForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.postQuoteForeground, Color.parseColor("#789922"));
                 int spoilerForeground = ThemeUtils.getThemeColor(tmp, theme, R.attr.spoilerForeground, Color.BLACK);
                 int spoilerBackground = ThemeUtils.getThemeColor(tmp, theme, R.attr.spoilerBackground, Color.parseColor("#BBBBBB"));

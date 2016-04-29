@@ -142,6 +142,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="refererForeground">#EE0000</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
+        <item name="subscriptionBackground">#C0C0C0</item>
     </style>
     
     <style name="Theme_Photon" parent="@style/Theme_Light_Base">
@@ -169,6 +170,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#FF6600</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
+        <item name="subscriptionBackground">#BBBBBB</item>
     </style>
     
     <style name="Theme_Neutron" parent="@style/Theme_Dark_Base">
@@ -196,6 +198,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#C9BE89</item>
         <item name="itemInfoForeground">#999999</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
+        <item name="subscriptionBackground">#444444</item>
     </style>
     
     <style name="Theme_Gurochan" parent="@style/Theme_Light_Base">
@@ -223,6 +226,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#34345C</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
+        <item name="subscriptionBackground">#DDDDDD</item>
     </style>
     
     <style name="Theme_Tomorrow" parent="@style/Theme_Dark_Base">
@@ -250,6 +254,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#81A2BE</item>
         <item name="itemInfoForeground">#707070</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
+        <item name="subscriptionBackground">#444444</item>
     </style>
     
     <style name="Theme_Mikuba" parent="@style/Theme_Light_Base">
@@ -277,6 +282,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="urlLinkForeground">#418A8E</item>
         <item name="itemInfoForeground">#999999</item>
         <item name="searchHighlightBackground">#EF0FFF</item>
+        <item name="subscriptionBackground">#CCCCCC</item>
     </style>
     
 </resources>
