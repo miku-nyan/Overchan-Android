@@ -104,7 +104,7 @@ public class FourchanModule extends AbstractChanModule {
     private String reportCaptchaAnswer = null;
     
     private static final Pattern ERROR_POSTING = Pattern.compile("<span id=\"errmsg\"(?:[^>]*)>(.*?)(?:</span>|<br)");
-    private static final Pattern SUCCESS_POSTING = Pattern.compile("<!-- thread:(\\d+),no:(?:\\d+) -->");
+    private static final Pattern SUCCESS_POSTING = Pattern.compile("<!-- thread:(\\d+),no:(\\d+) -->");
     
     public FourchanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -517,6 +517,7 @@ public class FourchanModule extends AbstractChanModule {
             redirect.type = UrlPageModel.TYPE_THREADPAGE;
             redirect.boardName = model.boardName;
             redirect.threadNumber = successMatcher.group(1);
+            redirect.postNumber = successMatcher.group(2);
             return buildUrl(redirect);
         }
         return null;

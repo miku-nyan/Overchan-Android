@@ -634,8 +634,22 @@ public class MakabaModule extends CloudflareChanModule {
         JSONObject makabaResult = new JSONObject(response);
         try {
             String statusResult = makabaResult.getString("Status");
-            if (statusResult.equals("OK")) return null;
-            if (statusResult.equals("Redirect")) {
+            if (statusResult.equals("OK")) {
+                try {
+                    if (model.threadNumber != null) {
+                        UrlPageModel redirect = new UrlPageModel();
+                        redirect.type = UrlPageModel.TYPE_THREADPAGE;
+                        redirect.chanName = CHAN_NAME;
+                        redirect.boardName = model.boardName;
+                        redirect.threadNumber = model.threadNumber;
+                        redirect.postNumber = Long.toString(makabaResult.getLong("Num"));
+                        return buildUrl(redirect);
+                    }
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                }
+                return null;
+            } else if (statusResult.equals("Redirect")) {
                 UrlPageModel redirect = new UrlPageModel();
                 redirect.type = UrlPageModel.TYPE_THREADPAGE;
                 redirect.chanName = CHAN_NAME;
