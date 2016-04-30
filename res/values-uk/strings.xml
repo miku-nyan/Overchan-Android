@@ -197,8 +197,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_copy_text">Копіювати текст</string>
     <string name="context_menu_hide_thread">Сховати тред</string>
     <string name="context_menu_hide_post">Сховати пост</string>
-    <string name="context_menu_delete_post">Стерти пост</string>
-    <string name="context_menu_delete_files">Стерти файли</string>
+    <string name="context_menu_delete">Стерти</string>
     <string name="context_menu_report">Поскаржитися</string>
     <string name="context_menu_subscribe">Підписатися</string>
     <string name="context_menu_unsubscribe">Відписатися</string>
@@ -215,6 +214,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="share_no_tabs">Відкритих вкладок немає</string>
     
     <string name="dialog_delete_password">Пароль видалення</string>
+    <string name="dialog_delete_only_files">Тільки файли</string>
     <string name="dialog_delete_button">Стерти</string>
     <string name="dialog_delete_progress">Видалення</string>
     

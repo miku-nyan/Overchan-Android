@@ -187,8 +187,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_copy_text">Copy text</string>
     <string name="context_menu_hide_thread">Hide thread</string>
     <string name="context_menu_hide_post">Hide post</string>
-    <string name="context_menu_delete_post">Delete post</string>
-    <string name="context_menu_delete_files">Delete files</string>
+    <string name="context_menu_delete">Delete</string>
     <string name="context_menu_report">Report abuse</string>
     <string name="context_menu_subscribe">Subscribe</string>
     <string name="context_menu_unsubscribe">Unsubscribe</string>
@@ -205,6 +204,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="share_no_tabs">No open tabs</string>
     
     <string name="dialog_delete_password">Password for deletion</string>
+    <string name="dialog_delete_only_files">Only files</string>
     <string name="dialog_delete_button">Delete</string>
     <string name="dialog_delete_progress">Deleting</string>
     

@@ -635,10 +635,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     R.string.context_menu_select_text : R.string.context_menu_copy_text);
             menu.add(Menu.NONE, R.id.context_menu_share, 4, R.string.context_menu_share);
             menu.add(Menu.NONE, R.id.context_menu_hide, 5, R.string.context_menu_hide_post);
-            menu.add(Menu.NONE, R.id.context_menu_delete, 6, R.string.context_menu_delete_post);
-            menu.add(Menu.NONE, R.id.context_menu_delete_files, 7, R.string.context_menu_delete_files);
-            menu.add(Menu.NONE, R.id.context_menu_report, 8, R.string.context_menu_report);
-            menu.add(Menu.NONE, R.id.context_menu_subscribe, 9, R.string.context_menu_subscribe);
+            menu.add(Menu.NONE, R.id.context_menu_delete, 6, R.string.context_menu_delete);
+            menu.add(Menu.NONE, R.id.context_menu_report, 7, R.string.context_menu_report);
+            menu.add(Menu.NONE, R.id.context_menu_subscribe, 8, R.string.context_menu_subscribe);
             if (!isList) {
                 for (int id : new int[] {
                         R.id.context_menu_reply,
@@ -647,7 +646,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         R.id.context_menu_share,
                         R.id.context_menu_hide,
                         R.id.context_menu_delete,
-                        R.id.context_menu_delete_files,
                         R.id.context_menu_report,
                         R.id.context_menu_subscribe} ) {
                     menu.findItem(id).setOnMenuItemClickListener(contextMenuListener);
@@ -657,12 +655,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 menu.findItem(R.id.context_menu_reply).setVisible(false);
                 menu.findItem(R.id.context_menu_reply_with_quote).setVisible(false);
             }
-            if (model.isDeleted || !presentationModel.source.boardModel.allowDeletePosts || tabModel.type == TabModel.TYPE_LOCAL) {
+            if (model.isDeleted || (!presentationModel.source.boardModel.allowDeletePosts && (!presentationModel.source.boardModel.allowDeleteFiles ||
+                    model.sourceModel.attachments == null || model.sourceModel.attachments.length == 0)) || tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_delete).setVisible(false);
-            }
-            if (model.isDeleted || !presentationModel.source.boardModel.allowDeleteFiles ||
-                    model.sourceModel.attachments == null || model.sourceModel.attachments.length == 0 || tabModel.type == TabModel.TYPE_LOCAL) {
-                menu.findItem(R.id.context_menu_delete_files).setVisible(false);
             }
             if (model.isDeleted || presentationModel.source.boardModel.allowReport == BoardModel.REPORT_NOT_ALLOWED ||
                     tabModel.type == TabModel.TYPE_LOCAL) {
@@ -807,14 +802,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 startActivity(Intent.createChooser(sharePostIntent, resources.getString(R.string.share_via)));
                 return true;
             case R.id.context_menu_delete:
-            case R.id.context_menu_delete_files:
                 DeletePostModel delModel = new DeletePostModel();
                 delModel.chanName = chan.getChanName();
                 delModel.boardName = tabModel.pageModel.boardName;
                 delModel.threadNumber = tabModel.pageModel.threadNumber;
                 delModel.postNumber = adapter.getItem(position).sourceModel.number;
-                delModel.onlyFiles = item.getItemId() == R.id.context_menu_delete_files;
-                runDelete(delModel);
+                runDelete(delModel,
+                        adapter.getItem(position).sourceModel.attachments != null && adapter.getItem(position).sourceModel.attachments.length > 0);
                 return true;
             case R.id.context_menu_report:
                 DeletePostModel reportModel = new DeletePostModel();
@@ -3521,17 +3515,33 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         startActivity(galleryIntent);
     }
     
-    private void runDelete(final DeletePostModel deletePostModel) {
-        final EditText inputField = new EditText(activity);
-        inputField.setSingleLine();
+    @SuppressLint("InflateParams")
+    private void runDelete(final DeletePostModel deletePostModel, final boolean hasFiles) {
+        Context dialogContext = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ?
+                new ContextThemeWrapper(activity, R.style.Theme_Neutron) : activity;
+        View dlgLayout = LayoutInflater.from(dialogContext).inflate(R.layout.dialog_delete, null);
+        final EditText inputField = (EditText) dlgLayout.findViewById(R.id.dialog_delete_password_field);
+        final CheckBox onlyFiles = (CheckBox) dlgLayout.findViewById(R.id.dialog_delete_only_files);
         inputField.setText(chan.getDefaultPassword());
-        inputField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        
+        if (!presentationModel.source.boardModel.allowDeletePosts && !presentationModel.source.boardModel.allowDeleteFiles) {
+            Logger.e(TAG, "board model doesn't support deleting");
+            return;
+        } else if (!presentationModel.source.boardModel.allowDeletePosts) {
+            onlyFiles.setEnabled(false);
+            onlyFiles.setChecked(true);
+        } else if (presentationModel.source.boardModel.allowDeleteFiles && hasFiles) {
+            onlyFiles.setEnabled(true);
+        } else {
+            onlyFiles.setEnabled(false);
+        }
         
         DialogInterface.OnClickListener dlgOnClick = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, final int which) {
                 if (currentTask != null) currentTask.cancel();
                 if (pullableLayout.isRefreshing()) setPullableNoRefreshing();
+                deletePostModel.onlyFiles = onlyFiles.isChecked();
                 deletePostModel.password = inputField.getText().toString();
                 final ProgressDialog progressDlg = new ProgressDialog(activity);
                 final CancellableTask deleteTask = new CancellableTask.BaseCancellableTask();
@@ -3568,7 +3578,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                         if (!deleteTask.isCancelled()) {
                                             progressDlg.dismiss();
                                             Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
-                                            runDelete(deletePostModel);
+                                            runDelete(deletePostModel, hasFiles);
                                         }
                                     }
                                 });
@@ -3604,7 +3614,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         };
         new AlertDialog.Builder(activity).
                 setTitle(R.string.dialog_delete_password).
-                setView(inputField).
+                setView(dlgLayout).
                 setPositiveButton(R.string.dialog_delete_button, dlgOnClick).
                 setNegativeButton(android.R.string.cancel, null).
                 create().

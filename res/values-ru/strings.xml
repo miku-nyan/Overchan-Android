@@ -192,8 +192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_copy_text">Копировать текст</string>
     <string name="context_menu_hide_thread">Скрыть тред</string>
     <string name="context_menu_hide_post">Скрыть сообщение</string>
-    <string name="context_menu_delete_post">Удалить сообщение</string>
-    <string name="context_menu_delete_files">Удалить файлы</string>
+    <string name="context_menu_delete">Удалить</string>
     <string name="context_menu_report">Пожаловаться</string>
     <string name="context_menu_subscribe">Подписаться</string>
     <string name="context_menu_unsubscribe">Отписаться</string>
@@ -210,6 +209,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="share_no_tabs">Нет открытых вкладок</string>
     
     <string name="dialog_delete_password">Пароль для удаления</string>
+    <string name="dialog_delete_only_files">Только файлы</string>
     <string name="dialog_delete_button">Удалить</string>
     <string name="dialog_delete_progress">Удаление</string>
     
