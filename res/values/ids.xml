@@ -59,10 +59,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <item name="context_menu_reply_with_quote" type="id"/>
     <item name="context_menu_reply_no_reading" type="id"/>
     <item name="context_menu_select_text" type="id"/>
-    <item name="context_menu_download" type="id"/>
     <item name="context_menu_share" type="id"/>
     <item name="context_menu_share_link" type="id"/>
     <item name="context_menu_hide" type="id"/>
+    <item name="context_menu_delete_submenu" type="id"/>
     <item name="context_menu_delete" type="id"/>
     <item name="context_menu_delete_files" type="id"/>
     <item name="context_menu_report" type="id"/>

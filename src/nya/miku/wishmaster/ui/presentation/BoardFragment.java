@@ -633,19 +633,17 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             menu.add(Menu.NONE, R.id.context_menu_reply_with_quote, 2, R.string.context_menu_reply_with_quote);
             menu.add(Menu.NONE, R.id.context_menu_select_text, 3, Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && isList ?
                     R.string.context_menu_select_text : R.string.context_menu_copy_text);
-            menu.add(Menu.NONE, R.id.context_menu_download, 4, R.string.context_menu_download_attachments);
-            menu.add(Menu.NONE, R.id.context_menu_share, 5, R.string.context_menu_share);
-            menu.add(Menu.NONE, R.id.context_menu_hide, 6, R.string.context_menu_hide_post);
-            menu.add(Menu.NONE, R.id.context_menu_delete, 7, R.string.context_menu_delete_post);
-            menu.add(Menu.NONE, R.id.context_menu_delete_files, 8, R.string.context_menu_delete_files);
-            menu.add(Menu.NONE, R.id.context_menu_report, 9, R.string.context_menu_report);
-            menu.add(Menu.NONE, R.id.context_menu_subscribe, 10, R.string.context_menu_subscribe);
+            menu.add(Menu.NONE, R.id.context_menu_share, 4, R.string.context_menu_share);
+            menu.add(Menu.NONE, R.id.context_menu_hide, 5, R.string.context_menu_hide_post);
+            menu.add(Menu.NONE, R.id.context_menu_delete, 6, R.string.context_menu_delete_post);
+            menu.add(Menu.NONE, R.id.context_menu_delete_files, 7, R.string.context_menu_delete_files);
+            menu.add(Menu.NONE, R.id.context_menu_report, 8, R.string.context_menu_report);
+            menu.add(Menu.NONE, R.id.context_menu_subscribe, 9, R.string.context_menu_subscribe);
             if (!isList) {
                 for (int id : new int[] {
                         R.id.context_menu_reply,
                         R.id.context_menu_reply_with_quote,
                         R.id.context_menu_select_text,
-                        R.id.context_menu_download,
                         R.id.context_menu_share,
                         R.id.context_menu_hide,
                         R.id.context_menu_delete,
@@ -669,11 +667,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             if (model.isDeleted || presentationModel.source.boardModel.allowReport == BoardModel.REPORT_NOT_ALLOWED ||
                     tabModel.type == TabModel.TYPE_LOCAL) {
                 menu.findItem(R.id.context_menu_report).setVisible(false);
-            }
-            if (model.sourceModel.attachments == null || model.sourceModel.attachments.length == 0 || tabModel.type == TabModel.TYPE_LOCAL) {
-                menu.findItem(R.id.context_menu_download).setVisible(false);
-            } else if (model.sourceModel.attachments.length == 1) {
-                menu.findItem(R.id.context_menu_download).setTitle(R.string.context_menu_download_attachment);
             }
             if (settings.isSubscriptionsEnabled()) {
                 if (subscriptions.hasSubscription(chan.getChanName(), presentationModel.source.boardModel.boardName,
@@ -812,13 +805,6 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 sharePostIntent.putExtra(Intent.EXTRA_SUBJECT, chan.buildUrl(sharePostUrlPageModel));
                 sharePostIntent.putExtra(Intent.EXTRA_TEXT, adapter.getItem(position).spannedComment.toString());
                 startActivity(Intent.createChooser(sharePostIntent, resources.getString(R.string.share_via)));
-                return true;
-            case R.id.context_menu_download:
-                if (adapter.getItem(position).sourceModel.attachments != null) {
-                    for (AttachmentModel attachment : adapter.getItem(position).sourceModel.attachments) {
-                        downloadFile(attachment);
-                    }
-                }
                 return true;
             case R.id.context_menu_delete:
             case R.id.context_menu_delete_files:
