@@ -273,6 +273,7 @@ public class TabsTrackerService extends Service {
                         @Override
                         public void onSuccess() {
                             BackgroundThumbDownloader.download(serializablePage, task);
+                            MainApplication.getInstance().subscriptions.checkOwnPost(serializablePage, oldCount);
                             tab.autoupdateError = false;
                             int newCount = serializablePage.posts != null ? serializablePage.posts.length : 0;
                             if (oldCount != newCount) {

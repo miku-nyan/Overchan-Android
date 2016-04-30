@@ -1178,6 +1178,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 public void onSuccess() {
                     if (isCancelled()) return;
                     BackgroundThumbDownloader.download(pageFromChan, imagesDownloadTask);
+                    MainApplication.getInstance().subscriptions.checkOwnPost(pageFromChan, itemsCountBefore);
+                    if (isCancelled()) return;
                     if (fromScratch) {
                         createPresentationModel(pageFromChan, false, true);
                     } else {

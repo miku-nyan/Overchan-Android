@@ -18,8 +18,15 @@
 
 package nya.miku.wishmaster.ui.presentation;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,6 +36,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -37,6 +45,7 @@ public class Subscriptions {
     private static final String TAG = "Subscriptions";
     private SubscriptionsDB database;
     private Object[] cached;
+    private Object[] waitingOwnPost;
     
     public Subscriptions(Context context) {
         database = new SubscriptionsDB(context);
@@ -120,6 +129,75 @@ public class Subscriptions {
     public void reset() {
         database.resetDB();
         cached = null;
+    }
+    
+    /**
+     * Установить детектор своего поста (для борд, которые не отдают номер своего поста после отправки)
+     */
+    public void detectOwnPost(String chan, String board, String thread, String comment) {
+        if (chan == null || board == null || thread == null || comment == null) return;
+        List<String> words = commentToWordsList(comment);
+        //Logger.d(TAG, "set detector; words: " + words);
+        waitingOwnPost = new Object[] { chan, board, thread, words };
+    }
+    
+    /**
+     * Проверить, нет ли на странице своего поста, установленного в {@link #detectOwnPost(String, String, String, String)},
+     * если есть, добавить пост к отслеживаемым (подпискам)
+     * @param page страница
+     * @param startPostIndex номер поста (по порядку) на странице, начиная с которого требуется проверять
+     */
+    @SuppressWarnings("unchecked")
+    public void checkOwnPost(SerializablePage page, int startPostIndex) {
+        if (page.pageModel == null || page.pageModel.type != UrlPageModel.TYPE_THREADPAGE || page.posts == null) return;
+        String chan = page.pageModel.chanName;
+        String board = page.pageModel.boardName;
+        String thread = page.pageModel.threadNumber;
+        Object[] tuple = waitingOwnPost;
+        if (tuple != null && tuple[0].equals(chan) && tuple[1].equals(board) && tuple[2].equals(thread)) {
+            waitingOwnPost = null;
+            int postCount = page.posts.length - startPostIndex;
+            if (postCount <= 1) {
+                if (postCount == 1 && page.posts[startPostIndex] != null)
+                    addSubscription(chan, board, thread, page.posts[startPostIndex].number);
+                return;
+            }
+            List<int[]> result = new ArrayList<>(postCount);
+            List<String> waitingWords = (List<String>) tuple[3];
+            for (int i=startPostIndex; i<page.posts.length; ++i) {
+                if (page.posts[i] == null || page.posts[i].comment == null) continue;
+                HashSet<String> postWords = new HashSet<>(commentToWordsList(htmlToComment(page.posts[i].comment)));
+                //Logger.d(TAG, "checking post i=" + i + "\ncomment: " + page.posts[i].comment+"\nwords:" + postWords);
+                int wordsCount = 0;
+                for (String waitingWord : waitingWords)
+                    if (postWords.remove(waitingWord)) ++wordsCount;
+                result.add(new int[] { i, wordsCount, postWords.size() });
+                //Logger.d(TAG, "result: overlap=" + wordsCount + "; remained=" + postWords.size());
+            }
+            if (result.size() == 0) return;
+            Collections.sort(result, new Comparator<int[]>() {
+                @Override
+                public int compare(int[] lhs, int[] rhs) {
+                    int result = compareInt(rhs[1], lhs[1]);
+                    if (result == 0) result = compareInt(lhs[2], rhs[2]);
+                    if (result == 0) result = compareInt(lhs[0], rhs[0]);
+                    return result;
+                }
+                private int compareInt(int lhs, int rhs) {
+                    return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
+                }
+            });
+            //for (int[] entry : result) Logger.d(TAG, "[" + entry[0] + ";" + entry[1] + ";" + entry[2] + "]");
+            addSubscription(chan, board, thread, page.posts[result.get(0)[0]].number);
+        }
+    }
+    
+    private static String htmlToComment(String html) {
+        return StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(html.replaceAll("<(br|p)/?>", " ")));
+    }
+    
+    private static List<String> commentToWordsList(String comment) {
+        return Arrays.asList(comment.replaceAll("[\\*%_]", "").replaceAll("\\[[^\\]]*\\]", "").replaceAll("[^\\w\\d\\s]", " ").trim().split("\\s+"));
     }
     
     private static class SubscriptionsDB {
