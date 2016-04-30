@@ -233,7 +233,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:summary="@string/pref_scroll_volume_buttons_summary" />
         
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="@string/pref_key_preferences_submenu"
             android:title="@string/pref_preferences_submenu_title"
             android:summary="@string/pref_preferences_submenu_summary" />

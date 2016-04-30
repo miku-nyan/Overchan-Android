@@ -386,7 +386,7 @@ public class ApplicationSettings {
     }
     
     public boolean preferencesSubmenu() {
-        return preferences.getBoolean(resources.getString(R.string.pref_key_preferences_submenu), false);
+        return preferences.getBoolean(resources.getString(R.string.pref_key_preferences_submenu), true);
     }
     
     public boolean isPinnedMarkup() {
