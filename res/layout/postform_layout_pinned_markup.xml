@@ -130,6 +130,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     android:layout_height="wrap_content"
                     android:id="@+id/postform_password_field"
                     android:inputType="textVisiblePassword"
+                    android:typeface="monospace"
                     android:maxLength="255"
                     android:singleLine="true" />
             </LinearLayout>
