@@ -19,6 +19,8 @@
 package nya.miku.wishmaster.ui.presentation;
 
 import java.io.File;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -216,6 +218,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private CancellableTask currentTask;
     private CancellableTask imagesDownloadTask = new CancellableTask.BaseCancellableTask();
     private ExecutorService imagesDownloadExecutor = Executors.newFixedThreadPool(4, Async.LOW_PRIORITY_FACTORY);
+    private OpenedDialogs dialogs = new OpenedDialogs();
     
     /** измеряется при вызове {@link #measureFloatingModels(LayoutInflater)} */
     private int postItemWidth = 0;
@@ -404,6 +407,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         imagesDownloadExecutor.shutdown();
+        
+        dialogs.onDestroyFragment(tabModel.id);
     }
     
     private void saveHistory() {
@@ -1518,6 +1523,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
                 BoardFragment fragment = fragmentRef.get();
+                if (fragment == null || fragment.presentationModel == null) {
+                    Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                    if (currentFragment instanceof BoardFragment) fragment = (BoardFragment) currentFragment;
+                }
                 if (fragment != null) {
                     try {
                         fragment.onCreateContextMenu(menu, v, menuInfo);
@@ -1556,6 +1565,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             @Override
             public void onClick(View v) {
                 BoardFragment fragment = fragmentRef.get();
+                if (fragment == null || fragment.presentationModel == null) {
+                    Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                    if (currentFragment instanceof BoardFragment) fragment = (BoardFragment) currentFragment;
+                }
                 if (fragment != null) fragment.openAttachment((AttachmentModel)v.getTag());
             }
         }
@@ -2235,13 +2248,14 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         
         private void fillThumbnail(View thumbnailView, AttachmentModel attachment, String hash, boolean nonBusy) {
+            BoardFragment fragment = fragment();
             weakRegisterForContextMenu(thumbnailView);
             thumbnailView.setOnClickListener(onAttachmentClickListener);
             thumbnailView.setTag(attachment);
             ImageView thumbnailPic = (ImageView) thumbnailView.findViewById(R.id.post_thumbnail_image);
             TextView size = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_size);
             TextView type = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
-            setImageViewSpoiler(thumbnailPic, attachment.isSpoiler || fragment().staticSettings.maskPictures);
+            setImageViewSpoiler(thumbnailPic, attachment.isSpoiler || fragment.staticSettings.maskPictures);
             switch (attachment.type) {
                 case AttachmentModel.TYPE_IMAGE_GIF:
                     type.setText(R.string.postitem_gif);
@@ -2267,25 +2281,34 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) {
                 size.setVisibility(View.GONE);
             } else {
-                size.setText(Attachments.getAttachmentSizeString(attachment, fragment().resources));
+                size.setText(Attachments.getAttachmentSizeString(attachment, fragment.resources));
                 size.setVisibility(View.VISIBLE);
             }
             
             boolean curBusy = isBusy && !nonBusy;
             if (attachment.thumbnail != null && attachment.thumbnail.length() != 0) {
+                CancellableTask imagesDownloadTask = fragment.imagesDownloadTask;
+                ExecutorService imagesDownloadExecutor = fragment.imagesDownloadExecutor;
+                if (fragment.presentationModel == null) {
+                    Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                    if (currentFragment instanceof BoardFragment) {
+                        imagesDownloadTask = ((BoardFragment) currentFragment).imagesDownloadTask;
+                        imagesDownloadExecutor = ((BoardFragment) currentFragment).imagesDownloadExecutor;
+                    }
+                }
                 thumbnailPic.setTag(Boolean.FALSE);
-                fragment().bitmapCache.asyncGet(
+                fragment.bitmapCache.asyncGet(
                         hash,
                         attachment.thumbnail,
-                        fragment().resources.getDimensionPixelSize(R.dimen.post_thumbnail_size),
-                        fragment().chan,
-                        fragment().tabModel.type == TabModel.TYPE_LOCAL ? fragment().localFile : null,
-                        fragment().imagesDownloadTask,
+                        fragment.resources.getDimensionPixelSize(R.dimen.post_thumbnail_size),
+                        fragment.chan,
+                        fragment.tabModel.type == TabModel.TYPE_LOCAL ? fragment.localFile : null,
+                        imagesDownloadTask,
                         thumbnailPic,
-                        fragment().imagesDownloadExecutor,
+                        imagesDownloadExecutor,
                         Async.UI_HANDLER,
-                        fragment().downloadThumbnails() && !curBusy,
-                        fragment().downloadThumbnails() ? (curBusy ? 0 : R.drawable.thumbnail_error) :
+                        fragment.downloadThumbnails() && !curBusy,
+                        fragment.downloadThumbnails() ? (curBusy ? 0 : R.drawable.thumbnail_error) :
                             Attachments.getDefaultThumbnailResId(attachment.type));
             } else {
                 thumbnailPic.setTag(Boolean.TRUE);
@@ -2301,19 +2324,29 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
          * @param nonBusy если true, значение поля isBusy игнорируется, загрузка происходит всегда, если только settings.
          */
         private void fillBadge(ImageView badgeIcon, String url, String hash, boolean nonBusy) {
+            BoardFragment fragment = fragment();
+            CancellableTask imagesDownloadTask = fragment.imagesDownloadTask;
+            ExecutorService imagesDownloadExecutor = fragment.imagesDownloadExecutor;
+            if (fragment.presentationModel == null) {
+                Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                if (currentFragment instanceof BoardFragment) {
+                    imagesDownloadTask = ((BoardFragment) currentFragment).imagesDownloadTask;
+                    imagesDownloadExecutor = ((BoardFragment) currentFragment).imagesDownloadExecutor;
+                }
+            }
             badgeIcon.setTag(Boolean.FALSE);
             boolean curBusy = isBusy && !nonBusy;
             fragment().bitmapCache.asyncGet(
                     hash,
                     url,
-                    fragment().resources.getDimensionPixelSize(R.dimen.post_badge_size),
-                    fragment().chan,
-                    fragment().tabModel.type == TabModel.TYPE_LOCAL ? fragment().localFile : null,
-                    fragment().imagesDownloadTask,
+                    fragment.resources.getDimensionPixelSize(R.dimen.post_badge_size),
+                    fragment.chan,
+                    fragment.tabModel.type == TabModel.TYPE_LOCAL ? fragment().localFile : null,
+                    imagesDownloadTask,
                     badgeIcon,
-                    fragment().imagesDownloadExecutor,
+                    imagesDownloadExecutor,
                     Async.UI_HANDLER,
-                    fragment().downloadThumbnails() && !curBusy,
+                    fragment.downloadThumbnails() && !curBusy,
                     0);
         }
     }
@@ -2953,6 +2986,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     }
                 }
                 dialog.show();
+                dialogs.add(dialog);
             }
         };
         
@@ -3060,6 +3094,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 dialog.setCanceledOnTouchOutside(true);
                 dialog.setContentView(dlgList);
                 dialog.show();
+                dialogs.add(dialog);
             }
         };
         if (tmpV.getWidth() != 0) {
@@ -3146,6 +3181,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 dialog.setCanceledOnTouchOutside(true);
                 dialog.setContentView(dlgList);
                 dialog.show();
+                dialogs.add(dialog);
             }
         };
         if (tmpV.getWidth() != 0) {
@@ -3305,7 +3341,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     ((FrameLayout) convertView).addView(tnImage);
                 }
                 convertView.setTag(getItem(position).getLeft());
-                registerForContextMenu(convertView);
+                safeRegisterForContextMenu(convertView);
                 convertView.setOnClickListener(this);
                 fill(position, convertView, isBusy);
                 if (isSelected[position]) {
@@ -3320,6 +3356,25 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
                 return convertView;
             }
+            private void safeRegisterForContextMenu(View view) {
+                try {
+                    view.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+                        @Override
+                        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+                            if (presentationModel == null) {
+                                Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                                if (currentFragment instanceof BoardFragment) {
+                                    currentFragment.onCreateContextMenu(menu, v, menuInfo);
+                                }
+                            } else {
+                                BoardFragment.this.onCreateContextMenu(menu, v, menuInfo);
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                }
+            }
             @Override
             public void onClick(View v) {
                 if (selectingMode) {
@@ -3327,7 +3382,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     isSelected[position] = !isSelected[position];
                     notifyDataSetChanged();
                 } else {
-                    openAttachment((AttachmentModel) v.getTag());
+                    BoardFragment fragment = BoardFragment.this;
+                    if (presentationModel == null) {
+                        Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                        if (currentFragment instanceof BoardFragment) fragment = (BoardFragment) currentFragment;
+                    }
+                    fragment.openAttachment((AttachmentModel) v.getTag());
                 }
             }
             private void fill(int position, View view, boolean isBusy) {
@@ -3340,6 +3400,15 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     return;
                 }
                 tnImage.setTag(Boolean.FALSE);
+                CancellableTask imagesDownloadTask = BoardFragment.this.imagesDownloadTask;
+                ExecutorService imagesDownloadExecutor = BoardFragment.this.imagesDownloadExecutor;
+                if (presentationModel == null) {
+                    Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                    if (currentFragment instanceof BoardFragment) {
+                        imagesDownloadTask = ((BoardFragment) currentFragment).imagesDownloadTask;
+                        imagesDownloadExecutor = ((BoardFragment) currentFragment).imagesDownloadExecutor;
+                    }
+                }
                 bitmapCache.asyncGet(
                         attachmentHash,
                         attachment.thumbnail,
@@ -3373,10 +3442,15 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 Async.runAsync(new Runnable() {
                     @Override
                     public void run() {
+                        BoardFragment fragment = BoardFragment.this;
+                        if (fragment.presentationModel == null) {
+                            Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+                            if (currentFragment instanceof BoardFragment) fragment = (BoardFragment) currentFragment;
+                        }
                         boolean flag = false;
                         for (int i=0; i<isSelected.length; ++i)
                             if (isSelected[i])
-                                if (!downloadFile(getItem(i).getLeft(), true))
+                                if (!fragment.downloadFile(getItem(i).getLeft(), true))
                                     flag = true;
                         final boolean toast = flag;
                         activity.runOnUiThread(new Runnable() {
@@ -3729,4 +3803,36 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         new AlertDialog.Builder(activity).setMessage(R.string.dialog_open_chan_text).
             setPositiveButton(android.R.string.yes, dialogClickListener).setNegativeButton(android.R.string.no, dialogClickListener).create().show();
     }
+    
+    private static class OpenedDialogs {
+        private List<WeakReference<Dialog>> refsList = new ArrayList<>();
+        private ReferenceQueue<Dialog> queue = new ReferenceQueue<>();
+        
+        private void reduce() {
+            Reference<? extends Dialog> r;
+            while ((r = queue.poll()) != null) {
+                int i = refsList.indexOf(r);
+                if (i != -1) refsList.remove(i);
+            }
+        }
+        
+        private synchronized void add(Dialog dialog) {
+            reduce();
+            refsList.add(new WeakReference<>(dialog));
+        }
+        
+        public void onDestroyFragment(long tabId) {
+            Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+            if (currentFragment instanceof BoardFragment && currentFragment.getArguments().getLong("TabModelId") == tabId) return;
+            
+            reduce();
+            for (int i=0; i<refsList.size(); ++i) {
+                Dialog dialog = refsList.get(i).get();
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+            }
+        }
+    }
+    
 }
