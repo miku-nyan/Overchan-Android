@@ -770,6 +770,18 @@ public class MainActivity extends FragmentActivity {
     }
     
     @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (settings.scrollVolumeButtons) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_VOLUME_UP:
+                case KeyEvent.KEYCODE_VOLUME_DOWN:
+                    return true;
+            }
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+    
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
