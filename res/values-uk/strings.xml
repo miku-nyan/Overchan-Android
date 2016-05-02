@@ -191,8 +191,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_show_thumbnail">Прев’ю</string>
     <string name="context_menu_attachment_info">Інформація</string>
     <string name="context_menu_download_file">Звантажити файл</string>
-    <string name="context_menu_download_attachment">Звантажити додаток</string>
-    <string name="context_menu_download_attachments">Звантажити додатки</string>
     <string name="context_menu_select_text">Виділити текст</string>
     <string name="context_menu_copy_text">Копіювати текст</string>
     <string name="context_menu_hide_thread">Сховати тред</string>

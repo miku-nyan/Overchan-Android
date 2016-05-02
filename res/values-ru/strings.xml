@@ -186,8 +186,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_show_thumbnail">Показать миниатюру</string>
     <string name="context_menu_attachment_info">Показать информацию</string>
     <string name="context_menu_download_file">Скачать файл</string>
-    <string name="context_menu_download_attachment">Скачать вложение</string>
-    <string name="context_menu_download_attachments">Скачать вложения</string>
     <string name="context_menu_select_text">Выделить текст</string>
     <string name="context_menu_copy_text">Копировать текст</string>
     <string name="context_menu_hide_thread">Скрыть тред</string>

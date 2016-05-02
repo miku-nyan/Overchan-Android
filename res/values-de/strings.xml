@@ -181,8 +181,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_show_thumbnail">Miniaturansicht anzeigen</string>
     <string name="context_menu_attachment_info">Informationen anzeigen</string>
     <string name="context_menu_download_file">Datei herunterladen</string>
-    <string name="context_menu_download_attachment">Anhang herunterladen</string>
-    <string name="context_menu_download_attachments">Anhänge herunterladen</string>
     <string name="context_menu_select_text">Text wählen</string>
     <string name="context_menu_copy_text">Text kopieren</string>
     <string name="context_menu_hide_thread">Thread verstecken</string>

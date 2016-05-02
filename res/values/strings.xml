@@ -181,8 +181,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_show_thumbnail">Show thumbnail</string>
     <string name="context_menu_attachment_info">Show information</string>
     <string name="context_menu_download_file">Download file</string>
-    <string name="context_menu_download_attachment">Download attachment</string>
-    <string name="context_menu_download_attachments">Download attachments</string>
     <string name="context_menu_select_text">Select text</string>
     <string name="context_menu_copy_text">Copy text</string>
     <string name="context_menu_hide_thread">Hide thread</string>
