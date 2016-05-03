@@ -183,7 +183,7 @@ public class GenericThemeEntry {
                 case "refererforeground": parseColor(key, theme.getString(key), R.attr.refererForeground, attrs); break;
                 case "iteminfoforeground": parseColor(key, theme.getString(key), R.attr.itemInfoForeground, attrs); break;
                 case "searchhighlightbackground": parseColor(key, theme.getString(key), R.attr.searchHighlightBackground, attrs); break;
-                case "subscriptionBackground": parseColor(key, theme.getString(key), R.attr.subscriptionBackground, attrs); break;
+                case "subscriptionbackground": parseColor(key, theme.getString(key), R.attr.subscriptionBackground, attrs); break;
                 default: throw new IllegalArgumentException("Unknown key: " + key);
             }
         }
