@@ -42,7 +42,7 @@ public class NewsReader {
             public void run() {
                 try {
                     ExtendedHttpClient httpClient = new ExtendedHttpClient(null);
-                    HttpRequestModel request = HttpRequestModel.builder().setGET().build();
+                    HttpRequestModel request = HttpRequestModel.DEFAULT_GET;
                     final String response = HttpStreamer.getInstance().getStringFromUrl(URL, request, httpClient, null, null, false);
                     if (response.length() > 0) {
                         activity.runOnUiThread(new Runnable() {

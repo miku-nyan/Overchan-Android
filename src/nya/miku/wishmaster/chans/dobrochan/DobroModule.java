@@ -462,7 +462,7 @@ public class DobroModule extends AbstractChanModule {
         String captchaUrl = getDomainUrl() + "captcha/" + boardName + "/" + System.currentTimeMillis() + ".png";
         
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;
@@ -512,7 +512,7 @@ public class DobroModule extends AbstractChanModule {
                             postingError = true;
                             String errorMessage = "";
                             String errorHtml = HttpStreamer.getInstance().
-                                    getStringFromUrl(location, HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+                                    getStringFromUrl(location, HttpRequestModel.DEFAULT_GET, httpClient, null, task, false);
                             Matcher errorMatcher = Pattern.compile("class='post-error'>([^<]*)<").matcher(errorHtml);
                             while (errorMatcher.find()) errorMessage += (errorMessage.equals("") ? "" : "; ") + errorMatcher.group(1);
                             if (errorMessage.equals("")) errorMessage = RegexUtils.removeHtmlTags(errorHtml).trim();

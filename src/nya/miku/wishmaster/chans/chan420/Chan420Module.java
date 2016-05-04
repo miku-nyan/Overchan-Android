@@ -243,8 +243,7 @@ public class Chan420Module extends AbstractChanModule {
         String url = (useHttps() ? "https://" : "http://") + "420chan.org:8080/narcbot/ajaxReport.jsp?postId=" + model.postNumber +
                 "&reason=RULE_VIOLATION&note=" + URLEncoder.encode(model.reportReason, "UTF-8").replace("+", "%20") +
                 "&location=" + URLEncoder.encode(location, "UTF-8").replace("+", "%20") + "&parentId=" + model.threadNumber;
-        String response =
-                HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false);
+        String response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false);
         Matcher matcher = REPORT_PATTERN.matcher(response);
         if (matcher.find()) {
             String text = matcher.group(1);

@@ -308,7 +308,7 @@ public class InachModule extends AbstractWakabaModule {
                 "&dummy=" + Long.toString(Math.round(Math.random()*1000000)) + "&update=1";
         
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;

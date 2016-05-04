@@ -36,6 +36,9 @@ public class HttpRequestModel {
     static final int METHOD_GET = 0;
     static final int METHOD_POST = 1;
     
+    /** простой GET запрос, без проверки If-Modified */
+    public static final HttpRequestModel DEFAULT_GET = builder().setGET().build();
+    
     //package
     /** метод запроса (GET или POST) */
     final int method;

@@ -254,7 +254,7 @@ public class DvachnetModule extends AbstractWakabaModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel get = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel get = HttpRequestModel.DEFAULT_GET;
         captchaId = HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "cgi/captcha?task=get_id", get, httpClient, listener, task, false);
         String captchaUrl = getUsingUrl() + "cgi/captcha?task=get_image&id=" + captchaId;
         Bitmap captchaBitmap = null;

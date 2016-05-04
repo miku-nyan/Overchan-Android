@@ -263,7 +263,7 @@ public class MikubaModule extends CloudflareChanModule {
         String captchaUrl = (useHttps() ? "https://" : "http://") + MIKUBA_DOMAIN + "/c";
         
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;

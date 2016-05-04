@@ -42,13 +42,13 @@ public class RecaptchaNoscript {
     static String getChallenge(String publicKey, CancellableTask task, HttpClient httpClient, String scheme) throws Exception {
         if (scheme == null) scheme = "http";
         String response = HttpStreamer.getInstance().getStringFromUrl(scheme + RECAPTCHA_CHALLENGE_URL + publicKey,
-                HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+                HttpRequestModel.DEFAULT_GET, httpClient, null, task, false);
         Matcher matcher = CHALLENGE_FIRST_PATTERN.matcher(response);
         if (matcher.find()) {
             String challenge = matcher.group(1);
             try {
                 response = HttpStreamer.getInstance().getStringFromUrl(scheme + RECAPTCHA_RELOAD_URL + challenge + "&k=" + publicKey,
-                        HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+                        HttpRequestModel.DEFAULT_GET, httpClient, null, task, false);
                 matcher = CHALLENGE_RELOAD_PATTERN.matcher(response);
                 if (matcher.find()) {
                     String newChallenge = matcher.group(1);

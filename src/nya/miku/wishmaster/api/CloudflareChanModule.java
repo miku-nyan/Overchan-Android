@@ -123,7 +123,7 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
     public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
         String fixedUrl = fixRelativeUrl(url);
         try {
-            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().build();
+            HttpRequestModel rqModel = HttpRequestModel.DEFAULT_GET;
             HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, rqModel, httpClient, listener, task, true);
         } catch (HttpWrongStatusCodeException e) {
             if (canCloudflare()) checkCloudflareError(e, fixedUrl);

@@ -293,7 +293,7 @@ public abstract class AbstractChanModule implements HttpChanModule {
     @Override
     public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
         String fixedUrl = fixRelativeUrl(url);
-        HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, true);
+        HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, true);
     }
     
 }

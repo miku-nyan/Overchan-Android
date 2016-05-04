@@ -80,7 +80,7 @@ import android.webkit.WebViewClient;
         processing2 = true;
         currentCookie = null;
         
-        final HttpRequestModel rqModel = HttpRequestModel.builder().setGET().build();
+        final HttpRequestModel rqModel = HttpRequestModel.DEFAULT_GET;
         final CookieStore cookieStore = httpClient.getCookieStore();
         CloudflareChecker.removeCookie(cookieStore, exception.getRequiredCookieName());
         final ViewGroup layout = (ViewGroup)activity.getWindow().getDecorView().getRootView();

@@ -78,7 +78,7 @@ public class Recaptcha {
                 HttpResponseModel responseModel = null;
                 try {
                     responseModel = HttpStreamer.getInstance().getFromUrl(scheme + RECAPTCHA_IMAGE_URL + recaptcha.challenge,
-                            HttpRequestModel.builder().setGET().build(), httpClient, null, task);
+                            HttpRequestModel.DEFAULT_GET, httpClient, null, task);
                     InputStream imageStream = responseModel.stream;
                     recaptcha.bitmap = BitmapFactory.decodeStream(imageStream);
                 } finally {

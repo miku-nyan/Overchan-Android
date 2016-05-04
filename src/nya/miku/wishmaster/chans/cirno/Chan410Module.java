@@ -186,12 +186,12 @@ public class Chan410Module extends AbstractChanModule {
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String checkUrl = CHAN410_URL + "api_adaptive.php?board=" + boardName;
-        if (HttpStreamer.getInstance().getStringFromUrl(checkUrl, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false).
-                trim().equals("1")) return null;
+        if (HttpStreamer.getInstance().getStringFromUrl(checkUrl, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false).trim().
+                equals("1")) return null;
         String captchaUrl = CHAN410_URL + "faptcha.php?board=" + boardName;
         
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;

@@ -105,7 +105,7 @@ public class HttpStreamer {
      */
     public HttpResponseModel getFromUrl(String url, HttpRequestModel requestModel, HttpClient httpClient, ProgressListener listener,
             CancellableTask task) throws HttpRequestException {
-        if (requestModel == null) requestModel = HttpRequestModel.builder().setGET().build();
+        if (requestModel == null) requestModel = HttpRequestModel.DEFAULT_GET;
         
         //подготавливаем Request
         HttpUriRequest request = null;

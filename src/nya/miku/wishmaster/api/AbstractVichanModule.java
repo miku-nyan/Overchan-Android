@@ -508,7 +508,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     
     protected static class VichanAntiBot {
         public static List<Pair<String, String>> getFormValues(String url, CancellableTask task, HttpClient httpClient) throws Exception {
-            return getFormValues(url, HttpRequestModel.builder().setGET().build(), task, httpClient, "<form name=\"post\"", "</form>");
+            return getFormValues(url, HttpRequestModel.DEFAULT_GET, task, httpClient, "<form name=\"post\"", "</form>");
         }
         
         public static List<Pair<String, String>> getFormValues(String url, HttpRequestModel requestModel, CancellableTask task, HttpClient client,

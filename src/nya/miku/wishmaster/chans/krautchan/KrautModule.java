@@ -287,7 +287,7 @@ public class KrautModule extends CloudflareChanModule {
         String url = (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/ajax/checkpost?board=" + boardName;
         try {
             JSONObject data = HttpStreamer.getInstance().
-                    getJSONObjectFromUrl(url, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, true).
+                    getJSONObjectFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, true).
                     getJSONObject("data");
             if (data.optString("captchas", "").equals("always")) {
                 StringBuilder captchaUrlBuilder = new StringBuilder();
@@ -309,7 +309,7 @@ public class KrautModule extends CloudflareChanModule {
                 String captchaUrl = captchaUrlBuilder.toString();
                 
                 Bitmap captchaBitmap = null;
-                HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+                HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
                 HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
                 try {
                     InputStream imageStream = responseModel.stream;

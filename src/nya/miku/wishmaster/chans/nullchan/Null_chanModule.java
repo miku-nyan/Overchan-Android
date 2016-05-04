@@ -190,7 +190,7 @@ public class Null_chanModule extends AbstractWakabaModule {
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String captchaUrl = getUsingUrl() + "captcha/image.php?" + Math.random();
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;

@@ -168,7 +168,7 @@ public class WakachanModule extends AbstractWakabaModule {
         String captchaUrl = getUsingUrl() + boardName + "/captcha.pl" + "?key=" + (threadNumber == null ? "mainpage" : ("res" + threadNumber));
         
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;
@@ -268,7 +268,7 @@ public class WakachanModule extends AbstractWakabaModule {
     public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String url = getUsingUrl() + "banned/report.pl?url=/" + model.boardName + "/res/" + model.threadNumber + "%23" + model.postNumber;
         String response = RegexUtils.removeHtmlTags(HttpStreamer.getInstance().getStringFromUrl(
-                url, HttpRequestModel.builder().setGET().build(), getHttpClient(), listener, task, false)).trim();
+                url, HttpRequestModel.DEFAULT_GET, getHttpClient(), listener, task, false)).trim();
         if (response.startsWith("Post reported.")) return null;
         throw new Exception(response);
     }

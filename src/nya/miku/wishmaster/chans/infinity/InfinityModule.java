@@ -268,7 +268,7 @@ public class InfinityModule extends AbstractVichanModule {
         if (needTorCaptcha) {
             String url = getUsingUrl() + "dnsbls_bypass.php";
             String response =
-                    HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false);
+                    HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false);
             Matcher base64Matcher = CAPTCHA_BASE64.matcher(response);
             Matcher cookieMatcher = CAPTCHA_COOKIE.matcher(response);
             if (base64Matcher.find() && cookieMatcher.find()) {

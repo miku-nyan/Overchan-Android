@@ -76,7 +76,7 @@ public class CustomThemeListActivity extends ListActivity {
             public void run() {
                 JSONArray r;
                 try {
-                    HttpRequestModel request = HttpRequestModel.builder().setGET().build();
+                    HttpRequestModel request = HttpRequestModel.DEFAULT_GET;
                     r = HttpStreamer.getInstance().getJSONArrayFromUrl(URL_INDEX, request, httpClient, null, task, false);
                 } catch (Exception e) {
                     r = null;
@@ -129,7 +129,7 @@ public class CustomThemeListActivity extends ListActivity {
             public void run() {
                 String r;
                 try {
-                    HttpRequestModel request = HttpRequestModel.builder().setGET().build();
+                    HttpRequestModel request = HttpRequestModel.DEFAULT_GET;
                     r = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, null, task, false);
                 } catch (Exception e) {
                     r = null;

@@ -179,7 +179,7 @@ public class NowereModule extends AbstractChanModule {
         String captchaUrl = getUsingUrl() + boardName + "/captcha.pl?key=" + (threadNumber == null ? "mainpage" : ("res" + threadNumber));
         
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;

@@ -411,7 +411,7 @@ public class PonyachModule extends AbstractWakabaModule {
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         if (HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "haikaptcha.php?m=isndn",
-                HttpRequestModel.builder().setGET().build(), httpClient, null, task, false).equals("1")) {
+                HttpRequestModel.DEFAULT_GET, httpClient, null, task, false).equals("1")) {
             throw new HaikuCaptchaException();
         }
         
@@ -469,7 +469,7 @@ public class PonyachModule extends AbstractWakabaModule {
             String baseUrl = thisModule.getUsingUrl();
             if (url.startsWith("/")) url = baseUrl + url.substring(1);
             HttpClient httpClient = thisModule.httpClient;
-            HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+            HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
             HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(url, requestModel, httpClient, null, task);
             try {
                 InputStream imageStream = responseModel.stream;
@@ -493,7 +493,7 @@ public class PonyachModule extends AbstractWakabaModule {
                 setCaptchaTypeCookie();
                 String haiku = HttpStreamer.getInstance().getStringFromUrl(
                         ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).getUsingUrl() + "haikaptcha.php?m=get",
-                        HttpRequestModel.builder().setGET().build(),
+                        HttpRequestModel.DEFAULT_GET,
                         ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).httpClient,
                         null, task, false);
                 //Logger.d(TAG, "haiku response: " + haiku);
@@ -574,7 +574,7 @@ public class PonyachModule extends AbstractWakabaModule {
                                         public void run() {
                                             String checkUrl = ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).getUsingUrl() +
                                                     "haikaptcha.php?m=chk&a=" + (String)v.getTag();
-                                            HttpRequestModel request = HttpRequestModel.builder().setGET().build();
+                                            HttpRequestModel request = HttpRequestModel.DEFAULT_GET;
                                             String response = null;
                                             try {
                                                 response = HttpStreamer.getInstance().getStringFromUrl(checkUrl, request,

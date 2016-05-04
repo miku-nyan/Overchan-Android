@@ -202,7 +202,7 @@ public class DFWKModule extends AbstractWakabaModule {
         String captchaUrl = getUsingUrl() + "captcha.php?" + Double.toString(Math.random());
         
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;

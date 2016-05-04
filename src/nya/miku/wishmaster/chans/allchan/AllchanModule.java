@@ -523,7 +523,7 @@ public class AllchanModule extends CloudflareChanModule {
                 String challenge = json.getString("challenge");
                 String captchaUrl = (useHttps() ? "https://" : "http://") + json.optString("url", "i.captcha.yandex.net/image?key=" + challenge);
                 Bitmap captchaBitmap = null;
-                HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+                HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
                 HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
                 try {
                     InputStream imageStream = responseModel.stream;

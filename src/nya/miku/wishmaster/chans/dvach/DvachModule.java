@@ -228,7 +228,7 @@ public class DvachModule extends AbstractWakabaModule {
         String url = getUsingUrl() + boardName + "/search?q=" + URLEncoder.encode(searchRequest, "UTF-8");
         HttpResponseModel responseModel = null;
         DvachSearchReader in = null;
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel rqModel = HttpRequestModel.DEFAULT_GET;
         try {
             responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
             if (responseModel.statusCode == 200) {
@@ -249,14 +249,14 @@ public class DvachModule extends AbstractWakabaModule {
         try {
             String checkUrl = getUsingUrl() + boardName + "/api/requires-captcha";
             if (HttpStreamer.getInstance().
-                    getJSONObjectFromUrl(checkUrl, HttpRequestModel.builder().setGET().build(), httpClient, listener, task, false).
+                    getJSONObjectFromUrl(checkUrl, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false).
                     getString("requires-captcha").equals("0")) return null;
         } catch (Exception e) {
             Logger.e(TAG, "captcha", e);
         }
         String captchaUrl = getUsingUrl() + boardName + "/captcha?" + String.valueOf(Math.floor(Math.random() * 10000000));
         Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;
@@ -361,8 +361,8 @@ public class DvachModule extends AbstractWakabaModule {
         
         final CSSCodeHolder holder = new CSSCodeHolder();
         final WebViewHolder wv = new WebViewHolder();
-        final String cssTest = HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + boardName + "/csstest.foo",
-                HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+        final String cssTest = HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + boardName + "/csstest.foo", HttpRequestModel.DEFAULT_GET,
+                httpClient, null, task, false);
         long startTime = System.currentTimeMillis();
         
         Async.runOnUiThread(new Runnable() {
@@ -403,8 +403,8 @@ public class DvachModule extends AbstractWakabaModule {
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
         String cssCode = holder.getCode();
         if (cssCode != null) {
-            HttpStreamer.getInstance().getBytesFromUrl(getUsingUrl() + boardName + "/csstest.foo?code=" + cssCode,
-                    HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+            HttpStreamer.getInstance().getBytesFromUrl(getUsingUrl() + boardName + "/csstest.foo?code=" + cssCode, HttpRequestModel.DEFAULT_GET,
+                    httpClient, null, task, false);
         }
     }
     

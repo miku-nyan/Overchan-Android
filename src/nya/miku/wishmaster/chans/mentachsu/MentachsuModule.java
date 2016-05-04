@@ -190,7 +190,7 @@ public class MentachsuModule extends AbstractWakabaModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel requestModel = HttpRequestModel.builder().setGET().build();
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
         String html = HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "captcha_update.php", requestModel, httpClient, null, task, false);
         Matcher matcher = CAPTCHA_KEY.matcher(html);
         if (matcher.find()) {

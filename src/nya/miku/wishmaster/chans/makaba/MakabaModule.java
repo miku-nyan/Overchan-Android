@@ -485,7 +485,7 @@ public class MakabaModule extends CloudflareChanModule {
         if (searchRequest.startsWith(HASHTAG_PREFIX)) {
             url = domainUrl + "makaba/makaba.fcgi?task=hashtags&board=" + boardName + "&tag=" +
                     URLEncoder.encode(searchRequest.substring(HASHTAG_PREFIX.length()), "UTF-8") + "&json=1";
-            request = HttpRequestModel.builder().setGET().build();
+            request = HttpRequestModel.DEFAULT_GET;
         } else {
             url = domainUrl + "makaba/makaba.fcgi";
             HttpEntity postEntity = ExtendedMultipartBuilder.create().
@@ -519,7 +519,7 @@ public class MakabaModule extends CloudflareChanModule {
             String url = null;
             try {
                 url = domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY + "&check=1";
-                String check = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(),
+                String check = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET,
                         httpClient, listener, task, true);
                 if (check.equals("APP VALID")) {
                     captchaType = CAPTCHA_SIGNER;
@@ -539,7 +539,7 @@ public class MakabaModule extends CloudflareChanModule {
         String response;
         String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "") + ("&board=" + boardName);
         try {
-            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.builder().setGET().build(),
+            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET,
                     httpClient, null, task, true);
             if (task != null && task.isCancelled()) throw new Exception("interrupted");
             if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
@@ -561,8 +561,7 @@ public class MakabaModule extends CloudflareChanModule {
         
         String id = response.substring(response.indexOf('\n') + 1);
         url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(url, HttpRequestModel.builder().setGET().build(),
-                httpClient, listener, task);
+        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, listener, task);
         try {
             InputStream imageStream = responseModel.stream;
             CaptchaModel captchaModel = new CaptchaModel();
@@ -591,7 +590,7 @@ public class MakabaModule extends CloudflareChanModule {
             postEntityBuilder.addString("2chaptcha_value", model.captchaAnswer);
         } else if (captchaType == CAPTCHA_SIGNER) {
             String response = HttpStreamer.getInstance().getStringFromUrl(domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY,
-                    HttpRequestModel.builder().setGET().build(), httpClient, null, task, false);
+                    HttpRequestModel.DEFAULT_GET, httpClient, null, task, false);
             if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
             if (!response.startsWith("APP CHECK KEY")) throw new Exception("Invalid response");
             String[] responseSplit = response.split("\n");
