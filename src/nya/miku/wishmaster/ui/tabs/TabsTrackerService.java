@@ -400,6 +400,7 @@ public class TabsTrackerService extends Service {
         
         private NotificationCompat.Builder notifUpdate = new NotificationCompat.Builder(TabsTrackerService.this).
                 setSmallIcon(R.drawable.ic_launcher).
+                setCategory(NotificationCompat.CATEGORY_SERVICE).
                 setContentIntent(PendingIntent.getActivity(
                         TabsTrackerService.this, 0, new Intent(TabsTrackerService.this, MainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT));
         
@@ -410,6 +411,7 @@ public class TabsTrackerService extends Service {
                 setOngoing(false).
                 setAutoCancel(true).
                 setOnlyAlertOnce(true).
+                setCategory(NotificationCompat.CATEGORY_MESSAGE).
                 setContentTitle(getString(R.string.subscriptions_notification_title)).
                 setDeleteIntent(PendingIntent.getBroadcast(
                         TabsTrackerService.this, 0, new Intent(BROADCAST_ACTION_CLEAR_SUBSCRIPTIONS), PendingIntent.FLAG_CANCEL_CURRENT));

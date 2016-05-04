@@ -273,6 +273,7 @@ public class DownloadingService extends Service {
                     setTicker(getString(R.string.downloading_start_ticker)).
                     setContentIntent(pIntentToProgressDialog).
                     setOngoing(true).
+                    setCategory(NotificationCompat.CATEGORY_PROGRESS).
                     setProgress(100, 0, true);
             
             while (!isCancelled() && !downloadingQueue.isEmpty()) {
@@ -752,6 +753,7 @@ public class DownloadingService extends Service {
                             setContentIntent(pIntentToErrorReport).
                             setOngoing(false).
                             setAutoCancel(true).
+                            setCategory(NotificationCompat.CATEGORY_ERROR).
                             build());
                     Intent broadcast = new Intent(BROADCAST_UPDATED);
                     broadcast.putExtra(EXTRA_DOWNLOADING_REPORT, REPORT_ERROR);

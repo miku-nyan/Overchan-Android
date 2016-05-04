@@ -170,6 +170,7 @@ public class PostingService extends Service {
                     setContentText(notifText).
                     setContentIntent(pIntentToProgressDialog).
                     setOngoing(true).
+                    setCategory(NotificationCompat.CATEGORY_PROGRESS).
                     setProgress(100, 0, true);
             
             notificationManager.notify(POSTING_NOTIFICATION_ID, progressNotifBuilder.build());
@@ -251,7 +252,8 @@ public class PostingService extends Service {
                             setContentText(errorMessage).
                             setContentIntent(pIntentToPostingForm).
                             setOngoing(false).
-                            setAutoCancel(true);
+                            setAutoCancel(true).
+                            setCategory(NotificationCompat.CATEGORY_ERROR);
                     notificationManager.notify(POSTING_NOTIFICATION_ID, errorNotifBuilder.build());
                     sendBroadcast(broadcastIntent);
                 }
