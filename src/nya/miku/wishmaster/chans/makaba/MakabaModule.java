@@ -586,8 +586,10 @@ public class MakabaModule extends CloudflareChanModule {
         postEntityBuilder.addString("comment", model.comment);
         
         if (captchaType == CAPTCHA_2CHAPTCHA && captchaId != null) {
-            postEntityBuilder.addString("2chaptcha_id", captchaId);
-            postEntityBuilder.addString("2chaptcha_value", model.captchaAnswer);
+            postEntityBuilder.
+                    addString("captcha_type", "2chaptcha").
+                    addString("2chaptcha_id", captchaId).
+                    addString("2chaptcha_value", model.captchaAnswer);
         } else if (captchaType == CAPTCHA_SIGNER) {
             String response = HttpStreamer.getInstance().getStringFromUrl(domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY,
                     HttpRequestModel.DEFAULT_GET, httpClient, null, task, false);
