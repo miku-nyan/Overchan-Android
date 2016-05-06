@@ -25,7 +25,11 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.content.Intent;
+import android.net.Uri;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.common.MainApplication;
 
 /**
  * Класс для работы с директорией как с архивом-контейнером (для записи/модификации)
@@ -33,6 +37,7 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
  *
  */
 public class WriteableDirContainer extends WriteableContainer {
+    private static final String TAG = "WriteableDirContainer";
     
     private Set<String> files;
     private File directory;
@@ -98,7 +103,18 @@ public class WriteableDirContainer extends WriteableContainer {
     }
     
     @Override
-    public void close() throws IOException {}
+    public void close() throws IOException {
+        try {
+            MainApplication context = MainApplication.getInstance();
+            for (String file : files) {
+                if (file.startsWith("originals/")) {
+                    context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(directory, file))));
+                }
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+    }
     
     @Override
     public void cancel() {}
