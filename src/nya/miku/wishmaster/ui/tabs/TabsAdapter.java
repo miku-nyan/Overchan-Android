@@ -139,7 +139,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
         if (position >= getCount()) return;
         HistoryFragment.setLastClosed(tabsState.tabsArray.get(position));
         tabsIdStack.removeTab(getItem(position).id);
-        remove(getItem(position));
+        remove(getItem(position), false);
         if (position == selectedItem) {
             if (!tabsIdStack.isEmpty()) {
                 setSelectedItemId(tabsIdStack.getCurrentTab());
@@ -148,12 +148,12 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
                     setSelectedItem(TabModel.POSITION_NEWTAB);
                 } else {
                     if (getCount() <= position) --position;
-                    setSelectedItem(position);
+                    setSelectedItem(position); //serialize
                 }
             }
         } else {
             if (position < selectedItem) --selectedItem;
-            setSelectedItem(selectedItem);
+            setSelectedItem(selectedItem); //serialize
         }
     }
     
@@ -274,6 +274,54 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
         if (serialize) MainApplication.getInstance().serializer.serializeTabsState(tabsState);
     }
     
+    @Override
+    public void add(TabModel object) {
+        add(object, true);
+    }
+    
+    /**
+     * Добавить объект в конец массива
+     * @param object объект
+     * @param serialize если true, сериализовать объект состояния вкладок
+     */
+    public void add(TabModel object, boolean serialize) {
+        setNotifyOnChange(false);
+        super.add(object);
+        notifyDataSetChanged(serialize);
+    }
+    
+    @Override
+    public void remove(TabModel object) {
+        remove(object, true);
+    }
+    
+    /**
+     * Удалить объект из массива
+     * @param object объект
+     * @param serialize если true, сериализовать объект состояния вкладок
+     */
+    public void remove(TabModel object, boolean serialize) {
+        setNotifyOnChange(false);
+        super.remove(object);
+        notifyDataSetChanged(serialize);
+    }
+    
+    @Override
+    public void insert(TabModel object, int index) {
+        insert(object, index, true);
+    }
+    
+    /**
+     * Вставить объект в массив на заданную позицию (индекс)
+     * @param object объект
+     * @param index индекс, на который объект должен быть вставлен
+     * @param serialize если true, сериализовать объект состояния вкладок
+     */
+    public void insert(TabModel object, int index, boolean serialize) {
+        setNotifyOnChange(false);
+        super.insert(object, index);
+        notifyDataSetChanged(serialize);
+    }
     
     /**
      * Интерфейс, слушающий событие выбора (переключения) вкладки.

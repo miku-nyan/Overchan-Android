@@ -106,14 +106,14 @@ public class UrlHandler {
         
         int selected = tabsAdapter.getSelectedItem();
         if (selected >= 0 && selected < tabsAdapter.getCount()) {
-            tabsAdapter.insert(model, selected + 1);
+            tabsAdapter.insert(model, selected + 1, !switchAfter);
         } else {
-            tabsAdapter.add(model);
+            tabsAdapter.add(model, !switchAfter);
         }
         if (switchAfter) tabsAdapter.setSelectedItemId(model.id);
     }
     
-    public static TabModel getTabModel(UrlPageModel pageModel, Resources resources) {
+    private static TabModel getTabModel(UrlPageModel pageModel, Resources resources) {
         if (pageModel == null) return null;
         
         TabModel model = new TabModel();
