@@ -36,8 +36,6 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -255,19 +253,7 @@ public class DvachModule extends AbstractWakabaModule {
             Logger.e(TAG, "captcha", e);
         }
         String captchaUrl = getUsingUrl() + boardName + "/captcha?" + String.valueOf(Math.floor(Math.random() * 10000000));
-        Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-        try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
-        } finally {
-            responseModel.release();
-        }
-        CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
-        captchaModel.bitmap = captchaBitmap;
-        return captchaModel;
+        return downloadCaptcha(captchaUrl, listener, task);
     }
     
     @Override

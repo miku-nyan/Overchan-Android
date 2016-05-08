@@ -35,8 +35,6 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
@@ -298,20 +296,7 @@ public class InachModule extends AbstractWakabaModule {
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String captchaUrl = getUsingUrl() +  "captcha.pl?key=" + (threadNumber == null ? "mainpage" : ("res" + threadNumber)) +
                 "&dummy=" + Long.toString(Math.round(Math.random()*1000000)) + "&update=1";
-        
-        Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-        try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
-        } finally {
-            responseModel.release();
-        }
-        CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
-        captchaModel.bitmap = captchaBitmap;
-        return captchaModel;
+        return downloadCaptcha(captchaUrl, listener, task);
     }
     
     @Override

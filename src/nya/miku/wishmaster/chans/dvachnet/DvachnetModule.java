@@ -19,7 +19,6 @@
 package nya.miku.wishmaster.chans.dvachnet;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,8 +33,6 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -241,18 +238,7 @@ public class DvachnetModule extends AbstractWakabaModule {
         HttpRequestModel get = HttpRequestModel.DEFAULT_GET;
         captchaId = HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "cgi/captcha?task=get_id", get, httpClient, listener, task, false);
         String captchaUrl = getUsingUrl() + "cgi/captcha?task=get_image&id=" + captchaId;
-        Bitmap captchaBitmap = null;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, get, httpClient, listener, task);
-        try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
-        } finally {
-            responseModel.release();
-        }
-        CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
-        captchaModel.bitmap = captchaBitmap;
-        return captchaModel;
+        return downloadCaptcha(captchaUrl, listener, task);
     }
     
     @Override

@@ -19,7 +19,6 @@
 package nya.miku.wishmaster.chans.dobrochan;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.text.DateFormat;
@@ -43,8 +42,6 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -456,22 +453,12 @@ public class DobroModule extends AbstractChanModule {
             }
         }
         
-        String captchaUrl = getDomainUrl() + "captcha/" + boardName + "/" + System.currentTimeMillis() + ".png";
-        
-        Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
+            String captchaUrl = getDomainUrl() + "captcha/" + boardName + "/" + System.currentTimeMillis() + ".png";
+            return downloadCaptcha(captchaUrl, listener, task);
         } finally {
-            responseModel.release();
             saveHanabiraCookie();
         }
-        CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
-        captchaModel.bitmap = captchaBitmap;
-        return captchaModel;
     }
     
     @Override

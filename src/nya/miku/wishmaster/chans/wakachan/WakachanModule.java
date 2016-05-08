@@ -33,8 +33,6 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -166,20 +164,7 @@ public class WakachanModule extends AbstractWakabaModule {
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String captchaUrl = getUsingUrl() + boardName + "/captcha.pl" + "?key=" + (threadNumber == null ? "mainpage" : ("res" + threadNumber));
-        
-        Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-        try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
-        } finally {
-            responseModel.release();
-        }
-        CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
-        captchaModel.bitmap = captchaBitmap;
-        return captchaModel;
+        return downloadCaptcha(captchaUrl, listener, task);
     }
     
     @Override

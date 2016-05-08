@@ -21,7 +21,6 @@ package nya.miku.wishmaster.chans.makaba;
 import static nya.miku.wishmaster.chans.makaba.MakabaConstants.*;
 import static nya.miku.wishmaster.chans.makaba.MakabaJsonMapper.*;
 
-import java.io.InputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -52,7 +51,6 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
-import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
@@ -65,7 +63,6 @@ import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -531,18 +528,11 @@ public class MakabaModule extends CloudflareChanModule {
         
         String id = response.substring(response.indexOf('\n') + 1);
         url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, listener, task);
-        try {
-            InputStream imageStream = responseModel.stream;
-            CaptchaModel captchaModel = new CaptchaModel();
-            captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
-            captchaModel.bitmap = BitmapFactory.decodeStream(imageStream);
-            captchaType = CAPTCHA_2CHAPTCHA;
-            captchaId = id;
-            return captchaModel;
-        } finally {
-            responseModel.release();
-        }
+        CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
+        captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
+        captchaType = CAPTCHA_2CHAPTCHA;
+        captchaId = id;
+        return captchaModel;
     }
 
     @Override

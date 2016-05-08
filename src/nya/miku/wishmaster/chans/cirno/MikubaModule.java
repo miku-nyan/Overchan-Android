@@ -19,7 +19,6 @@
 package nya.miku.wishmaster.chans.cirno;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -32,8 +31,6 @@ import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
@@ -260,22 +257,12 @@ public class MikubaModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String captchaUrl = (useHttps() ? "https://" : "http://") + MIKUBA_DOMAIN + "/c";
-        
-        Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
         try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
+            String captchaUrl = (useHttps() ? "https://" : "http://") + MIKUBA_DOMAIN + "/c";
+            return downloadCaptcha(captchaUrl, listener, task);
         } finally {
-            responseModel.release();
             saveCookiesToPreferences();
         }
-        CaptchaModel captchaModel = new CaptchaModel();
-        captchaModel.type = CaptchaModel.TYPE_NORMAL;
-        captchaModel.bitmap = captchaBitmap;
-        return captchaModel;
     }
     
     @Override

@@ -18,6 +18,7 @@
 
 package nya.miku.wishmaster.api;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import nya.miku.wishmaster.R;
@@ -33,6 +34,7 @@ import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
+import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
@@ -43,6 +45,8 @@ import cz.msebera.android.httpclient.cookie.Cookie;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -326,6 +330,31 @@ public abstract class AbstractChanModule implements HttpChanModule {
         if (task != null && task.isCancelled()) throw new Exception("interrupted");
         if (listener != null) listener.setIndeterminate();
         return array;
+    }
+    
+    /**
+     * Загрузить капчу по ссылке.
+     * Использется GET-запрос по умолчанию, код состояния HTTP не учитывается (загружается, даже если сервер не вернул HTTP 200).
+     * Тип модели капчи устанавливается: {@link CaptchaModel#TYPE_NORMAL} - допустимы все символы (а не только цифры).
+     * @param captchaUrl абсолютный URL
+     * @param listener интерфейс отслеживания прогресса (может принимать null)
+     * @param task задача, отмена которой прервёт поток (может принимать null)
+     * @return объект CaptchaModel с загруженной картинкой и типом {@link CaptchaModel#TYPE_NORMAL}
+     */
+    protected CaptchaModel downloadCaptcha(String captchaUrl, ProgressListener listener, CancellableTask task) throws Exception {
+        Bitmap captchaBitmap = null;
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
+        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
+        try {
+            InputStream imageStream = responseModel.stream;
+            captchaBitmap = BitmapFactory.decodeStream(imageStream);
+        } finally {
+            responseModel.release();
+        }
+        CaptchaModel captchaModel = new CaptchaModel();
+        captchaModel.type = CaptchaModel.TYPE_NORMAL;
+        captchaModel.bitmap = captchaBitmap;
+        return captchaModel;
     }
     
 }

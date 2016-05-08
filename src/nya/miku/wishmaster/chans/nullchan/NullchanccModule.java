@@ -45,8 +45,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -318,18 +316,8 @@ public class NullchanccModule extends AbstractWakabaModule {
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String captchaUrl = getUsingUrl() + "captcha.php?" + Math.random();
-        Bitmap captchaBitmap = null;
-        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-        try {
-            InputStream imageStream = responseModel.stream;
-            captchaBitmap = BitmapFactory.decodeStream(imageStream);
-        } finally {
-            responseModel.release();
-        }
-        CaptchaModel captchaModel = new CaptchaModel();
+        CaptchaModel captchaModel = downloadCaptcha(captchaUrl, listener, task);
         captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
-        captchaModel.bitmap = captchaBitmap;
         return captchaModel;
     }
     

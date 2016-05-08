@@ -18,7 +18,6 @@
 
 package nya.miku.wishmaster.chans.allchan;
 
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -31,8 +30,6 @@ import java.util.regex.Pattern;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
@@ -62,7 +59,6 @@ import nya.miku.wishmaster.http.recaptcha.Recaptcha;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
-import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONException;
@@ -507,21 +503,11 @@ public class AllchanModule extends CloudflareChanModule {
                 JSONObject json = downloadJSONObject(url, false, listener, task);
                 String challenge = json.getString("challenge");
                 String captchaUrl = (useHttps() ? "https://" : "http://") + json.optString("url", "i.captcha.yandex.net/image?key=" + challenge);
-                Bitmap captchaBitmap = null;
-                HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-                HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-                try {
-                    InputStream imageStream = responseModel.stream;
-                    captchaBitmap = BitmapFactory.decodeStream(imageStream);
-                } finally {
-                    responseModel.release();
-                }
+                captchaModel = downloadCaptcha(captchaUrl, listener, task);
+                captchaModel.type = captchaType == CAPTCHA_YANDEX_ESTD ? CaptchaModel.TYPE_NORMAL_DIGITS : CaptchaModel.TYPE_NORMAL;
                 this.captchaType = captchaType;
                 this.yandexCaptchaKey = challenge;
                 this.recaptchaV1 = null;
-                captchaModel = new CaptchaModel();
-                captchaModel.type = captchaType == CAPTCHA_YANDEX_ESTD ? CaptchaModel.TYPE_NORMAL_DIGITS : CaptchaModel.TYPE_NORMAL;
-                captchaModel.bitmap = captchaBitmap;
                 return captchaModel;
             case CAPTCHA_RECAPTCHA:
             case CAPTCHA_RECAPTCHA_FALLBACK:

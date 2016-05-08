@@ -38,8 +38,6 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -195,17 +193,8 @@ public class MentachsuModule extends AbstractWakabaModule {
         Matcher matcher = CAPTCHA_KEY.matcher(html);
         if (matcher.find()) {
             String captchaUrl = getUsingUrl() + "simple-php-captcha.php?_CAPTCHA&t=" + matcher.group(1);
-            Bitmap captchaBitmap = null;
-            HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-            try {
-                InputStream imageStream = responseModel.stream;
-                captchaBitmap = BitmapFactory.decodeStream(imageStream);
-            } finally {
-                responseModel.release();
-            }
-            CaptchaModel captchaModel = new CaptchaModel();
+            CaptchaModel captchaModel = downloadCaptcha(captchaUrl, listener, task);
             captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
-            captchaModel.bitmap = captchaBitmap;
             return captchaModel;
         } else throw new Exception("Captcha update epic fail");
     }

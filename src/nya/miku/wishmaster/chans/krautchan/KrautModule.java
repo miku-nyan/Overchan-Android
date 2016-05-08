@@ -20,7 +20,6 @@ package nya.miku.wishmaster.chans.krautchan;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -43,8 +42,6 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -307,20 +304,7 @@ public class KrautModule extends CloudflareChanModule {
                 String captchaId = captchaIdBuilder.toString();
                 captchaUrlBuilder.append(captchaId);
                 String captchaUrl = captchaUrlBuilder.toString();
-                
-                Bitmap captchaBitmap = null;
-                HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-                HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
-                try {
-                    InputStream imageStream = responseModel.stream;
-                    captchaBitmap = BitmapFactory.decodeStream(imageStream);
-                } finally {
-                    responseModel.release();
-                }
-                
-                CaptchaModel captchaModel = new CaptchaModel();
-                captchaModel.type = CaptchaModel.TYPE_NORMAL;
-                captchaModel.bitmap = captchaBitmap;
+                CaptchaModel captchaModel = downloadCaptcha(captchaUrl, listener, task);
                 lastCaptchaId = captchaId;
                 return captchaModel;
                 
