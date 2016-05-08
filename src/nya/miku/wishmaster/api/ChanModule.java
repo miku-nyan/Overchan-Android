@@ -95,7 +95,7 @@ public interface ChanModule {
      * @param page страница
      * @param listener интерфейс отслеживания прогресса (может принимать null)
      * @param task интерфейс отменяемой задачи
-     * @param oldList старый список тредов (может принимать null)
+     * @param oldList старый список тредов (может принимать null). Объекты из этого списка не должны быть изменены
      * @return список (массив) тредов страницы
      */
     ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList) throws Exception;
@@ -107,7 +107,7 @@ public interface ChanModule {
      * @param catalogType тип каталога (индекс в {@link BoardModel#catalogTypeDescriptions})
      * @param listener интерфейс отслеживания прогресса (может принимать null)
      * @param task интерфейс отменяемой задачи
-     * @param oldList старый список тредов (может принимать null)
+     * @param oldList старый список тредов (может принимать null). Объекты из этого списка не должны быть изменены
      * @return список (массив) тредов каталога
      */
     ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
@@ -123,7 +123,8 @@ public interface ChanModule {
      * @param threadNumber номер треда
      * @param listener интерфейс отслеживания прогресса (может принимать null)
      * @param task интерфейс отменяемой задачи
-     * @param oldList старый список постов (может принимать null)
+     * @param oldList старый список постов (может принимать null).
+     * Объекты из этого списка не должны быть изменены (исключение: поле {@link PostModel#deleted})
      * @return список (массив) постов треда
      */
     PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
