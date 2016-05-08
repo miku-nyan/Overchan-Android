@@ -253,6 +253,14 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
                 case ".gif":
                     attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
                     break;
+                case ".svg":
+                case ".svgz":
+                    attachment.type = AttachmentModel.TYPE_IMAGE_SVG;
+                    break;
+                case ".mp3":
+                case ".ogg":
+                    attachment.type = AttachmentModel.TYPE_AUDIO;
+                    break;
                 case ".webm":
                 case ".mp4":
                     attachment.type = AttachmentModel.TYPE_VIDEO;
@@ -268,7 +276,8 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             attachment.isSpoiler = isSpoiler;
             String tim = object.optString("tim", "");
             if (tim.length() > 0) {
-                attachment.thumbnail = isSpoiler ? null : ("/" + boardName + "/thumb/" + tim + ".jpg");
+                attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
+                    ("/" + boardName + "/thumb/" + tim + ".jpg");
                 attachment.path = "/" + boardName + "/src/" + tim + ext;
                 return attachment;
             }

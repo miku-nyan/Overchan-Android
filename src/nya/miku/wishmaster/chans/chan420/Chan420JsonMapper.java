@@ -132,6 +132,10 @@ public class Chan420JsonMapper {
                 case ".gif":
                     attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
                     break;
+                case ".svg":
+                case ".svgz":
+                    attachment.type = AttachmentModel.TYPE_IMAGE_SVG;
+                    break;
                 case ".webm":
                     attachment.type = AttachmentModel.TYPE_VIDEO;
                     break;

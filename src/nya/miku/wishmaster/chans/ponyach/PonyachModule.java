@@ -337,6 +337,10 @@ public class PonyachModule extends AbstractWakabaModule {
                         case "gif":
                             attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
                             break;
+                        case "svg":
+                        case "svgz":
+                            attachment.type = AttachmentModel.TYPE_IMAGE_SVG;
+                            break;
                         case "webm":
                         case "mp4":
                             attachment.type = AttachmentModel.TYPE_VIDEO;

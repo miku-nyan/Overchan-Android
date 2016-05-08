@@ -92,42 +92,12 @@ public class SamachanModule extends AbstractVichanModule {
 
     @Override
     protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
-        String ext = object.optString("ext", "");
-        if (!ext.equals("")) {
-            AttachmentModel attachment = new AttachmentModel();
-            switch (ext) {
-                case ".jpeg":
-                case ".jpg":
-                case ".png":
-                    attachment.type = AttachmentModel.TYPE_IMAGE_STATIC;
-                    break;
-                case ".gif":
-                    attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
-                    break;
-                case ".mp3":
-                    attachment.type = AttachmentModel.TYPE_AUDIO;
-                    break;
-                case ".webm":
-                case ".mp4":
-                    attachment.type = AttachmentModel.TYPE_VIDEO;
-                    break;
-                default:
-                    attachment.type = AttachmentModel.TYPE_OTHER_FILE;
-            }
-            attachment.size = object.optInt("fsize", -1);
-            if (attachment.size > 0) attachment.size = Math.round(attachment.size / 1024f);
-            attachment.width = object.optInt("w", -1);
-            attachment.height = object.optInt("h", -1);
-            attachment.originalName = object.optString("filename", "") + ext;
-            attachment.isSpoiler = isSpoiler;
-            String tim = object.optString("tim", "");
-            if (tim.length() > 0 && !ext.equals(".mp3") && !ext.equals(".webm")) {
-                attachment.thumbnail = isSpoiler ? null : ("/" + boardName + "/thumb/" + tim + ".jpg");
-            }
-            attachment.path = "/" + boardName + "/src/" + tim + ext;
-            return attachment;
+        AttachmentModel attachment = super.mapAttachment(object, boardName, isSpoiler);
+        if (attachment != null) {
+            String ext = object.optString("ext", "");
+            if (ext.equals(".webm")) attachment.thumbnail = null;
         }
-        return null;
+        return attachment;
     }
 
     @Override
