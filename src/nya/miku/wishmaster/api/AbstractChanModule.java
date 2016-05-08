@@ -34,7 +34,8 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
-
+import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 import cz.msebera.android.httpclient.HttpHost;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.cookie.Cookie;
@@ -167,8 +168,6 @@ public abstract class AbstractChanModule implements HttpChanModule {
      */
     protected void initHttpClient() {}
     
-    @Deprecated protected void addUnsafeSslPreference(PreferenceGroup group, String dependencyKey) {}
-    
     /**
      * Добавить в группу параметров (на экран/в категорию) новую категорию настроек прокси-сервера
      * @param group группа, на которую добавляются параметры
@@ -294,7 +293,39 @@ public abstract class AbstractChanModule implements HttpChanModule {
     @Override
     public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
         String fixedUrl = fixRelativeUrl(url);
-        HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, true);
+        HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false);
+    }
+    
+    /**
+     * Скачать JSON-объект по ссылке
+     * @param url абсолютный URL
+     * @param checkIfModidied не загружать, если данные не изменились с прошлого запроса (HTTP 304), в этом случае вернёт null
+     * @param listener интерфейс отслеживания прогресса (может принимать null)
+     * @param task задача, отмена которой прервёт поток (может принимать null)
+     * @return объект JSONObject, или NULL, если страница не была изменена (HTTP 304)
+     */
+    protected JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
+        JSONObject object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, false);
+        if (task != null && task.isCancelled()) throw new Exception("interrupted");
+        if (listener != null) listener.setIndeterminate();
+        return object;
+    }
+    
+    /**
+     * Скачать JSON-массив по ссылке
+     * @param url абсолютный URL
+     * @param checkIfModidied не загружать, если данные не изменились с прошлого запроса (HTTP 304), в этом случае вернёт null
+     * @param listener интерфейс отслеживания прогресса (может принимать null)
+     * @param task задача, отмена которой прервёт поток (может принимать null)
+     * @return объект JSONArray, или NULL, если страница не была изменена (HTTP 304)
+     */
+    protected JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
+        JSONArray array = HttpStreamer.getInstance().getJSONArrayFromUrl(url, rqModel, httpClient, listener, task, false);
+        if (task != null && task.isCancelled()) throw new Exception("interrupted");
+        if (listener != null) listener.setIndeterminate();
+        return array;
     }
     
 }

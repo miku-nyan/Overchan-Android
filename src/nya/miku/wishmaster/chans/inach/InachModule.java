@@ -133,14 +133,6 @@ public class InachModule extends AbstractWakabaModule {
         return preferences.getBoolean(getSharedKey(PREF_AJAX_UPDATE), true);
     }
     
-    private JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        JSONObject object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, false);
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return object;
-    }
-    
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
         return new InachReader(stream);

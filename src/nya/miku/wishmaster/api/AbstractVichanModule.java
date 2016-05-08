@@ -80,34 +80,6 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         super(preferences, resources);
     }
     
-    protected JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        JSONObject object = null;
-        try {
-            object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, canCloudflare());
-        } catch (HttpWrongStatusCodeException e) {
-            if (canCloudflare()) checkCloudflareError(e, url);
-            throw e;
-        }
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return object;
-    }
-    
-    protected JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        JSONArray array = null;
-        try {
-            array = HttpStreamer.getInstance().getJSONArrayFromUrl(url, rqModel, httpClient, listener, task, canCloudflare());
-        } catch (HttpWrongStatusCodeException e) {
-            if (canCloudflare()) checkCloudflareError(e, url);
-            throw e;
-        }
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return array;
-    }
-    
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel board = super.getBoard(shortName, listener, task);
@@ -193,10 +165,6 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             }
         }
         return threads.toArray(new ThreadModel[threads.size()]);
-    }
-    
-    protected boolean jsonImagesIncludeOmitted() {
-        return false;
     }
     
     protected ThreadModel mapThreadModel(JSONObject opPost, String boardName) {

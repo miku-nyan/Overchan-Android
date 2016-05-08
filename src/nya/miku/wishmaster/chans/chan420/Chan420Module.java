@@ -87,22 +87,6 @@ public class Chan420Module extends AbstractChanModule {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_420chan, null);
     }
     
-    private JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        JSONObject object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, false);
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return object;
-    }
-    
-    private JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        JSONArray array = HttpStreamer.getInstance().getJSONArrayFromUrl(url, rqModel, httpClient, listener, task, false);
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return array;
-    }
-    
     private boolean useHttps() {
         return false;
     }

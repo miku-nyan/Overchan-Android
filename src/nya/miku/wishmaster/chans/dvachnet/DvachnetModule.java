@@ -55,7 +55,6 @@ import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
-import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
@@ -161,21 +160,6 @@ public class DvachnetModule extends AbstractWakabaModule {
     protected SimpleBoardModel[] getBoardsList() {
         return BOARDS;
     }
-    
-    protected JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        JSONObject object = null;
-        try {
-            object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, canCloudflare());
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, url);
-            throw e;
-        }
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return object;
-    }
-    
     
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {

@@ -169,13 +169,10 @@ public class DobroModule extends AbstractChanModule {
         }
     }
     
-    private JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        JSONObject response = null;
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        response = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, true);
+    @Override
+    protected JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
+        JSONObject response = super.downloadJSONObject(url, checkIfModidied, listener, task);
         saveHanabiraCookie();
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
         return response;
     }
     

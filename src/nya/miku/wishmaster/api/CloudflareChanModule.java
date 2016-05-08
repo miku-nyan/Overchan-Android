@@ -34,6 +34,8 @@ import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
+import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public abstract class CloudflareChanModule extends AbstractChanModule {
     
@@ -124,9 +126,37 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
         String fixedUrl = fixRelativeUrl(url);
         try {
             HttpRequestModel rqModel = HttpRequestModel.DEFAULT_GET;
-            HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, rqModel, httpClient, listener, task, true);
+            HttpStreamer.getInstance().downloadFileFromUrl(fixedUrl, out, rqModel, httpClient, listener, task, canCloudflare());
         } catch (HttpWrongStatusCodeException e) {
             if (canCloudflare()) checkCloudflareError(e, fixedUrl);
+            throw e;
+        }
+    }
+    
+    @Override
+    protected JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
+        try {
+            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
+            JSONObject object = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, canCloudflare());
+            if (task != null && task.isCancelled()) throw new Exception("interrupted");
+            if (listener != null) listener.setIndeterminate();
+            return object;
+        } catch (HttpWrongStatusCodeException e) {
+            if (canCloudflare()) checkCloudflareError(e, url);
+            throw e;
+        }
+    }
+    
+    @Override
+    protected JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
+        try {
+            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
+            JSONArray array = HttpStreamer.getInstance().getJSONArrayFromUrl(url, rqModel, httpClient, listener, task, canCloudflare());
+            if (task != null && task.isCancelled()) throw new Exception("interrupted");
+            if (listener != null) listener.setIndeterminate();
+            return array;
+        } catch (HttpWrongStatusCodeException e) {
+            if (canCloudflare()) checkCloudflareError(e, url);
             throw e;
         }
     }

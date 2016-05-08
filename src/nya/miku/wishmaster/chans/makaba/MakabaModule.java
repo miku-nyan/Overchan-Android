@@ -168,36 +168,6 @@ public class MakabaModule extends CloudflareChanModule {
         }
     }
     
-    /** Загрузить из интернета (по адресу url) JSON объект. Учитывается возможность ошибки CloudFlare. */
-    private JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        JSONObject response = null;
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        try {
-            response = HttpStreamer.getInstance().getJSONObjectFromUrl(url, rqModel, httpClient, listener, task, true);
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, url);
-            throw e;
-        }
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return response;
-    }
-    
-    /** Загрузить из интернета (по адресу url) JSON массив. Учитывается возможность ошибки CloudFlare. */
-    private JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        JSONArray response = null;
-        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(checkIfModidied).build();
-        try {
-            response = HttpStreamer.getInstance().getJSONArrayFromUrl(url, rqModel, httpClient, listener, task, true);
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, url);
-            throw e;
-        }
-        if (task != null && task.isCancelled()) throw new Exception("interrupted");
-        if (listener != null) listener.setIndeterminate();
-        return response;
-    }
-    
     private void addMobileAPIPreference(PreferenceGroup group) {
         final Context context = group.getContext();
         CheckBoxPreference mobileAPIPref = new CheckBoxPreference(context);
