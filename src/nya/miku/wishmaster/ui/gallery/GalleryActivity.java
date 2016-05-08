@@ -483,6 +483,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             case AttachmentModel.TYPE_IMAGE_GIF:
                 shareIntent.setType("image/gif");
                 break;
+            case AttachmentModel.TYPE_IMAGE_SVG:
+                shareIntent.setType("image/svg+xml");
+                break;
             case AttachmentModel.TYPE_IMAGE_STATIC:
                 if (extension.equalsIgnoreCase(".png")) {
                     shareIntent.setType("image/png");
@@ -762,6 +765,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 case AttachmentModel.TYPE_IMAGE_GIF:
                     setGif(tag, file);
                     break;
+                case AttachmentModel.TYPE_IMAGE_SVG:
+                    setSvg(tag, file);
+                    break;
                 case AttachmentModel.TYPE_VIDEO:
                     setVideo(tag, file);
                     break;
@@ -908,6 +914,10 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 tag.layout.addView(iv);
             }
         });
+    }
+    
+    private void setSvg(GalleryItemViewTag tag, File file) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) setWebView(tag, file); else setOtherFile(tag, file);
     }
     
     private void setVideo(final GalleryItemViewTag tag, final File file) {

@@ -2273,7 +2273,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     type.setText(R.string.postitem_link);
                     break;
             }
-            if (attachment.type == AttachmentModel.TYPE_IMAGE_STATIC) {
+            if (attachment.type == AttachmentModel.TYPE_IMAGE_STATIC || attachment.type == AttachmentModel.TYPE_IMAGE_SVG) {
                 type.setVisibility(View.GONE);
             } else {
                 type.setVisibility(View.VISIBLE);

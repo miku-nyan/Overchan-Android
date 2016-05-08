@@ -32,7 +32,7 @@ public class AttachmentModel implements Serializable {
     
     /**
      * Тип вложения, одно из константных значений:
-     * {@link #TYPE_IMAGE_STATIC}, {@link #TYPE_IMAGE_GIF},
+     * {@link #TYPE_IMAGE_STATIC}, {@link #TYPE_IMAGE_GIF}, {@link #TYPE_IMAGE_SVG},
      * {@link #TYPE_VIDEO}, {@link #TYPE_AUDIO},
      * {@link #TYPE_OTHER_FILE}, {@link #TYPE_OTHER_NOTFILE}
      */
@@ -87,6 +87,10 @@ public class AttachmentModel implements Serializable {
      * Константное значение для обозначения типа вложения - анимированное изображение (файл GIF)
      */
     public static final int TYPE_IMAGE_GIF = 1;
+    /**
+     * Константное значение для обозначения типа вложения - векторное изображение (файл SVG)
+     */
+    public static final int TYPE_IMAGE_SVG = 6;
     /**
      * Константное значение для обозначения типа вложения - видеофайл (файл WEBM или другой формат)
      */
