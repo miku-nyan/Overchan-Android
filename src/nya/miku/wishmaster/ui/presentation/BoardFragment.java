@@ -1216,7 +1216,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         }
                         startItem = null; //уже загрузили с чана а не из кэша, так что дальше искать якорь на данный пост смысла нет
                         if (isCancelled()) return;
-                        final boolean newSubscriptions = subscriptions.checkSubscriptions(pageFromChan, itemsCountBefore);
+                        int checkSubscriptions = subscriptions.checkSubscriptions(pageFromChan, itemsCountBefore);
+                        final String newSubscription = checkSubscriptions >= 0 ? pageFromChan.posts[checkSubscriptions].number : null;
                         if (isCancelled()) return;
                         Async.runOnUiThread(new Runnable() {
                             @Override
@@ -1250,7 +1251,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                                         toastToNewPosts = true;
                                         if (silent && activity.isPaused()) {
                                             TabsTrackerService.setUnread();
-                                            if (newSubscriptions) TabsTrackerService.addSubscriptionNotification(tabModel.webUrl, tabModel.title);
+                                            if (newSubscription != null) {
+                                                TabsTrackerService.addSubscriptionNotification(tabModel.webUrl, newSubscription, tabModel.title);
+                                            }
                                         }
                                     }
                                 } else {

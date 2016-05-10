@@ -62,24 +62,25 @@ public class Subscriptions {
      * Проверить, есть ли на данной странице ответы на отслеживаемые посты
      * @param page страница
      * @param startPostIndex номер поста (по порядку) на странице, начиная с которого требуется проверять
+     * @return индекс (номер по порядку) первого ответа на отслеживаемые посты, если таковые есть, в противном случае -1 
      */
-    public boolean checkSubscriptions(SerializablePage page, int startPostIndex) {
-        if (!MainApplication.getInstance().settings.isSubscriptionsEnabled()) return false;
+    public int checkSubscriptions(SerializablePage page, int startPostIndex) {
+        if (!MainApplication.getInstance().settings.isSubscriptionsEnabled()) return -1;
         if (page.pageModel == null || page.pageModel.type != UrlPageModel.TYPE_THREADPAGE || page.posts == null)
-            return false;
+            return -1;
         String[] subscriptions = getSubscriptions(page.pageModel.chanName, page.pageModel.boardName, page.pageModel.threadNumber);
-        if (subscriptions == null) return false;
+        if (subscriptions == null) return -1;
         if (startPostIndex < page.posts.length &&
                 MainApplication.getInstance().settings.subscribeThreads() &&
                 Arrays.binarySearch(subscriptions, page.pageModel.threadNumber) >= 0)
-            return true;
+            return startPostIndex;
         for (int i=startPostIndex; i<page.posts.length; ++i) {
             String comment = page.posts[i].comment;
             if (comment == null) continue;
             Matcher m = PresentationItemModel.REPLY_LINK_FULL_PATTERN.matcher(comment);
-            while (m.find()) if (Arrays.binarySearch(subscriptions, m.group(1)) >= 0) return true;
+            while (m.find()) if (Arrays.binarySearch(subscriptions, m.group(1)) >= 0) return i;
         }
-        return false;
+        return -1;
     }
     
     /**

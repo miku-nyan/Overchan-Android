@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.LockSupport;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
@@ -78,8 +78,8 @@ public class TabsTrackerService extends Service {
     private static boolean unread = false;
     /** если true, выведется уведомление об ответе на отслеживаемые посты */
     private static boolean subscriptions = false;
-    /** список тредов, в которых есть ответы на отслеживаемые посты (пары: url, заголовок вкладки) */
-    private static List<Pair<String, String>> subscriptionsData = null;
+    /** список тредов, в которых есть ответы на отслеживаемые посты (triple: url вкладки, url со ссылкой на пост, заголовок вкладки) */
+    private static List<Triple<String, String, String>> subscriptionsData = null;
     /** ID вкладки, которая обновляется в данный момент или -1 */
     private static long currentUpdatingTabId = -1;
     
@@ -89,26 +89,40 @@ public class TabsTrackerService extends Service {
     }
     
     /** добавить тред, в котором есть ответы на отслеживаемые посты (будет выведено уведомление) */
-    public static void addSubscriptionNotification(String url, String tabTitle) {
-        List<Pair<String, String>> list = subscriptionsData;
+    public static void addSubscriptionNotification(String tabUrl, String postNumber, String tabTitle) {
+        List<Triple<String, String, String>> list = subscriptionsData;
         if (list == null) list = new ArrayList<>();
         int index = -1;
         for (int i=0; i<list.size(); ++i) {
-            Pair<String, String> pair = list.get(i);
-            if (url == null) {
-                if (pair.getLeft() == null && tabTitle.equals(pair.getRight())) {
+            Triple<String, String, String> triple = list.get(i);
+            if (tabUrl == null) {
+                if (triple.getLeft() == null && tabTitle.equals(triple.getRight())) {
                     index = i;
                     break;
                 }
             } else {
-                if (url.equals(pair.getLeft())) {
+                if (tabUrl.equals(triple.getLeft())) {
                     index = i;
                     break;
                 }
             }
         }
-        Pair<String, String> newPair = Pair.of(url, tabTitle);
-        if (index == -1) list.add(newPair); else list.set(index, newPair);
+        if (index == -1) {
+            String postUrl = tabUrl;
+            try {
+                UrlPageModel pageModel = UrlHandler.getPageModel(tabUrl);
+                if (pageModel != null) {
+                    pageModel.postNumber = postNumber;
+                    postUrl = MainApplication.getInstance().getChanModule(pageModel.chanName).buildUrl(pageModel);
+                }
+            } catch (Exception e) {
+                Logger.e(TAG, e);
+            }
+            list.add(Triple.of(tabUrl, postUrl, tabTitle));
+        } else {
+            String postUrl = list.get(index).getMiddle();
+            list.set(index, Triple.of(tabUrl, postUrl, tabTitle));
+        }
         subscriptionsData = list;
         subscriptions = true;
     }
@@ -279,8 +293,9 @@ public class TabsTrackerService extends Service {
                             if (oldCount != newCount) {
                                 if (oldCount != 0) tab.unreadPostsCount += (newCount - oldCount);
                                 setUnread();
-                                if (MainApplication.getInstance().subscriptions.checkSubscriptions(serializablePage, oldCount)) {
-                                    addSubscriptionNotification(tab.webUrl, tab.title);
+                                int checkSubscriptions = MainApplication.getInstance().subscriptions.checkSubscriptions(serializablePage, oldCount);
+                                if (checkSubscriptions >= 0) {
+                                    addSubscriptionNotification(tab.webUrl, serializablePage.posts[checkSubscriptions].number, tab.title);
                                     tab.unreadSubscriptions = true;
                                 }
                             }
@@ -379,9 +394,9 @@ public class TabsTrackerService extends Service {
         private Notification getSubscriptionsNotification() {
             if (!subscriptions) return null;
             subscriptions = false;
-            List<Pair<String, String>> list = subscriptionsData;
+            List<Triple<String, String, String>> list = subscriptionsData;
             if (list == null || list.size() == 0) return null;
-            String url = list.get(0).getLeft();
+            String url = list.get(0).getMiddle();
             Intent activityIntent = new Intent(TabsTrackerService.this, MainActivity.class).putExtra(EXTRA_CLEAR_SUBSCRIPTIONS, true);
             if (url != null) activityIntent.setData(Uri.parse(url));
             NotificationCompat.InboxStyle style = list.size() == 1 ? null : new NotificationCompat.InboxStyle().
