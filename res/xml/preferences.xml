@@ -349,8 +349,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:defaultValue="true"
             android:key="@string/pref_key_highlight_subscriptions"
             android:title="@string/pref_highlight_subscriptions_title"
-            android:summary="@string/pref_highlight_subscriptions_summary"
-            android:dependency="@string/pref_key_subscriptions_enabled" />
+            android:summary="@string/pref_highlight_subscriptions_summary" />
         
         <CheckBoxPreference
             android:defaultValue="true"

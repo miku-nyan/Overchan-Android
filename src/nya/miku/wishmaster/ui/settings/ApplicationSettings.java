@@ -435,7 +435,7 @@ public class ApplicationSettings {
     }
     
     public boolean highlightSubscriptions() {
-        return isSubscriptionsEnabled() && preferences.getBoolean(resources.getString(R.string.pref_key_highlight_subscriptions), true);
+        return preferences.getBoolean(resources.getString(R.string.pref_key_highlight_subscriptions), true);
     }
     
     public boolean subscribeOwnPosts() {
