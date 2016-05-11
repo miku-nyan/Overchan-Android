@@ -60,7 +60,7 @@ public class KurisachModule extends AbstractInstant0chan {
     
     @Override
     protected boolean canHttps() {
-        return false;
+        return true;
     }
     
     @Override
