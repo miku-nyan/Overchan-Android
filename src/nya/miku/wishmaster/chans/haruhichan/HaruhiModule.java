@@ -41,7 +41,7 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class HaruhiModule extends AbstractVichanModule {
     private static final String CHAN_NAME = "haruhichan.ru";
-    private static final String DOMAIN_NAME = "haruhichan.ru";
+    private static final String DOMAIN_NAME = "haruhichan.ovh";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "SOS団", " ", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Анимация", " ", false),
@@ -71,8 +71,18 @@ public class HaruhiModule extends AbstractVichanModule {
     }
     
     @Override
+    protected String[] getAllDomains() {
+        return new String[] { DOMAIN_NAME, "haruhichan.ru" };
+    }
+    
+    @Override
     protected String getUsingDomain() {
         return DOMAIN_NAME;
+    }
+    
+    @Override
+    protected boolean canCloudflare() {
+        return true;
     }
     
     @Override
