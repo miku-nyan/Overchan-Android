@@ -23,15 +23,11 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.interfaces.CancellableTask;
-import nya.miku.wishmaster.api.interfaces.ProgressListener;
-import nya.miku.wishmaster.api.models.BoardModel;
-import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.chans.nullchan.NullchanccModule;
+import nya.miku.wishmaster.chans.nullchan.AbstractInstant0chan;
 
-public class KurisachModule extends NullchanccModule {
+public class KurisachModule extends AbstractInstant0chan {
     private static final String CHAN_NAME = "kurisa.ch";
     private static final String DOMAIN = "kurisa.ch";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
@@ -68,22 +64,13 @@ public class KurisachModule extends NullchanccModule {
     }
     
     @Override
+    protected boolean canCloudflare() {
+        return true;
+    }
+    
+    @Override
     protected SimpleBoardModel[] getBoardsList() {
         return BOARDS;
     }
     
-    @Override
-    public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
-        BoardModel board = super.getBoard(shortName, listener, task);
-        board.defaultUserName = "Anonymous";
-        board.allowNames = true;
-        return board;
-    }
-    
-    @Override
-    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        CaptchaModel captcha = super.getNewCaptcha(boardName, threadNumber, listener, task);
-        captcha.type = CaptchaModel.TYPE_NORMAL;
-        return captcha;
-    }
 }

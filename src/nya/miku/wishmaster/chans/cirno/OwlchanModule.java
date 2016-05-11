@@ -18,7 +18,6 @@
 
 package nya.miku.wishmaster.chans.cirno;
 
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -37,7 +36,6 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 
 public class OwlchanModule extends AbstractKusabaModule {
@@ -61,10 +59,10 @@ public class OwlchanModule extends AbstractKusabaModule {
     };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
     
-    private static final DateFormat DATEFORMAT;
+    private static final DateFormat DATE_FORMAT;
     static {
-        DATEFORMAT = new SimpleDateFormat("dd/MM/yy | HH:mm:ss", Locale.US);
-        DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        DATE_FORMAT = new SimpleDateFormat("dd/MM/yy | HH:mm:ss", Locale.US);
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
     }
     
     public OwlchanModule(SharedPreferences preferences, Resources resources) {
@@ -107,6 +105,16 @@ public class OwlchanModule extends AbstractKusabaModule {
     }
     
     @Override
+    protected DateFormat getDateFormat() {
+        return DATE_FORMAT;
+    }
+    
+    @Override
+    protected int getKusabaFlags() {
+        return ~(KusabaReader.FLAG_HANDLE_EMBEDDED_POST_POSTPROCESS|KusabaReader.FLAG_OMITTED_STRING_REMOVE_HREF);
+    }
+    
+    @Override
     protected ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkModified, UrlPageModel urlModel)
             throws Exception {
         try {
@@ -143,17 +151,6 @@ public class OwlchanModule extends AbstractKusabaModule {
         board.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         board.markType = BoardModel.MARK_BBCODE;
         return board;
-    }
-    
-    @Override
-    protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DATEFORMAT) {
-            @Override
-            protected void parseThumbnail(String imgTag) {
-                if (imgTag.contains("/css/locked.gif")) currentThread.isClosed = true;
-                super.parseThumbnail(imgTag);
-            }
-        };
     }
     
     @Override

@@ -67,18 +67,6 @@ public class TohnoChanModule extends AbstractKusabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fb", "Feedback", "Other", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pic", "Dump", "Other", false),
     };
-    private static final Pattern YOUTUBE_PATTERN = Pattern.compile("data=\"(?:.*?)/v/([^&\"\\s]*)", Pattern.DOTALL);
-    
-    @SuppressLint("SimpleDateFormat")
-    private static final class DateFormatHolder {
-        private static final DateFormat DATE_FORMAT;
-        static {
-            DateFormatSymbols symbols = new DateFormatSymbols();
-            symbols.setShortWeekdays(new String[] { "", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" });
-            DATE_FORMAT = new SimpleDateFormat("MM/dd/yy(EEE)HH:mm", symbols);
-            DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("US/Pacific"));
-        }
-    }
     
     public TohnoChanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -105,49 +93,8 @@ public class TohnoChanModule extends AbstractKusabaModule {
     }
     
     @Override
-    protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DateFormatHolder.DATE_FORMAT) {
-            private int curEndThreadFilterPos = 0;
-            private int curEmbedFilterPos = 0;
-            private final char[] endThreadFilter = "<div class=\"Spacer\">".toCharArray();
-            private final char[] embedFilter = "<object type=\"application/x-shockwave-flash\"".toCharArray();
-            
-            @Override
-            protected void customFilters(int ch) throws IOException {
-                if (ch == endThreadFilter[curEndThreadFilterPos]) {
-                    ++curEndThreadFilterPos;
-                    if (curEndThreadFilterPos == endThreadFilter.length) {
-                        finalizeThread();
-                        curEndThreadFilterPos = 0;
-                    }
-                } else {
-                    if (curEndThreadFilterPos != 0) curEndThreadFilterPos = ch == endThreadFilter[0] ? 1 : 0;
-                }
-                
-                if (ch == embedFilter[curEmbedFilterPos]) {
-                    ++curEmbedFilterPos;
-                    if (curEmbedFilterPos == embedFilter.length) {
-                        parseEmbedded(readUntilSequence(">".toCharArray()));
-                        curEmbedFilterPos = 0;
-                    }
-                } else {
-                    if (curEmbedFilterPos != 0) curEmbedFilterPos = ch == embedFilter[0] ? 1 : 0;
-                }
-            }
-            
-            private void parseEmbedded(String tag) {
-                Matcher matcher = YOUTUBE_PATTERN.matcher(tag);
-                if (matcher.find()) {
-                    String id = matcher.group(1);
-                    AttachmentModel attachment = new AttachmentModel();
-                    attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
-                    attachment.path = "http://www.youtube.com/watch?v=" + id;
-                    attachment.thumbnail = "http://img.youtube.com/vi/" + id + "/default.jpg";
-                    currentAttachments.add(attachment);
-                }
-            }
-            
-        };
+    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
+        return new TohnoChanReader(stream, canCloudflare());
     }
     
     @Override
@@ -185,6 +132,67 @@ public class TohnoChanModule extends AbstractKusabaModule {
                 addString("message", model.comment).
                 addString("postpassword", model.password);
         setSendPostEntityAttachments(model, postEntityBuilder);
+    }
+    
+    @SuppressLint("SimpleDateFormat")
+    private static class TohnoChanReader extends KusabaReader {
+        private static final DateFormat DATE_FORMAT;
+        static {
+            DateFormatSymbols symbols = new DateFormatSymbols();
+            symbols.setShortWeekdays(new String[] { "", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" });
+            DATE_FORMAT = new SimpleDateFormat("MM/dd/yy(EEE)HH:mm", symbols);
+            DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("US/Pacific"));
+        }
+        
+        private static final Pattern YOUTUBE_PATTERN = Pattern.compile("data=\"(?:.*?)/v/([^&\"\\s]*)", Pattern.DOTALL);
+        
+        private static final char[] END_THREAD_FILTER = "<div class=\"Spacer\">".toCharArray();
+        private static final char[] EMBED_FILTER = "<object type=\"application/x-shockwave-flash\"".toCharArray();
+        
+        public TohnoChanReader(InputStream in, boolean canCloudflare) {
+            super(in, DATE_FORMAT, canCloudflare, ~(FLAG_HANDLE_EMBEDDED_POST_POSTPROCESS|FLAG_OMITTED_STRING_REMOVE_HREF));
+        }
+        
+        private int curEndThreadFilterPos = 0;
+        private int curEmbedFilterPos = 0;
+        
+        @Override
+        protected void customFilters(int ch) throws IOException {
+            super.customFilters(ch);
+            
+            if (ch == END_THREAD_FILTER[curEndThreadFilterPos]) {
+                ++curEndThreadFilterPos;
+                if (curEndThreadFilterPos == END_THREAD_FILTER.length) {
+                    finalizeThread();
+                    curEndThreadFilterPos = 0;
+                }
+            } else {
+                if (curEndThreadFilterPos != 0) curEndThreadFilterPos = ch == END_THREAD_FILTER[0] ? 1 : 0;
+            }
+            
+            if (ch == EMBED_FILTER[curEmbedFilterPos]) {
+                ++curEmbedFilterPos;
+                if (curEmbedFilterPos == EMBED_FILTER.length) {
+                    parseEmbedded(readUntilSequence(">".toCharArray()));
+                    curEmbedFilterPos = 0;
+                }
+            } else {
+                if (curEmbedFilterPos != 0) curEmbedFilterPos = ch == EMBED_FILTER[0] ? 1 : 0;
+            }
+        }
+        
+        private void parseEmbedded(String tag) {
+            Matcher matcher = YOUTUBE_PATTERN.matcher(tag);
+            if (matcher.find()) {
+                String id = matcher.group(1);
+                AttachmentModel attachment = new AttachmentModel();
+                attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                attachment.size = -1;
+                attachment.path = "http://www.youtube.com/watch?v=" + id;
+                attachment.thumbnail = "http://img.youtube.com/vi/" + id + "/default.jpg";
+                currentAttachments.add(attachment);
+            }
+        }
     }
     
 }

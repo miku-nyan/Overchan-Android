@@ -20,6 +20,7 @@ package nya.miku.wishmaster.api;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,8 +94,12 @@ public abstract class AbstractWakabaModule extends CloudflareChanModule {
         return false;
     }
     
+    protected DateFormat getDateFormat() {
+        return null;
+    }
+    
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, null, canCloudflare());
+        return new WakabaReader(stream, getDateFormat(), canCloudflare());
     }
     
     protected ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkModified, UrlPageModel urlModel)

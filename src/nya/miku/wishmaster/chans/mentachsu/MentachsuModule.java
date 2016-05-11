@@ -18,7 +18,6 @@
 
 package nya.miku.wishmaster.chans.mentachsu;
 
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -41,9 +40,7 @@ import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
-import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -135,8 +132,13 @@ public class MentachsuModule extends AbstractKusabaModule {
     }
     
     @Override
-    protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DATE_FORMAT, true);
+    protected DateFormat getDateFormat() {
+        return DATE_FORMAT;
+    }
+    
+    @Override
+    protected int getKusabaFlags() {
+        return ~(KusabaReader.FLAG_HANDLE_EMBEDDED_POST_POSTPROCESS|KusabaReader.FLAG_OMITTED_STRING_REMOVE_HREF);
     }
     
     @Override
@@ -157,7 +159,8 @@ public class MentachsuModule extends AbstractKusabaModule {
     }
     
     @Override
-    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList) throws Exception {
+    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
+            throws Exception {
         PostModel[] result = super.getPostsList(boardName, threadNumber, listener, task, oldList);
         if (result != null && result.length > 0) result[0].number = threadNumber;
         return result;

@@ -157,7 +157,7 @@ public class UchanModule extends AbstractWakabaModule {
     
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DATE_FORMAT) {
+        return new WakabaReader(stream, DATE_FORMAT, canCloudflare()) {
             @Override
             protected void parseDate(String date) {
                 date = date.substring(date.indexOf(')') + 1).trim();

@@ -19,10 +19,16 @@
 package nya.miku.wishmaster.api;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -33,9 +39,14 @@ import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
+import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
+import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -71,6 +82,19 @@ public abstract class AbstractKusabaModule extends AbstractWakabaModule {
         board.attachmentsFormatFilters = null;
         board.markType = BoardModel.MARK_WAKABAMARK;
         return board;
+    }
+    
+    @Override
+    protected final WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
+        return getKusabaReader(stream, urlModel);
+    }
+    
+    protected int getKusabaFlags() {
+        return ~0;
+    }
+    
+    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
+        return new KusabaReader(stream, getDateFormat(), canCloudflare(), getKusabaFlags());
     }
     
     @Override
@@ -189,5 +213,122 @@ public abstract class AbstractKusabaModule extends AbstractWakabaModule {
     
     protected String getReportFormValue(DeletePostModel model) {
         return "Report";
+    }
+    
+    protected static class KusabaReader extends WakabaReader {
+        public static final int FLAG_HANDLE_ADMIN_TAG = 1 << 0;
+        public static final int FLAG_HANDLE_MOD_TAG = 1 << 1;
+        public static final int FLAG_HANDLE_LOCKED_STICKY = 1 << 2;
+        public static final int FLAG_OMITTED_STRING_REMOVE_HREF = 1 << 3;
+        public static final int FLAG_HANDLE_EMBEDDED_POST_POSTPROCESS = 1 << 4;
+        
+        private static final Pattern PATTERN_EMBEDDED =
+                Pattern.compile("<object type=\"application/x-shockwave-flash\"(?:[^>]*)data=\"([^\"]*)\"(?:[^>]*)>", Pattern.DOTALL);
+        
+        private static final Pattern A_HREF = Pattern.compile("<a href[^>]*>");
+        
+        private static final char[] FILTER_ADMIN = "<span class=\"admin\">".toCharArray();
+        private static final char[] FILTER_MOD = "<span class=\"mod\">".toCharArray();
+        private static final char[] FILTER_SPAN_CLOSE = "</span>".toCharArray();
+        
+        private int curAdminPos = 0;
+        private int curModPos = 0;
+        private String adminTrip = null;
+        
+        private final int flags;
+        
+        public KusabaReader(InputStream in, DateFormat dateFormat, boolean canCloudflare, int flags) {
+            super(in, dateFormat, canCloudflare);
+            this.flags = flags;
+        }
+        
+        public KusabaReader(Reader reader, DateFormat dateFormat, boolean canCloudflare, int flags) {
+            super(reader, dateFormat, canCloudflare);
+            this.flags = flags;
+        }
+        
+        private boolean hasFlag(int flag) {
+            return (flags & flag) != 0;
+        }
+        
+        private void addAdminTrip(String trip) {
+            if (adminTrip == null) adminTrip = trip; else adminTrip += trip;
+        }
+        
+        /** переопределяющий метод должен вызвать метод суперкласса */
+        @Override
+        protected void postprocessPost(PostModel post) {
+            if (adminTrip != null) {
+                post.trip += adminTrip;
+                adminTrip = null;
+            }
+            
+            if (hasFlag(FLAG_HANDLE_EMBEDDED_POST_POSTPROCESS)) {
+                Matcher matcher = PATTERN_EMBEDDED.matcher(post.comment);
+                while (matcher.find()) {
+                    String url = matcher.group(1).replace("youtube.com/v/", "youtube.com/watch?v=");
+                    String id = null;
+                    if (url.contains("youtube") && url.contains("v=")) {
+                        id = url.substring(url.indexOf("v=") + 2);
+                        if (id.contains("&")) id = id.substring(0, id.indexOf("&"));
+                    }
+                    AttachmentModel attachment = new AttachmentModel();
+                    attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    attachment.size = -1;
+                    attachment.path = url;
+                    attachment.thumbnail = id != null ? ("http://img.youtube.com/vi/" + id + "/default.jpg") : null;
+                    
+                    int oldCount = post.attachments != null ? post.attachments.length : 0;
+                    AttachmentModel[] attachments = new AttachmentModel[oldCount + 1];
+                    for (int i=0; i<oldCount; ++i) attachments[i] = post.attachments[i];
+                    attachments[oldCount] = attachment;
+                    post.attachments = attachments;
+                }
+            }
+            
+        }
+        
+        /** переопределяющий метод должен вызвать метод суперкласса */
+        @Override
+        protected void customFilters(int ch) throws IOException {
+            if (ch == FILTER_ADMIN[curAdminPos]) {
+                ++curAdminPos;
+                if (curAdminPos == FILTER_ADMIN.length) {
+                    if (hasFlag(FLAG_HANDLE_ADMIN_TAG)) {
+                        addAdminTrip(StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTER_SPAN_CLOSE)).trim());
+                    }
+                    curAdminPos = 0;
+                }
+            } else {
+                if (curAdminPos != 0) curAdminPos = ch == FILTER_ADMIN[0] ? 1 : 0;
+            }
+            
+            if (ch == FILTER_MOD[curModPos]) {
+                ++curModPos;
+                if (curModPos == FILTER_MOD.length) {
+                    if (hasFlag(FLAG_HANDLE_MOD_TAG)) {
+                        addAdminTrip(StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTER_SPAN_CLOSE)).trim());
+                    }
+                    curModPos = 0;
+                }
+            } else {
+                if (curModPos != 0) curModPos = ch == FILTER_MOD[0] ? 1 : 0;
+            }
+        }
+        
+        @Override
+        protected void parseOmittedString(String omitted) {
+            if (hasFlag(FLAG_OMITTED_STRING_REMOVE_HREF)) omitted = RegexUtils.replaceAll(omitted, A_HREF, "");
+            super.parseOmittedString(omitted);
+        }
+        
+        @Override
+        protected void parseThumbnail(String imgTag) {
+            if (hasFlag(FLAG_HANDLE_LOCKED_STICKY)) {
+                if (imgTag.contains("/css/locked.gif")) currentThread.isClosed = true;
+                if (imgTag.contains("/css/sticky.gif")) currentThread.isSticky = true;
+            }
+            super.parseThumbnail(imgTag);
+        }
     }
 }

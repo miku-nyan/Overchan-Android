@@ -125,7 +125,7 @@ public class WakachanModule extends AbstractWakabaModule {
     
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, urlModel.boardName.equals("unyl") ? DATE_FORMAT_UNYL : DATE_FORMAT, true) {
+        return new WakabaReader(stream, urlModel.boardName.equals("unyl") ? DATE_FORMAT_UNYL : DATE_FORMAT, canCloudflare()) {
             @Override
             protected void parseOmittedString(String omitted) {
                 if (omitted.indexOf('>') != -1) omitted = omitted.substring(omitted.indexOf('>'));

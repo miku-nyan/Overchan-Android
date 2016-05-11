@@ -39,16 +39,13 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
-import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
-import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 
@@ -64,15 +61,13 @@ public class DFWKModule extends AbstractKusabaModule {
     private static final String[] ATTACHMENT_FORMATS_DF = new String[] { "jpg", "jpeg", "png", "gif", "7z", "mp3", "rar", "zip" };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
     
-    private static final DateFormat DATEFORMAT;
+    private static final DateFormat DATE_FORMAT;
     static {
-        DATEFORMAT = new SimpleDateFormat("EEE yy/MM/dd HH:mm", Locale.US);
-        DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        DATE_FORMAT = new SimpleDateFormat("EEE yy/MM/dd HH:mm", Locale.US);
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
     }
     
-    private static final Pattern A_HREF = Pattern.compile("<a href[^>]*>");
     private static final Pattern LINK_DATE = Pattern.compile("<a href=\"([^\"]*)\">(.*?)</a>", Pattern.DOTALL);
-    private static final Pattern EMBED_PATTERN = Pattern.compile("<object (?:[^>]*)data=\"(.*?)\"", Pattern.DOTALL);
     
     public DFWKModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -115,33 +110,8 @@ public class DFWKModule extends AbstractKusabaModule {
     }
     
     @Override
-    protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DATEFORMAT) {
-            private StringBuilder omittedDigitsBuffer = new StringBuilder();
-            @Override
-            protected void parseOmittedString(String omitted) {
-                int postsOmitted = -1;
-                int filesOmitted = -1;
-                try {
-                    omitted = RegexUtils.replaceAll(omitted, A_HREF, "");
-                    int len = omitted.length();
-                    for (int i=0; i<=len; ++i) {
-                        char ch = i == len ? ' ' : omitted.charAt(i);
-                        if (ch >= '0' && ch <= '9') {
-                            omittedDigitsBuffer.append(ch);
-                        } else {
-                            if (omittedDigitsBuffer.length() > 0) {
-                                int parsedValue = Integer.parseInt(omittedDigitsBuffer.toString());
-                                omittedDigitsBuffer.setLength(0);
-                                if (postsOmitted == -1) postsOmitted = parsedValue;
-                                else if (filesOmitted == -1) filesOmitted = parsedValue;
-                            }
-                        }
-                    }
-                } catch (NumberFormatException e) {}
-                if (postsOmitted > 0) currentThread.postsCount += postsOmitted;
-                if (filesOmitted > 0) currentThread.attachmentsCount += filesOmitted;
-            }
+    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
+        return new KusabaReader(stream, DATE_FORMAT, canCloudflare(), ~0) {
             @Override
             protected void parseDate(String date) {
                 Matcher linkMatcher = LINK_DATE.matcher(date);
@@ -151,26 +121,6 @@ public class DFWKModule extends AbstractKusabaModule {
                     super.parseDate(linkMatcher.group(2));
                 } else super.parseDate(date);
             }
-            @Override
-            protected void postprocessPost(PostModel post) {
-                Matcher embedMatcher = EMBED_PATTERN.matcher(post.comment);
-                if (embedMatcher.find()) {
-                    AttachmentModel embedAttachment = new AttachmentModel();
-                    embedAttachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
-                    embedAttachment.size = -1;
-                    embedAttachment.path = embedMatcher.group(1);
-                    if (embedAttachment.path.contains("youtube.com/v/")) {
-                        String ytId = embedAttachment.path.substring(embedAttachment.path.indexOf("youtube.com/v/") + 14);
-                        embedAttachment.path = "http://youtube.com/watch?v=" + ytId;
-                        embedAttachment.thumbnail = "http://img.youtube.com/vi/" + ytId + "/default.jpg";
-                    }
-                    if (post.attachments != null && post.attachments.length > 0) {
-                        post.attachments = new AttachmentModel[] { post.attachments[0], embedAttachment };
-                    } else {
-                        post.attachments = new AttachmentModel[] { embedAttachment };
-                    }
-                }
-            }
         };
     }
     
@@ -178,6 +128,13 @@ public class DFWKModule extends AbstractKusabaModule {
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String captchaUrl = getUsingUrl() + "captcha.php?" + Double.toString(Math.random());
         return downloadCaptcha(captchaUrl, listener, task);
+    }
+    
+    @Override
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String result = super.sendPost(model, listener, task);
+        if (model.threadNumber != null) return null;
+        return result;
     }
     
     @Override

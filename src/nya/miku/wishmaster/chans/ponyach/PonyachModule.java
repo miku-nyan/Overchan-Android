@@ -278,7 +278,7 @@ public class PonyachModule extends AbstractWakabaModule {
     
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DATE_FORMAT) {
+        return new WakabaReader(stream, DATE_FORMAT, canCloudflare()) {
             private final Pattern aHrefPattern = Pattern.compile("<a\\s+href=\"(.*?)\"", Pattern.DOTALL);
             private final Pattern attachmentSizePattern = Pattern.compile("([\\d\\.]+)[KM]B");
             private final Pattern attachmentPxSizePattern = Pattern.compile("(\\d+)x(\\d+)");

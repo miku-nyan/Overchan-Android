@@ -27,7 +27,6 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -40,7 +39,6 @@ import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
-import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
@@ -117,104 +115,9 @@ public class Chan10Module extends AbstractKusabaModule {
         return model;
     }
     
-    @SuppressLint("SimpleDateFormat")
     @Override
-    protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, null, true) {
-            private final DateFormat dateFormat;
-            {
-                DateFormatSymbols symbols = new DateFormatSymbols();
-                symbols.setMonths(new String[] {
-                        "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"});
-                dateFormat = new SimpleDateFormat("dd MMMM yy HH:mm:ss", symbols);
-                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-            }
-            int curIframePos = 0;
-            int curAdminPos = 0;
-            String adminTrip = null;
-            final char[] iframeFilter = "<iframe".toCharArray();
-            final char[] adminFilter = "<span class=\"admin\">".toCharArray();
-            final Pattern iframeSrc = Pattern.compile("src=\"([^\"]*)\"");
-            @Override
-            protected void postprocessPost(PostModel post) {
-                if (adminTrip != null) {
-                    post.trip += adminTrip;
-                    adminTrip = null;
-                }
-            }
-            @Override
-            protected void customFilters(int ch) throws IOException {
-                if (ch == adminFilter[curAdminPos]) {
-                    ++curAdminPos;
-                    if (curAdminPos == adminFilter.length) {
-                        adminTrip = StringEscapeUtils.unescapeHtml4(readUntilSequence("</span>".toCharArray())).trim();
-                        curAdminPos = 0;
-                    }
-                } else {
-                    if (curAdminPos != 0) curAdminPos = ch == iframeFilter[0] ? 1 : 0;
-                }
-                
-                if (ch == iframeFilter[curIframePos]) {
-                    ++curIframePos;
-                    if (curIframePos == iframeFilter.length) {
-                        Matcher srcMatcher = iframeSrc.matcher(readUntilSequence(">".toCharArray()));
-                        if (srcMatcher.find()) {
-                            AttachmentModel attachment = new AttachmentModel();
-                            attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
-                            attachment.path = srcMatcher.group(1);
-                            attachment.size = -1;
-                            if (attachment.path.startsWith("//")) attachment.path = "http:" + attachment.path;
-                            if (attachment.path.contains("coub.com/embed/")) {
-                                int qIndex = attachment.path.indexOf('?');
-                                if (qIndex > 0) attachment.path = attachment.path.substring(0, qIndex);
-                                attachment.path = attachment.path.replace("/embed/", "/view/");
-                            }
-                            currentAttachments.add(attachment);
-                        }
-                        curIframePos = 0;
-                    }
-                } else {
-                    if (curIframePos != 0) curIframePos = ch == iframeFilter[0] ? 1 : 0;
-                }
-            }
-            @Override
-            protected void parseAttachment(String html) {
-                int lastLinkIndex = html.lastIndexOf("href=\"");
-                if (lastLinkIndex < 0) return;
-                super.parseAttachment(html.substring(lastLinkIndex));
-            }
-            @Override
-            protected void parseThumbnail(String imgTag) {
-                super.parseThumbnail(imgTag);
-                
-                try {
-                    int sIndex = 0;
-                    while (imgTag.charAt(sIndex) <= ' ') ++sIndex;
-                    if (imgTag.startsWith("id=\"start_video", sIndex)) {
-                        String id = imgTag.substring(sIndex + 15, imgTag.indexOf('"', sIndex + 15));
-                        AttachmentModel attachment = new AttachmentModel();
-                        attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
-                        attachment.path = "http://youtube.com/watch?v=" + id;
-                        attachment.thumbnail = "http://img.youtube.com/vi/" + id + "/default.jpg";
-                        attachment.size = -1;
-                        currentAttachments.add(attachment);
-                    }
-                } catch (Exception e) { //string array bounds
-                    Logger.e(TAG, e);
-                }
-            }
-            @Override
-            protected void parseDate(String date) {
-                if (date.length() > 0) {
-                    date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
-                    try {
-                        currentPost.timestamp = dateFormat.parse(date).getTime();
-                    } catch (Exception e) {
-                        Logger.e(TAG, "cannot parse date", e);
-                    }
-                }
-            }
-        };
+    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
+        return new Chan10Reader(stream, canCloudflare());
     }
     
     @Override
@@ -234,6 +137,90 @@ public class Chan10Module extends AbstractKusabaModule {
     @Override
     protected String getReportFormValue(DeletePostModel model) {
         return "Отправить";
+    }
+    
+    @SuppressLint("SimpleDateFormat")
+    private static class Chan10Reader extends KusabaReader {
+        private static final DateFormat DATE_FORMAT;
+        static {
+            DateFormatSymbols symbols = new DateFormatSymbols();
+            symbols.setMonths(new String[] {
+                    "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"});
+            DATE_FORMAT = new SimpleDateFormat("dd MMMM yy HH:mm:ss", symbols);
+            DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        }
+        
+        private static final char[] IFRAME_FILTER = "<iframe".toCharArray();
+        private static final Pattern IFRAME_SRC = Pattern.compile("src=\"([^\"]*)\"");
+        
+        public Chan10Reader(InputStream in, boolean canCloudflare) {
+            super(in, DATE_FORMAT, canCloudflare, ~(FLAG_HANDLE_EMBEDDED_POST_POSTPROCESS|FLAG_OMITTED_STRING_REMOVE_HREF));
+        }
+        
+        private int curIframePos = 0;
+        
+        @Override
+        protected void customFilters(int ch) throws IOException {
+            super.customFilters(ch);
+            
+            if (ch == IFRAME_FILTER[curIframePos]) {
+                ++curIframePos;
+                if (curIframePos == IFRAME_FILTER.length) {
+                    Matcher srcMatcher = IFRAME_SRC.matcher(readUntilSequence(">".toCharArray()));
+                    if (srcMatcher.find()) {
+                        AttachmentModel attachment = new AttachmentModel();
+                        attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                        attachment.path = srcMatcher.group(1);
+                        attachment.size = -1;
+                        if (attachment.path.startsWith("//")) attachment.path = "http:" + attachment.path;
+                        if (attachment.path.contains("coub.com/embed/")) {
+                            int qIndex = attachment.path.indexOf('?');
+                            if (qIndex > 0) attachment.path = attachment.path.substring(0, qIndex);
+                            attachment.path = attachment.path.replace("/embed/", "/view/");
+                        }
+                        currentAttachments.add(attachment);
+                    }
+                    curIframePos = 0;
+                }
+            } else {
+                if (curIframePos != 0) curIframePos = ch == IFRAME_FILTER[0] ? 1 : 0;
+            }
+        }
+        
+        @Override
+        protected void parseAttachment(String html) {
+            int lastLinkIndex = html.lastIndexOf("href=\"");
+            if (lastLinkIndex < 0) return;
+            super.parseAttachment(html.substring(lastLinkIndex));
+        }
+        
+        @Override
+        protected void parseThumbnail(String imgTag) {
+            super.parseThumbnail(imgTag);
+            
+            try {
+                int sIndex = 0;
+                while (imgTag.charAt(sIndex) <= ' ') ++sIndex;
+                if (imgTag.startsWith("id=\"start_video", sIndex)) {
+                    String id = imgTag.substring(sIndex + 15, imgTag.indexOf('"', sIndex + 15));
+                    AttachmentModel attachment = new AttachmentModel();
+                    attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    attachment.path = "http://youtube.com/watch?v=" + id;
+                    attachment.thumbnail = "http://img.youtube.com/vi/" + id + "/default.jpg";
+                    attachment.size = -1;
+                    currentAttachments.add(attachment);
+                }
+            } catch (Exception e) { //string array bounds
+                Logger.e(TAG, e);
+            }
+        }
+        
+        @Override
+        protected void parseDate(String date) {
+            date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
+            super.parseDate(date);
+        }
+        
     }
     
 }

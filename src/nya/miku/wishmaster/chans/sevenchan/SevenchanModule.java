@@ -128,7 +128,7 @@ public class SevenchanModule extends AbstractKusabaModule {
     }
     
     @Override
-    protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
+    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
         return new SevenchanReader(stream);
     }
     

@@ -18,16 +18,13 @@
 
 package nya.miku.wishmaster.chans.nullchan;
 
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
@@ -40,31 +37,38 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
-import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
-import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
-import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.WakabaReader;
-import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 
+@SuppressWarnings("serial")
+@SuppressLint("SimpleDateFormat")
 public class Null_chanModule extends AbstractKusabaModule {
-    private static final String TAG = "Null_chanModule";
-    
     private static final String CHAN_NAME = "0-chan.ru";
     private static final String DOMAIN = "0-chan.ru";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "all", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fur", "Мех", "adult", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "e", "Электроника", "geek", false)
+    };
+    
+    private static final DateFormat DATE_FORMAT;
+    static {
+        DateFormatSymbols symbols = new DateFormatSymbols();
+        symbols.setMonths(new String[] {
+                "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"});
+        DATE_FORMAT = new SimpleDateFormat("dd MMMM yyyy в HH:mm:ss", symbols) {
+            @Override
+            public Date parse(String date) throws ParseException {
+                date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
+                return super.parse(date);
+            }
         };
-    private static final Pattern PATTERN_EMBEDDED =
-            Pattern.compile("<object type=\"application/x-shockwave-flash\"(?:[^>]*)data=\"([^\"]*)\"(?:[^>]*)>", Pattern.DOTALL);
+    }
     
     public Null_chanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -111,56 +115,9 @@ public class Null_chanModule extends AbstractKusabaModule {
         return model;
     }
     
-    @SuppressLint("SimpleDateFormat")
     @Override
-    protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream) {
-            private final DateFormat dateFormat;
-            {
-                DateFormatSymbols symbols = new DateFormatSymbols();
-                symbols.setMonths(new String[] {
-                        "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"});
-                dateFormat = new SimpleDateFormat("dd MMMM yyyy в HH:mm:ss", symbols);
-                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-            }
-            @Override
-            protected void parseDate(String date) {
-                if (date.length() > 0) {
-                    date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
-                    try {
-                        currentPost.timestamp = dateFormat.parse(date).getTime();
-                    } catch (Exception e) {
-                        Logger.e(TAG, "cannot parse date", e);
-                    }
-                }
-            }
-            @Override
-            protected void parseOmittedString(String omitted) {
-                if (omitted.indexOf('<') != -1) omitted = omitted.substring(0, omitted.indexOf('<'));
-                super.parseOmittedString(omitted);
-            }
-            @Override
-            protected void postprocessPost(PostModel post) {
-                Matcher matcher = PATTERN_EMBEDDED.matcher(post.comment);
-                while (matcher.find()) {
-                    String url = matcher.group(1).replace("youtube.com/v/", "youtube.com/watch?v=");
-                    String id = null;
-                    if (url.contains("youtube") && url.contains("v=")) {
-                        id = url.substring(url.indexOf("v=") + 2);
-                        if (id.contains("&")) id = id.substring(0, id.indexOf("&"));
-                    }
-                    AttachmentModel attachment = new AttachmentModel();
-                    attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
-                    attachment.path = url;
-                    attachment.thumbnail = id != null ? ("http://img.youtube.com/vi/" + id + "/default.jpg") : null;
-                    int oldCount = post.attachments != null ? post.attachments.length : 0;
-                    AttachmentModel[] attachments = new AttachmentModel[oldCount + 1];
-                    for (int i=0; i<oldCount; ++i) attachments[i] = post.attachments[i];
-                    attachments[oldCount] = attachment;
-                    post.attachments = attachments;
-                }
-            }
-        };
+    protected DateFormat getDateFormat() {
+        return DATE_FORMAT;
     }
     
     @Override
