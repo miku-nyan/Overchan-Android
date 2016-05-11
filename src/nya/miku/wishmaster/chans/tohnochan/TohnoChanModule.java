@@ -18,24 +18,14 @@
 
 package nya.miku.wishmaster.chans.tohnochan;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpHeaders;
-import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -43,24 +33,19 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractWakabaModule;
+import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
-import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
-import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.streamer.HttpRequestModel;
-import nya.miku.wishmaster.http.streamer.HttpResponseModel;
-import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
-public class TohnoChanModule extends AbstractWakabaModule {
+public class TohnoChanModule extends AbstractKusabaModule {
     private static final String CHAN_NAME = "tohno-chan.com";
     private static final String CHAN_DOMAIN = "tohno-chan.com";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
@@ -82,7 +67,6 @@ public class TohnoChanModule extends AbstractWakabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fb", "Feedback", "Other", false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pic", "Dump", "Other", false),
     };
-    private static final Pattern ERROR_POSTING = Pattern.compile("<h2(?:[^>]*)>(.*?)</h2>", Pattern.DOTALL);
     private static final Pattern YOUTUBE_PATTERN = Pattern.compile("data=\"(?:.*?)/v/([^&\"\\s]*)", Pattern.DOTALL);
     
     @SuppressLint("SimpleDateFormat")
@@ -128,26 +112,12 @@ public class TohnoChanModule extends AbstractWakabaModule {
             private final char[] endThreadFilter = "<div class=\"Spacer\">".toCharArray();
             private final char[] embedFilter = "<object type=\"application/x-shockwave-flash\"".toCharArray();
             
-            private final Method finalizeThread;
-            {
-                try {
-                    finalizeThread = WakabaReader.class.getDeclaredMethod("finalizeThread");
-                    finalizeThread.setAccessible(true);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            
             @Override
             protected void customFilters(int ch) throws IOException {
                 if (ch == endThreadFilter[curEndThreadFilterPos]) {
                     ++curEndThreadFilterPos;
                     if (curEndThreadFilterPos == endThreadFilter.length) {
-                        try {
-                            finalizeThread.invoke(this);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
+                        finalizeThread();
                         curEndThreadFilterPos = 0;
                     }
                 } else {
@@ -189,31 +159,23 @@ public class TohnoChanModule extends AbstractWakabaModule {
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
         model.timeZoneId = "US/Pacific";
-        model.defaultUserName = "Anonymous";
-        model.readonlyBoard = false;
         model.requiredFileForNewThread = !shortName.equals("mt") && !shortName.equals("fb");
-        model.allowDeletePosts = true;
-        model.allowDeleteFiles = true;
-        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
-        model.allowNames = true;
-        model.allowSubjects = true;
-        model.allowSage = true;
-        model.allowEmails = true;
-        model.ignoreEmailIfSage = true;
         model.allowCustomMark = true;
         model.customMarkDescription = "Spoiler";
-        model.allowRandomHash = true;
-        model.allowIcons = false;
-        model.attachmentsMaxCount = 1;
-        model.attachmentsFormatFilters = null;
         model.markType = BoardModel.MARK_BBCODE;
         return model;
     }
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "board.php";
-        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
+        String result = super.sendPost(model, listener, task);
+        if (model.threadNumber != null) return null;
+        return result;
+    }
+    
+    @Override
+    protected void setSendPostEntity(SendPostModel model, ExtendedMultipartBuilder postEntityBuilder) throws Exception {
+        postEntityBuilder.
                 addString("board", model.boardName).
                 addString("replythread", model.threadNumber == null ? "0" : model.threadNumber).
                 addString("editpost", "0").
@@ -222,66 +184,7 @@ public class TohnoChanModule extends AbstractWakabaModule {
                 addString("subj", model.subject).
                 addString("message", model.comment).
                 addString("postpassword", model.password);
-        if (model.attachments != null && model.attachments.length > 0)
-            postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
-        if (model.custommark) postEntityBuilder.addString("spoiler", "on");
-        else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
-        
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
-        HttpResponseModel response = null;
-        try {
-            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
-            if (response.statusCode == 302) {
-                if (model.threadNumber != null) return null;
-                for (Header header : response.headers) {
-                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
-                        return fixRelativeUrl(header.getValue());
-                    }
-                }
-            } else if (response.statusCode == 200) {
-                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
-                IOUtils.copyStream(response.stream, output);
-                String htmlResponse = output.toString("UTF-8");
-                Matcher errorMatcher = ERROR_POSTING.matcher(htmlResponse);
-                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1).trim());
-            } else throw new Exception(response.statusCode + " - " + response.statusReason);
-        } finally {
-            if (response != null) response.release();
-        }
-        return null;
-    }
-    
-    @Override
-    public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "board.php";
-        
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("board", model.boardName));
-        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
-        if (model.onlyFiles) pairs.add(new BasicNameValuePair("fileonly", "on"));
-        pairs.add(new BasicNameValuePair("postpassword", model.password));
-        pairs.add(new BasicNameValuePair("deletepost", "Delete"));
-        
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
-        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
-        if (result.contains("Incorrect password")) throw new Exception("Incorrect password");
-        return null;
-    }
-    
-    @Override
-    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "board.php";
-        
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("board", model.boardName));
-        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
-        pairs.add(new BasicNameValuePair("reportreason", model.reportReason));
-        pairs.add(new BasicNameValuePair("reportpost", "Report"));
-        
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
-        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
-        if (result.contains("Post successfully reported")) return null;
-        throw new Exception(result);
+        setSendPostEntityAttachments(model, postEntityBuilder);
     }
     
 }

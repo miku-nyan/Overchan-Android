@@ -18,22 +18,13 @@
 
 package nya.miku.wishmaster.chans.mentachsu;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpHeaders;
-import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -41,7 +32,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractWakabaModule;
+import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -53,14 +44,12 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.WakabaReader;
-import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
-import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
 @SuppressLint("SimpleDateFormat")
-public class MentachsuModule extends AbstractWakabaModule {
+public class MentachsuModule extends AbstractKusabaModule {
     
     private static final String CHAN_NAME = "02ch.su";
     private static final String DOMAIN = "02ch.su";
@@ -160,20 +149,8 @@ public class MentachsuModule extends AbstractWakabaModule {
         BoardModel model = super.getBoard(shortName, listener, task);
         model.timeZoneId = "GMT+3";
         model.defaultUserName = "Анонимус";
-        model.readonlyBoard = false;
         model.requiredFileForNewThread = false;
-        model.allowDeletePosts = true;
-        model.allowDeleteFiles = true;
-        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
         model.allowNames = false;
-        model.allowSubjects = true;
-        model.allowSage = true;
-        model.allowEmails = true;
-        model.ignoreEmailIfSage = false;
-        model.allowCustomMark = false;
-        model.allowRandomHash = true;
-        model.allowIcons = false;
-        model.attachmentsMaxCount = 1;
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         model.markType = BoardModel.MARK_BBCODE;
         return model;
@@ -200,78 +177,26 @@ public class MentachsuModule extends AbstractWakabaModule {
     }
     
     @Override
-    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "board.php";
-        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
-                addString("board", model.boardName).
-                addString("replythread", model.threadNumber == null ? "0" : model.threadNumber).
-                addString("em", model.sage ? "sage" : model.email).
-                addString("subject", model.subject).
-                addString("message", model.comment).
-                addString("recaptcha_response_field", model.captchaAnswer);
-        if (model.attachments != null && model.attachments.length > 0)
-            postEntityBuilder.addFile("imagefile", model.attachments[0], model.randomHash);
-        else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
-        
-        postEntityBuilder.addString("postpassword", model.password);
-        
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
-        HttpResponseModel response = null;
-        try {
-            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
-            if (response.statusCode == 302) {
-                for (Header header : response.headers) {
-                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
-                        return fixRelativeUrl(header.getValue());
-                    }
-                }
-            } else if (response.statusCode == 200) {
-                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
-                IOUtils.copyStream(response.stream, output);
-                String htmlResponse = output.toString("UTF-8");
-                Matcher errorMatcher = ERROR_POSTING.matcher(htmlResponse);
-                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1).trim());
-            } else throw new Exception(response.statusCode + " - " + response.statusReason);
-        } finally {
-            if (response != null) response.release();
-        }
-        return null;
+    protected void setSendPostEntityMain(SendPostModel model, ExtendedMultipartBuilder postEntityBuilder) throws Exception {
+        super.setSendPostEntityMain(model, postEntityBuilder);
+        postEntityBuilder.addString("recaptcha_response_field", model.captchaAnswer);
     }
     
     @Override
-    public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "board.php";
-        
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("board", model.boardName));
-        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
-        if (model.onlyFiles) pairs.add(new BasicNameValuePair("fileonly", "on"));
-        pairs.add(new BasicNameValuePair("postpassword", model.password));
-        pairs.add(new BasicNameValuePair("deletepost", "Удалить"));
-        
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
-        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+    protected void checkDeletePostResult(DeletePostModel model, String result) throws Exception {
         if (result.contains("Неправильный пароль")) throw new Exception("Неправильный пароль");
         Matcher errorMatcher = ERROR_POSTING.matcher(result);
         if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
-        return null;
     }
     
     @Override
-    public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = getUsingUrl() + "board.php";
-        
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("board", model.boardName));
-        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
-        if (model.onlyFiles) pairs.add(new BasicNameValuePair("fileonly", "on"));
-        pairs.add(new BasicNameValuePair("reportreason", model.reportReason));
-        pairs.add(new BasicNameValuePair("reportpost", "Аминь"));
-        
-        HttpRequestModel request = HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setNoRedirect(true).build();
-        String result = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
-        if (result.contains("Post successfully reported")) return null;
-        throw new Exception(result);
+    protected String getDeleteFormValue(DeletePostModel model) {
+        return "Удалить";
+    }
+    
+    @Override
+    protected String getReportFormValue(DeletePostModel model) {
+        return "Аминь";
     }
     
 }
