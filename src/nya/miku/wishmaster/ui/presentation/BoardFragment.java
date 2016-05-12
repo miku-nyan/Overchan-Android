@@ -220,6 +220,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     private ExecutorService imagesDownloadExecutor = Executors.newFixedThreadPool(4, Async.LOW_PRIORITY_FACTORY);
     private OpenedDialogs dialogs = new OpenedDialogs();
     
+    private boolean updatingNow = false;
+    
     /** измеряется при вызове {@link #measureFloatingModels(LayoutInflater)} */
     private int postItemWidth = 0;
     /** измеряется при вызове {@link #measureFloatingModels(LayoutInflater)} */
@@ -1191,6 +1193,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             pageLoader = new PageLoaderFromChan(pageFromChan, new PageLoaderFromChan.PageLoaderCallback() {
                 @Override
                 public void onSuccess() {
+                    updatingNow = false;
                     if (isCancelled()) return;
                     BackgroundThumbDownloader.download(pageFromChan, imagesDownloadTask);
                     MainApplication.getInstance().subscriptions.checkOwnPost(pageFromChan, itemsCountBefore);
@@ -1287,6 +1290,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
                 @Override
                 public void onError(final String message) {
+                    updatingNow = false;
                     if (isCancelled()) return;
                     Async.runOnUiThread(new Runnable() {
                         @Override
@@ -1308,12 +1312,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         return;
                     }
                     e.handle(activity, PageGetter.this, new InteractiveException.Callback() {
-                        @Override public void onSuccess() { update(true, false, false); }
-                        @Override public void onError(String message) { switchToErrorView(message); }
+                        @Override public void onSuccess() { updatingNow = false; update(true, false, false); }
+                        @Override public void onError(String message) { updatingNow = false; switchToErrorView(message); }
                     });
                 }
             }, chan, this);
             if (isCancelled()) return;
+            updatingNow = true;
             pageLoader.run();
         }
         
@@ -1483,6 +1488,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 }
             });
         }
+        
+        @Override
+        public void cancel() {
+            super.cancel();
+            updatingNow = false;
+        }
+        
     }
     
     private static void hackListViewSetPosition(final ListView listView, final int position, final int top) {
@@ -2397,6 +2409,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     public void updateSilent() {
         if (!listLoaded) {
             Logger.e(TAG, "called updateSilent() but the list is not loaded");
+        } else if (updatingNow) {
+            Logger.d(TAG, "already updating now");
         } else {
             update(true, true, true);
         }
