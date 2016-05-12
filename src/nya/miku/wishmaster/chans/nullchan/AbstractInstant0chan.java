@@ -69,7 +69,7 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
         onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
         onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
         onlyNewPostsPreference.setDefaultValue(true);
-        group.addItemFromInflater(onlyNewPostsPreference);
+        group.addPreference(onlyNewPostsPreference);
     }
     
     protected boolean loadOnlyNewPosts() {
