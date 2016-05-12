@@ -885,6 +885,16 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
     
     @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            TabsTrackerService.onResumeTab(activity, tabModel.webUrl, tabModel.title);
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+        }
+    }
+    
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (currentTask != null) {

@@ -92,21 +92,7 @@ public class TabsTrackerService extends Service {
     public static void addSubscriptionNotification(String tabUrl, String postNumber, String tabTitle) {
         List<Triple<String, String, String>> list = subscriptionsData;
         if (list == null) list = new ArrayList<>();
-        int index = -1;
-        for (int i=0; i<list.size(); ++i) {
-            Triple<String, String, String> triple = list.get(i);
-            if (tabUrl == null) {
-                if (triple.getLeft() == null && tabTitle.equals(triple.getRight())) {
-                    index = i;
-                    break;
-                }
-            } else {
-                if (tabUrl.equals(triple.getLeft())) {
-                    index = i;
-                    break;
-                }
-            }
-        }
+        int index = findTab(list, tabUrl, tabTitle);
         if (index == -1) {
             String postUrl = tabUrl;
             try {
@@ -147,6 +133,33 @@ public class TabsTrackerService extends Service {
     /** получить ID вкладки, которая обновляется в данный момент; вернёт -1, если обновление не выполняется в данный момент */
     public static long getCurrentUpdatingTabId() {
         return currentUpdatingTabId;
+    }
+    
+    /** вызывается, когда открыта вкладка; если уведомление об отслеживаемых ссылается на эту вкладку, оно будет отменено */
+    public static void onResumeTab(Context context, String tabUrl, String tabTitle) {
+        List<Triple<String, String, String>> list = subscriptionsData;
+        if (list == null) return;
+        int index = findTab(list, tabUrl, tabTitle);
+        if (index != -1) {
+            ((NotificationManager) context.getSystemService(NOTIFICATION_SERVICE)).cancel(TRACKER_NOTIFICATION_SUBSCRIPTIONS_ID);
+            clearSubscriptions();
+        }
+    }
+    
+    private static int findTab(List<Triple<String, String, String>> list, String tabUrl, String tabTitle) {
+        for (int i=0; i<list.size(); ++i) {
+            Triple<String, String, String> triple = list.get(i);
+            if (tabUrl == null) {
+                if (triple.getLeft() == null && tabTitle.equals(triple.getRight())) {
+                    return i;
+                }
+            } else {
+                if (tabUrl.equals(triple.getLeft())) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
     
     private ApplicationSettings settings;
