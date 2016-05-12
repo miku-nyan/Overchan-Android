@@ -169,7 +169,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_save_attachment">Зберегти</string>
     <string name="menu_share">Поділитися</string>
     <string name="menu_share_link">Поділитися лінком</string>
-    <string name="menu_search_google">Пошук Google</string>
+    <string name="menu_reverse_search">Пошук по картинці</string>
     <string name="menu_open">Відкрити</string>
     <string name="menu_open_player">Відкрити у плеєрі</string>
     <string name="menu_quickaccess_add">До швидкого доступу</string>
@@ -201,7 +201,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_unsubscribe">Відписатися</string>
     <string name="context_menu_share">Поділитися</string>
     <string name="context_menu_share_link">Поділитися лінком</string>
-    <string name="context_menu_search_google">Пошук Google</string>
+    <string name="context_menu_reverse_search">Пошук по картинці</string>
     <string name="context_menu_delete_autohide_rule">Стерти правило</string>
     <string name="context_menu_quickaccess_add">До швидкого доступу</string>
     <string name="context_menu_quickaccess_remove">Стерти зі швидкого доступу</string>

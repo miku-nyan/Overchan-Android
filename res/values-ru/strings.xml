@@ -164,7 +164,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_save_attachment">Сохранить</string>
     <string name="menu_share">Поделиться</string>
     <string name="menu_share_link">Поделиться ссылкой</string>
-    <string name="menu_search_google">Искать в Google</string>
+    <string name="menu_reverse_search">Поиск по картинке</string>
     <string name="menu_open">Открыть</string>
     <string name="menu_open_player">Открыть в плеере</string>
     <string name="menu_quickaccess_add">В быстрый доступ</string>
@@ -196,7 +196,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_unsubscribe">Отписаться</string>
     <string name="context_menu_share">Поделиться</string>
     <string name="context_menu_share_link">Поделиться ссылкой</string>
-    <string name="context_menu_search_google">Искать в Google</string>
+    <string name="context_menu_reverse_search">Поиск по картинке</string>
     <string name="context_menu_delete_autohide_rule">Удалить правило</string>
     <string name="context_menu_quickaccess_add">Добавить в быстрый доступ</string>
     <string name="context_menu_quickaccess_remove">Удалить из быстого доступа</string>

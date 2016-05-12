@@ -66,6 +66,7 @@ import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.MainActivity;
 import nya.miku.wishmaster.ui.QuickAccess;
+import nya.miku.wishmaster.ui.ReverseImageSearch;
 import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.gallery.GalleryActivity;
@@ -586,22 +587,22 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             menu.add(Menu.NONE, R.id.context_menu_thumb_download, 2, R.string.context_menu_download_file);
             menu.add(Menu.NONE, R.id.context_menu_thumb_copy_url, 3, R.string.context_menu_copy_url);
             menu.add(Menu.NONE, R.id.context_menu_thumb_attachment_info, 4, R.string.context_menu_attachment_info);
-            menu.add(Menu.NONE, R.id.context_menu_thumb_search_google, 5, R.string.context_menu_search_google);
+            menu.add(Menu.NONE, R.id.context_menu_thumb_reverse_search, 5, R.string.context_menu_reverse_search);
             for (int id : new int[] {
                     R.id.context_menu_thumb_download,
                     R.id.context_menu_thumb_copy_url,
                     R.id.context_menu_thumb_attachment_info,
-                    R.id.context_menu_thumb_search_google } ) {
+                    R.id.context_menu_thumb_reverse_search } ) {
                 menu.findItem(id).setOnMenuItemClickListener(contextMenuListener);
             }
             switch (model.type) {
                 case AttachmentModel.TYPE_AUDIO:
                 case AttachmentModel.TYPE_VIDEO:
                 case AttachmentModel.TYPE_OTHER_FILE:
-                    menu.findItem(R.id.context_menu_thumb_search_google).setVisible(false);
+                    menu.findItem(R.id.context_menu_thumb_reverse_search).setVisible(false);
                     break;
                 case AttachmentModel.TYPE_OTHER_NOTFILE:
-                    menu.findItem(R.id.context_menu_thumb_search_google).setVisible(false);
+                    menu.findItem(R.id.context_menu_thumb_reverse_search).setVisible(false);
                     menu.findItem(R.id.context_menu_thumb_download).setVisible(false);
                     break;
             }
@@ -719,10 +720,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 String info = Attachments.getAttachmentInfoString(chan, ((AttachmentModel) lastContextMenuAttachment.getTag()), resources);
                 Toast.makeText(activity, info, Toast.LENGTH_LONG).show();
                 return true;
-            case R.id.context_menu_thumb_search_google:
-                String googleUrl = "http://www.google.com/searchbyimage?image_url=" +
-                        chan.fixRelativeUrl(((AttachmentModel) lastContextMenuAttachment.getTag()).path);
-                UrlHandler.launchExternalBrowser(activity, googleUrl);
+            case R.id.context_menu_thumb_reverse_search:
+                ReverseImageSearch.openDialog(activity, chan.fixRelativeUrl(((AttachmentModel) lastContextMenuAttachment.getTag()).path));
                 return true;
         }
         

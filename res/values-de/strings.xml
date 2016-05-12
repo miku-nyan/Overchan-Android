@@ -159,7 +159,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="menu_save_attachment">Speichern</string>
     <string name="menu_share">Teilen</string>
     <string name="menu_share_link">Link teilen</string>
-    <string name="menu_search_google">In Google suchen</string>
+    <string name="menu_reverse_search">Bildersuche</string>
     <string name="menu_open">Öffnen</string>
     <string name="menu_open_player">Den externen Player öffnen</string>
     <string name="menu_quickaccess_add">Zum Schnellzugang</string>
@@ -191,7 +191,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="context_menu_unsubscribe">Deabonnieren</string>
     <string name="context_menu_share">Teile</string>
     <string name="context_menu_share_link">Link teilen</string>
-    <string name="context_menu_search_google">In Google suchen</string>
+    <string name="context_menu_reverse_search">Bildersuche</string>
     <string name="context_menu_delete_autohide_rule">Die Regel entfernen</string>
     <string name="context_menu_quickaccess_add">Zum Schnellzugang</string>
     <string name="context_menu_quickaccess_remove">Von Schnellzugang entfernen</string>

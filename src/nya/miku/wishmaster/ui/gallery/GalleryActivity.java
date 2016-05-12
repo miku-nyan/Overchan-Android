@@ -47,6 +47,7 @@ import nya.miku.wishmaster.lib.gifdrawable.GifDrawable;
 import nya.miku.wishmaster.ui.AppearanceUtils;
 import nya.miku.wishmaster.ui.Attachments;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
+import nya.miku.wishmaster.ui.ReverseImageSearch;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
@@ -369,7 +370,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         menu.add(Menu.NONE, R.id.menu_open_external, 3, R.string.menu_open).setIcon(R.drawable.ic_menu_set_as);
         menu.add(Menu.NONE, R.id.menu_share, 4, R.string.menu_share).setIcon(android.R.drawable.ic_menu_share);
         menu.add(Menu.NONE, R.id.menu_share_link, 5, R.string.menu_share_link).setIcon(android.R.drawable.ic_menu_share);
-        menu.add(Menu.NONE, R.id.menu_search_google, 6, R.string.menu_search_google).setIcon(android.R.drawable.ic_menu_search);
+        menu.add(Menu.NONE, R.id.menu_reverse_search, 6, R.string.menu_reverse_search).setIcon(android.R.drawable.ic_menu_search);
         menu.add(Menu.NONE, R.id.menu_open_browser, 7, R.string.menu_open_browser).setIcon(R.drawable.ic_menu_browser);
         updateMenu();
         
@@ -393,7 +394,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         menu.findItem(R.id.menu_open_external).setTitle(tag.attachmentModel.type != AttachmentModel.TYPE_OTHER_FILE ?
                 R.string.menu_open_player : R.string.menu_open);
         menu.findItem(R.id.menu_share).setVisible(currentLoaded && tag.attachmentModel.type != AttachmentModel.TYPE_OTHER_NOTFILE);
-        menu.findItem(R.id.menu_search_google).setVisible(
+        menu.findItem(R.id.menu_reverse_search).setVisible(
                 tag.attachmentModel.type == AttachmentModel.TYPE_IMAGE_STATIC || tag.attachmentModel.type == AttachmentModel.TYPE_IMAGE_GIF);
     }
     
@@ -415,8 +416,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
             case R.id.menu_share_link:
                 shareLink();
                 return true;
-            case R.id.menu_search_google:
-                openGoogle();
+            case R.id.menu_reverse_search:
+                reverseSearch();
                 return true;
             case R.id.menu_open_browser:
                 openBrowser();
@@ -552,13 +553,12 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_via)));
     }
     
-    private void openGoogle() {
+    private void reverseSearch() {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
         String absoluteUrl = remote.getAbsoluteUrl(tag.attachmentModel.path);
         if (absoluteUrl == null) return;
-        String googleUrl = "http://www.google.com/searchbyimage?image_url=" + absoluteUrl;
-        UrlHandler.launchExternalBrowser(this, googleUrl);
+        ReverseImageSearch.openDialog(this, absoluteUrl);
     }
     
     private void openBrowser() {
