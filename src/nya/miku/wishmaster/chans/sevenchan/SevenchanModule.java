@@ -19,28 +19,40 @@
 package nya.miku.wishmaster.chans.sevenchan;
 
 import java.io.InputStream;
+import java.util.regex.Pattern;
+
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
+import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 
 public class SevenchanModule extends AbstractKusabaModule {
     private static final String CHAN_NAME = "7chan.org";
     private static final String RECAPTCHA_KEY = "6LdVg8YSAAAAAOhqx0eFT1Pi49fOavnYgy7e-lTO";
     static final String TIMEZONE = "GMT+4"; // ?
+    
+    private static final Pattern THREAD_REFERENCE_ALT = Pattern.compile("read.php\\?b=([^&]+)&t=(\\d+)(?:&p=)?(\\d*).*");
+    
+    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "7ch", "Site Discussion", "7chan & Related Services", false),
@@ -127,6 +139,26 @@ public class SevenchanModule extends AbstractKusabaModule {
         return true;
     }
     
+    private void addOnlyNewPostsPreference(PreferenceGroup group) {
+        Context context = group.getContext();
+        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
+        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
+        onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
+        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
+        onlyNewPostsPreference.setDefaultValue(true);
+        group.addPreference(onlyNewPostsPreference);
+    }
+    
+    private boolean loadOnlyNewPosts() {
+        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addOnlyNewPostsPreference(preferenceGroup);
+        super.addPreferencesOnScreen(preferenceGroup);
+    }
+    
     @Override
     protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
         return new SevenchanReader(stream);
@@ -147,6 +179,27 @@ public class SevenchanModule extends AbstractKusabaModule {
         board.attachmentsFormatFilters = shortName.equals("fl") ? new String[] { "swf" } : null;
         board.markType = BoardModel.MARK_BBCODE;
         return board;
+    }
+    
+    @Override
+    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
+            throws Exception {
+        if (loadOnlyNewPosts() && oldList != null && oldList.length > 0) {
+            String url = getUsingUrl() +
+                    "ajax.php?act=spy&board=" + boardName + "&thread=" + threadNumber + "&pastid=" + oldList[oldList.length-1].number;
+            ThreadModel[] page = readWakabaPage(url, listener, task, true, null);
+            if (page != null && page.length > 0) {
+                PostModel[] posts = new PostModel[oldList.length + page[0].posts.length];
+                for (int i=0; i<oldList.length; ++i) posts[i] = oldList[i];
+                for (int i=0; i<page[0].posts.length; ++i) posts[oldList.length + i] = page[0].posts[i];
+                return posts;
+            } else {
+                return oldList;
+            }
+        }
+        PostModel[] result = super.getPostsList(boardName, threadNumber, listener, task, oldList);
+        if (result.length >= 1000 && loadOnlyNewPosts()) return getPostsList(boardName, threadNumber, listener, task, result);
+        return result;
     }
     
     @Override
@@ -179,6 +232,11 @@ public class SevenchanModule extends AbstractKusabaModule {
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("imagefile[]", model.attachments[0], model.randomHash);
         else if (model.threadNumber == null) postEntityBuilder.addString("nofile", "on");
+    }
+    
+    @Override
+    public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        return super.parseUrl(RegexUtils.replaceAll(url, THREAD_REFERENCE_ALT, "$1/res/$2.html#$3"));
     }
     
     @Override

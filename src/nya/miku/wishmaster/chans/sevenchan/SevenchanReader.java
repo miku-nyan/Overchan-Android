@@ -45,6 +45,7 @@ public class SevenchanReader extends WakabaReader {
     private StringBuilder dateBuffer = new StringBuilder();
     private String lastThumbnail = null;
     private String lastAdminMark = null;
+    private String lastModMark = null;
     
     private static final DateFormat DATE_FORMAT, DATE_FORMAT_ALT;
     static {
@@ -70,6 +71,7 @@ public class SevenchanReader extends WakabaReader {
     private static final char[] DATE_START_FILTER = "<input type=\"checkbox\" name=\"post[]\"".toCharArray();
     private static final char[] DATE_END_FILTER = "<span class=\"reflink\">".toCharArray();
     private static final char[] ADMIN_FILTER = "<span title=\"7chan administrator\" class=\"capcode\">".toCharArray();
+    private static final char[] MOD_FILTER = "<span title=\"7chan moderator\" class=\"capcode\">".toCharArray();
     
     private int curNumberPos = 0;
     private int curSubjectPos = 0;
@@ -80,6 +82,7 @@ public class SevenchanReader extends WakabaReader {
     private int curDateStartPos = 0;
     private int curDateEndPos = 0;
     private int curAdminPos = 0;
+    private int curModPos = 0;
     
     public SevenchanReader(InputStream in) {
         super(in, DATE_FORMAT);
@@ -147,6 +150,10 @@ public class SevenchanReader extends WakabaReader {
                     currentPost.trip = lastAdminMark + (currentPost.trip == null ? "" : currentPost.trip);
                     lastAdminMark = null;
                 }
+                if (lastModMark != null) {
+                    currentPost.trip = lastModMark + (currentPost.trip == null ? "" : currentPost.trip);
+                    lastModMark = null;
+                }
                 finalizePost();
                 curCommentPos = 0;
             }
@@ -213,7 +220,17 @@ public class SevenchanReader extends WakabaReader {
             }
         } else {
             if (curAdminPos != 0) curAdminPos = ch == ADMIN_FILTER[0] ? 1 : 0;
-        }        
+        }
+        
+        if (ch == MOD_FILTER[curModPos]) {
+            ++curModPos;
+            if (curModPos == MOD_FILTER.length) {
+                lastModMark = StringEscapeUtils.unescapeHtml4(readUntilSequence(SPAN_CLOSE)).trim();
+                curModPos = 0;
+            }
+        } else {
+            if (curModPos != 0) curModPos = ch == MOD_FILTER[0] ? 1 : 0;
+        }
         
     }
     
