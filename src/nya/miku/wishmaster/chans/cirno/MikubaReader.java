@@ -27,9 +27,13 @@ import java.io.Reader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -93,12 +97,15 @@ public class MikubaReader implements Closeable {
     
     private static final char[] OMITTED_CLOSE = "</span>".toCharArray();
     
+    private static final Pattern POST_REFERENCE = Pattern.compile("<a href=\"/reply/(\\d+)");
+    
     private final Reader _in;
     
     private StringBuilder readBuffer = new StringBuilder();
     private List<ThreadModel> threads;
     private ThreadModel currentThread;
     private List<PostModel> postsBuf;
+    private Set<String> postsNumBuf;
     private PostModel currentPost;
     private boolean inDate;
     private StringBuilder dateBuffer = new StringBuilder();
@@ -114,7 +121,8 @@ public class MikubaReader implements Closeable {
         currentThread = new ThreadModel();
         currentThread.postsCount = 0;
         currentThread.attachmentsCount = -1;
-        postsBuf = new ArrayList<PostModel>();
+        postsBuf = new ArrayList<>();
+        postsNumBuf = new HashSet<>();
     }
     
     private void initPostModel() {
@@ -144,6 +152,7 @@ public class MikubaReader implements Closeable {
             if (currentPost.subject == null) currentPost.subject = "";
             if (currentPost.comment == null) currentPost.comment = "";
             postsBuf.add(currentPost);
+            postsNumBuf.add(currentPost.number);
         }
         initPostModel();
     }
@@ -273,10 +282,36 @@ public class MikubaReader implements Closeable {
         int buflen = commentBuffer.length();
         if (buflen > len2) {
             commentBuffer.setLength(buflen - len2);
-            return CryptoUtils.fixCloudflareEmails(commentBuffer.toString());
+            return CryptoUtils.fixCloudflareEmails(fixPostRefs(commentBuffer));
         } else {
             return "";
         }
+    }
+    
+    private String fixPostRefs(StringBuilder commentBuffer) {
+        String comment = commentBuffer.toString();
+        commentBuffer.setLength(0);
+        if (postsBuf == null || postsBuf.size() == 0) return comment;
+        Matcher matcher = POST_REFERENCE.matcher(comment);
+        if (!matcher.find()) return comment;
+        String threadNum = postsBuf.get(0).number;
+        int appendPos = 0;
+        boolean replacements = false;
+        do {
+            String num = matcher.group(1);
+            commentBuffer.append(comment, appendPos, matcher.start(1));
+            appendPos = matcher.end();
+            if (!num.equals(threadNum) && postsNumBuf.contains(num)) {
+                replacements = true;
+                commentBuffer.append(threadNum);
+            } else {
+                commentBuffer.append(num);
+            }
+        } while (matcher.find());
+        commentBuffer.append(comment, appendPos, comment.length());
+        if (replacements) comment = commentBuffer.toString();
+        commentBuffer.setLength(0);
+        return comment;
     }
     
     private void parseOmittedString(String omitted) {
