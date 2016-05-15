@@ -223,7 +223,7 @@ public class MainApplication extends Application {
         tabsSwitcher = new TabsSwitcher();
         
         long maxHeapSize = Runtime.getRuntime().maxMemory();
-        bitmapCache = new BitmapCache((int)Math.min(maxHeapSize / 8, Integer.MAX_VALUE), fileCache);
+        bitmapCache = new BitmapCache((int)Math.min(maxHeapSize / 16, Integer.MAX_VALUE), fileCache);
         pagesCache = new PagesCache((int)Math.min(maxHeapSize / 4, Integer.MAX_VALUE), serializer);
         draftsCache = new DraftsCache(10, serializer);
         
