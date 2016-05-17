@@ -70,6 +70,7 @@ import nya.miku.wishmaster.ui.ReverseImageSearch;
 import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.gallery.GalleryActivity;
+import nya.miku.wishmaster.ui.gallery.GallerySettings;
 import nya.miku.wishmaster.ui.downloading.BackgroundThumbDownloader;
 import nya.miku.wishmaster.ui.posting.PostFormActivity;
 import nya.miku.wishmaster.ui.posting.PostingService;
@@ -3608,6 +3609,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
         if (presentationModel == null || presentationModel.source == null || presentationModel.source.boardModel == null) return;
         Intent galleryIntent = new Intent(activity.getApplicationContext(), GalleryActivity.class);
+        galleryIntent.putExtra(GalleryActivity.EXTRA_SETTINGS, GallerySettings.fromSettings(settings));
         galleryIntent.putExtra(GalleryActivity.EXTRA_ATTACHMENT, attachment);
         galleryIntent.putExtra(GalleryActivity.EXTRA_BOARDMODEL, presentationModel.source.boardModel);
         galleryIntent.putExtra(GalleryActivity.EXTRA_PAGEHASH, tabModel.hash);

@@ -24,12 +24,14 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.SparseIntArray;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-public class GenericThemeEntry {
+public class GenericThemeEntry implements Parcelable {
     private static final int BASE_THEME_LIGHT = R.style.Theme_Futaba;
     private static final int BASE_THEME_DARK = R.style.Theme_Neutron;
     
@@ -44,6 +46,56 @@ public class GenericThemeEntry {
         this.themeId = themeId;
         this.fontSizeStyleId = fontSizeStyleId;
         this.customAttrs = customAttrs;
+    }
+    
+    private GenericThemeEntry(Parcel in) {
+        this.themeId = in.readInt();
+        this.fontSizeStyleId = in.readInt();
+        int n = in.readInt();
+        if (n == -1) {
+            this.customAttrs = null;
+        } else {
+            SparseIntArray attrs = new SparseIntArray();
+            for (int i=0; i<n; ++i) {
+                int key = in.readInt();
+                int value = in.readInt();
+                attrs.put(key, value);
+            }
+            this.customAttrs = attrs;
+        }
+    }
+    
+    public static final Parcelable.Creator<GenericThemeEntry> CREATOR = new Parcelable.Creator<GenericThemeEntry>() {
+        @Override
+        public GenericThemeEntry createFromParcel(Parcel source) {
+            return new GenericThemeEntry(source);
+        }
+        
+        @Override
+        public GenericThemeEntry[] newArray(int size) {
+            return new GenericThemeEntry[size];
+        }
+    };
+    
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(themeId);
+        dest.writeInt(fontSizeStyleId);
+        if (customAttrs == null) {
+            dest.writeInt(-1);
+        } else {
+            int n = customAttrs.size();
+            dest.writeInt(n);
+            for (int i=0; i<n; ++i) {
+                dest.writeInt(customAttrs.keyAt(i));
+                dest.writeInt(customAttrs.valueAt(i));
+            }
+        }
     }
     
     @Override

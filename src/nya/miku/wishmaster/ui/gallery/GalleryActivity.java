@@ -103,6 +103,7 @@ import android.widget.VideoView;
 public class GalleryActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "GalleryActivity";
     
+    public static final String EXTRA_SETTINGS = "settings";
     public static final String EXTRA_ATTACHMENT = "attachment";
     public static final String EXTRA_SAVED_ATTACHMENTHASH = "attachmenthash";
     public static final String EXTRA_BOARDMODEL = "boardmodel";
@@ -129,7 +130,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     private ServiceConnection serviceConnection;
     private GalleryRemote remote;
     
-    private ApplicationSettings settings;
+    private GallerySettings settings;
     private List<Triple<AttachmentModel, String, String>> attachments = null;
     private int currentPosition = 0;
     private int previousPosition = -1;
@@ -215,7 +216,9 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) requestWindowFeature(Window.FEATURE_PROGRESS);
-        settings = new ApplicationSettings(PreferenceManager.getDefaultSharedPreferences(getApplication()), getResources());
+        settings = getIntent().getParcelableExtra(EXTRA_SETTINGS);
+        if (settings == null) settings = GallerySettings.fromSettings(
+                new ApplicationSettings(PreferenceManager.getDefaultSharedPreferences(getApplication()), getResources()));
         settings.getTheme().setTo(this, R.style.Transparent);
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) CompatibilityImpl.setActionBarNoIcon(this);
