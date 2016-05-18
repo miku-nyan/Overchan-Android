@@ -224,7 +224,7 @@ public class MainApplication extends Application {
         
         long maxHeapSize = Runtime.getRuntime().maxMemory();
         bitmapCache = new BitmapCache((int)Math.min(maxHeapSize / 16, Integer.MAX_VALUE), fileCache);
-        pagesCache = new PagesCache((int)Math.min(maxHeapSize / 4, Integer.MAX_VALUE), serializer);
+        pagesCache = new PagesCache((int)Math.min(maxHeapSize / 6, Integer.MAX_VALUE), serializer);
         draftsCache = new DraftsCache(10, serializer);
         
         database = new Database(this);
