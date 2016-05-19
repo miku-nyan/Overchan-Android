@@ -364,6 +364,7 @@ public class DobroModule extends AbstractChanModule {
                     replaceAll("%%(.*?)%%", "<span class=\"spoiler\">$1</span>").
                     replaceAll("`(.*?)`", "<tt>$1</tt>").
                     replaceAll("&gt;&gt;(\\d+)\\b", "<a href=\"#i$1\">&gt;&gt;$1</a>").
+                    replaceAll("(^|<br />)(&gt;.*?)($|<br />)", "$1<span class=\"unkfunc\">$2</span>$3"). //<br />&gt;...<br />&gt;...
                     replaceAll("(^|<br />)(&gt;.*?)($|<br />)", "$1<span class=\"unkfunc\">$2</span>$3"));
         } else {
             model.comment = model.comment.replaceAll("<blockquote depth=\"\\d*\">", "<blockquote class=\"unkfunc\">");
