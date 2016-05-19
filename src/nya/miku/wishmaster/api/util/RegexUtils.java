@@ -27,7 +27,7 @@ public class RegexUtils {
     private static final Pattern HTML_SPAN_TAGS = Pattern.compile("</?span[^>]*?>");
     private static final Pattern SPACES = Pattern.compile("\\s+");
     private static final Pattern LINKIFY =
-            Pattern.compile("((?:^|\\s|<br/?>)(?:<p>)?)(https?://(?:[^<>\\s]*(?:<wbr/?>)?)*)", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("((?:^|\\s|<br ?/?>)(?:<p>)?)(https?://(?:[^<>\\s]*(?:<wbr ?/?>)?)*)", Pattern.CASE_INSENSITIVE);
     private static final Pattern WBR = Pattern.compile("<wbr/?>", Pattern.CASE_INSENSITIVE);
     
     public static String replaceAll(CharSequence source, Pattern pattern, String replacement) {
