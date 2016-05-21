@@ -208,6 +208,7 @@ public class WakabaReader implements Closeable {
             if (currentPost.trip == null) currentPost.trip = "";
             if (canCloudflare) {
                 currentPost.comment = CryptoUtils.fixCloudflareEmails(currentPost.comment);
+                currentPost.subject = CryptoUtils.fixCloudflareEmails(currentPost.subject);
                 if (currentPost.email.startsWith("/cdn-cgi/l/email-protection#"))
                     currentPost.email = CryptoUtils.decodeCloudflareEmail(currentPost.email.substring(28));
             }

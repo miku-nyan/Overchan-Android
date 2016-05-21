@@ -105,7 +105,7 @@ public class SevenchanReader extends WakabaReader {
         if (ch == SUBJECT_FILTER[curSubjectPos]) {
             ++curSubjectPos;
             if (curSubjectPos == SUBJECT_FILTER.length) {
-                currentPost.subject = StringEscapeUtils.unescapeHtml4(readUntilSequence(SPAN_CLOSE)).trim();
+                currentPost.subject = CryptoUtils.fixCloudflareEmails(StringEscapeUtils.unescapeHtml4(readUntilSequence(SPAN_CLOSE)).trim());
                 curSubjectPos = 0;
             }
         } else {

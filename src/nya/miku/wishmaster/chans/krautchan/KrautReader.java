@@ -223,6 +223,7 @@ public class KrautReader implements Closeable {
                 break;
             case FILTER_SUBJECT:
                 currentPost.subject = StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTERS_CLOSE[filterIndex])).trim();
+                currentPost.subject = CryptoUtils.fixCloudflareEmails(currentPost.subject);
                 break;
             case FILTER_POSTERNAME:
                 currentPost.name = StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTERS_CLOSE[filterIndex])).trim();

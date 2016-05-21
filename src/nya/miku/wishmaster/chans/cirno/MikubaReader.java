@@ -211,6 +211,7 @@ public class MikubaReader implements Closeable {
                 break;
             case FILTER_SUBJECT:
                 currentPost.subject = StringEscapeUtils.unescapeHtml4(readUntilSequence(FILTERS_CLOSE[filterIndex])).trim();
+                currentPost.subject = CryptoUtils.fixCloudflareEmails(currentPost.subject);
                 inDate = true;
                 break;
             case FILTER_ENDDATE:
