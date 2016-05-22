@@ -42,13 +42,9 @@ public class ApplicationSettings {
         this.resources = resources;
         this.isTablet = (resources.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
         this.isSFW = !R.class.getPackage().getName().endsWith(".wishmaster");
-        
-        if (preferences.getString(resources.getString(R.string.pref_key_download_dir), "").equals("")) {
-            preferences.edit().putString(resources.getString(R.string.pref_key_download_dir), getDefaultDownloadDir().getAbsolutePath()).commit();
-        }
     }
     
-    private File getDefaultDownloadDir() {
+    public File getDefaultDownloadDir() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
             return CompatibilityImpl.getDefaultDownloadDir();
         }

@@ -37,6 +37,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -96,6 +97,9 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
             });
         }
+        
+        ((EditTextPreference) getPreferenceManager().findPreference(getString(R.string.pref_key_download_dir))).
+                getEditText().setHint(MainApplication.getInstance().settings.getDefaultDownloadDir().getAbsolutePath());
         
         final Preference clearCachePreference = getPreferenceManager().findPreference(getString(R.string.pref_key_clear_cache));
         clearCachePreference.setSummary(getString(R.string.pref_clear_cache_summary, MainApplication.getInstance().fileCache.getCurrentSizeMB()));
