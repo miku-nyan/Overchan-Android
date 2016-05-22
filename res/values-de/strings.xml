@@ -278,6 +278,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="downloading_error_ticker">Einige Dateien werden nicht geladen</string>
     <string name="downloading_error_title">Fehler beim Herunterladen</string>
     <string name="downloading_error_report_title">Die folgenden Dateien wurden nicht heruntergeladen:</string>
+    <string name="downloading_error_report_retry">Wiederholen</string>
     <string name="downloading_title">Herunterladen (%d verbleibend)</string>
     <string name="downloading_title_simple">Herunterladen</string>
     <string name="downloading_error_mkdir">Das Verzeichnis kann nicht erstellt werden</string>

@@ -278,6 +278,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="downloading_error_ticker">Some files are not loaded</string>
     <string name="downloading_error_title">Error while downloading</string>
     <string name="downloading_error_report_title">The following files have not been downloaded.</string>
+    <string name="downloading_error_report_retry">Retry</string>
     <string name="downloading_title">Downloading (%d remaining)</string>
     <string name="downloading_title_simple">Downloading</string>
     <string name="downloading_error_mkdir">Cannot create the directory</string>

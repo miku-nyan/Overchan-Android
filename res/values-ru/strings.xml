@@ -285,6 +285,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="downloading_error_ticker">Некоторые файлы не загружены</string>
     <string name="downloading_error_title">Ошибка при загрузке</string>
     <string name="downloading_error_report_title">Следующие файлы не были загружены:</string>
+    <string name="downloading_error_report_retry">Повторить</string>
     <string name="downloading_title">Загрузка (%d осталось)</string>
     <string name="downloading_title_simple">Загрузка</string>
     <string name="downloading_error_mkdir">Невозможно создать директорию</string>

@@ -18,10 +18,14 @@
 
 package nya.miku.wishmaster.ui.downloading;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
@@ -32,6 +36,8 @@ import java.util.Locale;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.ChanModule;
@@ -53,6 +59,8 @@ import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.containers.WriteableContainer;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
+import nya.miku.wishmaster.lib.base64.Base64;
+import nya.miku.wishmaster.lib.base64.Base64OutputStream;
 import nya.miku.wishmaster.ui.Attachments;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import android.annotation.SuppressLint;
@@ -87,6 +95,7 @@ public class DownloadingService extends Service {
     
     public static final String SHARED_PREFERENCES_NAME = "downloading_last_error_report";
     public static final String PREF_ERROR_REPORT = "LAST_ERROR_REPORT";
+    public static final String PREF_ERROR_ITEMS = "LAST_ERROR_ITEMS";
     
     /** путь и имя файла с основным (сериализованным) объектом сохранённой страницы внутри архива */
     public static final String MAIN_OBJECT_FILE = "data/serialized.bin";
@@ -241,6 +250,7 @@ public class DownloadingService extends Service {
         private String currentItemName;
         private DownloadingQueueItem currentItem;
         private StringBuilder errorReport;
+        private ArrayList<DownloadingQueueItem> errorItems;
         
         public DownloadingTask(int startId) {
             setStartId(startId);
@@ -265,6 +275,7 @@ public class DownloadingService extends Service {
         @Override
         public void run() {
             errorReport = new StringBuilder();
+            errorItems = new ArrayList<>();
             Intent intentToProgressDialog = new Intent(DownloadingService.this, DownloadingProgressActivity.class);
             PendingIntent pIntentToProgressDialog =
                     PendingIntent.getActivity(DownloadingService.this, 0, intentToProgressDialog, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -327,12 +338,12 @@ public class DownloadingService extends Service {
                     File directory = new File(settings.getDownloadDirectory(), item.chanName);
                     if (item.subdirectory != null && item.subdirectory.length() > 0) directory = new File(directory, item.subdirectory);
                     if (!directory.mkdirs() && !directory.isDirectory()) {
-                        addError(elementName, getString(R.string.downloading_error_mkdir));
+                        addError(item, elementName, getString(R.string.downloading_error_mkdir));
                         continue;
                     }
                     File target = new File(directory, filename);
                     if (target.exists()) {
-                        addError(elementName, getString(R.string.downloading_error_file_exists));
+                        addError(item, elementName, getString(R.string.downloading_error_file_exists));
                         continue;
                     }
                     File fromCache = fileCache.get(FileCache.PREFIX_ORIGINALS + ChanModels.hashAttachmentModel(item.attachment) +
@@ -352,7 +363,8 @@ public class DownloadingService extends Service {
                             success = true;
                         } catch (Exception e) {
                             if (!isCancelled()) {
-                                addError(elementName, getString(IOUtils.isENOSPC(e) ? R.string.error_no_space : R.string.downloading_error_copy));
+                                addError(item, elementName,
+                                        getString(IOUtils.isENOSPC(e) ? R.string.error_no_space : R.string.downloading_error_copy));
                             }
                         } finally {
                             IOUtils.closeQuietly(is);
@@ -375,7 +387,7 @@ public class DownloadingService extends Service {
                             success = true;
                         } catch (Exception e) {
                             Logger.e(TAG, e);
-                            if (!isCancelled()) addError(elementName, e instanceof InteractiveException ?
+                            if (!isCancelled()) addError(item, elementName, e instanceof InteractiveException ?
                                     getString(R.string.downloading_error_interactive_format, ((InteractiveException) e).getServiceName()) :
                                         getMessageOrENOSPC(e));
                         } finally {
@@ -400,7 +412,7 @@ public class DownloadingService extends Service {
                     
                     File directory = new File(settings.getDownloadDirectory(), item.chanName);
                     if (!directory.mkdirs() && !directory.isDirectory()) {
-                        addError(elementName, getString(R.string.downloading_error_mkdir));
+                        addError(item, elementName, getString(R.string.downloading_error_mkdir));
                         continue;
                     }
                     
@@ -484,7 +496,7 @@ public class DownloadingService extends Service {
                                     if (IOUtils.isENOSPC(e)) {
                                         throw new Exception(getString(R.string.error_no_space));
                                     } else {
-                                        addError(asset, getString(R.string.downloading_error_copy));
+                                        addError(item, asset, getString(R.string.downloading_error_copy));
                                     }
                                 }
                             } finally {
@@ -510,7 +522,7 @@ public class DownloadingService extends Service {
                                 if (IOUtils.isENOSPC(e)) {
                                     throw new Exception(getString(R.string.error_no_space));
                                 } else {
-                                    addError(FAVICON_FILE, getString(R.string.downloading_error_copy));
+                                    addError(item, FAVICON_FILE, getString(R.string.downloading_error_copy));
                                 }
                             }
                         } finally {
@@ -572,14 +584,14 @@ public class DownloadingService extends Service {
                                             if (IOUtils.isENOSPC(e)) {
                                                 throw new Exception(getString(R.string.error_no_space));
                                             } else {
-                                                addError(curElementName, getString(R.string.downloading_error_copy));
+                                                addError(item, curElementName, getString(R.string.downloading_error_copy));
                                             }
                                         }
                                     } finally {
                                         IOUtils.closeQuietly(out);
                                     }
                                 } else {
-                                    if (!isCancelled()) addError(curElementName, getString(R.string.downloading_error_download));
+                                    if (!isCancelled()) addError(item, curElementName, getString(R.string.downloading_error_download));
                                 }
                             }
                         }
@@ -634,7 +646,7 @@ public class DownloadingService extends Service {
                                                 if (IOUtils.isENOSPC(e)) {
                                                     throw new Exception(getString(R.string.error_no_space));
                                                 } else {
-                                                    addError(curElementName, e instanceof InteractiveException ?
+                                                    addError(item, curElementName, e instanceof InteractiveException ?
                                                             getString(R.string.downloading_error_interactive_format,
                                                                     ((InteractiveException) e).getServiceName()) : getMessageOrENOSPC(e));
                                                 }
@@ -664,7 +676,7 @@ public class DownloadingService extends Service {
                                             if (IOUtils.isENOSPC(e)) {
                                                 throw new Exception(getString(R.string.error_no_space));
                                             } else {
-                                                addError(curElementName, getString(R.string.downloading_error_copy));
+                                                addError(item, curElementName, getString(R.string.downloading_error_copy));
                                             }
                                         }
                                     } finally {
@@ -695,14 +707,14 @@ public class DownloadingService extends Service {
                                             if (IOUtils.isENOSPC(e)) {
                                                 throw new Exception(getString(R.string.error_no_space));
                                             } else {
-                                                addError(curThumbElementName, getString(R.string.downloading_error_copy));
+                                                addError(item, curThumbElementName, getString(R.string.downloading_error_copy));
                                             }
                                         }
                                     } finally {
                                         IOUtils.closeQuietly(out);
                                     }
                                 } else {
-                                    if (!isCancelled()) addError(curThumbElementName, getString(R.string.downloading_error_download));
+                                    if (!isCancelled()) addError(item, curThumbElementName, getString(R.string.downloading_error_download));
                                 }
                             }
                         }
@@ -715,13 +727,13 @@ public class DownloadingService extends Service {
                         
                     } catch (Exception e) {
                         Logger.e(TAG, e);
-                        if (!isCancelled()) addError(elementName, getMessageOrENOSPC(e));
+                        if (!isCancelled()) addError(item, elementName, getMessageOrENOSPC(e));
                         if (zip != null) zip.cancel();
                     } finally {
                         try {
                             if (zip != null) zip.close();
                         } catch (Exception e) {
-                            if (!isCancelled()) addError(elementName, getString(R.string.downloading_error_save_container));
+                            if (!isCancelled()) addError(item, elementName, getString(R.string.downloading_error_save_container));
                         }
                     }
                 }
@@ -757,12 +769,17 @@ public class DownloadingService extends Service {
                             build());
                     Intent broadcast = new Intent(BROADCAST_UPDATED);
                     broadcast.putExtra(EXTRA_DOWNLOADING_REPORT, REPORT_ERROR);
-                    getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE).edit().putString(PREF_ERROR_REPORT, errorReport.toString()).commit();
+                    getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE).edit().
+                            putString(PREF_ERROR_REPORT, errorReport.toString()).
+                            putString(PREF_ERROR_ITEMS, serializeErrorItems(errorItems)).
+                            commit();
                     sendBroadcast(broadcast);
                 }
             }
             errorReport.setLength(0);
             errorReport.trimToSize();
+            errorItems.clear();
+            errorItems.trimToSize();
             Logger.d(TAG, "stopped downloading task");
             cancelForeground(DOWNLOADING_NOTIFICATION_ID);
             stopSelf(startId);
@@ -810,9 +827,12 @@ public class DownloadingService extends Service {
             return page;
         }
         
-        private void addError(String element, String error) {
+        private void addError(DownloadingQueueItem item, String element, String error) {
             if (error == null) error = getString(R.string.downloading_error_unknown);
             errorReport.append(element).append('\n').append(error).append("\n\n");
+            if (errorItems.size() > 0 && errorItems.get(errorItems.size()-1).equals(item)) return;
+            //одинаковые item могут идти только подряд (вложения одного треда)
+            errorItems.add(item);
         }
         
         private String getMessageOrENOSPC(Exception e) {
@@ -826,6 +846,30 @@ public class DownloadingService extends Service {
             } catch (Exception e) {
                 Logger.e(TAG, e);
             }
+        }
+    }
+    
+    private static String serializeErrorItems(ArrayList<DownloadingQueueItem> list) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new Base64OutputStream(baos, Base64.DEFAULT)));
+            oos.writeObject(list);
+            oos.close();
+            return baos.toString("US-ASCII");
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            return "";
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static ArrayList<DownloadingQueueItem> deserializeErrorItems(String data) {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new ByteArrayInputStream(Base64.decode(data, Base64.DEFAULT))));
+            return (ArrayList<DownloadingQueueItem>) ois.readObject();
+        } catch (Exception e) {
+            Logger.e(TAG, e);
+            return null;
         }
     }
     

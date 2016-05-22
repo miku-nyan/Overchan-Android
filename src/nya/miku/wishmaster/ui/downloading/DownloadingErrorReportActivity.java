@@ -19,17 +19,28 @@
 package nya.miku.wishmaster.ui.downloading;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.common.Async;
+import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.common.MainApplication;
+
+import java.util.List;
+
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DownloadingErrorReportActivity extends Activity implements View.OnClickListener {
+    private static final String TAG = "DownloadingErrorReportActivity";
+    
     private TextView textView;
     private NotificationManager notificationManager;
+    private String errorItemsData;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +50,7 @@ public class DownloadingErrorReportActivity extends Activity implements View.OnC
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         textView = (TextView) findViewById(R.id.downloading_error_report_view);
         findViewById(R.id.downloading_error_report_ok_btn).setOnClickListener(this);
+        findViewById(R.id.downloading_error_report_retry_btn).setOnClickListener(this);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         updateErrorInfo();
     }
@@ -50,14 +62,38 @@ public class DownloadingErrorReportActivity extends Activity implements View.OnC
     }
 
     private void updateErrorInfo() {
-        String report = getSharedPreferences(DownloadingService.SHARED_PREFERENCES_NAME, MODE_PRIVATE).
-                getString(DownloadingService.PREF_ERROR_REPORT, "");
+        SharedPreferences prefs = getSharedPreferences(DownloadingService.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        String report = prefs.getString(DownloadingService.PREF_ERROR_REPORT, "");
         textView.setText(report);
         notificationManager.cancel(DownloadingService.ERROR_REPORT_NOTIFICATION_ID);
+        errorItemsData = prefs.getString(DownloadingService.PREF_ERROR_ITEMS, null);
     }
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == R.id.downloading_error_report_retry_btn) Async.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<DownloadingService.DownloadingQueueItem> items = DownloadingService.deserializeErrorItems(errorItemsData);
+                    for (DownloadingService.DownloadingQueueItem item : items) {
+                        if (!DownloadingService.isInQueue(item)) {
+                            Intent downloadIntent = new Intent(DownloadingErrorReportActivity.this, DownloadingService.class);
+                            downloadIntent.putExtra(DownloadingService.EXTRA_DOWNLOADING_ITEM, item);
+                            startService(downloadIntent);
+                        }
+                    }
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                    Async.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainApplication.getInstance(), R.string.error_unknown, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        });
         finish();
     }
 }

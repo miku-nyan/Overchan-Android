@@ -42,10 +42,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:id="@+id/downloading_error_report_view" />
     </ScrollView>
     
-    <Button
-        android:id="@+id/downloading_error_report_ok_btn"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@android:string/ok" />
+        android:orientation="horizontal"
+        android:weightSum="2" >
+        <Button
+            android:id="@+id/downloading_error_report_retry_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/downloading_error_report_retry" />
+        <Button
+            android:id="@+id/downloading_error_report_ok_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@android:string/ok" />
+    </LinearLayout>
 
 </LinearLayout>

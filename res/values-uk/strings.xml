@@ -288,6 +288,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="downloading_error_ticker">Не всі файли звантажені</string>
     <string name="downloading_error_title">Помилка звантаження</string>
     <string name="downloading_error_report_title">Не вдалося звантажити файли:</string>
+    <string name="downloading_error_report_retry">Повторити</string>
     <string name="downloading_title">Звантаження (ще %d)</string>
     <string name="downloading_title_simple">Звантаження</string>
     <string name="downloading_error_mkdir">Помилка створення теки</string>
