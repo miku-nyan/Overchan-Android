@@ -58,6 +58,7 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -446,9 +447,10 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
         if (url.contains("/catalog.html")) {
             try {
-                RegexUtils.getUrlPath(url, getAllDomains());
                 int index = url.indexOf("/catalog.html");
                 String left = url.substring(0, index);
                 UrlPageModel model = new UrlPageModel();
@@ -459,7 +461,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
                 return model;
             } catch (Exception e) {}
         }
-        UrlPageModel model = WakabaUtils.parseUrl(url, getChanName(), getAllDomains());
+        UrlPageModel model = WakabaUtils.parseUrlPath(urlPath, getChanName());
         if (model.type == UrlPageModel.TYPE_BOARDPAGE && model.boardPage == 0) model.boardPage = 1;
         return model;
     }

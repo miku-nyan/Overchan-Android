@@ -55,7 +55,13 @@ public class WakabaUtils {
     }
     
     public static UrlPageModel parseUrl(String url, String chanName, String... domains) {
-        String path = RegexUtils.getUrlPath(url, domains).toLowerCase(Locale.US);
+        String path = UrlPathUtils.getUrlPath(url, domains);
+        if (path == null) throw new IllegalArgumentException();
+        return parseUrlPath(path, chanName);
+    }
+    
+    public static UrlPageModel parseUrlPath(String path, String chanName) {
+        path = path.toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = chanName;

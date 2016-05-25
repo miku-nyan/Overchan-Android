@@ -56,8 +56,8 @@ import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
@@ -406,9 +406,10 @@ public class DvachModule extends AbstractWakabaModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
         if (url.contains("/search?q=")) {
             try {
-                RegexUtils.getUrlPath(url, getAllDomains());
                 int index = url.indexOf("/search?q=");
                 String left = url.substring(0, index);
                 UrlPageModel model = new UrlPageModel();
@@ -420,6 +421,6 @@ public class DvachModule extends AbstractWakabaModule {
                 return model;
             } catch (Exception e) {}
         }
-        return WakabaUtils.parseUrl(url, getChanName(), getAllDomains());
+        return WakabaUtils.parseUrlPath(urlPath, getChanName());
     }
 }

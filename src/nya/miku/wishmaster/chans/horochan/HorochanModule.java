@@ -58,6 +58,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
@@ -436,7 +437,9 @@ public class HorochanModule extends CloudflareChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String path = RegexUtils.getUrlPath(url, DOMAIN).toLowerCase(Locale.US);
+        String path = UrlPathUtils.getUrlPath(url, DOMAIN);
+        if (path == null) throw new IllegalArgumentException("wrong domain");
+        path = path.toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;

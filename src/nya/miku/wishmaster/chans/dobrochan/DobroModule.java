@@ -66,6 +66,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -568,14 +569,9 @@ public class DobroModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String path = RegexUtils.getUrlPath(url, new RegexUtils.DomainChecker() {
-            @Override
-            public void checkDomain(String domain) throws IllegalArgumentException {
-                if ((!getDomain().equals(domain)) && (DOMAINS_LIST.indexOf(domain) == -1)) {
-                    throw new IllegalArgumentException("wrong domain");
-                }
-            }
-        }).toLowerCase(Locale.US);
+        String path = UrlPathUtils.getUrlPath(url, getDomain(), DOMAINS_LIST);
+        if (path == null) throw new IllegalArgumentException("wrong domain");
+        path = path.toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;

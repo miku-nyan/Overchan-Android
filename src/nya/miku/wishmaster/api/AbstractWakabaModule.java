@@ -52,6 +52,7 @@ public abstract class AbstractWakabaModule extends CloudflareChanModule {
     protected static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     
     private Map<String, SimpleBoardModel> boardsMap = null;
+    private String[] allDomains = null;
     
     public AbstractWakabaModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -60,7 +61,8 @@ public abstract class AbstractWakabaModule extends CloudflareChanModule {
     protected abstract String getUsingDomain();
     
     protected String[] getAllDomains() {
-        return new String[] { getUsingDomain() };
+        if (allDomains == null) allDomains = new String[] { getUsingDomain() };
+        return allDomains;
     }
     
     protected boolean canHttps() {
@@ -83,11 +85,6 @@ public abstract class AbstractWakabaModule extends CloudflareChanModule {
     @Override
     protected boolean canCloudflare() {
         return false;
-    }
-    
-    @Override
-    protected String getCloudflareCookieDomain() {
-        return getUsingDomain();
     }
     
     protected boolean wakabaNoRedirect() {

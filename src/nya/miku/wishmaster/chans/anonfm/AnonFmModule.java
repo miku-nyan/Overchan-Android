@@ -56,6 +56,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -184,7 +185,7 @@ public class AnonFmModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        RegexUtils.getUrlPath(url, DOMAIN);
+        if (UrlPathUtils.getUrlPath(url, DOMAIN) == null) throw new IllegalArgumentException("wrong domain");
         String threadNumber = url.substring(url.indexOf('#') + 1);
         if (threadNumber.length() == url.length()) threadNumber = getCurrentThreadNumber();
         return getPageModel(threadNumber);

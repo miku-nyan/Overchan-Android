@@ -47,7 +47,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.CryptoUtils;
-import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -689,15 +689,9 @@ public class MakabaModule extends CloudflareChanModule {
 
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String path = RegexUtils.getUrlPath(url, new RegexUtils.DomainChecker() {
-            @Override
-            public void checkDomain(String domain) throws IllegalArgumentException {
-                //проверка домена
-                if ((!MakabaModule.this.domain.equals(domain)) && (DOMAINS_LIST.indexOf(domain) == -1)) {
-                    throw new IllegalArgumentException("wrong domain");
-                }
-            }
-        }).toLowerCase(Locale.US);
+        String path = UrlPathUtils.getUrlPath(url, MakabaModule.this.domain, DOMAINS_LIST);
+        if (path == null) throw new IllegalArgumentException("wrong domain");
+        path = path.toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;

@@ -48,7 +48,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -349,7 +349,9 @@ public class MikubaModule extends CloudflareChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String path = RegexUtils.getUrlPath(url, MIKUBA_DOMAIN).toLowerCase(Locale.US);
+        String path = UrlPathUtils.getUrlPath(url, MIKUBA_DOMAIN);
+        if (path == null) throw new IllegalArgumentException("wrong domain");
+        path = path.toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = MIKUBA_NAME;

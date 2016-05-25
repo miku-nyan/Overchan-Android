@@ -52,6 +52,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -634,9 +635,10 @@ public class AllchanModule extends CloudflareChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        String urlPath = UrlPathUtils.getUrlPath(url, DOMAIN);
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
         if (url.contains("/catalog.html")) {
             try {
-                RegexUtils.getUrlPath(url, DOMAIN);
                 int index = url.indexOf("/catalog.html");
                 String left = url.substring(0, index);
                 UrlPageModel model = new UrlPageModel();
@@ -647,6 +649,6 @@ public class AllchanModule extends CloudflareChanModule {
                 return model;
             } catch (Exception e) {}
         }
-        return WakabaUtils.parseUrl(url, CHAN_NAME, DOMAIN);
+        return WakabaUtils.parseUrlPath(urlPath, CHAN_NAME);
     }
 }
