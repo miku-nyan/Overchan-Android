@@ -422,8 +422,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     <string name="infinity_tor_message">Um 8chan über Tor zu senden, müssen Sie den .onion Domain verwenden.</string>
     
-    <string name="inach_prefs_ajax_update">JSON-Update</string>
-    
     <string name="fourchan_prefs_new_recaptcha">Recaptcha 2.0</string>
     <string name="fourchan_prefs_new_recaptcha_summary">Die neue Version von Recaptcha verwenden</string>
     <string name="fourchan_prefs_new_recaptcha_fallback">Recaptcha 2.0 Fallback</string>

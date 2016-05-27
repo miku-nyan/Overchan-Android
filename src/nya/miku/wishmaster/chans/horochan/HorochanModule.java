@@ -87,7 +87,6 @@ public class HorochanModule extends CloudflareChanModule {
     
     private static final String[] ATTACHMENT_FORMATS = new String[] { "gif", "jpg", "jpeg", "png", "bmp", "webm" };
     
-    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_RECAPTCHA_FALLBACK = "PREF_KEY_RECAPTCHA_FALLBACK";
     
     private Map<String, String> boardNames = null;
@@ -136,12 +135,7 @@ public class HorochanModule extends CloudflareChanModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
-        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context); //only_new_posts
-        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
-        onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
-        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
-        onlyNewPostsPreference.setDefaultValue(true);
-        preferenceGroup.addPreference(onlyNewPostsPreference);
+        addOnlyNewPostsPreference(preferenceGroup, true);
         CheckBoxPreference fallbackRecaptchaPref = new CheckBoxPreference(context); // recaptcha fallback
         fallbackRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha_fallback);
         fallbackRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_fallback_summary);
@@ -154,7 +148,7 @@ public class HorochanModule extends CloudflareChanModule {
     }
     
     private boolean loadOnlyNewPosts() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
+        return loadOnlyNewPosts(true);
     }
     
     private boolean recaptchaFallback() {

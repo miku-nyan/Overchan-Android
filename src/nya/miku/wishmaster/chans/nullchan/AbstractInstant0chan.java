@@ -33,14 +33,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
-import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
@@ -56,29 +53,17 @@ import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 
 public abstract class AbstractInstant0chan extends AbstractKusabaModule {
-    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
-    
     public AbstractInstant0chan(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
     }
     
-    protected void addOnlyNewPostsPreference(PreferenceGroup group) {
-        Context context = group.getContext();
-        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
-        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
-        onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
-        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
-        onlyNewPostsPreference.setDefaultValue(true);
-        group.addPreference(onlyNewPostsPreference);
-    }
-    
     protected boolean loadOnlyNewPosts() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
+        return loadOnlyNewPosts(true);
     }
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        addOnlyNewPostsPreference(preferenceGroup);
+        addOnlyNewPostsPreference(preferenceGroup, true);
         super.addPreferencesOnScreen(preferenceGroup);
     }
     

@@ -32,11 +32,9 @@ import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -117,13 +115,7 @@ public class InachModule extends AbstractWakabaModule {
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        Context context = preferenceGroup.getContext();
-        CheckBoxPreference ajaxPref = new CheckBoxPreference(context);
-        ajaxPref.setTitle(R.string.inach_prefs_ajax_update);
-        ajaxPref.setSummary(R.string.pref_only_new_posts_summary);
-        ajaxPref.setKey(getSharedKey(PREF_AJAX_UPDATE));
-        ajaxPref.setDefaultValue(true);
-        preferenceGroup.addPreference(ajaxPref);
+        addOnlyNewPostsPreference(preferenceGroup, true);
         super.addPreferencesOnScreen(preferenceGroup);
     }
     

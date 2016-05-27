@@ -37,11 +37,9 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 
@@ -51,8 +49,6 @@ public class SevenchanModule extends AbstractKusabaModule {
     static final String TIMEZONE = "GMT+4"; // ?
     
     private static final Pattern THREAD_REFERENCE_ALT = Pattern.compile("read.php\\?b=([^&]+)&t=(\\d+)(?:&p=)?(\\d*).*");
-    
-    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "7ch", "Site Discussion", "7chan & Related Services", false),
@@ -139,23 +135,13 @@ public class SevenchanModule extends AbstractKusabaModule {
         return true;
     }
     
-    private void addOnlyNewPostsPreference(PreferenceGroup group) {
-        Context context = group.getContext();
-        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
-        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
-        onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
-        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
-        onlyNewPostsPreference.setDefaultValue(true);
-        group.addPreference(onlyNewPostsPreference);
-    }
-    
     private boolean loadOnlyNewPosts() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
+        return loadOnlyNewPosts(true);
     }
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        addOnlyNewPostsPreference(preferenceGroup);
+        addOnlyNewPostsPreference(preferenceGroup, true);
         super.addPreferencesOnScreen(preferenceGroup);
     }
     

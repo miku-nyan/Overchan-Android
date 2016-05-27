@@ -68,6 +68,7 @@ public abstract class AbstractChanModule implements HttpChanModule {
     protected static final String PREF_KEY_PROXY_PORT = "PREF_KEY_PROXY_PORT";
     protected static final String PREF_KEY_PASSWORD = "PREF_KEY_PASSWORD";
     protected static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
+    protected static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     
     /**
      * Основной HTTP-клиент
@@ -275,6 +276,35 @@ public abstract class AbstractChanModule implements HttpChanModule {
      */
     protected boolean useHttps(boolean defaultValue) {
         return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), defaultValue);
+    }
+    
+    /**
+     * Добавить в группу параметров (на экран/в категорию) настройку выбора использования инкрементальной загрузки (загрузки только новых постов).
+     * Для хранения используется ключ общих параметров {@link #PREF_KEY_ONLY_NEW_POSTS} ({@link #getSharedKey(String)}).
+     * См. также: {@link #loadOnlyNewPosts(boolean)} - для получения значения параметра.
+     * @param group группа, на которую добавляется параметр
+     * @param defaultValue значение параметра по умолчанию
+     * return объект {@link CheckBoxPreference} с параметром
+     */
+    protected CheckBoxPreference addOnlyNewPostsPreference(PreferenceGroup group, boolean defaultValue) {
+        final Context context = group.getContext();
+        CheckBoxPreference onlyNewPostsPref = new CheckBoxPreference(context);
+        onlyNewPostsPref.setTitle(R.string.pref_only_new_posts);
+        onlyNewPostsPref.setSummary(R.string.pref_only_new_posts_summary);
+        onlyNewPostsPref.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
+        onlyNewPostsPref.setDefaultValue(defaultValue);
+        group.addPreference(onlyNewPostsPref);
+        return onlyNewPostsPref;
+    }
+    
+    /**
+     * Определить значение параметра использования инкрементальной загрузки из ключа общих настроек {@link #PREF_KEY_ONLY_NEW_POSTS}.
+     * Настройка добавляется на экран (в группу) настроек методом {@link #addOnlyNewPostsPreference(PreferenceGroup, boolean)}.
+     * @param defaultValue значение параметра по умолчанию
+     * @return значение параметра
+     */
+    protected boolean loadOnlyNewPosts(boolean defaultValue) {
+        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), defaultValue);
     }
     
     @Override

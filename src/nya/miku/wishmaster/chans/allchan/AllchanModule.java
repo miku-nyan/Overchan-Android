@@ -85,7 +85,6 @@ public class AllchanModule extends CloudflareChanModule {
     
     private static final String RECAPTCHA_PUBLIC_KEY = "6LfKRgcTAAAAAIe-bmV_pCbMzvKvBZGbZNRsfmED";
     
-    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_CAPTCHA_TYPE = "PREF_KEY_CAPTCHA_TYPE";
     
     public static final String[] CATALOG_TYPES = new String[] { "date", "recent", "bumps" };
@@ -141,11 +140,7 @@ public class AllchanModule extends CloudflareChanModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
-        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context); //only_new_posts
-        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
-        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
-        onlyNewPostsPreference.setDefaultValue(true);
-        preferenceGroup.addPreference(onlyNewPostsPreference);
+        addOnlyNewPostsPreference(preferenceGroup, true);
         final ListPreference captchaPreference = new ListPreference(context); //captcha_type
         captchaPreference.setTitle(R.string.pref_captcha_type);
         captchaPreference.setDialogTitle(R.string.pref_captcha_type);
@@ -183,7 +178,7 @@ public class AllchanModule extends CloudflareChanModule {
     }
     
     private boolean loadOnlyNewPosts() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
+        return loadOnlyNewPosts(true);
     }
     
     private int getUsingCaptchaType() {

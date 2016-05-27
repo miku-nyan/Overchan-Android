@@ -89,7 +89,6 @@ public class DobroModule extends AbstractChanModule {
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     
-    private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_MAX_RATING = "PREF_KEY_MAX_RATING";
     private static final String PREF_KEY_SHOW_CAPTCHA = "PREF_KEY_SHOW_CAPTCHA";
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
@@ -174,18 +173,8 @@ public class DobroModule extends AbstractChanModule {
         return response;
     }
     
-    private void addOnlyNewPostsPreference(PreferenceGroup group) {
-        Context context = group.getContext();
-        CheckBoxPreference onlyNewPostsPreference = new CheckBoxPreference(context);
-        onlyNewPostsPreference.setTitle(R.string.pref_only_new_posts);
-        onlyNewPostsPreference.setSummary(R.string.pref_only_new_posts_summary);
-        onlyNewPostsPreference.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));
-        onlyNewPostsPreference.setDefaultValue(true);
-        group.addPreference(onlyNewPostsPreference);
-    }
-    
     private boolean loadOnlyNewPosts() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), true);
+        return loadOnlyNewPosts(true);
     }
     
     private void addDomainPreferences(PreferenceGroup group) {
@@ -262,7 +251,7 @@ public class DobroModule extends AbstractChanModule {
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        addOnlyNewPostsPreference(preferenceGroup);
+        addOnlyNewPostsPreference(preferenceGroup, true);
         addRatingPreference(preferenceGroup);
         addCaptchaPreference(preferenceGroup);
         addDomainPreferences(preferenceGroup);
