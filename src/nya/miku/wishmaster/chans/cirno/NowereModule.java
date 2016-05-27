@@ -27,11 +27,9 @@ import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -62,8 +60,6 @@ public class NowereModule extends AbstractChanModule {
     static final String NOWERE_DOMAIN = "nowere.net";
     static final String NOWERE_URL_HTTP = "http://nowere.net/";
     static final String NOWERE_URL_HTTPS = "https://nowere.net/";
-    
-    private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     
     public NowereModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -96,19 +92,13 @@ public class NowereModule extends AbstractChanModule {
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        Context context = preferenceGroup.getContext();
         addPasswordPreference(preferenceGroup);
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(false);
-        preferenceGroup.addPreference(httpsPref);
+        addHttpsPreference(preferenceGroup, false);
         addProxyPreferences(preferenceGroup);
     }
     
     private String getUsingUrl() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), false) ? NOWERE_URL_HTTPS : NOWERE_URL_HTTP;
+        return useHttps(false) ? NOWERE_URL_HTTPS : NOWERE_URL_HTTP;
     }
     
     private ThreadModel[] readWakabaPage(String url, ProgressListener listener, CancellableTask task, boolean checkIfModified) throws Exception {

@@ -89,7 +89,6 @@ public class HorochanModule extends CloudflareChanModule {
     
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_RECAPTCHA_FALLBACK = "PREF_KEY_RECAPTCHA_FALLBACK";
-    private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     
     private Map<String, String> boardNames = null;
     private Map<String, Integer> boardPagesCount = null;
@@ -114,7 +113,7 @@ public class HorochanModule extends CloudflareChanModule {
     }
     
     private boolean useHttps() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true);
+        return useHttps(true);
     }
     
     private String getUsingUrl() {
@@ -149,12 +148,7 @@ public class HorochanModule extends CloudflareChanModule {
         fallbackRecaptchaPref.setKey(getSharedKey(PREF_KEY_RECAPTCHA_FALLBACK));
         fallbackRecaptchaPref.setDefaultValue(false);
         preferenceGroup.addPreference(fallbackRecaptchaPref);
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context); //https
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(true);
-        preferenceGroup.addPreference(httpsPref);
+        addHttpsPreference(preferenceGroup, true); //https
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }

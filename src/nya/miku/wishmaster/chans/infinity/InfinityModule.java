@@ -128,12 +128,7 @@ public class InfinityModule extends AbstractVichanModule {
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
         addPasswordPreference(preferenceGroup);
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(true);
-        preferenceGroup.addPreference(httpsPref);
+        CheckBoxPreference httpsPref = addHttpsPreference(preferenceGroup, true);
         CheckBoxPreference onionPref = new CheckBoxPreference(context);
         onionPref.setTitle(R.string.pref_use_onion);
         onionPref.setSummary(R.string.pref_use_onion_summary);
@@ -162,7 +157,7 @@ public class InfinityModule extends AbstractVichanModule {
     
     @Override
     protected boolean useHttps() {
-        return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) && preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true);
+        return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) && useHttps(true);
     }
     
     @Override

@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -41,10 +40,8 @@ import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 
 public abstract class AbstractWakabaModule extends CloudflareChanModule {
@@ -75,7 +72,7 @@ public abstract class AbstractWakabaModule extends CloudflareChanModule {
     
     protected boolean useHttps() {
         if (!canHttps()) return false;
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), useHttpsDefaultValue());
+        return useHttps(useHttpsDefaultValue());
     }
     
     protected String getUsingUrl() {
@@ -137,16 +134,8 @@ public abstract class AbstractWakabaModule extends CloudflareChanModule {
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        Context context = preferenceGroup.getContext();
         addPasswordPreference(preferenceGroup);
-        if (canHttps()) {
-            CheckBoxPreference httpsPref = new CheckBoxPreference(context);
-            httpsPref.setTitle(R.string.pref_use_https);
-            httpsPref.setSummary(R.string.pref_use_https_summary);
-            httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-            httpsPref.setDefaultValue(useHttpsDefaultValue());
-            preferenceGroup.addPreference(httpsPref);
-        }
+        if (canHttps()) addHttpsPreference(preferenceGroup, useHttpsDefaultValue());
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }

@@ -28,11 +28,9 @@ import cz.msebera.android.httpclient.cookie.Cookie;
 import cz.msebera.android.httpclient.entity.mime.content.ByteArrayBody;
 import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
@@ -75,7 +73,6 @@ public class MikubaModule extends CloudflareChanModule {
     private static final Pattern YOUTUBE_PATTERN = Pattern.compile("(?:\\s|^)(?:https?://)?(?:www\\.)?youtube.com/watch\\?v=(\\w+)(?:.*?)(?:\\s|$)",
             Pattern.CASE_INSENSITIVE);
     
-    private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_SESSION_COOKIE = "PREF_KEY_SESSION_COOKIE";
     
     private static final String SESSION_COOKIE_NAME = "webpy_session_id";
@@ -166,19 +163,13 @@ public class MikubaModule extends CloudflareChanModule {
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        Context context = preferenceGroup.getContext();
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(true);
-        preferenceGroup.addPreference(httpsPref);
+        addHttpsPreference(preferenceGroup, true);
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     
     private boolean useHttps() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true);
+        return useHttps(true);
     }
     
     @Override

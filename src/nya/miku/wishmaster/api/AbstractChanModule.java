@@ -67,6 +67,7 @@ public abstract class AbstractChanModule implements HttpChanModule {
     protected static final String PREF_KEY_PROXY_HOST = "PREF_KEY_PROXY_HOST";
     protected static final String PREF_KEY_PROXY_PORT = "PREF_KEY_PROXY_PORT";
     protected static final String PREF_KEY_PASSWORD = "PREF_KEY_PASSWORD";
+    protected static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     
     /**
      * Основной HTTP-клиент
@@ -245,6 +246,35 @@ public abstract class AbstractChanModule implements HttpChanModule {
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         addPasswordPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
+    }
+    
+    /**
+     * Добавить в группу параметров (на экран/в категорию) настройку выбора HTTPS (защищённого соединения).
+     * Для хранения используется ключ общих параметров {@link #PREF_KEY_USE_HTTPS} ({@link #getSharedKey(String)}).
+     * См. также: {@link #useHttps(boolean)} - для получения значения параметра.
+     * @param group группа, на которую добавляется параметр
+     * @param defaultValue значение параметра по умолчанию
+     * return объект {@link CheckBoxPreference} с параметром
+     */
+    protected CheckBoxPreference addHttpsPreference(PreferenceGroup group, boolean defaultValue) {
+        final Context context = group.getContext();
+        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
+        httpsPref.setTitle(R.string.pref_use_https);
+        httpsPref.setSummary(R.string.pref_use_https_summary);
+        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
+        httpsPref.setDefaultValue(defaultValue);
+        group.addPreference(httpsPref);
+        return httpsPref;
+    }
+    
+    /**
+     * Определить значение параметра использования HTTPS (защищённого соединения) из ключа общих настроек {@link #PREF_KEY_USE_HTTPS}.
+     * Настройка добавляется на экран (в группу) настроек методом {@link #addHttpsPreference(PreferenceGroup, boolean)}.
+     * @param defaultValue значение параметра по умолчанию
+     * @return значение параметра
+     */
+    protected boolean useHttps(boolean defaultValue) {
+        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), defaultValue);
     }
     
     @Override

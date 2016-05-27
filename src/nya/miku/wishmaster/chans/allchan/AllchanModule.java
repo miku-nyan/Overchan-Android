@@ -87,7 +87,6 @@ public class AllchanModule extends CloudflareChanModule {
     
     private static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
     private static final String PREF_KEY_CAPTCHA_TYPE = "PREF_KEY_CAPTCHA_TYPE";
-    private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     
     public static final String[] CATALOG_TYPES = new String[] { "date", "recent", "bumps" };
     public static final String[] CATALOG_DESCRIPTIONS = new String[] {
@@ -127,7 +126,7 @@ public class AllchanModule extends CloudflareChanModule {
     }
     
     private boolean useHttps() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true);
+        return useHttps(true);
     }
     
     private String getUsingUrl() {
@@ -157,12 +156,7 @@ public class AllchanModule extends CloudflareChanModule {
         int i = Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT));
         if (i >= 0) captchaPreference.setSummary(CAPTCHA_TYPES[i]);
         preferenceGroup.addPreference(captchaPreference);
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context); //https
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(true);
-        preferenceGroup.addPreference(httpsPref);
+        addHttpsPreference(preferenceGroup, true);
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
         

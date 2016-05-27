@@ -52,7 +52,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -264,13 +263,7 @@ public class PonyachModule extends AbstractWakabaModule {
         });
         preferenceGroup.addPreference(domainPref);
         
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(useHttpsDefaultValue());
-        preferenceGroup.addPreference(httpsPref);
-        
+        addHttpsPreference(preferenceGroup, useHttpsDefaultValue());
         addProxyPreferences(preferenceGroup);
         captchaLevel.setSummary(captchaLevel.getEntry());
         domainPref.setSummary(domainPref.getEntry());

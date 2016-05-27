@@ -85,7 +85,6 @@ public class FourchanModule extends AbstractChanModule {
     
     private static final boolean NEW_RECAPTCHA_DEFAULT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1;
     
-    private static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     private static final String PREF_KEY_NEW_RECAPTCHA = "PREF_KEY_NEW_RECAPTCHA1";
     private static final String PREF_KEY_NEW_RECAPTCHA_FALLBACK = "PREF_KEY_NEW_RECAPTCHA_FALLBACK";
     private static final String PREF_KEY_PASS_TOKEN = "PREF_KEY_PASS_TOKEN";
@@ -307,12 +306,7 @@ public class FourchanModule extends AbstractChanModule {
         fallbackRecaptchaPref.setDependency(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
         
         addPasswordPreference(preferenceGroup);
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
-        httpsPref.setTitle(R.string.pref_use_https);
-        httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
-        httpsPref.setDefaultValue(true);
-        preferenceGroup.addPreference(httpsPref);
+        addHttpsPreference(preferenceGroup, true);
         addProxyPreferences(preferenceGroup);
         
         final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
@@ -328,7 +322,7 @@ public class FourchanModule extends AbstractChanModule {
     }
     
     private boolean useHttps() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true);
+        return useHttps(true);
     }
     
     private boolean useNewRecaptcha() {
