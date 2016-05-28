@@ -68,6 +68,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.interactive.SimpleCaptchaException;
@@ -290,14 +291,14 @@ public class FourchanModule extends AbstractChanModule {
         Context context = preferenceGroup.getContext();
         addPasscodePreference(preferenceGroup);
         
-        CheckBoxPreference newRecaptchaPref = new CheckBoxPreference(context);
+        CheckBoxPreference newRecaptchaPref = new LazyPreferences.CheckBoxPreference(context);
         newRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha);
         newRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_summary);
         newRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA));
         newRecaptchaPref.setDefaultValue(NEW_RECAPTCHA_DEFAULT);
         preferenceGroup.addPreference(newRecaptchaPref);
         
-        final CheckBoxPreference fallbackRecaptchaPref = new CheckBoxPreference(context);
+        final CheckBoxPreference fallbackRecaptchaPref = new LazyPreferences.CheckBoxPreference(context);
         fallbackRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha_fallback);
         fallbackRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_fallback_summary);
         fallbackRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA_FALLBACK));

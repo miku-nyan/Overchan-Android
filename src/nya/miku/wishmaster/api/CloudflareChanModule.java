@@ -30,6 +30,7 @@ import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.http.cloudflare.CloudflareException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -108,7 +109,7 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
     protected void addCloudflareRecaptchaFallbackPreference(PreferenceGroup preferenceGroup) {
         if (canCloudflare()) {
             Context context = preferenceGroup.getContext();
-            CheckBoxPreference fallbackPref = new CheckBoxPreference(context);
+            CheckBoxPreference fallbackPref = new LazyPreferences.CheckBoxPreference(context);
             fallbackPref.setTitle(R.string.pref_cf_recaptcha_fallback);
             fallbackPref.setSummary(R.string.pref_cf_recaptcha_fallback_summary);
             fallbackPref.setKey(getSharedKey(PREF_KEY_CLOUDFLARE_RECAPTCHA_FALLBACK));

@@ -34,6 +34,7 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class SynchModule extends AbstractVichanModule {
@@ -105,7 +106,7 @@ public class SynchModule extends AbstractVichanModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
-        ListPreference domainPref = new ListPreference(context);
+        ListPreference domainPref = new LazyPreferences.ListPreference(context);
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
         domainPref.setTitle(R.string.pref_domain);
         domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));

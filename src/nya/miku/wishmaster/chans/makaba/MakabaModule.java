@@ -47,6 +47,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.CryptoUtils;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -105,7 +106,7 @@ public class MakabaModule extends CloudflareChanModule {
         super(preferences, resources);
         updateDomain(
                 preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN),
-                preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true));
+                preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS_MAKABA), true));
     }
     
     @Override
@@ -167,7 +168,7 @@ public class MakabaModule extends CloudflareChanModule {
     
     private void addMobileAPIPreference(PreferenceGroup group) {
         final Context context = group.getContext();
-        CheckBoxPreference mobileAPIPref = new CheckBoxPreference(context);
+        CheckBoxPreference mobileAPIPref = new LazyPreferences.CheckBoxPreference(context);
         mobileAPIPref.setTitle(R.string.makaba_prefs_mobile_api);
         mobileAPIPref.setSummary(R.string.pref_only_new_posts_summary);
         mobileAPIPref.setKey(getSharedKey(PREF_KEY_MOBILE_API));
@@ -181,7 +182,7 @@ public class MakabaModule extends CloudflareChanModule {
         captchaCategory.setTitle(R.string.makaba_prefs_captcha_category);
         group.addPreference(captchaCategory);
         
-        CheckBoxPreference skipCaptchaPreference = new CheckBoxPreference(context);
+        CheckBoxPreference skipCaptchaPreference = new LazyPreferences.CheckBoxPreference(context);
         skipCaptchaPreference.setTitle(R.string.makaba_prefs_skip_captcha);
         skipCaptchaPreference.setKey(getSharedKey(PREF_KEY_SKIP_CAPTCHA));
         skipCaptchaPreference.setDefaultValue(false);
@@ -202,9 +203,9 @@ public class MakabaModule extends CloudflareChanModule {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if (preference.getKey().equals(getSharedKey(PREF_KEY_DOMAIN))) {
-                    updateDomain((String) newValue, preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS), true));
+                    updateDomain((String) newValue, preferences.getBoolean(getSharedKey(PREF_KEY_USE_HTTPS_MAKABA), true));
                     return true;
-                } else if (preference.getKey().equals(getSharedKey(PREF_KEY_USE_HTTPS))) {
+                } else if (preference.getKey().equals(getSharedKey(PREF_KEY_USE_HTTPS_MAKABA))) {
                     updateDomain(preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN), (boolean)newValue);
                     return true;
                 }
@@ -224,10 +225,10 @@ public class MakabaModule extends CloudflareChanModule {
         domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         domainPref.setOnPreferenceChangeListener(updateDomainListener);
         domainCat.addPreference(domainPref);
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context); //чекбокс "использовать https"
+        CheckBoxPreference httpsPref = new LazyPreferences.CheckBoxPreference(context); //чекбокс "использовать https"
         httpsPref.setTitle(R.string.pref_use_https);
         httpsPref.setSummary(R.string.pref_use_https_summary);
-        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
+        httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS_MAKABA));
         httpsPref.setDefaultValue(true);
         httpsPref.setOnPreferenceChangeListener(updateDomainListener);
         domainCat.addPreference(httpsPref);

@@ -65,6 +65,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
@@ -215,7 +216,7 @@ public class DobroModule extends AbstractChanModule {
                 return false;
             }
         };
-        ListPreference ratingPref = new ListPreference(context);
+        ListPreference ratingPref = new LazyPreferences.ListPreference(context);
         ratingPref.setTitle(R.string.dobrochan_prefs_max_rating);
         ratingPref.setSummary(preferences.getString(getSharedKey(PREF_KEY_MAX_RATING), "R-15"));
         ratingPref.setEntries(RATINGS);
@@ -241,7 +242,7 @@ public class DobroModule extends AbstractChanModule {
     
     private void addCaptchaPreference(PreferenceGroup group) {
         Context context = group.getContext();
-        CheckBoxPreference showCaptchaPreference = new CheckBoxPreference(context);
+        CheckBoxPreference showCaptchaPreference = new LazyPreferences.CheckBoxPreference(context);
         showCaptchaPreference.setTitle(R.string.dobrochan_prefs_show_captcha);
         showCaptchaPreference.setSummary(R.string.dobrochan_prefs_show_captcha_summary);
         showCaptchaPreference.setKey(getSharedKey(PREF_KEY_SHOW_CAPTCHA));

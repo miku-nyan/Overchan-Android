@@ -55,6 +55,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.FastHtmlTagParser;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -129,7 +130,7 @@ public class InfinityModule extends AbstractVichanModule {
         Context context = preferenceGroup.getContext();
         addPasswordPreference(preferenceGroup);
         CheckBoxPreference httpsPref = addHttpsPreference(preferenceGroup, true);
-        CheckBoxPreference onionPref = new CheckBoxPreference(context);
+        CheckBoxPreference onionPref = new LazyPreferences.CheckBoxPreference(context);
         onionPref.setTitle(R.string.pref_use_onion);
         onionPref.setSummary(R.string.pref_use_onion_summary);
         onionPref.setKey(getSharedKey(PREF_KEY_USE_ONION));

@@ -51,6 +51,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
@@ -141,7 +142,7 @@ public class AllchanModule extends CloudflareChanModule {
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
         addOnlyNewPostsPreference(preferenceGroup, true);
-        final ListPreference captchaPreference = new ListPreference(context); //captcha_type
+        final ListPreference captchaPreference = new LazyPreferences.ListPreference(context); //captcha_type
         captchaPreference.setTitle(R.string.pref_captcha_type);
         captchaPreference.setDialogTitle(R.string.pref_captcha_type);
         captchaPreference.setKey(getSharedKey(PREF_KEY_CAPTCHA_TYPE));

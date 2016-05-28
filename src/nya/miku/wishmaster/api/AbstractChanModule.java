@@ -31,6 +31,7 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.CryptoUtils;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -183,14 +184,14 @@ public abstract class AbstractChanModule implements HttpChanModule {
         PreferenceCategory proxyCat = new PreferenceCategory(context); //категория настроек прокси
         proxyCat.setTitle(R.string.pref_cat_proxy);
         group.addPreference(proxyCat);
-        CheckBoxPreference useProxyPref = new CheckBoxPreference(context); //чекбокс "использовать ли прокси вообще"
+        CheckBoxPreference useProxyPref = new LazyPreferences.CheckBoxPreference(context); //чекбокс "использовать ли прокси вообще"
         useProxyPref.setTitle(R.string.pref_use_proxy);
         useProxyPref.setSummary(R.string.pref_use_proxy_summary);
         useProxyPref.setKey(getSharedKey(PREF_KEY_USE_PROXY));
         useProxyPref.setDefaultValue(false);
         useProxyPref.setOnPreferenceChangeListener(updateHttpListener);
         proxyCat.addPreference(useProxyPref);
-        EditTextPreference proxyHostPref = new EditTextPreference(context); //поле ввода адреса прокси-сервера
+        EditTextPreference proxyHostPref = new LazyPreferences.EditTextPreference(context); //поле ввода адреса прокси-сервера
         proxyHostPref.setTitle(R.string.pref_proxy_host);
         proxyHostPref.setDialogTitle(R.string.pref_proxy_host);
         proxyHostPref.setSummary(R.string.pref_proxy_host_summary);
@@ -201,7 +202,7 @@ public abstract class AbstractChanModule implements HttpChanModule {
         proxyHostPref.setOnPreferenceChangeListener(updateHttpListener);
         proxyCat.addPreference(proxyHostPref);
         proxyHostPref.setDependency(getSharedKey(PREF_KEY_USE_PROXY));
-        EditTextPreference proxyHostPort = new EditTextPreference(context); //поле ввода порта прокси-сервера
+        EditTextPreference proxyHostPort = new LazyPreferences.EditTextPreference(context); //поле ввода порта прокси-сервера
         proxyHostPort.setTitle(R.string.pref_proxy_port);
         proxyHostPort.setDialogTitle(R.string.pref_proxy_port);
         proxyHostPort.setSummary(R.string.pref_proxy_port_summary);
@@ -259,7 +260,7 @@ public abstract class AbstractChanModule implements HttpChanModule {
      */
     protected CheckBoxPreference addHttpsPreference(PreferenceGroup group, boolean defaultValue) {
         final Context context = group.getContext();
-        CheckBoxPreference httpsPref = new CheckBoxPreference(context);
+        CheckBoxPreference httpsPref = new LazyPreferences.CheckBoxPreference(context);
         httpsPref.setTitle(R.string.pref_use_https);
         httpsPref.setSummary(R.string.pref_use_https_summary);
         httpsPref.setKey(getSharedKey(PREF_KEY_USE_HTTPS));
@@ -288,7 +289,7 @@ public abstract class AbstractChanModule implements HttpChanModule {
      */
     protected CheckBoxPreference addOnlyNewPostsPreference(PreferenceGroup group, boolean defaultValue) {
         final Context context = group.getContext();
-        CheckBoxPreference onlyNewPostsPref = new CheckBoxPreference(context);
+        CheckBoxPreference onlyNewPostsPref = new LazyPreferences.CheckBoxPreference(context);
         onlyNewPostsPref.setTitle(R.string.pref_only_new_posts);
         onlyNewPostsPref.setSummary(R.string.pref_only_new_posts_summary);
         onlyNewPostsPref.setKey(getSharedKey(PREF_KEY_ONLY_NEW_POSTS));

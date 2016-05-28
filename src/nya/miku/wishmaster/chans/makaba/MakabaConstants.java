@@ -70,7 +70,7 @@ public class MakabaConstants {
     public static final String[] CATALOG_TYPES = { "standart", "last_reply", "num", "image_size" };
     
     public static final String PREF_KEY_MOBILE_API = "mobile_api";
-    public static final String PREF_KEY_USE_HTTPS = "use_https";
+    public static final String PREF_KEY_USE_HTTPS_MAKABA = "use_https";
     public static final String PREF_KEY_DOMAIN = "domain";
     public static final String PREF_KEY_SKIP_CAPTCHA = "skip_captcha1";
     public static final String PREF_KEY_SKIP_CAPTCHA_SET = "skip_captcha_set";

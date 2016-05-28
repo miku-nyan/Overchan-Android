@@ -76,6 +76,7 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
@@ -189,7 +190,7 @@ public class PonyachModule extends AbstractWakabaModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         final Context context = preferenceGroup.getContext();
-        ListPreference captchaLevel = new ListPreference(context);
+        ListPreference captchaLevel = new LazyPreferences.ListPreference(context);
         captchaLevel.setTitle(R.string.ponyach_prefs_captcha);
         captchaLevel.setDialogTitle(R.string.ponyach_prefs_captcha);
         captchaLevel.setKey(getSharedKey(PREF_KEY_CAPTCHA_LEVEL));
@@ -247,7 +248,7 @@ public class PonyachModule extends AbstractWakabaModule {
         });
         preferenceGroup.addPreference(passcodePref);
         
-        ListPreference domainPref = new ListPreference(context);
+        ListPreference domainPref = new LazyPreferences.ListPreference(context);
         domainPref.setTitle(R.string.pref_domain);
         domainPref.setDialogTitle(R.string.pref_domain);
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));

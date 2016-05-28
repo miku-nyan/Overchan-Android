@@ -57,6 +57,7 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.WakabaReader;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.Async;
@@ -136,7 +137,7 @@ public class DvachModule extends AbstractWakabaModule {
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
         addPasswordPreference(preferenceGroup);
-        CheckBoxPreference onionPref = new CheckBoxPreference(context);
+        CheckBoxPreference onionPref = new LazyPreferences.CheckBoxPreference(context);
         onionPref.setTitle(R.string.pref_use_onion);
         onionPref.setSummary(R.string.pref_use_onion_summary);
         onionPref.setKey(getSharedKey(PREF_KEY_USE_ONION));

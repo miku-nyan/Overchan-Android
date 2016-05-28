@@ -57,6 +57,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
@@ -136,7 +137,7 @@ public class HorochanModule extends CloudflareChanModule {
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
         addOnlyNewPostsPreference(preferenceGroup, true);
-        CheckBoxPreference fallbackRecaptchaPref = new CheckBoxPreference(context); // recaptcha fallback
+        CheckBoxPreference fallbackRecaptchaPref = new LazyPreferences.CheckBoxPreference(context); // recaptcha fallback
         fallbackRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha_fallback);
         fallbackRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_fallback_summary);
         fallbackRecaptchaPref.setKey(getSharedKey(PREF_KEY_RECAPTCHA_FALLBACK));
