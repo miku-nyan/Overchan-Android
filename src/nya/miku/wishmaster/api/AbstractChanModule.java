@@ -49,6 +49,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -121,9 +122,6 @@ public abstract class AbstractChanModule implements HttpChanModule {
     };
     
     public AbstractChanModule(SharedPreferences preferences, Resources resources) {
-        if (!preferences.contains(getSharedKey(PREF_KEY_PASSWORD))) {
-            preferences.edit().putString(getSharedKey(PREF_KEY_PASSWORD), CryptoUtils.genPassword()).commit();
-        }
         this.preferences = preferences;
         this.resources = resources;
         updateHttpClient(
@@ -221,7 +219,15 @@ public abstract class AbstractChanModule implements HttpChanModule {
      */
     protected void addPasswordPreference(PreferenceGroup group) {
         final Context context = group.getContext();
-        EditTextPreference passwordPref = new EditTextPreference(context); //поле ввода пароля
+        EditTextPreference passwordPref = new EditTextPreference(context) {
+            @Override
+            protected void showDialog(Bundle state) {
+                if (createPassword()) {
+                    setText(getDefaultPassword());
+                }
+                super.showDialog(state);
+            }
+        };
         passwordPref.setTitle(R.string.pref_password_title);
         passwordPref.setDialogTitle(R.string.pref_password_title);
         passwordPref.setSummary(R.string.pref_password_summary);
@@ -308,8 +314,17 @@ public abstract class AbstractChanModule implements HttpChanModule {
         return preferences.getBoolean(getSharedKey(PREF_KEY_ONLY_NEW_POSTS), defaultValue);
     }
     
+    private boolean createPassword() {
+        if (!preferences.contains(getSharedKey(PREF_KEY_PASSWORD))) {
+            preferences.edit().putString(getSharedKey(PREF_KEY_PASSWORD), CryptoUtils.genPassword()).commit();
+            return true;
+        }
+        return false;
+    }
+    
     @Override
     public String getDefaultPassword() {
+        createPassword();
         return preferences.getString(getSharedKey(PREF_KEY_PASSWORD), "");
     }
     
