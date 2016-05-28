@@ -62,6 +62,8 @@ import android.text.InputType;
 public abstract class AbstractChanModule implements HttpChanModule {
     private static final String TAG = "AbstractChanModule";
     
+    private static final String preferenceKeySplit = "_";
+    
     protected static final String DEFAULT_PROXY_HOST = "127.0.0.1";
     protected static final String DEFAULT_PROXY_PORT = "8118";
     
@@ -86,8 +88,6 @@ public abstract class AbstractChanModule implements HttpChanModule {
      * используйте ключи, полученные методом {@link #getSharedKey(String)}
      */
     protected final SharedPreferences preferences;
-    
-    private final String preferenceKeySplit = "_";
     
     /**
      * Слушатель, следящий за изменением настроек, при изменении которых необходимо обновить (создать новый) HTTP клиент
