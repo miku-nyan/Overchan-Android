@@ -40,8 +40,8 @@ public class Chan76Module extends AbstractVichanModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "s", "Spaghetti", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "int", "International", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "i", "Invasion", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "oc", "OC", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "swf", "Flash", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fit", "Fitness", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "new", "Current Events", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r7k", "Robot 7600", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Aneemay", null, false)
     };
