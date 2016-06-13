@@ -124,6 +124,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_replies_only_quantity), false);
     }
     
+    public boolean swipeToHideThread() {
+        return true; //TODO
+    }
+    
     public boolean showHiddenItems() {
         return true;
         //return !preferences.getBoolean(resources.getString(R.string.pref_key_hide_completely), false);

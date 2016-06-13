@@ -57,6 +57,7 @@ import nya.miku.wishmaster.http.interactive.InteractiveException;
 import nya.miku.wishmaster.lib.ClickableLinksTextView;
 import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.lib.JellyBeanSpanFixTextView;
+import nya.miku.wishmaster.lib.SwipeDismissListViewTouchListener;
 import nya.miku.wishmaster.lib.pullable_layout.SwipeRefreshLayout;
 import nya.miku.wishmaster.ui.AppearanceUtils;
 import nya.miku.wishmaster.ui.Attachments;
@@ -394,6 +395,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (listView != null) {
             listView.setOnCreateContextMenuListener(null);
             listView.setOnItemClickListener(null);
+            listView.setOnTouchListener(null);
             listView.setOnScrollListener(null);
             listView.setAdapter(null);
         }
@@ -1396,6 +1398,32 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             }
             listLoaded = true;
             Async.runOnUiThread(new Runnable() {
+                /** установить SwipeDismissListViewTouchListener, если требуется (соответствует версия ОС, открыт список тредов, включена настройка);
+                 *  возвращает созданный OnScrollListener */
+                private ListView.OnScrollListener setSwipeDismissListener() {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1 && pageType == TYPE_THREADSLIST &&
+                            settings.swipeToHideThread()) {
+                        final SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(listView,
+                                new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                            @Override
+                            public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                for (int i : reverseSortedPositions) {
+                                    adapter.getItem(i).hidden = true;
+                                    database.addHidden(tabModel.pageModel.chanName, tabModel.pageModel.boardName,
+                                            adapter.getItem(i).sourceModel.number, null);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            }
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return !adapter.getItem(position).hidden;
+                            }
+                        });
+                        listView.setOnTouchListener(touchListener);
+                        return touchListener.makeScrollListener();
+                    }
+                    return null;
+                }
                 @Override
                 public void run() {
                     if (presentationModel == null || presentationModel.isNotReady())
@@ -1403,11 +1431,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     
                     listView.setAdapter(adapter);
                     listView.requestFocus();
+                    final ListView.OnScrollListener swipeDismissOnScrollListener = setSwipeDismissListener();
                     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1) {
                         //busy состояние адаптера, не загружать картинки из интернета, во время скроллинга
                         listView.setOnScrollListener(new ListView.OnScrollListener() {
                             @Override
                             public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                if (swipeDismissOnScrollListener != null) swipeDismissOnScrollListener.onScrollStateChanged(view, scrollState);
                                 if (scrollState == ListView.OnScrollListener.SCROLL_STATE_IDLE) {
                                     adapter.setBusy(false);
                                 } else {
