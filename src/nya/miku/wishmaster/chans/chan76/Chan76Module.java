@@ -43,7 +43,8 @@ public class Chan76Module extends AbstractVichanModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fit", "Fitness", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "new", "Current Events", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r7k", "Robot 7600", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Aneemay", null, false)
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Aneemay", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sp", "Sports", null, false)
     };
     
     public Chan76Module(SharedPreferences preferences, Resources resources) {
