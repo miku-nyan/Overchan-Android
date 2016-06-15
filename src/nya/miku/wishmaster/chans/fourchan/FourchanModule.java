@@ -514,6 +514,7 @@ public class FourchanModule extends CloudflareChanModule {
             redirect.boardName = model.boardName;
             redirect.threadNumber = successMatcher.group(1);
             redirect.postNumber = successMatcher.group(2);
+            if (redirect.threadNumber.equals("0")) redirect.threadNumber = redirect.postNumber;
             return buildUrl(redirect);
         }
         return null;
