@@ -46,7 +46,6 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.Logger;
@@ -87,13 +86,8 @@ public class MakabaModule extends CloudflareChanModule {
     /** что-то типа 'https://2ch.hk/' */
     private String domainUrl;
     
-    private static final int CAPTCHA_2CHAPTCHA = 1;
-    private static final int CAPTCHA_SIGNER = 2;
-    
     private static final String HASHTAG_PREFIX = "\u00A0#";
     
-    /** тип текущей капчи*/
-    private int captchaType;
     /** id текущей капчи*/
     private String captchaId;
     
@@ -176,26 +170,6 @@ public class MakabaModule extends CloudflareChanModule {
         group.addPreference(mobileAPIPref);
     }
     
-    private void addCaptchaPreference(PreferenceGroup group) {
-        final Context context = group.getContext();
-        PreferenceCategory captchaCategory = new PreferenceCategory(context);
-        captchaCategory.setTitle(R.string.makaba_prefs_captcha_category);
-        group.addPreference(captchaCategory);
-        
-        CheckBoxPreference skipCaptchaPreference = new LazyPreferences.CheckBoxPreference(context);
-        skipCaptchaPreference.setTitle(R.string.makaba_prefs_skip_captcha);
-        skipCaptchaPreference.setKey(getSharedKey(PREF_KEY_SKIP_CAPTCHA));
-        skipCaptchaPreference.setDefaultValue(false);
-        skipCaptchaPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                preferences.edit().putBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA_SET), true).commit();
-                return true;
-            }
-        });
-        captchaCategory.addPreference(skipCaptchaPreference);
-    }
-    
     /** Добавить категорию настроек домена (в т.ч. https) */
     private void addDomainPreferences(PreferenceGroup group) {
         Context context = group.getContext();
@@ -237,7 +211,6 @@ public class MakabaModule extends CloudflareChanModule {
     @Override
     public void addPreferencesOnScreen(final PreferenceGroup preferenceScreen) {
         addMobileAPIPreference(preferenceScreen);
-        addCaptchaPreference(preferenceScreen);
         addCloudflareRecaptchaFallbackPreference(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
@@ -482,36 +455,12 @@ public class MakabaModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        boolean skipCaptcha = preferences.getBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), false);
-        if (threadNumber != null && skipCaptcha) {
-            String url = null;
-            try {
-                url = domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY + "&check=1";
-                String check = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET,
-                        httpClient, listener, task, true);
-                if (check.equals("APP VALID")) {
-                    captchaType = CAPTCHA_SIGNER;
-                    captchaId = null;
-                    return null;
-                } else {
-                    Logger.d(TAG, "(signer failed)response: "+check);
-                }
-            } catch (Exception e) {
-                Logger.e(TAG, e);
-                if (e instanceof HttpWrongStatusCodeException && url != null) {
-                    checkCloudflareError((HttpWrongStatusCodeException) e, url);
-                }
-            }
-        }
-        
         String response;
         String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "") + ("&board=" + boardName);
         try {
-            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET,
-                    httpClient, null, task, true);
+            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, null, task, true);
             if (task != null && task.isCancelled()) throw new Exception("interrupted");
             if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
-                captchaType = CAPTCHA_2CHAPTCHA;
                 captchaId = null;
                 return null;
             } else if (!response.startsWith("CHECK")) {
@@ -522,16 +471,10 @@ public class MakabaModule extends CloudflareChanModule {
             throw e;
         }
         
-        if (threadNumber != null && !skipCaptcha && !preferences.contains(getSharedKey(PREF_KEY_SKIP_CAPTCHA_SET))) {
-            preferences.edit().putBoolean(getSharedKey(PREF_KEY_SKIP_CAPTCHA), true).commit();
-            return getNewCaptcha(boardName, threadNumber, listener, task);
-        }
-        
         String id = response.substring(response.indexOf('\n') + 1);
         url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
         CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
         captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
-        captchaType = CAPTCHA_2CHAPTCHA;
         captchaId = id;
         return captchaModel;
     }
@@ -546,24 +489,11 @@ public class MakabaModule extends CloudflareChanModule {
         
         postEntityBuilder.addString("comment", model.comment);
         
-        if (captchaType == CAPTCHA_2CHAPTCHA && captchaId != null) {
+        if (captchaId != null) {
             postEntityBuilder.
                     addString("captcha_type", "2chaptcha").
                     addString("2chaptcha_id", captchaId).
                     addString("2chaptcha_value", model.captchaAnswer);
-        } else if (captchaType == CAPTCHA_SIGNER) {
-            String response = HttpStreamer.getInstance().getStringFromUrl(domainUrl + "makaba/captcha.fcgi?appid=" + DASHCHAN_PUBLIC_KEY,
-                    HttpRequestModel.DEFAULT_GET, httpClient, null, task, false);
-            if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
-            if (!response.startsWith("APP CHECK KEY")) throw new Exception("Invalid response");
-            String[] responseSplit = response.split("\n");
-            if (responseSplit.length < 3) throw new Exception("Invalid response");
-            StringBuilder sb = new StringBuilder();
-            while (sb.length() < 22) sb.append((int)(Math.random() * 10));
-            String appSignature = sb.toString();
-            postEntityBuilder.addString("app_signature", appSignature);
-            postEntityBuilder.addString("app_response_id", responseSplit[1]);
-            postEntityBuilder.addString("app_response", CryptoUtils.computeSHA1(responseSplit[2]+"|"+appSignature+"|"+DASHCHAN_PRIVATE_KEY));
         }
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
         

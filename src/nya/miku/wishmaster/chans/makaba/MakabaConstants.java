@@ -72,13 +72,8 @@ public class MakabaConstants {
     public static final String PREF_KEY_MOBILE_API = "mobile_api";
     public static final String PREF_KEY_USE_HTTPS_MAKABA = "use_https";
     public static final String PREF_KEY_DOMAIN = "domain";
-    public static final String PREF_KEY_SKIP_CAPTCHA = "skip_captcha1";
-    public static final String PREF_KEY_SKIP_CAPTCHA_SET = "skip_captcha_set";
     public static final String PREF_KEY_USERCODE_COOKIE_DOMAIN = "usercode_domain";
     public static final String PREF_KEY_USERCODE_COOKIE_VALUE = "usercode_cookie";
     
     public static final String USERCODE_COOKIE_NAME = "usercode_auth";
-    
-    public static final String DASHCHAN_PUBLIC_KEY = "CVjh9SfLC46PzUkv3gc5CeMhLOlnpQ8z";
-    public static final String DASHCHAN_PRIVATE_KEY = "slqOXfj0CmOnDvNMxZwj1X1JXj24URhK";
 }
