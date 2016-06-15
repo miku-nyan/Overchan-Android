@@ -56,7 +56,7 @@ import android.text.InputType;
 import android.webkit.WebView;
 import android.widget.Toast;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractChanModule;
+import nya.miku.wishmaster.api.CloudflareChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -77,10 +77,11 @@ import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-public class FourchanModule extends AbstractChanModule {
+public class FourchanModule extends CloudflareChanModule {
     
     static final String CHAN_NAME = "4chan.org";
     
@@ -127,6 +128,7 @@ public class FourchanModule extends AbstractChanModule {
     
     @Override
     protected void initHttpClient() {
+        super.initHttpClient();
         setPasscodeCookie(preferences.getString(getSharedKey(PREF_KEY_PASS_COOKIE), ""), false);
     }
     
@@ -336,6 +338,11 @@ public class FourchanModule extends AbstractChanModule {
     }
     
     @Override
+    protected boolean cloudflareRecaptchaFallback() {
+        return newRecaptchaFallback();
+    }
+    
+    @Override
     public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
         List<SimpleBoardModel> list = new ArrayList<SimpleBoardModel>();
         Map<String, BoardModel> newMap = new HashMap<String, BoardModel>();
@@ -478,13 +485,23 @@ public class FourchanModule extends AbstractChanModule {
                 postEntityBuilder.addString("recaptcha_challenge_field", recaptcha.challenge).
                         addString("recaptcha_response_field", model.captchaAnswer);
             }
-            recaptcha2 = null;
         }
         if (model.attachments != null && model.attachments.length != 0) postEntityBuilder.addFile("upfile", model.attachments[0]);
         if (model.custommark) postEntityBuilder.addString("spoiler", "on");
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
-        String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+        String response;
+        try {
+            response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, true);
+        } catch (HttpWrongStatusCodeException e) {
+            try {
+                checkCloudflareError(e, "https://4chan.org");
+            } catch (Exception cf) {
+                if (recaptcha2 != null) Recaptcha2solved.push(RECAPTCHA_KEY, recaptcha2);
+                throw cf;
+            }
+            throw e;
+        }
         Matcher errorMatcher = ERROR_POSTING.matcher(response);
         if (errorMatcher.find()) {
             throw new Exception(Html.fromHtml(errorMatcher.group(1)).toString());
