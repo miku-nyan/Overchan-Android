@@ -72,14 +72,15 @@ public class AllchanModule extends CloudflareChanModule {
     private static final String DOMAIN = "allchan.su";
     
     private static final String[] CAPTCHA_TYPES = new String[] {
-            "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
+            "Node captcha", "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
     private static final String[] CAPTCHA_TYPES_KEYS = new String[] {
-            "recaptcha", "recaptcha-fallback", "recaptchav1" };
-    private static final String CAPTCHA_TYPE_DEFAULT = "recaptchav1";
+            "node-captcha", "recaptcha", "recaptcha-fallback", "recaptchav1" };
+    private static final String CAPTCHA_TYPE_DEFAULT = "recaptcha";
     
-    private static final int CAPTCHA_RECAPTCHA = 1;
-    private static final int CAPTCHA_RECAPTCHA_FALLBACK = 2;
-    private static final int CAPTCHA_RECAPTCHA_V1 = 3;
+    private static final int CAPTCHA_NODE = 1;
+    private static final int CAPTCHA_RECAPTCHA = 2;
+    private static final int CAPTCHA_RECAPTCHA_FALLBACK = 3;
+    private static final int CAPTCHA_RECAPTCHA_V1 = 4;
     
     private static final String RECAPTCHA_PUBLIC_KEY = "6LfKRgcTAAAAAIe-bmV_pCbMzvKvBZGbZNRsfmED";
     
@@ -100,6 +101,7 @@ public class AllchanModule extends CloudflareChanModule {
     private HashMap<String, BoardModel> boardsMap;
     
     private int captchaType;
+    private String nodeCaptchaKey;
     private Recaptcha recaptchaV1;
     
     public AllchanModule(SharedPreferences preferences, Resources resources) {
@@ -182,6 +184,8 @@ public class AllchanModule extends CloudflareChanModule {
         String key = preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT);
         if (Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(key) == -1) key = CAPTCHA_TYPE_DEFAULT;
         switch (key) {
+            case "node-captcha":
+                return CAPTCHA_NODE;
             case "recaptcha":
                 return preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) ?
                         CAPTCHA_RECAPTCHA_FALLBACK :
@@ -472,13 +476,25 @@ public class AllchanModule extends CloudflareChanModule {
         CaptchaModel captchaModel;
         int captchaType = getUsingCaptchaType();
         switch (captchaType) {
+            case CAPTCHA_NODE:
+                String url = getUsingUrl() + "api/nodeCaptchaImage.json";
+                JSONObject json = downloadJSONObject(url, false, listener, task);
+                String challenge = json.getString("challenge");
+                String captchaUrl = getUsingUrl() + "node-captcha/" + json.getString("fileName");
+                captchaModel = downloadCaptcha(captchaUrl, listener, task);
+                captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
+                this.captchaType = captchaType;
+                this.nodeCaptchaKey = challenge;
+                return captchaModel;
             case CAPTCHA_RECAPTCHA:
             case CAPTCHA_RECAPTCHA_FALLBACK:
                 this.captchaType = captchaType;
+                this.nodeCaptchaKey = null;
                 this.recaptchaV1 = null;
                 return null;
             case CAPTCHA_RECAPTCHA_V1:
                 this.captchaType = captchaType;
+                this.nodeCaptchaKey = null;
                 this.recaptchaV1 = Recaptcha.obtain(RECAPTCHA_PUBLIC_KEY, task, httpClient, useHttps() ? "https" : "http");
                 captchaModel = new CaptchaModel();
                 captchaModel.type = CaptchaModel.TYPE_NORMAL;
@@ -498,6 +514,9 @@ public class AllchanModule extends CloudflareChanModule {
             postEntityBuilder.addString("threadNumber", model.threadNumber);
         }
         switch (captchaType) {
+            case CAPTCHA_NODE:
+                postEntityBuilder.addString("nodeCaptchaChallenge", nodeCaptchaKey).addString("nodeCaptchaResponse", model.captchaAnswer);
+                break;
             case CAPTCHA_RECAPTCHA:
             case CAPTCHA_RECAPTCHA_FALLBACK:
                 postEntityBuilder.addString("captchaEngine", "google-recaptcha");
