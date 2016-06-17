@@ -72,17 +72,14 @@ public class AllchanModule extends CloudflareChanModule {
     private static final String DOMAIN = "allchan.su";
     
     private static final String[] CAPTCHA_TYPES = new String[] {
-            "Yandex (latin)", "Yandex (digits)", "Yandex (rus)", "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
+            "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
     private static final String[] CAPTCHA_TYPES_KEYS = new String[] {
-            "yandex-elatm", "yandex-estd", "yandex-rus", "recaptcha", "recaptcha-fallback", "recaptchav1" };
+            "recaptcha", "recaptcha-fallback", "recaptchav1" };
     private static final String CAPTCHA_TYPE_DEFAULT = "recaptchav1";
     
-    private static final int CAPTCHA_YANDEX_ELATM = 1;
-    private static final int CAPTCHA_YANDEX_ESTD = 2;
-    private static final int CAPTCHA_YANDEX_RUS = 3;
-    private static final int CAPTCHA_RECAPTCHA = 4;
-    private static final int CAPTCHA_RECAPTCHA_FALLBACK = 5;
-    private static final int CAPTCHA_RECAPTCHA_V1 = 6;
+    private static final int CAPTCHA_RECAPTCHA = 1;
+    private static final int CAPTCHA_RECAPTCHA_FALLBACK = 2;
+    private static final int CAPTCHA_RECAPTCHA_V1 = 3;
     
     private static final String RECAPTCHA_PUBLIC_KEY = "6LfKRgcTAAAAAIe-bmV_pCbMzvKvBZGbZNRsfmED";
     
@@ -103,7 +100,6 @@ public class AllchanModule extends CloudflareChanModule {
     private HashMap<String, BoardModel> boardsMap;
     
     private int captchaType;
-    private String yandexCaptchaKey;
     private Recaptcha recaptchaV1;
     
     public AllchanModule(SharedPreferences preferences, Resources resources) {
@@ -186,12 +182,6 @@ public class AllchanModule extends CloudflareChanModule {
         String key = preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT);
         if (Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(key) == -1) key = CAPTCHA_TYPE_DEFAULT;
         switch (key) {
-            case "yandex-elatm":
-                return CAPTCHA_YANDEX_ELATM;
-            case "yandex-estd":
-                return CAPTCHA_YANDEX_ESTD;
-            case "yandex-rus":
-                return CAPTCHA_YANDEX_RUS;
             case "recaptcha":
                 return preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) ?
                         CAPTCHA_RECAPTCHA_FALLBACK :
@@ -482,33 +472,13 @@ public class AllchanModule extends CloudflareChanModule {
         CaptchaModel captchaModel;
         int captchaType = getUsingCaptchaType();
         switch (captchaType) {
-            case CAPTCHA_YANDEX_ELATM:
-            case CAPTCHA_YANDEX_ESTD:
-            case CAPTCHA_YANDEX_RUS:
-                String url = getUsingUrl() + "api/yandexCaptchaImage.json?type=";
-                switch (captchaType) {
-                    case CAPTCHA_YANDEX_ELATM: url += "elatm"; break;
-                    case CAPTCHA_YANDEX_ESTD: url += "estd"; break;
-                    case CAPTCHA_YANDEX_RUS: url += "rus"; break;
-                }
-                JSONObject json = downloadJSONObject(url, false, listener, task);
-                String challenge = json.getString("challenge");
-                String captchaUrl = (useHttps() ? "https://" : "http://") + json.optString("url", "i.captcha.yandex.net/image?key=" + challenge);
-                captchaModel = downloadCaptcha(captchaUrl, listener, task);
-                captchaModel.type = captchaType == CAPTCHA_YANDEX_ESTD ? CaptchaModel.TYPE_NORMAL_DIGITS : CaptchaModel.TYPE_NORMAL;
-                this.captchaType = captchaType;
-                this.yandexCaptchaKey = challenge;
-                this.recaptchaV1 = null;
-                return captchaModel;
             case CAPTCHA_RECAPTCHA:
             case CAPTCHA_RECAPTCHA_FALLBACK:
                 this.captchaType = captchaType;
-                this.yandexCaptchaKey = null;
                 this.recaptchaV1 = null;
                 return null;
             case CAPTCHA_RECAPTCHA_V1:
                 this.captchaType = captchaType;
-                this.yandexCaptchaKey = null;
                 this.recaptchaV1 = Recaptcha.obtain(RECAPTCHA_PUBLIC_KEY, task, httpClient, useHttps() ? "https" : "http");
                 captchaModel = new CaptchaModel();
                 captchaModel.type = CaptchaModel.TYPE_NORMAL;
@@ -528,16 +498,6 @@ public class AllchanModule extends CloudflareChanModule {
             postEntityBuilder.addString("threadNumber", model.threadNumber);
         }
         switch (captchaType) {
-            case CAPTCHA_YANDEX_ELATM:
-            case CAPTCHA_YANDEX_ESTD:
-            case CAPTCHA_YANDEX_RUS:
-                switch (captchaType) {
-                    case CAPTCHA_YANDEX_ELATM: postEntityBuilder.addString("captchaEngine", "yandex-captcha-elatm"); break;
-                    case CAPTCHA_YANDEX_ESTD: postEntityBuilder.addString("captchaEngine", "yandex-captcha-estd"); break;
-                    case CAPTCHA_YANDEX_RUS: postEntityBuilder.addString("captchaEngine", "yandex-captcha-rus"); break;
-                }
-                postEntityBuilder.addString("yandexCaptchaChallenge", yandexCaptchaKey).addString("yandexCaptchaResponse", model.captchaAnswer);
-                break;
             case CAPTCHA_RECAPTCHA:
             case CAPTCHA_RECAPTCHA_FALLBACK:
                 postEntityBuilder.addString("captchaEngine", "google-recaptcha");
