@@ -18,37 +18,21 @@
 
 package nya.miku.wishmaster.chans.nullchan;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.SequenceInputStream;
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.preference.EditTextPreference;
-import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
-import android.text.InputType;
-import android.text.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
-//import nya.miku.wishmaster.api.models.CaptchaModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
-import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.api.util.ReplacingReader;
-import nya.miku.wishmaster.api.util.WakabaReader;
 
-public class NullchanccModule extends AbstractInstant0chan {
-    private static final String CHAN_NAME = "0chan.cc";
-    private static final String DEFAULT_DOMAIN = "0chan.cc";
-    private static final String DOMAINS_HINT = "0chan.cc, 31.220.3.61";
+public class NullchaneuModule extends AbstractInstant0chan {
+    private static final String CHAN_NAME = "0chan.eu";
+    private static final String DEFAULT_DOMAIN = "0chan.eu";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "all", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Рисунки", "all", false),
@@ -82,9 +66,8 @@ public class NullchanccModule extends AbstractInstant0chan {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "g", "Девушки", "adult", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fur", "Фурри", "adult", true)
     };
-    private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     
-    public NullchanccModule(SharedPreferences preferences, Resources resources) {
+    public NullchaneuModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
     }
     
@@ -95,7 +78,7 @@ public class NullchanccModule extends AbstractInstant0chan {
     
     @Override
     public String getDisplayingName() {
-        return "Øчан (0chan.cc)";
+        return "Øчан (0chan.eu)";
     }
     
     @Override
@@ -105,15 +88,7 @@ public class NullchanccModule extends AbstractInstant0chan {
     
     @Override
     protected String getUsingDomain() {
-        String domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN);
-        return TextUtils.isEmpty(domain) ? DEFAULT_DOMAIN : domain;
-    }
-    
-    @Override
-    protected String[] getAllDomains() {
-        if (!getChanName().equals(CHAN_NAME) || getUsingDomain().equals(DEFAULT_DOMAIN))
-            return super.getAllDomains();
-        return new String[] { DEFAULT_DOMAIN, getUsingDomain() };
+        return DEFAULT_DOMAIN;
     }
     
     @Override
@@ -124,25 +99,6 @@ public class NullchanccModule extends AbstractInstant0chan {
     @Override
     protected boolean canCloudflare() {
         return true;
-    }
-    
-    private void addDomainPreference(PreferenceGroup group) {
-        Context context = group.getContext();
-        EditTextPreference domainPref = new EditTextPreference(context);
-        domainPref.setTitle(R.string.pref_domain);
-        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
-        domainPref.setDialogTitle(R.string.pref_domain);
-        domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
-        domainPref.getEditText().setHint(DEFAULT_DOMAIN);
-        domainPref.getEditText().setSingleLine();
-        domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        group.addPreference(domainPref);
-    }
-    
-    @Override
-    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        addDomainPreference(preferenceGroup);
-        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
@@ -157,31 +113,17 @@ public class NullchanccModule extends AbstractInstant0chan {
         return model;
     }
     
-    @SuppressLint("SimpleDateFormat")
-    @Override
-    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
-        Reader reader;
-        if (urlModel != null && urlModel.chanName != null && urlModel.chanName.equals("expand")) {
-            stream = new SequenceInputStream(new ByteArrayInputStream("<form id=\"delform\">".getBytes()), stream);
-            reader = new BufferedReader(new InputStreamReader(stream));
-        } else {
-            reader = new ReplacingReader(new BufferedReader(new InputStreamReader(stream)), "<form id=\"delform20\"", "<form id=\"delform\"");
-        }
-        return new Instant0chanReader(reader, canCloudflare());
-    }
-	
-    /*
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        CaptchaModel captcha = super.getNewCaptcha(boardName, threadNumber, listener, task);
-        captcha.type = CaptchaModel.TYPE_NORMAL_DIGITS;
+        String captchaUrl = getUsingUrl() + "myata.php?" + Math.random();
+        CaptchaModel captcha = downloadCaptcha(captchaUrl, listener, task);
+        captcha.type = CaptchaModel.TYPE_NORMAL;
         return captcha;
     }
-    */
 	
     @Override
     public String fixRelativeUrl(String url) {
-        if (useHttps()) url = url.replace("http://0chan.cc", "https://0chan.cc");
+        if (useHttps()) url = url.replace("http://0chan.eu", "https://0chan.eu");
         return super.fixRelativeUrl(url);
     }
     
