@@ -70,7 +70,7 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class InfinityModule extends AbstractVichanModule {
     private static final String TAG = "InfinityModule";
     
-    static final String CHAN_NAME = "8chan";
+    private static final String CHAN_NAME = "8chan";
     private static final String DEFAULT_DOMAIN = "8ch.net";
     private static final String ONION_DOMAIN = "oxwugzccvk3dk6tj.onion";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "8chan.co" };
@@ -92,7 +92,7 @@ public class InfinityModule extends AbstractVichanModule {
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
     private static final Pattern BAN_REASON_PATTERN = Pattern.compile("<p class=\"reason\">(.*?)</p>");
     
-    private static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
+    protected static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
     
     private Map<String, BoardModel> boardsMap = new HashMap<>();
     private boolean needTorCaptcha = false;
@@ -208,7 +208,7 @@ public class InfinityModule extends AbstractVichanModule {
             json = new JSONObject();
         }
         BoardModel model = new BoardModel();
-        model.chan = CHAN_NAME;
+        model.chan = getChanName();
         model.boardName = shortName;
         model.boardDescription = json.optString("title", shortName);
         model.uniqueAttachmentNames = true;
@@ -340,7 +340,7 @@ public class InfinityModule extends AbstractVichanModule {
         }
         
         UrlPageModel refererPage = new UrlPageModel();
-        refererPage.chanName = CHAN_NAME;
+        refererPage.chanName = getChanName();
         refererPage.boardName = model.boardName;
         if (model.threadNumber == null) {
             refererPage.type = UrlPageModel.TYPE_BOARDPAGE;
@@ -416,7 +416,7 @@ public class InfinityModule extends AbstractVichanModule {
         
         UrlPageModel refererPage = new UrlPageModel();
         refererPage.type = UrlPageModel.TYPE_THREADPAGE;
-        refererPage.chanName = CHAN_NAME;
+        refererPage.chanName = getChanName();
         refererPage.boardName = model.boardName;
         refererPage.threadNumber = model.threadNumber;
         Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
@@ -449,12 +449,6 @@ public class InfinityModule extends AbstractVichanModule {
         } finally {
             if (response != null) response.release();
         }
-    }
-    
-    @Override
-    public String fixRelativeUrl(String url) {
-        if (url.startsWith("?/")) url = url.substring(1);
-        return super.fixRelativeUrl(url);
     }
     
 }
