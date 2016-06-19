@@ -95,6 +95,7 @@ public class MainActivity extends FragmentActivity {
     private boolean tabsPanelRight;
     private boolean openSpoilers;
     private boolean highlightSubscriptions;
+    private boolean swipeToHideThread;
     private boolean isHorizontalOrientation;
     private boolean isPaused = false;
     private boolean isDestroyed = false;
@@ -363,6 +364,7 @@ public class MainActivity extends FragmentActivity {
         tabsPanelRight = MainApplication.getInstance().settings.isTabsPanelOnRight();
         openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         highlightSubscriptions = MainApplication.getInstance().settings.highlightSubscriptions();
+        swipeToHideThread = MainApplication.getInstance().settings.swipeToHideThread();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         (theme = MainApplication.getInstance().settings.getTheme()).setTo(this);
         super.onCreate(savedInstanceState);
@@ -509,7 +511,8 @@ public class MainActivity extends FragmentActivity {
         
         if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
                 settings.showHiddenItems != newSettings.showHiddenItems ||
-                settings.maskPictures != newSettings.maskPictures) {
+                settings.maskPictures != newSettings.maskPictures ||
+                MainApplication.getInstance().settings.swipeToHideThread() != swipeToHideThread) {
             shouldReloadBoardFragment = true;
         }
         
@@ -523,6 +526,7 @@ public class MainActivity extends FragmentActivity {
         autohideRulesHash = MainApplication.getInstance().settings.getAutohideRulesJson().hashCode();
         openSpoilers = MainApplication.getInstance().settings.openSpoilers();
         highlightSubscriptions = MainApplication.getInstance().settings.highlightSubscriptions();
+        swipeToHideThread = MainApplication.getInstance().settings.swipeToHideThread();
         updateTabPanelTabletWeight();
         
         if (shouldReloadBoardFragment) reloadCurrentBoardFragment();

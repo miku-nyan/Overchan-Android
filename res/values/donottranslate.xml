@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_chans_order_json">PREF_KEY_CHANS_ORDER_JSON</string>
     <string name="pref_key_custom_theme_json">PREF_KEY_CUSTOM_THEME_JSON</string>
     <!-- <string name="pref_key_hide_completely">PREF_KEY_HIDE_COMPLETELY</string> -->
+    <string name="pref_key_swipe_to_hide_thread">PREF_KEY_SWIPE_TO_HIDE_THREAD</string>
     <string name="pref_key_external_links_confirmation">PREF_KEY_EXTERNAL_LINKS_CONFIRMATION</string>
     <string name="pref_key_do_not_close_tabs">PREF_KEY_DO_NOT_CLOSE_TABS</string>
     <string name="pref_key_scroll_volume_buttons">PREF_KEY_SCROLL_VOLUME_BUTTONS</string>

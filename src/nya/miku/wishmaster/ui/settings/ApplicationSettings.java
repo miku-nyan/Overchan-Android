@@ -125,7 +125,7 @@ public class ApplicationSettings {
     }
     
     public boolean swipeToHideThread() {
-        return true; //TODO
+        return preferences.getBoolean(resources.getString(R.string.pref_key_swipe_to_hide_thread), false);
     }
     
     public boolean showHiddenItems() {

@@ -483,6 +483,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_autohide_summary">Automatic hiding by regular expressions</string>
     <!-- <string name="pref_hide_completely_title">Hide completely</string>
     <string name="pref_hide_completely_summary">Do not show hidden posts and threads</string> -->
+    <string name="pref_swipe_to_hide_title">Swipe to hide</string>
+    <string name="pref_swipe_to_hide_summary">Swipe to hide thread</string>
     <string name="pref_external_links_confirmation_title">Links confirmation</string>
     <string name="pref_external_links_confirmation_summary">Ask before going external links</string>
     <string name="pref_do_not_close_tabs_title">Do not close tabs</string>
