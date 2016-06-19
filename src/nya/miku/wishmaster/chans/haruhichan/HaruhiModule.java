@@ -86,6 +86,11 @@ public class HaruhiModule extends AbstractVichanModule {
     }
     
     @Override
+    protected boolean canHttps() {
+        return true;
+    }
+    
+    @Override
     protected SimpleBoardModel[] getBoardsList() {
         return BOARDS;
     }
