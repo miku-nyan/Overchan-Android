@@ -71,8 +71,10 @@ public class AllchanModule extends CloudflareChanModule {
     private static final String CHAN_NAME = "allchan.su";
     private static final String DOMAIN = "allchan.su";
     
-    private static final String[] CAPTCHA_TYPES = new String[] { "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
-    private static final String[] CAPTCHA_TYPES_KEYS = new String[] { "recaptcha", "recaptcha-fallback", "recaptchav1" };
+    private static final String[] CAPTCHA_TYPES = new String[] {
+            "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
+    private static final String[] CAPTCHA_TYPES_KEYS = new String[] {
+            "recaptcha", "recaptcha-fallback", "recaptchav1" };
     private static final String CAPTCHA_TYPE_DEFAULT = "recaptchav1";
     
     private static final int CAPTCHA_RECAPTCHA = 1;
