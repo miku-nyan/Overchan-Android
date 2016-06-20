@@ -133,6 +133,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="wakachan.org" />
                 <data android:host="www.wakachan.org" />
                 
+                <data android:host="8ch.pl" />
+                <data android:host="www.8ch.pl" />
+                
                 <data android:host="pl.vichan.net" />
                 
                 <data android:host="samachan.org" />
@@ -144,6 +147,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="dva-ch.net" />
                 
                 <data android:host="0chan.cc" />
+                <data android:host="www.0chan.cc" />
+                
+                <data android:host="0chan.eu" />
                 <data android:host="www.0chan.cc" />
                 
                 <data android:host="0-chan.ru" />
