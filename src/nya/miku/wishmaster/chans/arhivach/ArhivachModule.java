@@ -1,8 +1,11 @@
 package nya.miku.wishmaster.chans.arhivach;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 
 import java.io.Closeable;
@@ -21,6 +24,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -35,9 +39,10 @@ public class ArhivachModule extends AbstractChanModule {
     //private static final String TAG = "ArhivachModule";
     
     static final String CHAN_NAME = "Arhivach.org";
-    
-    static final String CHAN_DOMAIN = "arhivach.org";
-    static final String CHAN_URL = "http://" + CHAN_DOMAIN + "/";
+    private static final String DEFAULT_DOMAIN = "arhivach.org";
+    private static final String ONION_DOMAIN = "arhivachovtj2jrp.onion";
+
+    private static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
     
     public ArhivachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -56,6 +61,33 @@ public class ArhivachModule extends AbstractChanModule {
     @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_arhivach, null);
+    }
+    
+    private String getUsingDomain() {
+        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) ? ONION_DOMAIN : DEFAULT_DOMAIN;
+    }
+    
+    private String getUsingUrl() {
+        return (useHttps() ? "https://" : "http://") + getUsingDomain() + "/";
+    }
+    
+    private boolean useHttps() {
+        return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) && useHttps(false);
+    }
+    
+    @Override   
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        Context context = preferenceGroup.getContext();
+        CheckBoxPreference httpsPref = addHttpsPreference(preferenceGroup, false);
+        CheckBoxPreference onionPref = new LazyPreferences.CheckBoxPreference(context);
+        onionPref.setTitle(R.string.pref_use_onion);
+        onionPref.setSummary(R.string.pref_use_onion_summary);
+        onionPref.setKey(getSharedKey(PREF_KEY_USE_ONION));
+        onionPref.setDefaultValue(false);
+        onionPref.setDisableDependentsState(true);
+        preferenceGroup.addPreference(onionPref);
+        httpsPref.setDependency(getSharedKey(PREF_KEY_USE_ONION));
+        addProxyPreferences(preferenceGroup);
     }
     
     @Override
@@ -132,7 +164,7 @@ public class ArhivachModule extends AbstractChanModule {
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN_NAME)) throw new IllegalArgumentException("wrong chan");
-        StringBuilder url = new StringBuilder(CHAN_URL);
+        StringBuilder url = new StringBuilder(getUsingUrl());
         switch (model.type) {
             case UrlPageModel.TYPE_INDEXPAGE:
                 url.append("index").append("/");
@@ -157,7 +189,7 @@ public class ArhivachModule extends AbstractChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String domain;
         String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)").matcher(url);
+        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
         if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
         Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
         if (parsePath.find()) {
@@ -168,7 +200,7 @@ public class ArhivachModule extends AbstractChanModule {
         }
         
         boolean matchDomain = false;
-        if (CHAN_DOMAIN.equalsIgnoreCase(domain)) {
+        if (DEFAULT_DOMAIN.equalsIgnoreCase(domain) || ONION_DOMAIN.equalsIgnoreCase(domain)) {
                 matchDomain = true;
         }
         if (!matchDomain) throw new IllegalArgumentException("wrong chan");
