@@ -40,8 +40,6 @@ public class CirnoBoards {
     
     static {
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
-        addBoard("azu", "Azumanga Daioh", "К удалению", "Осака", false);
-        addBoard("me", "Меха", "К удалению", "Лакс Кляйн", false);
         addBoard("au", "Автомобили", "Общее", "Джереми Кларксон", false);
         addBoard("es", "Бесконечное лето", "Общее", "Пионер", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
