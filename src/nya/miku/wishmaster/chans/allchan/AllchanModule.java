@@ -150,6 +150,7 @@ public class AllchanModule extends CloudflareChanModule {
         int i = Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT));
         if (i >= 0) captchaPreference.setSummary(CAPTCHA_TYPES[i]);
         preferenceGroup.addPreference(captchaPreference);
+        addPasswordPreference(preferenceGroup);
         addHttpsPreference(preferenceGroup, true);
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
@@ -262,7 +263,7 @@ public class AllchanModule extends CloudflareChanModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         if (boardsMap != null && boardsMap.containsKey(shortName)) return boardsMap.get(shortName);
-        String url = getUsingUrl() + "misc/board/b.json";
+        String url = getUsingUrl() + "misc/board/" + shortName + ".json";
         JSONObject json = downloadJSONObject(url, false, listener, task);
         try {
             BoardModel board = mapBoardModel(json.getJSONObject("board"));
@@ -302,8 +303,7 @@ public class AllchanModule extends CloudflareChanModule {
     @Override
     public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
             throws Exception {
-        String url = getUsingUrl() + boardName + "/catalog.json";
-        if (catalogType > 0) url += "?sort=" + CATALOG_TYPES[catalogType];
+        String url = getUsingUrl() + boardName + "/catalog" + (catalogType > 0 ? "-" + CATALOG_TYPES[catalogType] : "") + ".json";
         JSONObject json = downloadJSONObject(url, oldList != null, listener, task);
         if (json == null) return oldList;
         try {
@@ -393,6 +393,11 @@ public class AllchanModule extends CloudflareChanModule {
             }
         }
         model.name = RegexUtils.removeHtmlTags(name);
+        String extra = json.optString("extraData");
+        if (extra.indexOf(" /") > 0) {
+            extra = "(" + extra + ")";
+            model.name = model.name.length() > 0 ? (model.name + " " + extra) : extra;
+        }
         String subject = json.optString("subject");
         if (!subject.startsWith("<a href")) {
             model.subject = RegexUtils.removeHtmlTags(subject);
@@ -404,6 +409,12 @@ public class AllchanModule extends CloudflareChanModule {
         model.comment = model.comment != null ? (model.comment + text) : text;
         model.email = json.optString("email");
         model.trip = json.optString("tripCode");
+        JSONObject user = json.optJSONObject("user");
+        if (user != null) {
+            String level = user.optString("level");
+            if (level.equals("SUPERUSER")) model.trip += "## Admin";
+            else if (level.equals("ADMIN") || level.equals("MODER")) model.trip += "## Mod";    
+        }
         model.icons = null;
         model.op = json.optBoolean("isOp");
         model.sage = model.email.toLowerCase(Locale.US).contains("sage");
