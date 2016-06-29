@@ -83,6 +83,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="2-chru.net" />
                 <data android:host="2chru.net" />
+                <data android:host="2-chru.cafe" />
+                <data android:host="2chru.cafe" />
                 <data android:host="dmirrgetyojz735v.onion" />
                 <data android:host="www.2-chru.net" />
                 <data android:host="www.2chru.net" />
@@ -111,6 +113,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="www.10ch.ru" />
                 
                 <data android:host="haruhichan.ru" />
+                <data android:host="haruhichan.ovh" />
                 
                 <data android:host="chuck.dfwk.ru" />
                 
@@ -120,10 +123,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="8ch.net" />
                 <data android:host="8chan.co" />
-                <data android:host="fullchan4jtta4sx.onion" />
+                <data android:host="oxwugzccvk3dk6tj.onion" />
                 <data android:host="www.8ch.net" />
                 <data android:host="www.8chan.co" />
-                <data android:host="www.fullchan4jtta4sx.onion" />
+                <data android:host="www.oxwugzccvk3dk6tj.onion" />
                 
                 <data android:host="krautchan.net" />
                 <data android:host="www.krautchan.net" />
@@ -135,6 +138,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="8ch.pl" />
                 <data android:host="www.8ch.pl" />
+                <data android:host="8ch.vichandcxw4gm3wy.onion" />
                 
                 <data android:host="pl.vichan.net" />
                 
@@ -183,6 +187,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 
                 <data android:host="arhivach.org" />
                 <data android:host="www.arhivach.org" />
+                <data android:host="arhivachovtj2jrp.onion" />
+                <data android:host="www.arhivachovtj2jrp.onion" />
                 <!-- end of domains -->
             </intent-filter>
             <intent-filter>
