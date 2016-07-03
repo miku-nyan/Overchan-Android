@@ -282,8 +282,7 @@ public class AllchanModule extends CloudflareChanModule {
         if (json == null) return oldList;
         try {
             try {
-                BoardModel board = mapBoardModel(json.optJSONObject("board"));
-                addToMap(board);
+                BoardModel board = getBoard(boardName, listener, task);
                 board.lastPage = Math.max(json.getInt("pageCount") - 1, 0);
             } catch (Exception e) {
                 Logger.e(TAG, e);
@@ -308,8 +307,7 @@ public class AllchanModule extends CloudflareChanModule {
         if (json == null) return oldList;
         try {
             try {
-                BoardModel board = mapBoardModel(json.getJSONObject("board"));
-                addToMap(board);
+                getBoard(boardName, listener, task);
             } catch (Exception e) {
                 Logger.e(TAG, e);
             }
@@ -361,8 +359,7 @@ public class AllchanModule extends CloudflareChanModule {
         if (json == null) return oldList;
         try {
             try {
-                BoardModel board = mapBoardModel(json.getJSONObject("board"));
-                addToMap(board);
+                getBoard(boardName, listener, task);
             } catch (Exception e) {
                 Logger.e(TAG, e);
             }
