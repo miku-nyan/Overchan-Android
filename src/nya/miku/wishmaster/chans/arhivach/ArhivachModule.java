@@ -10,7 +10,6 @@ import android.support.v4.content.res.ResourcesCompat;
 
 import java.io.Closeable;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +24,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.LazyPreferences;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -41,6 +41,7 @@ public class ArhivachModule extends AbstractChanModule {
     static final String CHAN_NAME = "Arhivach.org";
     private static final String DEFAULT_DOMAIN = "arhivach.org";
     private static final String ONION_DOMAIN = "arhivachovtj2jrp.onion";
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN };
 
     private static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
     
@@ -187,30 +188,14 @@ public class ArhivachModule extends AbstractChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String domain;
-        String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
-        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
-        if (parsePath.find()) {
-            domain = parsePath.group(1).toLowerCase(Locale.US);
-            path = parsePath.group(2);
-        } else {
-            domain = parseUrl.group(1).toLowerCase(Locale.US);
-        }
-        
-        boolean matchDomain = false;
-        if (DEFAULT_DOMAIN.equalsIgnoreCase(domain) || ONION_DOMAIN.equalsIgnoreCase(domain)) {
-                matchDomain = true;
-        }
-        if (!matchDomain) throw new IllegalArgumentException("wrong chan");
-        
+        String urlPath  = UrlPathUtils.getUrlPath(url, DOMAINS);
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
         UrlPageModel model = new UrlPageModel();
         model.chanName = getChanName();
         try {
-            if (path.contains("thread/")) {
+            if (urlPath.contains("thread/")) {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
-                Matcher matcher = Pattern.compile("thread/([0-9]+?)/(.*)").matcher(path);
+                Matcher matcher = Pattern.compile("thread/(\\d+)/?(.*)").matcher(urlPath);
                 if (!matcher.find()) throw new Exception();
                 model.boardName = "";
                 model.threadNumber = matcher.group(1);
@@ -219,10 +204,10 @@ public class ArhivachModule extends AbstractChanModule {
                     if (!post.equals(""))
                         model.postNumber = post;
                 }
-            } else if (path.contains("index") || path.indexOf("/")==0 || path.length()==0) {
+            } else if (urlPath.contains("index") || urlPath.indexOf("/")==0 || urlPath.length()==0) {
                 model.type = UrlPageModel.TYPE_BOARDPAGE;
                 model.boardName = "";
-                Matcher matcher = Pattern.compile("index/(\\d+)/?(.*)").matcher(path);
+                Matcher matcher = Pattern.compile("index/(\\d+)/?(.*)").matcher(urlPath);
                 String page = "";
                 if (matcher.find())
                     page = matcher.group(1);
@@ -230,11 +215,10 @@ public class ArhivachModule extends AbstractChanModule {
                     model.boardPage = (Integer.parseInt(page) / 25) + 1;
                 else
                     model.boardPage = 1;
-
             }
         } catch (Exception e) {
             model.type = UrlPageModel.TYPE_OTHERPAGE;
-            model.otherPath = path;
+            model.otherPath = urlPath;
         }
         
         return model;
