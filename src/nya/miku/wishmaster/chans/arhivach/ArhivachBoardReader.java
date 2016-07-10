@@ -309,16 +309,20 @@ public class ArhivachBoardReader implements Closeable {
     }
     
     protected void parseDate(String date) {
+        //TODO: Refactor date parser
         if (date.length() > 0) {
             String[] parts = date.split("\\s+");
             if (parts.length > 0) {
                 Calendar calendar = Calendar.getInstance(CHAN_DATEFORMAT_FULL.getTimeZone());
                 if (parts.length == 2) {
-                    long currentTime = calendar.getTimeInMillis();
                     if (parts[0].equalsIgnoreCase("вчера")) {
-                        currentTime -= 24 * 60* 60 * 1000;
+                        calendar.add(Calendar.DAY_OF_YEAR, -1);
                     }
-                    date = CHAN_DATEFORMAT.format(currentTime) + " " + parts[1];
+                    String[] time = parts[1].split(":");
+                    calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(time[0]));
+                    calendar.set(Calendar.MINUTE, Integer.valueOf(time[1]));
+                    currentPost.timestamp = calendar.getTimeInMillis();
+                    return;
                 }
                 if (parts.length == 3) {
                     if (parts[2].contains(":")) {
