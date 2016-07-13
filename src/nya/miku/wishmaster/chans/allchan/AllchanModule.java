@@ -405,7 +405,7 @@ public class AllchanModule extends CloudflareChanModule {
         String text = RegexUtils.replaceAll(json.optString("text"), COMMENT_QUOTE, "<span class=\"unkfunc\">");
         model.comment = model.comment != null ? (model.comment + text) : text;
         model.email = json.optString("email");
-        model.trip = json.optString("tripCode");
+        model.trip = json.optString("tripcode");
         JSONObject user = json.optJSONObject("user");
         if (user != null) {
             String level = user.optString("level");
