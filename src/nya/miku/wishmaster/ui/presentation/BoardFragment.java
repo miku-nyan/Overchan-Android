@@ -414,7 +414,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         imagesDownloadExecutor.shutdown();
         
-        dialogs.onDestroyFragment(tabModel.id);
+        if (tabModel != null) dialogs.onDestroyFragment(tabModel.id);
     }
     
     private void saveHistory() {
