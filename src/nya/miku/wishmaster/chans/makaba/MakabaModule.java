@@ -455,28 +455,25 @@ public class MakabaModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String response;
-        String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "") + ("&board=" + boardName);
-        try {
-            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, null, task, true);
-            if (task != null && task.isCancelled()) throw new Exception("interrupted");
-            if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
+        String url = domainUrl + "api/captcha/2chaptcha/id?board=" + boardName + (threadNumber != null ? "&thread=" + threadNumber : "");
+        JSONObject response = downloadJSONObject(url, false, listener, task);
+        switch (response.optString("result")) {
+            case "1": //Enabled
+                String id = response.optString("id");
+                url = domainUrl + "api/captcha/2chaptcha/image/" + id;
+                CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
+                captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
+                captchaId = id;
+                return captchaModel;
+            case "2": //VIP
+            case "3": //Disabled
                 captchaId = null;
                 return null;
-            } else if (!response.startsWith("CHECK")) {
+            case "0": //Fail
+                throw new Exception(response.optString("description"));
+            default:
                 throw new Exception("Invalid captcha response");
-            }
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, url);
-            throw e;
         }
-        
-        String id = response.substring(response.indexOf('\n') + 1);
-        url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
-        CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
-        captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
-        captchaId = id;
-        return captchaModel;
     }
 
     @Override
