@@ -456,14 +456,16 @@ public class MakabaModule extends CloudflareChanModule {
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String response;
-        String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "") + ("&board=" + boardName);
+        JSONObject json;
+        String url = domainUrl + "api/captcha/2chaptcha/id?" + ("board=" + boardName) + (threadNumber != null ? "&thread" : "") ;
         try {
             response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, null, task, true);
             if (task != null && task.isCancelled()) throw new Exception("interrupted");
-            if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
+            json = new JSONObject(response);
+            if (json.getInt("result")==3 || json.getInt("result")==2) {
                 captchaId = null;
                 return null;
-            } else if (!response.startsWith("CHECK")) {
+            } else if (json.getInt("result")!=1) {
                 throw new Exception("Invalid captcha response");
             }
         } catch (HttpWrongStatusCodeException e) {
@@ -471,8 +473,9 @@ public class MakabaModule extends CloudflareChanModule {
             throw e;
         }
         
-        String id = response.substring(response.indexOf('\n') + 1);
-        url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
+        String id = json.getString("id");
+        url = domainUrl + "api/captcha/2chaptcha/image/" + id;
+
         CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
         captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
         captchaId = id;
