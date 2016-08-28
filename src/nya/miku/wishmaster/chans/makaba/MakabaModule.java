@@ -457,27 +457,40 @@ public class MakabaModule extends CloudflareChanModule {
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String url = domainUrl + "api/captcha/2chaptcha/id?board=" + boardName + (threadNumber != null ? "&thread=" + threadNumber : "");
         JSONObject response = downloadJSONObject(url, false, listener, task);
-        switch (response.optString("result")) {
-            case "1": //Enabled
+        switch (response.optInt("result")) {
+            case 1: //Enabled
                 String id = response.optString("id");
                 url = domainUrl + "api/captcha/2chaptcha/image/" + id;
                 CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
                 captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
                 captchaId = id;
                 return captchaModel;
-            case "2": //VIP
-            case "3": //Disabled
+            case 2: //VIP
+            case 3: //Disabled
                 captchaId = null;
                 return null;
-            case "0": //Fail
+            case 0: //Fail
                 throw new Exception(response.optString("description"));
             default:
                 throw new Exception("Invalid captcha response");
         }
     }
-
+    
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        if (captchaId != null) {
+            String checkCaptchaUrl = domainUrl + "api/captcha/2chaptcha/check/" + captchaId + "?value=" + model.captchaAnswer;
+            JSONObject captchaResult;
+            try {
+                captchaResult = downloadJSONObject(checkCaptchaUrl, false, listener, task);
+                if (captchaResult.getInt("result") == 0) {
+                    throw new Exception(captchaResult.getString("description"));
+                }
+            } catch (JSONException e) {
+                Logger.e(TAG, e);
+            }
+        }
+        
         String url = domainUrl + "makaba/posting.fcgi?json=1";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("task", "post").
