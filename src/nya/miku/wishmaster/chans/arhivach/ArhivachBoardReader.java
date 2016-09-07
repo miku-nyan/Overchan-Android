@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.common.Logger;
 
 /**
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 03.07.2015.
@@ -27,15 +29,17 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 
 @SuppressLint("SimpleDateFormat")
 public class ArhivachBoardReader implements Closeable {
-    //private static final String TAG = "ArhivachBoardReader";
+    private static final String TAG = "ArhivachBoardReader";
     
     private static final DateFormat CHAN_DATEFORMAT;
+    private static final DateFormat CHAN_DATEFORMAT_FULL;
     static {
         DateFormatSymbols chanSymbols = new DateFormatSymbols();
-        chanSymbols.setShortWeekdays(new String[] { "", "Вск", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Суб" });
-
-        CHAN_DATEFORMAT = new SimpleDateFormat("dd/MM/yy EEE HH:mm:ss", chanSymbols);
-        CHAN_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        chanSymbols.setMonths(new String[] { "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря" });
+        
+        CHAN_DATEFORMAT = new SimpleDateFormat("dd MMMM yyyy", chanSymbols);
+        CHAN_DATEFORMAT_FULL = new SimpleDateFormat("dd MMMM yyyy HH:mm", chanSymbols);
+        CHAN_DATEFORMAT_FULL.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
     
     private static final Pattern URL_PATTERN =
@@ -305,17 +309,40 @@ public class ArhivachBoardReader implements Closeable {
     }
     
     protected void parseDate(String date) {
-        //TODO: Implement date parser
-        /*
+        //TODO: Refactor date parser
         if (date.length() > 0) {
-            try {
-                currentPost.timestamp = CHAN_DATEFORMAT.parse(date).getTime();
-            } catch (Exception e) {
-                currentPost.timestamp = Calendar.getInstance().getTimeInMillis();
-                Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
+            String[] parts = date.split("\\s+");
+            if (parts.length > 0) {
+                Calendar calendar = Calendar.getInstance(CHAN_DATEFORMAT_FULL.getTimeZone());
+                if (parts.length == 2) {
+                    if (parts[0].equalsIgnoreCase("вчера")) {
+                        calendar.add(Calendar.DAY_OF_YEAR, -1);
+                    }
+                    String[] time = parts[1].split(":");
+                    calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(time[0]));
+                    calendar.set(Calendar.MINUTE, Integer.valueOf(time[1]));
+                    currentPost.timestamp = calendar.getTimeInMillis();
+                    return;
+                }
+                if (parts.length == 3) {
+                    if (parts[2].contains(":")) {
+                        date = parts[0] + " " + parts[1] + " " + calendar.get(Calendar.YEAR) + " " + parts[2];
+                    } else {
+                        try {
+                            currentPost.timestamp = CHAN_DATEFORMAT.parse(date).getTime();
+                        } catch (Exception e) {
+                            Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
+                        }
+                    }
+                }
+                
+                try {
+                    currentPost.timestamp = CHAN_DATEFORMAT_FULL.parse(date).getTime();
+                } catch (Exception e) {
+                    Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
+                }
             }
         }
-        */
     }
     
     private void skipUntilSequence(char[] sequence) throws IOException {
