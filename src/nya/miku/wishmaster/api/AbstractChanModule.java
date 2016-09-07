@@ -73,7 +73,8 @@ public abstract class AbstractChanModule implements HttpChanModule {
     protected static final String PREF_KEY_PASSWORD = "PREF_KEY_PASSWORD";
     protected static final String PREF_KEY_USE_HTTPS = "PREF_KEY_USE_HTTPS";
     protected static final String PREF_KEY_ONLY_NEW_POSTS = "PREF_KEY_ONLY_NEW_POSTS";
-    
+    protected static final String PREF_KEY_CAPTCHA_AUTO_UPDATE = "PREF_KEY_CAPTCHA_AUTO_UPDATE";
+
     /**
      * Основной HTTP-клиент
      */
@@ -432,5 +433,20 @@ public abstract class AbstractChanModule implements HttpChanModule {
         captchaModel.bitmap = captchaBitmap;
         return captchaModel;
     }
-    
+
+    //TODO: Write the documentation
+    protected void addCaptchaAutoUpdatePreference(PreferenceGroup group) {
+        final Context context = group.getContext();
+        CheckBoxPreference captchaAutoUpdatePreference = new LazyPreferences.CheckBoxPreference(context);
+        captchaAutoUpdatePreference.setTitle(R.string.pref_captcha_auto_update);
+        captchaAutoUpdatePreference.setKey(getSharedKey(PREF_KEY_CAPTCHA_AUTO_UPDATE));
+        captchaAutoUpdatePreference.setDefaultValue(false);
+        group.addPreference(captchaAutoUpdatePreference);
+    }
+
+    //TODO: Write the documentation
+    public boolean getCaptchaAutoUpdatePreference(){
+        return false;
+    }
+
 }

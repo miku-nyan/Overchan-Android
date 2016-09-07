@@ -616,4 +616,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>45\uff05</item>
         <item>50\uff05</item>
     </string-array>
+    <string name="pref_captcha_auto_update">Автоматическое обновление капчи</string>
 </resources>

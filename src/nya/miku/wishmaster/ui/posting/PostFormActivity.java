@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.AbstractChanModule;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -456,6 +457,15 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 return false;
             }
         });
+        captchaField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus && chan instanceof AbstractChanModule && ((AbstractChanModule) chan).getCaptchaAutoUpdatePreference()) {
+                    updateCaptcha(false);
+                }
+            }
+        });
+
         sendButton = (Button) findViewById(R.id.postform_send_button);
         sendButton.setOnClickListener(this);
         
@@ -561,10 +571,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         }
     }
     
-    private void switchToLoadingCaptcha() {
+    private void switchToLoadingCaptcha(boolean disableCaptchaField) {
         captchaLoading.setVisibility(View.VISIBLE);
         captchaView.setVisibility(View.GONE);
-        captchaField.setEnabled(false);
+        captchaField.setEnabled(!disableCaptchaField);
         sendButton.setEnabled(false);
     }
     
@@ -603,9 +613,13 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         switchToErrorCaptcha();
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
-    
+
     private void updateCaptcha() {
-        switchToLoadingCaptcha();
+        updateCaptcha(true);
+    }
+
+    private void updateCaptcha(boolean disableCaptchaField) {
+        switchToLoadingCaptcha(disableCaptchaField);
         if (currentTask != null) currentTask.cancel();
         MainApplication.getInstance().draftsCache.clearLastCaptcha();
         Async.runAsync(new Runnable() {
