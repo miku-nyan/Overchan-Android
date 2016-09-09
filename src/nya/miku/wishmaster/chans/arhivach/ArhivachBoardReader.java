@@ -1,15 +1,11 @@
 package nya.miku.wishmaster.chans.arhivach;
 
-import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -21,26 +17,16 @@ import java.util.regex.Pattern;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
-import nya.miku.wishmaster.common.Logger;
 
 /**
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 03.07.2015.
  */
 
-@SuppressLint("SimpleDateFormat")
 public class ArhivachBoardReader implements Closeable {
-    private static final String TAG = "ArhivachBoardReader";
     
-    private static final DateFormat CHAN_DATEFORMAT;
-    private static final DateFormat CHAN_DATEFORMAT_FULL;
-    static {
-        DateFormatSymbols chanSymbols = new DateFormatSymbols();
-        chanSymbols.setMonths(new String[] { "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря" });
-        
-        CHAN_DATEFORMAT = new SimpleDateFormat("dd MMMM yyyy", chanSymbols);
-        CHAN_DATEFORMAT_FULL = new SimpleDateFormat("dd MMMM yyyy HH:mm", chanSymbols);
-        CHAN_DATEFORMAT_FULL.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
+    private static final Pattern DATE_PATTERN = Pattern.compile("(?:(\\d+)\\s+)?(\\w+)\\s+(?:(\\d+):(\\d+)|(\\d{4}))");
+    private static final String[] MONTH_STRINGS = new String[] { "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря" };
+    private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("GMT");
     
     private static final Pattern URL_PATTERN =
             Pattern.compile("((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
@@ -308,40 +294,47 @@ public class ArhivachBoardReader implements Closeable {
         }
     }
     
-    protected void parseDate(String date) {
-        //TODO: Refactor date parser
-        if (date.length() > 0) {
-            String[] parts = date.split("\\s+");
-            if (parts.length > 0) {
-                Calendar calendar = Calendar.getInstance(CHAN_DATEFORMAT_FULL.getTimeZone());
-                if (parts.length == 2) {
-                    if (parts[0].equalsIgnoreCase("вчера")) {
-                        calendar.add(Calendar.DAY_OF_YEAR, -1);
-                    }
-                    String[] time = parts[1].split(":");
-                    calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(time[0]));
-                    calendar.set(Calendar.MINUTE, Integer.valueOf(time[1]));
-                    currentPost.timestamp = calendar.getTimeInMillis();
-                    return;
+    private void parseDate(String date) {
+        Matcher matcher = DATE_PATTERN.matcher(date);
+        if (matcher.matches()) {
+            int day, month, year, hour, minute;
+            Calendar calendar = Calendar.getInstance(TIME_ZONE);
+            
+            String dayString = matcher.group(1);
+            String monthString = matcher.group(2);
+            if (dayString == null) {
+                if (monthString.equalsIgnoreCase("вчера")) {
+                    calendar.add(Calendar.DAY_OF_MONTH, -1);
                 }
-                if (parts.length == 3) {
-                    if (parts[2].contains(":")) {
-                        date = parts[0] + " " + parts[1] + " " + calendar.get(Calendar.YEAR) + " " + parts[2];
-                    } else {
-                        try {
-                            currentPost.timestamp = CHAN_DATEFORMAT.parse(date).getTime();
-                        } catch (Exception e) {
-                            Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
-                        }
-                    }
-                }
-                
-                try {
-                    currentPost.timestamp = CHAN_DATEFORMAT_FULL.parse(date).getTime();
-                } catch (Exception e) {
-                    Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
+                day = calendar.get(Calendar.DAY_OF_MONTH);
+                month = calendar.get(Calendar.MONTH);
+            } else {
+                day = Integer.parseInt(dayString);
+                month = 0;
+                while (!monthString.equalsIgnoreCase(MONTH_STRINGS[month])
+                        && (month < MONTH_STRINGS.length)) {
+                    ++month;
                 }
             }
+            
+            String yearString = matcher.group(5);
+            if (yearString == null) {
+                hour = Integer.parseInt(matcher.group(3));
+                minute = Integer.parseInt(matcher.group(4));
+                year = calendar.get(Calendar.YEAR);
+            } else {
+                int offset = -1 * TimeZone.getDefault().getRawOffset();
+                hour = offset / 3600000;
+                minute = (offset / 60000) % 60;
+                year = Integer.parseInt(yearString);
+            }
+            
+            calendar.set(Calendar.DAY_OF_MONTH, day);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+            currentPost.timestamp = calendar.getTimeInMillis();
         }
     }
     
