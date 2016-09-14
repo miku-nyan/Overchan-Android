@@ -5,9 +5,14 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,17 +27,21 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.common.IOUtils;
+import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.http.streamer.HttpRequestException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
+import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 /**
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 23.06.2015.
  */
 
 public class ArhivachModule extends AbstractChanModule {
-    //private static final String TAG = "ArhivachModule";
+    private static final String TAG = "ArhivachModule";
     
     static final String CHAN_NAME = "Arhivach.org";
     
@@ -128,7 +137,82 @@ public class ArhivachModule extends AbstractChanModule {
             return oldList == null ? threads[0].posts : ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(threads[0].posts));
         }
     }
-    
+
+    private JSONArray tagComplete(String searchRequest, ProgressListener listener, CancellableTask task) throws Exception {
+        //TODO: Refactor tagComplete
+        HttpResponseModel responseModel = null;
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().build();
+        StringBuilder url = new StringBuilder(CHAN_URL);
+        StringBuilder callback = new StringBuilder();
+        callback.append("Overchan");
+        callback.append(Math.abs((new Random()).nextLong()));
+        callback.append("_");
+        callback.append(System.currentTimeMillis());
+        url.append("ajax/?callback=");
+        url.append(callback);
+        url.append("&act=tagcomplete");
+        url.append("&create=0");
+        url.append("&nobrackets=0");
+        url.append("&only_board=0");
+        url.append("&q=");
+        url.append(searchRequest);
+        url.append("&_=");
+        url.append(System.currentTimeMillis());
+        BufferedReader in = null;
+        try {
+            responseModel = HttpStreamer.getInstance().getFromUrl(url.toString(), rqModel, httpClient, listener, task);
+            if (responseModel.statusCode == 200) {
+                if (responseModel.stream == null) throw new HttpRequestException(new NullPointerException());
+                in = new BufferedReader(new InputStreamReader(responseModel.stream));
+                final int bufferSize = 1024;
+                final char[] buffer = new char[bufferSize];
+                final StringBuilder out = new StringBuilder();
+                while (true) {
+                    if (task != null && task.isCancelled()) throw new InterruptedException();
+                    int rsz = in.read(buffer, 0, buffer.length);
+                    if (rsz < 0)
+                        break;
+                    out.append(buffer, 0, rsz);
+                }
+
+                String tags = out.toString();
+                tags = tags.replace(callback.toString(), "");
+                tags = tags.substring(tags.indexOf("(")+1, tags.lastIndexOf(")"));
+                JSONObject o = new JSONObject(tags);
+                return o.getJSONArray("tags");
+            } else {
+                throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            IOUtils.closeQuietly(in);
+            if (responseModel != null) responseModel.release();
+        }
+    }
+
+    @Override
+    public PostModel[] search(String boardName, String searchRequest, ProgressListener listener, CancellableTask task) throws Exception {
+        UrlPageModel urlModel = new UrlPageModel();
+        urlModel.chanName = CHAN_NAME;
+        urlModel.type = UrlPageModel.TYPE_SEARCHPAGE;
+        urlModel.boardName = boardName;
+        urlModel.searchRequest = searchRequest;
+        String url = buildUrl(urlModel);
+        JSONArray tags = tagComplete(searchRequest, listener, task);
+        try {
+            url = url + tags.getJSONObject(0).getInt("id");
+        } catch (Exception e) {
+            return new PostModel[0];
+        }
+        ThreadModel[] threads = readBoardPage(url, listener, task, false, false);
+        List<PostModel> posts = new ArrayList<PostModel>();
+        for (ThreadModel thread : threads){
+            posts.add(thread.posts[0]);
+        }
+        return posts.toArray(new PostModel[posts.size()]);
+    }
+
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN_NAME)) throw new IllegalArgumentException("wrong chan");
@@ -146,6 +230,10 @@ public class ArhivachModule extends AbstractChanModule {
                 if (!model.boardName.equals("")) throw new IllegalArgumentException("wrong board name");
                 url.append("thread/").append(model.threadNumber).append("/");
                 if (model.postNumber != null && model.postNumber.length() != 0) url.append("#").append(model.postNumber);
+                break;
+            case UrlPageModel.TYPE_SEARCHPAGE:
+                if (!model.boardName.equals("")) throw new IllegalArgumentException("wrong board name");
+                url.append("?q=" + model.searchRequest + "&tags=");
                 break;
             default:
                 throw new IllegalArgumentException("wrong page type");
@@ -179,7 +267,7 @@ public class ArhivachModule extends AbstractChanModule {
             if (path.contains("thread/")) {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
                 Matcher matcher = Pattern.compile("thread/([0-9]+?)/(.*)").matcher(path);
-                if (!matcher.find()) throw new Exception();
+                if (!matcher.find()) throw new IllegalArgumentException("wrong thread number");
                 model.boardName = "";
                 model.threadNumber = matcher.group(1);
                 if (matcher.group(2).startsWith("#")) {
@@ -199,12 +287,23 @@ public class ArhivachModule extends AbstractChanModule {
                 else
                     model.boardPage = 1;
 
+            } else if (path.contains("?tags=") || path.contains("&tags=")) {
+                //TODO: implement search request parser
+                Logger.d(TAG, "URL PARSE");
+                model.type = UrlPageModel.TYPE_SEARCHPAGE;
+                model.boardName = "";
+                Matcher matcher = Pattern.compile("q=([^&])+&?").matcher(path.substring(path.indexOf("q=")+1));
+                if (matcher.find()) {
+                    model.searchRequest = matcher.group(1);
+                } else {
+                    model.searchRequest = "";
+                }
             }
         } catch (Exception e) {
             model.type = UrlPageModel.TYPE_OTHERPAGE;
             model.otherPath = path;
         }
-        
+
         return model;
     }
 }
