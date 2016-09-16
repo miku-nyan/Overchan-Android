@@ -30,7 +30,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 public class CirnoBoards {
     private static final String[] ATTACHMENT_FILTERS = new String[] { "jpg", "jpeg", "png", "gif" };
     
-    private static final List<String> IICHAN_BOARDS_410 = Arrays.asList("gnx", "int", "ts", "cu", "dev");
+    private static final List<String> IICHAN_BOARDS_410 = Arrays.asList("int", "ts", "cu", "dev", "ci");
     
     private static final List<String> IICHAN_SPOILER_MARK_BOARDS = Arrays.asList("bro", "maid", "med", "tv", "a", "fi", "to", "vn", "vg");
     
@@ -40,19 +40,18 @@ public class CirnoBoards {
     
     static {
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
-        addBoard("azu", "Azumanga Daioh", "К удалению", "Осака", false);
-        addBoard("me", "Меха", "К удалению", "Лакс Кляйн", false);
         addBoard("au", "Автомобили", "Общее", "Джереми Кларксон", false);
         addBoard("es", "Бесконечное лето", "Общее", "Пионер", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
         addBoard("vg", "Видеоигры", "Общее", "Марио", false);
         addBoard("hr", "Высокое разрешение", "Общее", "Аноним", false);
         addBoard("gf", "gif- и flash-анимация", "Общее", "Аноним", true); //???
+        addBoard("ci", "Городская жизнь", "Общее", "Аноним", false);
         addBoard("an", "Живопись", "Общее", "Кот Синкая", false);
         addBoard("ne", "Животные", "Общее", "Пушок", false);
         addBoard("tran", "Иностранные языки", "Общее", "Е. Д. Поливанов", false);
         addBoard("int", "International", "Общее", "Anonymous", false);
-        addBoard("tv", "Кино и ТВ", "Общее", "К. С. Станиславский", false);
+        addBoard("tv", "Кино, ТВ и мультфильмы", "Общее", "К. С. Станиславский", false);
         addBoard("cu", "Кулинария", "Общее", "Аноним", false);
         addBoard("l", "Литература", "Общее", "Ф. М. Достоевский", false);
         addBoard("bro", "My Little Pony", "Общее", "Эпплджек", false);
@@ -80,7 +79,6 @@ public class CirnoBoards {
         addBoard("aa", "Аниме-арт", "Японская культура", "Ракка", false);
         addBoard("vn", "Визуальные новеллы", "Японская культура", "Сэйбер", false);
         addBoard("vo", "Vocaloid", "Японская культура", "", false); //hatsune
-        addBoard("gnx", "Gainax", "Японская культура", "Ноно", false);
         addBoard("abe", "ёситоси абэ", "Японская культура", "Chada", false);
         addBoard("c", "Косплей", "Японская культура", "Аноним", false);
         addBoard("ls", "Lucky☆Star", "Японская культура", "Цукаса", false);
@@ -90,7 +88,6 @@ public class CirnoBoards {
         addBoard("sos", "Suzumiya Haruhi no Yūutsu", "Японская культура", "Кёнко", false);
         addBoard("to", "Touhou", "Японская культура", "Нитори", false);
         addBoard("fi", "Фигурки", "Японская культура", "Фигурка анонима", false);
-        addBoard("hau", "Higurashi no Naku Koro ni", "Японская культура", "Ханю", false);
         addBoard("ts", "Цундере", "Японская культура", "Baka Inu", false);
         addBoard("jp", "Япония", "Японская культура", "名無しさん", false);
         

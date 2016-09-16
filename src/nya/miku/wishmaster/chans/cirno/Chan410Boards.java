@@ -52,7 +52,6 @@ public class Chan410Boards {
         addBoard("a", "Аниме и манга", "Аниме", "Аноним", false);
         addBoard("ts", "Цундере", "Аниме", "Baka Inu", false);
         addBoard("tm", "Type-Moon", "Аниме", "Шики", false);
-        addBoard("gnx", "Gainax", "На пробу", "Ноно", false);
         addBoard("ci", "Городская жизнь", "На пробу", "Аноним", false);
         
         SIMPLE_ARRAY = new SimpleBoardModel[LIST.size()];
