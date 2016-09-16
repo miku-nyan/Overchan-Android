@@ -242,7 +242,7 @@ public class AllchanModule extends CloudflareChanModule {
         model.allowNames = true;
         model.allowSubjects = true;
         model.allowSage = true;
-        model.allowEmails = true;
+        model.allowEmails = false;
         model.ignoreEmailIfSage = true;
         model.allowCustomMark = true;
         model.allowRandomHash = true;
@@ -413,8 +413,9 @@ public class AllchanModule extends CloudflareChanModule {
             else if (level.equals("ADMIN") || level.equals("MODER")) model.trip += "## Mod";    
         }
         model.icons = null;
+        JSONObject options = json.optJSONObject("options");
         model.op = json.optBoolean("isOp");
-        model.sage = model.email.toLowerCase(Locale.US).contains("sage");
+        model.sage = options.optBoolean("sage") || model.email.toLowerCase(Locale.US).contains("sage");
         try {
             model.timestamp = DATE_FORMAT.parse(json.optString("createdAt")).getTime();
         } catch (Exception e) {
@@ -543,13 +544,13 @@ public class AllchanModule extends CloudflareChanModule {
                 break;
         }
         postEntityBuilder.
-                addString("email", model.sage ? "sage" : model.email).
                 addString("name", model.name).
                 addString("subject", model.subject).
                 addString("text", model.comment).
                 addString("signAsOp", model.custommark ? "true" : "false").
                 addString("password", model.password).
                 addString("markupMode", "EXTENDED_WAKABA_MARK,BB_CODE");
+        if (model.sage) postEntityBuilder.addString("sage", "true");
         String rating = (model.icon >= 0 && model.icon < RATINGS.length) ? RATINGS[model.icon] : "SFW";
         if (model.attachments != null && model.attachments.length > 0) {
             for (int i=0; i<model.attachments.length; ++i) {
@@ -626,6 +627,7 @@ public class AllchanModule extends CloudflareChanModule {
                 return model;
             } catch (Exception e) {}
         }
+        urlPath = urlPath.replaceAll("#\\w+-", "#");
         return WakabaUtils.parseUrlPath(urlPath, CHAN_NAME);
     }
 }
