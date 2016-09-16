@@ -35,20 +35,25 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class LainModule extends AbstractVichanModule {
     private static final String CHAN_NAME = "lainchan.org";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cyb", "cyberpunk", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mega", "15 freshly bumped threads", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sec", "Cybersecurity", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tech", "consumer technology", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "λ", "programming", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "layer", "layer:03", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "DIY & Electronics", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "layer", "the solution to layer:04", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "zzz", "dream", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "w", "weeb", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "feels", "Feelings", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "drg", "drugs 2.0", "", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "literature", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "DIY & Electronics", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "art", "ars gratia artis", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "random", " ", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "fileboard", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "q", "questions and complaints", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cult", "Culture", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "civ", "Civics", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "q", "questions and complaints", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "random", "a selection of random threads!", " ", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cyb", "cyberpunk", "Closed", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "w", "weeb", "Closed", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "art", "ars gratia artis", "Closed", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "random", "Closed", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "fileboard", "Closed", false),
     };
     
     public LainModule(SharedPreferences preferences, Resources resources) {
