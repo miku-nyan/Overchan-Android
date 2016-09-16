@@ -53,39 +53,39 @@ public class ArhivachModule extends AbstractChanModule {
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN };
 
     private static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
-    
+
     public ArhivachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
     }
-    
+
     @Override
     public String getChanName() {
         return CHAN_NAME;
     }
-    
+
     @Override
     public String getDisplayingName() {
         return "Архивач";
     }
-    
+
     @Override
     public Drawable getChanFavicon() {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_arhivach, null);
     }
-    
+
     private String getUsingDomain() {
         return preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) ? ONION_DOMAIN : DEFAULT_DOMAIN;
     }
-    
+
     private String getUsingUrl() {
         return (useHttps() ? "https://" : "http://") + getUsingDomain() + "/";
     }
-    
+
     private boolean useHttps() {
         return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) && useHttps(false);
     }
-    
-    @Override   
+
+    @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
         CheckBoxPreference httpsPref = addHttpsPreference(preferenceGroup, false);
@@ -99,17 +99,17 @@ public class ArhivachModule extends AbstractChanModule {
         httpsPref.setDependency(getSharedKey(PREF_KEY_USE_ONION));
         addProxyPreferences(preferenceGroup);
     }
-    
+
     @Override
     public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
         return ArhivachBoards.getBoardsList();
     }
-    
+
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         return ArhivachBoards.getBoard(shortName);
     }
-    
+
     private ThreadModel[] readBoardPage(String url, ProgressListener listener, CancellableTask task, boolean checkIfModified, boolean isThread)
             throws Exception {
         HttpResponseModel responseModel = null;
@@ -133,7 +133,7 @@ public class ArhivachModule extends AbstractChanModule {
             if (responseModel != null) responseModel.release();
         }
     }
-    
+
     @Override
     public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
             throws Exception {
@@ -151,7 +151,7 @@ public class ArhivachModule extends AbstractChanModule {
             return threads;
         }
     }
-    
+
     @Override
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
@@ -225,12 +225,13 @@ public class ArhivachModule extends AbstractChanModule {
     }
 
     @Override
-    public PostModel[] search(String boardName, String searchRequest, ProgressListener listener, CancellableTask task) throws Exception {
+    public PostModel[] search(String boardName, String searchRequest, int page, ProgressListener listener, CancellableTask task) throws Exception {
         UrlPageModel urlModel = new UrlPageModel();
         urlModel.chanName = CHAN_NAME;
         urlModel.type = UrlPageModel.TYPE_SEARCHPAGE;
         urlModel.boardName = boardName;
         urlModel.searchRequest = searchRequest;
+        urlModel.boardPage = page;
         String url = buildUrl(urlModel);
         JSONArray tags = tagComplete(searchRequest, listener, task);
         try {
@@ -244,6 +245,11 @@ public class ArhivachModule extends AbstractChanModule {
             posts.add(thread.posts[0]);
         }
         return posts.toArray(new PostModel[posts.size()]);
+    }
+
+    @Override
+    public PostModel[] search(String boardName, String searchRequest, ProgressListener listener, CancellableTask task) throws Exception {
+        return search(boardName, searchRequest, 0, listener, task);
     }
 
     @Override
@@ -275,7 +281,7 @@ public class ArhivachModule extends AbstractChanModule {
         }
         return url.toString();
     }
-    
+
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String urlPath  = UrlPathUtils.getUrlPath(url, DOMAINS);
