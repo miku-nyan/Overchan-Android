@@ -350,6 +350,11 @@ public abstract class AbstractChanModule implements HttpChanModule {
     public PostModel[] search(String boardName, String searchRequest, ProgressListener listener, CancellableTask task) throws Exception {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public PostModel[] search(String boardName, String searchRequest, int page, ProgressListener listener, CancellableTask task) throws Exception {
+        throw new UnsupportedOperationException();
+    }
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
