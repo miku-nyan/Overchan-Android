@@ -51,7 +51,7 @@ public class ArhivachBoards {
         model.readonlyBoard = true;
         model.firstPage = 1;
         model.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
-        model.searchAllowed = false;
+        model.searchAllowed = true;
         model.catalogAllowed = false;
         return model;
     }
