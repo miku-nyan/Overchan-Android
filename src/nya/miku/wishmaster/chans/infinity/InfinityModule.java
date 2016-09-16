@@ -80,7 +80,15 @@ public class InfinityModule extends AbstractVichanModule {
         @Override
         public FastHtmlTagParser.TagsPair replace(FastHtmlTagParser.TagsPair source) {
             if (source.openTag.equalsIgnoreCase("<p class=\"body-line ltr quote\">"))
-                return new FastHtmlTagParser.TagsPair("<blockquote class=\"unkfunc\">", "</blockquote>");
+                return new FastHtmlTagParser.TagsPair("<span class=\"quote\">", "</span><br />");
+            return null;
+        }
+    };
+    private static final FastHtmlTagParser.TagReplaceHandler PARAGRAPH_REPLACER = new FastHtmlTagParser.TagReplaceHandler() {
+        @Override
+        public FastHtmlTagParser.TagsPair replace(FastHtmlTagParser.TagsPair source) {
+            if (source.openTag.equalsIgnoreCase("<p class=\"body-line ltr \">"))
+                return new FastHtmlTagParser.TagsPair("", "<br />");
             return null;
         }
     };
@@ -244,6 +252,8 @@ public class InfinityModule extends AbstractVichanModule {
         PostModel model = super.mapPostModel(object, boardName);
         try {
             model.comment = FastHtmlTagParser.getPTagParser().replace(model.comment, QUOTE_REPLACER);
+            model.comment = FastHtmlTagParser.getPTagParser().replace(model.comment, PARAGRAPH_REPLACER);
+            model.comment = model.comment.replaceAll("<br />$", "");
         } catch (Exception e) {}
         return model;
     }
