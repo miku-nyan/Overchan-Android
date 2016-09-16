@@ -45,7 +45,8 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class ArhivachModule extends AbstractChanModule {
     //private static final String TAG = "ArhivachModule";
-    
+
+    private static final Pattern INDEX_PAGE_PATTERN = Pattern.compile("index/(\\d+)/?(.*)");
     static final String CHAN_NAME = "Arhivach.org";
     private static final String DEFAULT_DOMAIN = "arhivach.org";
     private static final String ONION_DOMAIN = "arhivachovtj2jrp.onion";
@@ -265,6 +266,8 @@ public class ArhivachModule extends AbstractChanModule {
                 break;
             case UrlPageModel.TYPE_SEARCHPAGE:
                 if (!model.boardName.equals("")) throw new IllegalArgumentException("wrong board name");
+                url.append("index").append("/");
+                if (model.boardPage > 1) url.append((model.boardPage - 1) * 25).append("/");
                 url.append("?q=" + model.searchRequest + "&tags=");
                 break;
             default:
@@ -291,10 +294,11 @@ public class ArhivachModule extends AbstractChanModule {
                     if (!post.equals(""))
                         model.postNumber = post;
                 }
-            } else if (urlPath.contains("index") || urlPath.indexOf("/")==0 || urlPath.length()==0) {
-                model.type = UrlPageModel.TYPE_BOARDPAGE;
+            } else if (urlPath.contains("tags=")) {
+                //TODO: implement search request parser
+                model.type = UrlPageModel.TYPE_SEARCHPAGE;
                 model.boardName = "";
-                Matcher matcher = Pattern.compile("index/(\\d+)/?(.*)").matcher(urlPath);
+                Matcher matcher = INDEX_PAGE_PATTERN.matcher(urlPath);
                 String page = "";
                 if (matcher.find())
                     page = matcher.group(1);
@@ -302,16 +306,23 @@ public class ArhivachModule extends AbstractChanModule {
                     model.boardPage = (Integer.parseInt(page) / 25) + 1;
                 else
                     model.boardPage = 1;
-            } else if (urlPath.contains("?tags=") || urlPath.contains("&tags=")) {
-                //TODO: implement search request parser
-                model.type = UrlPageModel.TYPE_SEARCHPAGE;
-                model.boardName = "";
-                Matcher matcher = Pattern.compile("q=([^&])+&?").matcher(urlPath.substring(urlPath.indexOf("q=")+1));
+                matcher = Pattern.compile("q=([^&]+)&?").matcher(urlPath.substring(urlPath.indexOf("q=")-1));
                 if (matcher.find()) {
                     model.searchRequest = matcher.group(1);
                 } else {
                     model.searchRequest = "";
                 }
+            } else if ((urlPath.contains("index") || urlPath.indexOf("/")==0 || urlPath.length()==0) && !urlPath.contains("tags=")) {
+                model.type = UrlPageModel.TYPE_BOARDPAGE;
+                model.boardName = "";
+                Matcher matcher = INDEX_PAGE_PATTERN.matcher(urlPath);
+                String page = "";
+                if (matcher.find())
+                    page = matcher.group(1);
+                if (!page.equals(""))
+                    model.boardPage = (Integer.parseInt(page) / 25) + 1;
+                else
+                    model.boardPage = 1;
             }
         } catch (Exception e) {
             model.type = UrlPageModel.TYPE_OTHERPAGE;
