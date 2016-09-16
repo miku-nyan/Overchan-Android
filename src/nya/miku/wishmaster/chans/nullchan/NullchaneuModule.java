@@ -18,6 +18,13 @@
 
 package nya.miku.wishmaster.chans.nullchan;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -25,10 +32,17 @@ import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.AttachmentModel;
+import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
+import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.CryptoUtils;
+import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.WakabaReader;
 
 public class NullchaneuModule extends AbstractInstant0chan {
     private static final String CHAN_NAME = "0chan.eu";
@@ -114,6 +128,14 @@ public class NullchaneuModule extends AbstractInstant0chan {
     }
     
     @Override
+    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
+        if ((urlModel != null) && (urlModel.chanName != null) && urlModel.chanName.equals("expand")) {
+            stream = new SequenceInputStream(new ByteArrayInputStream("<form id=\"delform\">".getBytes()), stream);
+        }
+        return new NulleuReader(stream, canCloudflare());
+    }
+    
+    @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String captchaUrl = getUsingUrl() + "myata.php?" + Math.random();
         CaptchaModel captcha = downloadCaptcha(captchaUrl, listener, task);
@@ -125,6 +147,79 @@ public class NullchaneuModule extends AbstractInstant0chan {
     public String fixRelativeUrl(String url) {
         if (useHttps()) url = url.replace("http://0chan.eu", "https://0chan.eu");
         return super.fixRelativeUrl(url);
+    }
+    
+    private static class NulleuReader extends Instant0chanReader {
+        private static final Pattern PATTERN_EMBEDDED = Pattern.compile("<param name=\"movie\"(?:[^>]*)value=\"([^\"]+)\"(?:[^>]*)>", Pattern.DOTALL);
+        private static final Pattern PATTERN_COUNTRYBALL = Pattern.compile("class=\"_country_\"(?:.*)src=\"(.+)\"", Pattern.DOTALL);
+        private static final Pattern PATTERN_TABULATION = Pattern.compile("^\\t+", Pattern.MULTILINE);
+        private static final char[] USERID_FILTER = "<span class=\"hand\"".toCharArray();
+        
+        private int curUserIdPos = 0;
+        
+        public NulleuReader(InputStream stream, boolean canCloudflare) {
+            super(stream, canCloudflare);
+        }
+        
+        @Override
+        protected void postprocessPost(PostModel post) {
+            super.postprocessPost(post);
+            //TODO: Remove indents in post by html parser
+            post.comment = RegexUtils.replaceAll(post.comment, PATTERN_TABULATION , "");
+            
+            Matcher matcher = PATTERN_EMBEDDED.matcher(post.comment);
+            if (matcher.find()) {
+                String url = matcher.group(1);
+                if (url.contains("youtube.com/v/")) {
+                    String id = url.substring(url.indexOf("v/") + 2);
+                    AttachmentModel attachment = new AttachmentModel();
+                    attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    attachment.path = "http://www.youtube.com/watch?v=" + id;
+                    attachment.thumbnail = "http://img.youtube.com/vi/" + id + "/default.jpg";
+                    int oldCount = post.attachments != null ? post.attachments.length : 0;
+                    AttachmentModel[] attachments = new AttachmentModel[oldCount + 1];
+                    for (int i=0; i<oldCount; ++i) attachments[i] = post.attachments[i];
+                    attachments[oldCount] = attachment;
+                    post.attachments = attachments;
+                }
+            }
+        }
+        
+        @Override
+        protected void customFilters(int ch) throws IOException {
+            super.customFilters(ch);
+            if (ch == USERID_FILTER[curUserIdPos]) {
+                ++curUserIdPos;
+                if (curUserIdPos == USERID_FILTER.length) {
+                    skipUntilSequence(">".toCharArray());
+                    String id = readUntilSequence("</span>".toCharArray());
+                    if (!id.isEmpty()) {
+                        currentPost.name += (" ID:" + id);
+                        if (!id.equalsIgnoreCase("Heaven")) {
+                            currentPost.color = CryptoUtils.hashIdColor(id);
+                        }
+                    }
+                    curUserIdPos = 0;
+                }
+            } else {
+                if (curUserIdPos != 0) curUserIdPos = ch == USERID_FILTER[0] ? 1 : 0;
+            }
+        }
+        
+        @Override
+        protected void parseThumbnail(String imgTag) {
+            super.parseThumbnail(imgTag);
+            Matcher matcher = PATTERN_COUNTRYBALL.matcher(imgTag);
+            if (matcher.find()) {
+                BadgeIconModel iconModel = new BadgeIconModel();
+                iconModel.source = matcher.group(1);
+                int currentIconsCount = currentPost.icons == null ? 0 : currentPost.icons.length;
+                BadgeIconModel[] newIconsArray = new BadgeIconModel[currentIconsCount + 1];
+                for (int i=0; i<currentIconsCount; ++i) newIconsArray[i] = currentPost.icons[i];
+                newIconsArray[currentIconsCount] = iconModel;
+                currentPost.icons = newIconsArray;
+            }
+        }
     }
     
 }
