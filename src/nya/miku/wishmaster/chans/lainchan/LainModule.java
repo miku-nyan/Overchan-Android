@@ -35,7 +35,6 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class LainModule extends AbstractVichanModule {
     private static final String CHAN_NAME = "lainchan.org";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mega", "15 freshly bumped threads", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sec", "Cybersecurity", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tech", "consumer technology", " ", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "λ", "programming", " ", false),
@@ -48,7 +47,6 @@ public class LainModule extends AbstractVichanModule {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cult", "Culture", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "civ", "Civics", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "q", "questions and complaints", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "random", "a selection of random threads!", " ", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cyb", "cyberpunk", "Closed", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "w", "weeb", "Closed", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "art", "ars gratia artis", "Closed", false),
