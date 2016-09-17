@@ -61,6 +61,7 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
+import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
@@ -473,10 +474,23 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         try {
             super.downloadFile(url, out, listener, task);
         } catch (HttpWrongStatusCodeException e) {
-            if (url.contains("/thumb/") && url.endsWith(".jpg") && e.getStatusCode() == 404) {
-                super.downloadFile(url.substring(0, url.length() - 3) + "png", out, listener, task);
-            } else {
-                throw e;
+            if (url.contains("/thumb/") && e.getStatusCode() == 404) {
+                String ext = url.substring(url.lastIndexOf(".")+1).toLowerCase();
+                String file_name = url.substring(0, url.lastIndexOf("."));
+                // jpg -> png -> gif -> jpeg -> throw exception
+                switch (ext) {
+                    case "jpg":
+                        downloadFile(file_name + ".png", out, listener, task);
+                        break;
+                    case "png":
+                        downloadFile(file_name + ".gif", out, listener, task);
+                        break;
+                    case "gif":
+                        downloadFile(file_name + ".jpeg", out, listener, task);
+                        break;
+                    default:
+                        throw e;
+                }
             }
         }
     }
