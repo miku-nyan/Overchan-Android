@@ -277,12 +277,10 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             attachment.originalName = object.optString("filename", "") + ext;
             attachment.isSpoiler = isSpoiler;
             String tim = object.optString("tim", "");
-            String thumbLocation = tim.length() == 64 ? "/file_store/thumb/" : "/" + boardName + "/thumb/";
-            String fileLocation = tim.length() == 64 ? "/file_store/" : "/" + boardName + "/src/";
             if (tim.length() > 0) {
                 attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
-                    (thumbLocation + tim + ".jpg");
-                attachment.path = fileLocation + tim + ext;
+                        ("/" + boardName + "/thumb/" + tim + ".jpg");
+                attachment.path = "/" + boardName + "/src/" + tim + ext;
                 return attachment;
             }
         }

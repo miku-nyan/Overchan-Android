@@ -46,6 +46,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractVichanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
@@ -256,6 +257,28 @@ public class InfinityModule extends AbstractVichanModule {
             model.comment = model.comment.replaceAll("<br />$", "");
         } catch (Exception e) {}
         return model;
+    }
+    
+    @Override
+    protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+        AttachmentModel attachment = super.mapAttachment(object, boardName, isSpoiler);
+        String ext = object.optString("ext", "");
+        if (attachment != null) {
+            String tim = object.optString("tim", "");
+            String thumbLocation = tim.length() == 64 ? "/file_store/thumb/" : "/" + boardName + "/thumb/";
+            String fileLocation = tim.length() == 64 ? "/file_store/" : "/" + boardName + "/src/";
+            if (tim.length() > 0) {
+                if(tim.length()!=64 || (tim.length() == 64 && attachment.type == AttachmentModel.TYPE_VIDEO)){
+                    ext = ".jpg";
+                }
+                attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
+                        (thumbLocation + tim + ext);
+                attachment.path = fileLocation + tim + ext;
+
+                return attachment;
+            }
+        }
+        return attachment;
     }
     
     @Override
