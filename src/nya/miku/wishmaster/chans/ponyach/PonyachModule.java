@@ -94,12 +94,9 @@ public class PonyachModule extends AbstractWakabaModule {
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "/b/ - was never good", "", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Жалобы и предложения", "", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tea", "Чайная комната", "", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cafe", "2chru.cafe asylum", "", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "test", "Полигон", "", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "игры", "", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "oc", "Ориджинал контент", "", false),
             //ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r34", "r34", "", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rf", "Убежище", "", true),
         };
     
     private static final String RECAPTCHA_KEY = "6Lfp8AYUAAAAABmsvywGiiNyAIkpymMeZPvLUj30";
@@ -262,7 +259,7 @@ public class PonyachModule extends AbstractWakabaModule {
                 if (ch == dateFilter[curDatePos]) {
                     ++curDatePos;
                     if (curDatePos == dateFilter.length) {
-                        parseDate(readUntilSequence("</span>".toCharArray()).trim());
+                        parsePonyachDate(readUntilSequence("</span>".toCharArray()).trim());
                         curDatePos = 0;
                     }
                 } else {
@@ -281,10 +278,13 @@ public class PonyachModule extends AbstractWakabaModule {
                 }
             }
             @Override
-            protected void parseDate(String date) {
+            protected void parseDate(String date) {} //Turn off false triggering
+            
+            private void parsePonyachDate(String date) {
                 date = date.substring(date.indexOf(' ') + 1);
                 super.parseDate(date);
             }
+            
             private void myParseAttachment(String html) {
                 Matcher aHrefMatcher = aHrefPattern.matcher(html);
                 if (aHrefMatcher.find()) {
