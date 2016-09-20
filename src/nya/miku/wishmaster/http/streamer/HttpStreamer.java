@@ -18,8 +18,6 @@
 
 package nya.miku.wishmaster.http.streamer;
 
-import android.net.Uri;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
