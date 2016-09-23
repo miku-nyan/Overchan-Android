@@ -263,16 +263,17 @@ public class InfinityModule extends AbstractVichanModule {
     protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         AttachmentModel attachment = super.mapAttachment(object, boardName, isSpoiler);
         String ext = object.optString("ext", "");
+        String thumbnail_ext = ext;
         if (attachment != null) {
             String tim = object.optString("tim", "");
             String thumbLocation = tim.length() == 64 ? "/file_store/thumb/" : "/" + boardName + "/thumb/";
             String fileLocation = tim.length() == 64 ? "/file_store/" : "/" + boardName + "/src/";
             if (tim.length() > 0) {
                 if(tim.length()!=64 || (tim.length() == 64 && attachment.type == AttachmentModel.TYPE_VIDEO)){
-                    ext = ".jpg";
+                    thumbnail_ext = ".jpg";
                 }
                 attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
-                        (thumbLocation + tim + ext);
+                        (thumbLocation + tim + thumbnail_ext);
                 attachment.path = fileLocation + tim + ext;
 
                 return attachment;
