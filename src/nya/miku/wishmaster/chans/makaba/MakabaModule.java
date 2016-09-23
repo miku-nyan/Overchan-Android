@@ -169,6 +169,10 @@ public class MakabaModule extends CloudflareChanModule {
         mobileAPIPref.setDefaultValue(true);
         group.addPreference(mobileAPIPref);
     }
+
+    public boolean getCaptchaAutoUpdatePreference(){
+        return preferences.getBoolean(getSharedKey(PREF_KEY_CAPTCHA_AUTO_UPDATE), false);
+    }
     
     /** Добавить категорию настроек домена (в т.ч. https) */
     private void addDomainPreferences(PreferenceGroup group) {
@@ -212,6 +216,7 @@ public class MakabaModule extends CloudflareChanModule {
     public void addPreferencesOnScreen(final PreferenceGroup preferenceScreen) {
         addMobileAPIPreference(preferenceScreen);
         addCloudflareRecaptchaFallbackPreference(preferenceScreen);
+        addCaptchaAutoUpdatePreference(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
     }

@@ -81,7 +81,12 @@ public class PageLoaderFromChan implements Runnable {
                     page.threads = catalog;
                     break;
                 case UrlPageModel.TYPE_SEARCHPAGE:
-                    PostModel[] searchResult = chan.search(urlPage.boardName, urlPage.searchRequest, null, task);
+                    PostModel[] searchResult = null;
+                    try {
+                        searchResult = chan.search(urlPage.boardName, urlPage.searchRequest, urlPage.boardPage, null, task);
+                    } catch (UnsupportedOperationException e) {
+                        searchResult = chan.search(urlPage.boardName, urlPage.searchRequest, null, task);
+                    }
                     page.posts = searchResult;
                     break;
                 default:

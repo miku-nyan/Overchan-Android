@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.util.URLPathEncoder;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
@@ -105,6 +106,13 @@ public class HttpStreamer {
      */
     public HttpResponseModel getFromUrl(String url, HttpRequestModel requestModel, HttpClient httpClient, ProgressListener listener,
             CancellableTask task) throws HttpRequestException {
+        String uri = url;
+        try {
+            uri = new URLPathEncoder().encode(url);
+        } catch (Exception e) {
+            Logger.e(TAG, e.getMessage());
+        }
+
         if (requestModel == null) requestModel = HttpRequestModel.DEFAULT_GET;
         
         //подготавливаем Request
@@ -118,10 +126,10 @@ public class HttpStreamer {
             RequestBuilder requestBuilder = null;
             switch (requestModel.method) {
                 case HttpRequestModel.METHOD_GET:
-                    requestBuilder = RequestBuilder.get().setUri(url);
+                    requestBuilder = RequestBuilder.get().setUri(uri);
                     break;
                 case HttpRequestModel.METHOD_POST:
-                    requestBuilder = RequestBuilder.post().setUri(url).setEntity(requestModel.postEntity);
+                    requestBuilder = RequestBuilder.post().setUri(uri).setEntity(requestModel.postEntity);
                     break;
                 default:
                     throw new IllegalArgumentException("Incorrect type of HTTP Request");
@@ -133,8 +141,8 @@ public class HttpStreamer {
             }
             if (requestModel.checkIfModified && requestModel.method == HttpRequestModel.METHOD_GET) {
                 synchronized (ifModifiedMap) {
-                    if (ifModifiedMap.containsKey(url)) {
-                        requestBuilder.addHeader(new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE, ifModifiedMap.get(url)));
+                    if (ifModifiedMap.containsKey(uri)) {
+                        requestBuilder.addHeader(new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE, ifModifiedMap.get(uri)));
                     }
                 }
             }
@@ -198,7 +206,7 @@ public class HttpStreamer {
             responseModel.response = response;
             if (lastModifiedValue != null) {
                 synchronized (ifModifiedMap) {
-                    ifModifiedMap.put(url, lastModifiedValue);
+                    ifModifiedMap.put(uri, lastModifiedValue);
                 }
             }
         } catch (Exception e) {

@@ -414,7 +414,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         
         imagesDownloadExecutor.shutdown();
         
-        dialogs.onDestroyFragment(tabModel.id);
+        if (tabModel != null) dialogs.onDestroyFragment(tabModel.id);
     }
     
     private void saveHistory() {
@@ -1088,7 +1088,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         errorView.setVisibility(View.GONE);
         pullableLayout.setVisibility(View.VISIBLE);
         catalogBarView.setVisibility(tabModel.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE ? View.VISIBLE : View.GONE);
-        navigationBarView.setVisibility(tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE ? View.VISIBLE : View.GONE);
+        navigationBarView.setVisibility((tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE) || ((tabModel.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE) && presentationModel.source.boardModel.searchPagination) ? View.VISIBLE : View.GONE);
         searchBarView.setVisibility(View.GONE);
         setNavigationCatalogBar();
     }
@@ -2533,7 +2533,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     private void setNavigationCatalogBar() {
         if (presentationModel == null) return;
-        if (tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE) {
+        if ((tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE) || (tabModel.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE)) {
             View.OnClickListener navigationBarOnClickListener = new NavigationBarOnClickListener(this);
             for (int id : new int[] {R.id.board_navigation_previous, R.id.board_navigation_next, R.id.board_navigation_page }) {
                 navigationBarView.findViewById(id).setOnClickListener(navigationBarOnClickListener);
@@ -2565,7 +2565,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         @Override
         public void onClick(View v) {
             final UrlPageModel model = new UrlPageModel();
-            model.type = UrlPageModel.TYPE_BOARDPAGE;
+            model.type = fragmentRef.get().tabModel.pageModel.type;//UrlPageModel.TYPE_BOARDPAGE;
+            if (model.type == UrlPageModel.TYPE_SEARCHPAGE)
+                model.searchRequest = fragmentRef.get().tabModel.pageModel.searchRequest;
             model.chanName = fragmentRef.get().chan.getChanName();
             model.boardName = fragmentRef.get().tabModel.pageModel.boardName;
             switch (v.getId()) {
@@ -2703,6 +2705,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         model.type = UrlPageModel.TYPE_SEARCHPAGE;
                         model.boardName = tabModel.pageModel.boardName;
                         model.searchRequest = field.getText().toString();
+                        model.boardPage = presentationModel.source.boardModel.firstPage;
                         UrlHandler.open(model, activity);
                     } else {
                         int highlightColor = ThemeUtils.getThemeColor(activity.getTheme(), R.attr.searchHighlightBackground, Color.RED);
