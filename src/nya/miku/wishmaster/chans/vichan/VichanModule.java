@@ -132,19 +132,6 @@ public class VichanModule extends AbstractVichanModule {
     }
     
     @Override
-    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
-        try {
-            super.downloadFile(url, out, listener, task);
-        } catch (HttpWrongStatusCodeException e) {
-            if (url.contains("/thumb/") && url.endsWith(".jpg") && e.getStatusCode() == 404) {
-                super.downloadFile(url.substring(0, url.length() - 3) + "gif", out, listener, task);
-            } else {
-                throw e;
-            }
-        }
-    }
-    
-    @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         return super.parseUrl(url.replaceAll("-\\w+.*html", ".html"));
     }

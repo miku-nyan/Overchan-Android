@@ -31,10 +31,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.tuple.Pair;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpHeaders;
-import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.cookie.Cookie;
 import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
@@ -42,15 +40,11 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -59,11 +53,6 @@ import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.InputFilter;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Toast;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractWakabaModule;
@@ -80,18 +69,15 @@ import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
-import nya.miku.wishmaster.common.Logger;
-import nya.miku.wishmaster.common.MainApplication;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.streamer.HttpRequestException;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
 @SuppressLint("SimpleDateFormat")
 public class PonyachModule extends AbstractWakabaModule {
-    private static final String TAG = "PonyachModule";
     private static final String CHAN_NAME = "ponyach";
     private static final String DEFAULT_DOMAIN = "ponyach.ru";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, "ponychan.ru", "ponya.ch", "ponyach.cf", "ponyach.ga", "ponyach.ml" };
@@ -108,19 +94,16 @@ public class PonyachModule extends AbstractWakabaModule {
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "/b/ - was never good", "", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Жалобы и предложения", "", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tea", "Чайная комната", "", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cafe", "2chru.cafe asylum", "", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "test", "Полигон", "", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "игры", "", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "oc", "Ориджинал контент", "", false),
             //ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r34", "r34", "", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rf", "Убежище", "", true),
         };
     
+    private static final String RECAPTCHA_KEY = "6Lfp8AYUAAAAABmsvywGiiNyAIkpymMeZPvLUj30";
+    
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
-    private static final String PREF_KEY_CAPTCHA_LEVEL = "PREF_KEY_CAPTCHA_LEVEL";
     private static final String PREF_KEY_PHPSESSION_COOKIE = "PREF_KEY_PHPSESSION_COOKIE";
     private static final String PHPSESSION_COOKIE_NAME = "PHPSESSID";
-    private static final String CAPTCHATYPE_COOKIE_NAME = "captcha_type";
     
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2[^>]*>(.*?)</h2>", Pattern.DOTALL);
     
@@ -190,15 +173,6 @@ public class PonyachModule extends AbstractWakabaModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         final Context context = preferenceGroup.getContext();
-        ListPreference captchaLevel = new LazyPreferences.ListPreference(context);
-        captchaLevel.setTitle(R.string.ponyach_prefs_captcha);
-        captchaLevel.setDialogTitle(R.string.ponyach_prefs_captcha);
-        captchaLevel.setKey(getSharedKey(PREF_KEY_CAPTCHA_LEVEL));
-        captchaLevel.setEntryValues(new String[] { "3", "2", "1" });
-        captchaLevel.setEntries(new String[] { "Easy", "Easy++", "Medium" });
-        captchaLevel.setDefaultValue("1");
-        preferenceGroup.addPreference(captchaLevel);
-        
         EditTextPreference passcodePref = new EditTextPreference(context);
         passcodePref.setTitle(R.string.ponyach_prefs_passcode);
         passcodePref.setDialogTitle(R.string.ponyach_prefs_passcode);
@@ -266,7 +240,6 @@ public class PonyachModule extends AbstractWakabaModule {
         
         addHttpsPreference(preferenceGroup, useHttpsDefaultValue());
         addProxyPreferences(preferenceGroup);
-        captchaLevel.setSummary(captchaLevel.getEntry());
         domainPref.setSummary(domainPref.getEntry());
     }
     
@@ -286,7 +259,7 @@ public class PonyachModule extends AbstractWakabaModule {
                 if (ch == dateFilter[curDatePos]) {
                     ++curDatePos;
                     if (curDatePos == dateFilter.length) {
-                        parseDate(readUntilSequence("</span>".toCharArray()).trim());
+                        parsePonyachDate(readUntilSequence("</span>".toCharArray()).trim());
                         curDatePos = 0;
                     }
                 } else {
@@ -305,10 +278,13 @@ public class PonyachModule extends AbstractWakabaModule {
                 }
             }
             @Override
-            protected void parseDate(String date) {
+            protected void parseDate(String date) {} //Turn off false triggering
+            
+            private void parsePonyachDate(String date) {
                 date = date.substring(date.indexOf(' ') + 1);
                 super.parseDate(date);
             }
+            
             private void myParseAttachment(String html) {
                 Matcher aHrefMatcher = aHrefPattern.matcher(html);
                 if (aHrefMatcher.find()) {
@@ -408,11 +384,6 @@ public class PonyachModule extends AbstractWakabaModule {
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        if (HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "haikaptcha.php?m=isndn",
-                HttpRequestModel.DEFAULT_GET, httpClient, null, task, false).equals("1")) {
-            throw new HaikuCaptchaException();
-        }
-        
         String url = getUsingUrl() + "board.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("board", model.boardName).
@@ -421,6 +392,15 @@ public class PonyachModule extends AbstractWakabaModule {
                 addString("em", model.sage ? "sage" : model.email).
                 addString("subject", model.subject).
                 addString("message", model.comment);
+        
+        if (HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "recaptchav2.php?c=isnd",
+                HttpRequestModel.DEFAULT_GET, httpClient, null, task, false).equals("1")) {
+            String response = Recaptcha2solved.pop(RECAPTCHA_KEY);
+            if (response == null) {
+                throw Recaptcha2.obtain(getUsingUrl(), RECAPTCHA_KEY, null, CHAN_NAME, false);
+            }
+            postEntityBuilder.addString("g-recaptcha-response", response);
+        }
         
         int filesCount = model.attachments != null ? model.attachments.length : 0;
         for (int i=0; i<filesCount; ++i) postEntityBuilder.addFile("upload[]", model.attachments[i], model.randomHash);
@@ -440,7 +420,7 @@ public class PonyachModule extends AbstractWakabaModule {
                 IOUtils.copyStream(response.stream, output);
                 String htmlResponse = output.toString("UTF-8");
                 Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
-                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1));
+                if (errorMatcher.find()) throw new Exception(errorMatcher.group(1).trim());
                 if (htmlResponse.contains("<strong>Вы забанены</strong>")) throw new Exception("Вы забанены");
             }
             throw new Exception(response.statusCode + " - " + response.statusReason);
@@ -450,198 +430,4 @@ public class PonyachModule extends AbstractWakabaModule {
         }
     }
     
-    private static class HaikuCaptchaException extends InteractiveException {
-        private static final long serialVersionUID = 1L;
-        
-        private static final Pattern IMG_PATTERN = Pattern.compile("<img(.*?)>");
-        private static final Pattern SRC_PATTERN = Pattern.compile("src=\"(.*?)\"");
-        private static final Pattern HAIKU_PATTERN = Pattern.compile("onclick=\"haiku\\('(.*?)'\\);\"");
-        
-        @Override
-        public String getServiceName() {
-            return "Haiku Captcha";
-        }
-        
-        private Bitmap getBitmap(String url, CancellableTask task) throws HttpRequestException {
-            PonyachModule thisModule = ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME));
-            String baseUrl = thisModule.getUsingUrl();
-            if (url.startsWith("/")) url = baseUrl + url.substring(1);
-            HttpClient httpClient = thisModule.httpClient;
-            HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
-            HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(url, requestModel, httpClient, null, task);
-            try {
-                InputStream imageStream = responseModel.stream;
-                return BitmapFactory.decodeStream(imageStream);
-            } finally {
-                responseModel.release();
-            }
-        }
-        
-        private void setCaptchaTypeCookie() {
-            PonyachModule thisModule = ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME));
-            String level = thisModule.preferences.getString(thisModule.getSharedKey(PREF_KEY_CAPTCHA_LEVEL), "1");
-            BasicClientCookie cookie = new BasicClientCookie(CAPTCHATYPE_COOKIE_NAME, level);
-            cookie.setDomain(thisModule.getUsingDomain());
-            thisModule.httpClient.getCookieStore().addCookie(cookie);
-        }
-        
-        @Override
-        public void handle(final Activity activity, final CancellableTask task, final Callback callback) {
-            try {
-                setCaptchaTypeCookie();
-                String haiku = HttpStreamer.getInstance().getStringFromUrl(
-                        ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).getUsingUrl() + "haikaptcha.php?m=get",
-                        HttpRequestModel.DEFAULT_GET,
-                        ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).httpClient,
-                        null, task, false);
-                //Logger.d(TAG, "haiku response: " + haiku);
-                if (task.isCancelled()) throw new Exception();
-                String captcha = null;
-                final List<Pair<String, String>> answers = new ArrayList<>();
-                Matcher imgMatcher = IMG_PATTERN.matcher(haiku);
-                while (imgMatcher.find()) {
-                    String img = imgMatcher.group(1);
-                    Matcher srcMatcher = SRC_PATTERN.matcher(img);
-                    if (srcMatcher.find()) {
-                        String src = srcMatcher.group(1);
-                        if (img.contains("onclick=\"haiku()\"")) {
-                            captcha = src;
-                        } else {
-                            Matcher haikuMatcher = HAIKU_PATTERN.matcher(img);
-                            if (haikuMatcher.find()) {
-                                answers.add(Pair.of(src, haikuMatcher.group(1)));
-                            }
-                        }
-                    }
-                }
-                if (captcha == null || answers.isEmpty()) throw new Exception();
-                
-                final Bitmap captchaBmp = getBitmap(captcha, task);
-                if (task.isCancelled()) throw new Exception();
-                final Bitmap[] answersBmp = new Bitmap[answers.size()];
-                for (int i=0; i<answersBmp.length; ++i) {
-                    answersBmp[i] = getBitmap(answers.get(i).getLeft(), task);
-                    if (task.isCancelled()) throw new Exception();
-                }
-                
-                activity.runOnUiThread(new Runnable() {
-                    @SuppressLint("InlinedApi")
-                    @Override
-                    public void run() {
-                        final Dialog dialog = new Dialog(activity);
-                        
-                        LinearLayout mainLayout = new LinearLayout(activity);
-                        mainLayout.setOrientation(LinearLayout.VERTICAL);
-                        final ImageView captchaView = new ImageView(activity);
-                        captchaView.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        captchaView.setImageBitmap(captchaBmp);
-                        captchaView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                                if (task.isCancelled()) return;
-                                Async.runAsync(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        handle(activity, task, callback);
-                                    }
-                                });
-                            }
-                        });
-                        mainLayout.addView(captchaView);
-                        
-                        LinearLayout answersLayout = new LinearLayout(activity);
-                        answersLayout.setOrientation(LinearLayout.HORIZONTAL);
-                        answersLayout.setWeightSum(answersBmp.length);
-                        answersLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        for (int i=0; i<answersBmp.length; ++i) {
-                            ImageView answer = new ImageView(activity);
-                            answer.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-                            answer.setBackgroundColor(Color.WHITE);
-                            answer.setImageBitmap(answersBmp[i]);
-                            answer.setTag(answers.get(i).getRight());
-                            answer.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(final View v) {
-                                    dialog.dismiss();
-                                    if (task.isCancelled()) return;
-                                    Async.runAsync(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            String checkUrl = ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).getUsingUrl() +
-                                                    "haikaptcha.php?m=chk&a=" + (String)v.getTag();
-                                            HttpRequestModel request = HttpRequestModel.DEFAULT_GET;
-                                            String response = null;
-                                            try {
-                                                response = HttpStreamer.getInstance().getStringFromUrl(checkUrl, request,
-                                                        ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).httpClient,
-                                                        null, task, false);
-                                            } catch (Exception e) {
-                                                Logger.e(TAG, e);
-                                            }
-                                            if (task.isCancelled()) return;
-                                            try {
-                                                if (response != null) {
-                                                    Matcher m = Pattern.compile("haiku_wait\\((\\d+)\\)").matcher(response);
-                                                    if (m.find()) {
-                                                        Integer time = Integer.parseInt(m.group(1));
-                                                        Logger.d(TAG, "incorrect");
-                                                        Logger.d(TAG, "response: " + response);
-                                                        Logger.d(TAG, "waiting " + time + " seconds");
-                                                        Thread.sleep(time * 1000);
-                                                        throw new Exception("try again");
-                                                    }
-                                                    ((PonyachModule) MainApplication.getInstance().getChanModule(CHAN_NAME)).savePhpCookies();
-                                                    activity.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            callback.onSuccess();
-                                                        }
-                                                    });
-                                                } else throw new Exception("response == null");
-                                            } catch (Exception e) {
-                                                Logger.e(TAG, e);
-                                                if (task.isCancelled()) return;
-                                                handle(activity, task, callback);
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                            answersLayout.addView(answer);
-                        }
-                        mainLayout.addView(answersLayout);
-                        
-                        ScrollView dlgLayout = new ScrollView(activity);
-                        dlgLayout.addView(mainLayout);
-                        
-                        dialog.setTitle("Haiku Captcha");
-                        dialog.setContentView(dlgLayout);
-                        dialog.setCanceledOnTouchOutside(false);
-                        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialog) {
-                                if (!task.isCancelled()) callback.onError("Cancelled");
-                            }
-                        });
-                        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                        dialog.show();
-                    }
-                });
-                
-            } catch (Exception e) {
-                Logger.e(TAG, e);
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onError("Error");
-                    }
-                });
-            }
-            
-        }
-        
-    }
 }

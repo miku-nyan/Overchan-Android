@@ -44,7 +44,10 @@ public class Chan76Module extends AbstractVichanModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "new", "Current Events", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r7k", "Robot 7600", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Aneemay", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sp", "Sports", null, false)
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sp", "Sports", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Hobbies", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lounge", "Comfy", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tv", "TEE VEE", null, false)
     };
     
     public Chan76Module(SharedPreferences preferences, Resources resources) {
@@ -72,13 +75,8 @@ public class Chan76Module extends AbstractVichanModule {
     }
     
     @Override
-    protected boolean canHttps() {
+    protected boolean useHttps() {
         return true;
-    }
-    
-    @Override
-    protected boolean useHttpsDefaultValue() {
-        return false;
     }
     
     @Override
