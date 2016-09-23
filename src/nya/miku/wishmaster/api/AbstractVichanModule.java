@@ -61,7 +61,6 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
-import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
