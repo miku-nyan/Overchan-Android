@@ -105,7 +105,8 @@ public class InfinityPlModule extends InfinityModule {
                 HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setCustomHeaders(customHeaders).setNoRedirect(true).build();
         JSONObject json = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, listener, task, false);
         if (json.has("error")) {
-            String error = json.getString("error");
+            String error = json.optString("error");
+            if (error.equals("true") && json.optBoolean("banned")) throw new Exception("You are banned! ;_;");
             if (error.contains("To post on 8chan over Tor, you must use the hidden service for security reasons."))
                 throw new Exception("To post on 8chan over Tor, you must use the onion domain.");
             throw new Exception(error);
