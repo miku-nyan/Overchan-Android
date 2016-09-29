@@ -155,12 +155,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             JSONArray curArray = response.getJSONObject(i).getJSONArray("threads");
             for (int j=0, clen=curArray.length(); j<clen; ++j) {
                 JSONObject curThreadJson = curArray.getJSONObject(j);
-                ThreadModel curThread = new ThreadModel();
-                curThread.threadNumber = Long.toString(curThreadJson.getLong("no"));
-                curThread.postsCount = curThreadJson.optInt("replies", -2) + 1;
-                curThread.attachmentsCount = curThreadJson.optInt("images", -2) + 1;
-                curThread.isSticky = curThreadJson.optInt("sticky") == 1;
-                curThread.isClosed = curThreadJson.optInt("closed") == 1;
+                ThreadModel curThread = mapThreadModel(curThreadJson, boardName);
                 curThread.posts = new PostModel[] { mapPostModel(curThreadJson, boardName) };
                 threads.add(curThread);
             }
