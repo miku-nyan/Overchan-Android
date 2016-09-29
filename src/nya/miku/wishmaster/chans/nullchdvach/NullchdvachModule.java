@@ -157,7 +157,7 @@ public class NullchdvachModule extends AbstractWakabaModule {
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel board = super.getBoard(shortName, listener, task);
         board.defaultUserName = "Аноним";
-        board.timeZoneId = "GMT+3";
+        board.timeZoneId = "GMT+4";
         board.readonlyBoard = false;
         board.requiredFileForNewThread = true;
         board.allowDeletePosts = false;

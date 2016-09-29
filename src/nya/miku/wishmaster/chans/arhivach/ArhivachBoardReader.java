@@ -310,10 +310,10 @@ public class ArhivachBoardReader implements Closeable {
                 month = calendar.get(Calendar.MONTH);
             } else {
                 day = Integer.parseInt(dayString);
-                month = 0;
+                month = MONTH_STRINGS.length - 1;
                 while (!monthString.equalsIgnoreCase(MONTH_STRINGS[month])
-                        && (month < MONTH_STRINGS.length)) {
-                    ++month;
+                        && (month > 0)) {
+                    --month;
                 }
             }
             
@@ -323,9 +323,8 @@ public class ArhivachBoardReader implements Closeable {
                 minute = Integer.parseInt(matcher.group(4));
                 year = calendar.get(Calendar.YEAR);
             } else {
-                int offset = -1 * TimeZone.getDefault().getRawOffset();
-                hour = offset / 3600000;
-                minute = (offset / 60000) % 60;
+                hour = 0;
+                minute = 0;
                 year = Integer.parseInt(yearString);
             }
             
