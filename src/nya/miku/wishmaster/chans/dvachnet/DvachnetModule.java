@@ -30,11 +30,15 @@ import cz.msebera.android.httpclient.HttpHeaders;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
-
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.EditTextPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.InputType;
+import android.text.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractWakabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -58,7 +62,8 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class DvachnetModule extends AbstractWakabaModule {
     
     static final String CHAN_NAME = "dva-ch.net";
-    private static final String DOMAIN = "dva-ch.net";
+    private static final String DEFAULT_DOMAIN = "dva-ch.net";
+    private static final String DOMAINS_HINT = "dva-ch.net, 2ch.rip";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "Обсуждения", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Дискуссии о Два.ч ", "Обсуждения", false),
@@ -115,6 +120,7 @@ public class DvachnetModule extends AbstractWakabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Хентай", "Взрослым", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ho", "Прочий хентай", "Взрослым", true)
     };
+    private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     
     private Map<String, BoardModel> boardsMap = new HashMap<>();
     private String captchaId = "";
@@ -140,7 +146,15 @@ public class DvachnetModule extends AbstractWakabaModule {
     
     @Override
     protected String getUsingDomain() {
-        return DOMAIN;
+        String domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN);
+        return TextUtils.isEmpty(domain) ? DEFAULT_DOMAIN : domain;
+    }
+    
+    @Override
+    protected String[] getAllDomains() {
+        if (!getChanName().equals(CHAN_NAME) || getUsingDomain().equals(DEFAULT_DOMAIN))
+            return super.getAllDomains();
+        return new String[] { DEFAULT_DOMAIN, getUsingDomain() };
     }
     
     @Override
@@ -151,6 +165,25 @@ public class DvachnetModule extends AbstractWakabaModule {
     @Override
     protected boolean canHttps() {
         return true;
+    }
+    
+    private void addDomainPreference(PreferenceGroup group) {
+        Context context = group.getContext();
+        EditTextPreference domainPref = new EditTextPreference(context);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
+        domainPref.getEditText().setHint(DEFAULT_DOMAIN);
+        domainPref.getEditText().setSingleLine();
+        domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        group.addPreference(domainPref);
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addDomainPreference(preferenceGroup);
+        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
