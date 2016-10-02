@@ -75,7 +75,7 @@ public class TumbachModule extends CloudflareChanModule {
             "Node captcha", "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
     private static final String[] CAPTCHA_TYPES_KEYS = new String[] {
             "node-captcha", "recaptcha", "recaptcha-fallback", "recaptchav1" };
-    private static final String CAPTCHA_TYPE_DEFAULT = "recaptcha";
+    private static final String CAPTCHA_TYPE_DEFAULT = "node-captcha";
     
     private static final int CAPTCHA_NODE = 1;
     private static final int CAPTCHA_RECAPTCHA = 2;
