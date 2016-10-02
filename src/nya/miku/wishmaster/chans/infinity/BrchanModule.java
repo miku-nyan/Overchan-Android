@@ -18,6 +18,8 @@
 
 package nya.miku.wishmaster.chans.infinity;
 
+import java.util.regex.Pattern;
+
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -31,8 +33,10 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -42,6 +46,7 @@ public class BrchanModule extends InfinityModule {
     private static final String CHAN_NAME = "brchan.org";
     private static final String DEFAULT_DOMAIN = "brchan.org";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN };
+    private static final Pattern PROTECTED_URL_PATTERN = Pattern.compile("<a[^>]*href=\"https?://privatelink.de/\\?([^\"]*)\"[^>]*>");
     
     public BrchanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -90,6 +95,14 @@ public class BrchanModule extends InfinityModule {
         BoardModel model = super.getBoard(shortName, listener, task);
         if (model.attachmentsMaxCount > 0) model.attachmentsMaxCount = 3;
         model.timeZoneId = "Brazil/East";
+        return model;
+    }
+    
+    
+    @Override
+    protected PostModel mapPostModel(JSONObject object, String boardName) {
+        PostModel model = super.mapPostModel(object, boardName);
+        model.comment = RegexUtils.replaceAll(model.comment, PROTECTED_URL_PATTERN, "<a href=\"$1\">");
         return model;
     }
     
