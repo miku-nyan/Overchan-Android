@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpHeaders;
@@ -121,8 +123,10 @@ public class DvachnetModule extends AbstractWakabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ho", "Прочий хентай", "Взрослым", true)
     };
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
+    private static final Pattern ERROR_PATTERN = Pattern.compile("<h1[^>]*>(.*?)</h1>");
     
     private Map<String, BoardModel> boardsMap = new HashMap<>();
+    
     private String captchaId = "";
     
     public DvachnetModule(SharedPreferences preferences, Resources resources) {
@@ -287,7 +291,8 @@ public class DvachnetModule extends AbstractWakabaModule {
                 addString("comment", model.comment).
                 addString("captcha_id", captchaId).
                 addString("captcha_value", model.captchaAnswer).
-                addString("password", model.password);
+                addString("password", model.password).
+                addString("json", "1");
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("image", model.attachments[0], model.randomHash);
         
@@ -306,21 +311,13 @@ public class DvachnetModule extends AbstractWakabaModule {
                 ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
                 IOUtils.copyStream(response.stream, output);
                 String htmlResponse = output.toString("UTF-8");
-                if (!htmlResponse.contains("<blockquote")) {
-                    int start = htmlResponse.indexOf("<h1 style=\"text-align: center\">");
-                    if (start != -1) {
-                        int end = htmlResponse.indexOf("</h1>", start + 31);
-                        if (end != -1) {
-                            throw new Exception(htmlResponse.substring(start + 31, end).trim());
-                        }
-                    }
-                    start = htmlResponse.indexOf("<h1>");
-                    if (start != -1) {
-                        int end = htmlResponse.indexOf("</h1>", start + 4);
-                        if (end != -1) {
-                            throw new Exception(htmlResponse.substring(start + 4, end).trim());
-                        }
-                    }
+                Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                if (errorMatcher.find()) {
+                    throw new Exception(errorMatcher.group(1).trim());
+                }
+                JSONObject jsonResponse = new JSONObject(htmlResponse);
+                if (jsonResponse.optString("message_title").equalsIgnoreCase("Ошибка")) {
+                    throw new Exception(jsonResponse.optString("message", "Ошибка"));
                 }
             } else throw new Exception(response.statusCode + " - " + response.statusReason);
         } finally {
