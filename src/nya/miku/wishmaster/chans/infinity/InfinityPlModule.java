@@ -37,7 +37,7 @@ public class InfinityPlModule extends InfinityModule {
     private static final String CHAN_NAME = "8ch.pl";
     private static final String DEFAULT_DOMAIN = "8ch.pl";
     private static final String ONION_DOMAIN = "8ch.vichandcxw4gm3wy.onion";
-    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN };
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "vichan.net" };
     
     public InfinityPlModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
