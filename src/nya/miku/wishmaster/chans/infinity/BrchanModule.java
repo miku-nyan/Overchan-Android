@@ -154,6 +154,32 @@ public class BrchanModule extends InfinityModule {
     }
     
     @Override
+    public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "post.php";
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("board", model.boardName));
+        pairs.add(new BasicNameValuePair("delete_" + model.postNumber, "on"));
+        if (model.onlyFiles) pairs.add(new BasicNameValuePair("file", "on"));
+        pairs.add(new BasicNameValuePair("password", model.password));
+        pairs.add(new BasicNameValuePair("delete", "Apagar"));
+        pairs.add(new BasicNameValuePair("reason", ""));
+        pairs.add(new BasicNameValuePair("json_response", "1"));
+        
+        UrlPageModel refererPage = new UrlPageModel();
+        refererPage.type = UrlPageModel.TYPE_THREADPAGE;
+        refererPage.chanName = getChanName();
+        refererPage.boardName = model.boardName;
+        refererPage.threadNumber = model.threadNumber;
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
+        HttpRequestModel request = HttpRequestModel.builder().
+                setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        JSONObject jsonResponse = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, listener, task, false);
+        String error = jsonResponse.optString("error");
+        if (error.length() > 0) throw new Exception(error);
+        return null;
+    }
+    
+    @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         return super.parseUrl(url.replaceAll("\\+\\d+.html", ".html"));
     }
