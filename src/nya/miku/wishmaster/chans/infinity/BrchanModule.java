@@ -64,7 +64,7 @@ public class BrchanModule extends InfinityModule {
     
     @Override
     public Drawable getChanFavicon() {
-        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_cirno, null);
+        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_brchan, null);
     }
     
     @Override
