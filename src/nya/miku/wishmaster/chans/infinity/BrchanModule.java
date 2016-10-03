@@ -18,6 +18,8 @@
 
 package nya.miku.wishmaster.chans.infinity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import android.content.SharedPreferences;
@@ -27,12 +29,16 @@ import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import cz.msebera.android.httpclient.util.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
@@ -97,7 +103,6 @@ public class BrchanModule extends InfinityModule {
         model.timeZoneId = "Brazil/East";
         return model;
     }
-    
     
     @Override
     protected PostModel mapPostModel(JSONObject object, String boardName) {
