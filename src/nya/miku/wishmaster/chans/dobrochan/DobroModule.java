@@ -94,7 +94,7 @@ public class DobroModule extends AbstractChanModule {
     private static final String PREF_KEY_SHOW_CAPTCHA = "PREF_KEY_SHOW_CAPTCHA";
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     private static final String PREF_KEY_HANABIRA_COOKIE = "PREF_KEY_HANABIRA_COOKIE";
-    private static final String HANABIRA_COOKIE_NAME = "hanabira";
+    private static final String HANABIRA_COOKIE_NAME = "hanabira_temp";
     private static final String DEFAULT_DOMAIN = "dobrochan.com";
     
     static final String[] RATINGS = new String[] { "SFW", "R-15", "R-18", "R-18G" };

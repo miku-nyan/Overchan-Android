@@ -18,57 +18,46 @@
 
 package nya.miku.wishmaster.chans.nullchan;
 
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.message.BasicNameValuePair;
+import java.io.ByteArrayOutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.util.TextUtils;
+
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
-import nya.miku.wishmaster.api.models.CaptchaModel;
-import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.chans.infinity.InfinityModule;
+import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.http.streamer.HttpRequestModel;
+import nya.miku.wishmaster.http.streamer.HttpResponseModel;
+import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-@SuppressWarnings("serial")
-@SuppressLint("SimpleDateFormat")
-public class Null_chanModule extends AbstractKusabaModule {
+public class Null_chanModule extends InfinityModule {
     private static final String CHAN_NAME = "0-chan.ru";
     private static final String DOMAIN = "0-chan.ru";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "all", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fur", "Мех", "adult", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "e", "Электроника", "geek", false)
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tmp", "Временное убежище", null, true)
     };
     
-    private static final DateFormat DATE_FORMAT;
-    static {
-        DateFormatSymbols symbols = new DateFormatSymbols();
-        symbols.setMonths(new String[] {
-                "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"});
-        DATE_FORMAT = new SimpleDateFormat("dd MMMM yyyy в HH:mm:ss", symbols) {
-            @Override
-            public Date parse(String date) throws ParseException {
-                date = date.replaceAll("(?:[^\\d]*)(\\d(?:.*))", "$1");
-                return super.parse(date);
-            }
-        };
-    }
+    private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "gif", "png", "webm", "mp4" };
+    
+    private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
     
     public Null_chanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -90,73 +79,139 @@ public class Null_chanModule extends AbstractKusabaModule {
     }
     
     @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addPasswordPreference(preferenceGroup);
+        addProxyPreferences(preferenceGroup);
+    }
+    
+    @Override
+    protected boolean canCloudflare() {
+        return false;
+    }
+    
+    @Override
     protected String getUsingDomain() {
         return DOMAIN;
     }
     
     @Override
-    protected boolean canHttps() {
-        return false;
+    protected String[] getAllDomains() {
+        return new String[] { DOMAIN };
     }
     
     @Override
-    protected SimpleBoardModel[] getBoardsList() {
+    protected boolean useHttps() {
+        return useHttps(false);
+    }
+    
+    @Override
+    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) {
         return BOARDS;
     }
     
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
-        BoardModel model = super.getBoard(shortName, listener, task);
-        model.timeZoneId = "GMT+3";
-        model.defaultUserName = "Аноним";
-        model.requiredFileForNewThread = false;
-        model.allowReport = BoardModel.REPORT_SIMPLE;
-        model.allowEmails = false;
-        return model;
+        //BoardModel board = super.getBoard(shortName, listener, task);
+        SimpleBoardModel simpleModel = getBoardsMap(listener, task).get(shortName);
+        BoardModel board = new BoardModel();
+        board.chan = getChanName();
+        board.boardName = shortName;
+        board.uniqueAttachmentNames = true;
+        board.timeZoneId = "US/Eastern";
+        board.defaultUserName = "Anonymous";
+        board.readonlyBoard = false;
+        board.requiredFileForNewThread = false;
+        board.allowDeletePosts = false;
+        board.allowNames = true;
+        board.allowSubjects = true;
+        board.allowSage = true;
+        board.allowEmails = true;
+        board.ignoreEmailIfSage = true;
+        board.allowCustomMark = true;
+        board.customMarkDescription = "Spoiler";
+        board.allowRandomHash = true;
+        board.allowIcons = false;
+        board.attachmentsFormatFilters = ATTACHMENT_FORMATS;
+        board.markType = BoardModel.MARK_NOMARK;
+        board.firstPage = 1;
+        board.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
+        board.searchAllowed = false;
+        board.catalogAllowed = true;
+        if (simpleModel != null) {
+            board.boardDescription = simpleModel.boardDescription;
+            board.boardCategory = simpleModel.boardCategory;
+            board.nsfw = simpleModel.nsfw;
+        }
+        board.bumpLimit = BoardModel.LAST_PAGE_UNDEFINED;
+        board.attachmentsMaxCount = 1;
+        return board;
     }
     
     @Override
-    protected DateFormat getDateFormat() {
-        return DATE_FORMAT;
-    }
-    
-    @Override
-    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String captchaUrl = getUsingUrl() + "captcha/image.php?" + Math.random();
-        return downloadCaptcha(captchaUrl, listener, task);
-    }
-    
-    @Override
-    protected void setSendPostEntityMain(SendPostModel model, ExtendedMultipartBuilder postEntityBuilder) throws Exception {
-        postEntityBuilder.
-                addString("board", model.boardName).
-                addString("replythread", model.threadNumber == null ? "0" : model.threadNumber);
-        if (model.sage) postEntityBuilder.addString("sage", "on");
-        postEntityBuilder.
-                addString("captcha", model.captchaAnswer).
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
+        String url = getUsingUrl() + "post.php";
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("name", model.name).
+                addString("email", model.sage ? "sage" : model.email).
                 addString("subject", model.subject).
-                addString("message", model.comment);
-        setSendPostEntityAttachments(model, postEntityBuilder);
-        postEntityBuilder.addString("embed", "");
+                addString("body", model.comment).
+                addString("post", model.threadNumber == null ? "New Topic" : "New Reply").
+                addString("board", model.boardName).
+                addString("json_response", "1");
+        if (model.threadNumber != null) postEntityBuilder.addString("thread", model.threadNumber);
+        if (model.custommark) postEntityBuilder.addString("spoiler", "on");
+        postEntityBuilder.addString("password", TextUtils.isEmpty(model.password) ? getDefaultPassword() : model.password);
+        if ((model.attachments != null) && (model.attachments.length > 0)) {
+            postEntityBuilder.addFile("file", model.attachments[0], model.randomHash);
+        }
         
-        postEntityBuilder.
-                addString("postpassword", model.password).
-                addString("gotothread", "checked");
+        UrlPageModel refererPage = new UrlPageModel();
+        refererPage.chanName = getChanName();
+        refererPage.boardName = model.boardName;
+        if (model.threadNumber == null) {
+            refererPage.type = UrlPageModel.TYPE_BOARDPAGE;
+            refererPage.boardPage = UrlPageModel.DEFAULT_FIRST_PAGE;
+        } else {
+            refererPage.type = UrlPageModel.TYPE_THREADPAGE;
+            refererPage.threadNumber = model.threadNumber;
+        }
+        Header[] customHeaders = new Header[] { new BasicHeader(HttpHeaders.REFERER, buildUrl(refererPage)) };
+        HttpRequestModel request =
+                HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setCustomHeaders(customHeaders).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, listener, task);
+            if (response.statusCode == 200) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                if (htmlResponse.contains("banned")) {
+                    throw new Exception("You are banned! ;_;");
+                }
+                JSONObject result = new JSONObject(htmlResponse);
+                if (result.has("error")) {
+                    throw new Exception(result.optString("error"));
+                } else {
+                    String redirect = result.optString("redirect");
+                    if (redirect.length() > 0) return fixRelativeUrl(redirect);
+                    return null;
+                }
+            } else if (response.statusCode == 400) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                if (htmlResponse.contains("<h1>Error</h1>")) {
+                    Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                    if (errorMatcher.find()) {
+                        String error = errorMatcher.group(1);
+                        throw new Exception(error);
+                    }
+                }
+            }
+            throw new Exception(response.statusCode + " - " + response.statusReason);
+        } finally {
+            if (response != null) response.release();
+        }
     }
-    
-    @Override
-    protected List<? extends NameValuePair> getReportFormAllValues(DeletePostModel model) {
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("board", model.boardName));
-        pairs.add(new BasicNameValuePair("post[]", model.postNumber));
-        pairs.add(new BasicNameValuePair("reportpost", "Пожаловаться"));
-        return pairs;
-    }
-    
-    @Override
-    protected String getDeleteFormValue(DeletePostModel model) {
-        return "Удалить";
-    }
-    
 }

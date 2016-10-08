@@ -18,9 +18,12 @@
 
 package nya.miku.wishmaster.chans.ponyach;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -66,6 +69,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.LazyPreferences;
+import nya.miku.wishmaster.api.util.ReplacingReader;
 import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.IOUtils;
@@ -245,7 +249,9 @@ public class PonyachModule extends AbstractWakabaModule {
     
     @Override
     protected WakabaReader getWakabaReader(InputStream stream, UrlPageModel urlModel) {
-        return new WakabaReader(stream, DATE_FORMAT, canCloudflare()) {
+        Reader reader = new ReplacingReader(new BufferedReader(new InputStreamReader(stream)),
+                "<span class=\"unkfunc0\"", "<span class=\"unkfunc\"");
+        return new WakabaReader(reader, DATE_FORMAT, canCloudflare()) {
             private final Pattern aHrefPattern = Pattern.compile("<a\\s+href=\"(.*?)\"", Pattern.DOTALL);
             private final Pattern attachmentSizePattern = Pattern.compile("([\\d\\.]+)[KM]B");
             private final Pattern attachmentPxSizePattern = Pattern.compile("(\\d+)x(\\d+)");
@@ -347,6 +353,7 @@ public class PonyachModule extends AbstractWakabaModule {
             }
             @Override
             protected void postprocessPost(PostModel post) {
+                post.comment = post.comment.replaceAll("<a[^>]*href=\"javascript:.*?</a>", "");
                 post.attachments = myAttachments.toArray(new AttachmentModel[myAttachments.size()]);
                 myAttachments.clear();
             }
