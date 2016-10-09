@@ -62,7 +62,7 @@ public class LampachModule extends AbstractWakabaModule {
     };
     
     private static final Pattern ERROR_PATTERN = Pattern.compile("<div style=[^>]*>(.*?)<");
-    //private static final Pattern REDIRECT_PATTERN = Pattern.compile("url=res/(\\d+)\\.html#(\\d+)");
+    private static final Pattern REDIRECT_PATTERN = Pattern.compile("url=res/(\\d+)\\.html#(\\d+)");
     
     public LampachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -132,7 +132,7 @@ public class LampachModule extends AbstractWakabaModule {
         String url = getUsingUrl() + model.boardName + "/imgboard.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("parent", model.threadNumber != null ? model.threadNumber : "0").
-                addString("email", model.email).
+                addString("email", model.sage ? "sage" : ((TextUtils.isEmpty(model.email)) ? "noko" : model.email)).
                 addString("subject", model.subject).
                 addString("message", model.comment).
                 addString("captcha", TextUtils.isEmpty(model.captchaAnswer) ? "" : model.captchaAnswer).
@@ -150,6 +150,19 @@ public class LampachModule extends AbstractWakabaModule {
                 ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
                 IOUtils.copyStream(response.stream, output);
                 String htmlResponse = output.toString("UTF-8");
+                if (htmlResponse.contains("Updat")) {
+                    Matcher redirectMatcher = REDIRECT_PATTERN.matcher(htmlResponse);
+                    if (redirectMatcher.find()) {
+                        UrlPageModel redirModel = new UrlPageModel();
+                        redirModel.chanName = CHAN_NAME;
+                        redirModel.type = UrlPageModel.TYPE_THREADPAGE;
+                        redirModel.boardName = model.boardName;
+                        redirModel.threadNumber = redirectMatcher.group(1);
+                        redirModel.postNumber = redirectMatcher.group(2);
+                        return buildUrl(redirModel);
+                    }
+                    return null;
+                }
                 Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
                 if (errorMatcher.find()) {
                     throw new Exception(errorMatcher.group(1));
