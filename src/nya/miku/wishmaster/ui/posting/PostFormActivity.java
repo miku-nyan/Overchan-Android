@@ -127,6 +127,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             case R.id.postform_mark_strike:
             case R.id.postform_mark_spoiler:
             case R.id.postform_mark_quote:
+            case R.id.postform_mark_code:
                 try {
                     switch (v.getId()) {
                         case R.id.postform_mark_bold:
@@ -146,6 +147,9 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                             break;
                         case R.id.postform_mark_quote:
                             PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_QUOTE);
+                            break;
+                        case R.id.postform_mark_code:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_CODE);
                             break;
                     }
                 } catch (Exception e) {
@@ -489,6 +493,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_UNDERLINE),
                 PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_STRIKE),
                 PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_SPOILER),
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_CODE),
         };
         if (markupEnabled[0] || markupEnabled[1] || markupEnabled[2] || markupEnabled[3] || markupEnabled[4] || markupEnabled[5]) {
             markLayout.setVisibility(View.VISIBLE);
@@ -498,6 +503,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             if (!markupEnabled[3]) markLayout.findViewById(R.id.postform_mark_underline).setVisibility(View.GONE);
             if (!markupEnabled[4]) markLayout.findViewById(R.id.postform_mark_strike).setVisibility(View.GONE);
             if (!markupEnabled[5]) markLayout.findViewById(R.id.postform_mark_spoiler).setVisibility(View.GONE);
+            if (!markupEnabled[6]) markLayout.findViewById(R.id.postform_mark_code).setVisibility(View.GONE);
         } else {
             markLayout.setVisibility(View.GONE);
         }

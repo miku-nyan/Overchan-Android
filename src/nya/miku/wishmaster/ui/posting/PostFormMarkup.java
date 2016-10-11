@@ -29,12 +29,14 @@ public class PostFormMarkup {
     public static final int FEATURE_STRIKE = 4;
     public static final int FEATURE_SPOILER = 5;
     public static final int FEATURE_QUOTE = 6;
+    //http://wakaba.c3.cx/docs/docs.html#WakabaMark
+    public static final int FEATURE_CODE = 7;
     
     public static boolean hasMarkupFeature(int markType, int feature) {
         switch (markType) {
             case BoardModel.MARK_NOMARK: return false;
-            case BoardModel.MARK_BBCODE: return true;
-            case BoardModel.MARK_4CHAN: return feature != FEATURE_STRIKE;
+            case BoardModel.MARK_BBCODE: return feature != FEATURE_CODE;
+            case BoardModel.MARK_4CHAN: return (feature != FEATURE_STRIKE) && (feature != FEATURE_CODE);
             case BoardModel.MARK_WAKABAMARK: return feature != FEATURE_UNDERLINE;
         }
         return false;
@@ -73,6 +75,10 @@ public class PostFormMarkup {
                     break;
                 case FEATURE_QUOTE:
                     comment.replace(selectionStart, selectionEnd, ">" + text.replace("\n", "\n>"));
+                    break;
+                case FEATURE_CODE:
+                    comment.replace(selectionStart, selectionEnd, "`" + text.replace("`", "``").replace("\n", "`\n`").replace("\n``", "\n") + "`");
+                    commentField.setSelection(selectionStart + 1);
                     break;
             }
         } else if (markType == BoardModel.MARK_BBCODE) {
