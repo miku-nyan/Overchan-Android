@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,6 +90,9 @@ public class DobroModule extends AbstractChanModule {
     private static final List<String> DOMAINS_LIST = Arrays.asList(new String[] { "dobrochan.ru", "dobrochan.com", "dobrochan.org" });
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+    }
     
     private static final String PREF_KEY_MAX_RATING = "PREF_KEY_MAX_RATING";
     private static final String PREF_KEY_SHOW_CAPTCHA = "PREF_KEY_SHOW_CAPTCHA";
