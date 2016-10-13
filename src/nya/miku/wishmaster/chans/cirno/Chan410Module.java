@@ -162,6 +162,37 @@ public class Chan410Module extends AbstractChanModule {
     }
     
     @Override
+    public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
+            throws Exception {
+        UrlPageModel urlModel = new UrlPageModel();
+        urlModel.chanName = CHAN410_NAME;
+        urlModel.type = UrlPageModel.TYPE_CATALOGPAGE;
+        urlModel.boardName = boardName;
+        String url = buildUrl(urlModel);
+        
+        HttpResponseModel responseModel = null;
+        Chan410CatalogReader in = null;
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(oldList != null).build();
+        try {
+            responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
+            if (responseModel.statusCode == 200) {
+                in = new Chan410CatalogReader(responseModel.stream);
+                if (task != null && task.isCancelled()) throw new Exception("interrupted");
+                return in.readPage();
+            } else {
+                if (responseModel.notModified()) return oldList;
+                throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
+            }
+        } catch (Exception e) {
+            if (responseModel != null) HttpStreamer.getInstance().removeFromModifiedMap(url);
+            throw e;
+        } finally {
+            IOUtils.closeQuietly(in);
+            if (responseModel != null) responseModel.release();
+        }
+    }
+    
+    @Override
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
         UrlPageModel urlModel = new UrlPageModel();
@@ -273,12 +304,19 @@ public class Chan410Module extends AbstractChanModule {
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN410_NAME)) throw new IllegalArgumentException("wrong chan");
+        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return CHAN410_URL + model.boardName + "/catalog.html";
         return WakabaUtils.buildUrl(model, CHAN410_URL);
     }
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return WakabaUtils.parseUrl(url, CHAN410_NAME, CHAN410_DOMAIN);
+        UrlPageModel model = WakabaUtils.parseUrl(url, CHAN410_NAME, CHAN410_DOMAIN);
+        if (model.type == UrlPageModel.TYPE_OTHERPAGE && model.otherPath != null && model.otherPath.endsWith("/catalog.html")) {
+            model.type = UrlPageModel.TYPE_CATALOGPAGE;
+            model.boardName = model.otherPath.substring(0, model.otherPath.length() - 13);
+            model.otherPath = null;
+        }
+        return model;
     }
     
 }

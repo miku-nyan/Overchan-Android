@@ -108,6 +108,7 @@ public class Chan410Boards {
         
         model.firstPage = 0;
         model.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
+        model.catalogAllowed = !name.equals("d");
         return model;
     }
 }
