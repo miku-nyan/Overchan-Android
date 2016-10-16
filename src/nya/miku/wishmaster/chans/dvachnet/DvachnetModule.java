@@ -64,8 +64,9 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class DvachnetModule extends AbstractWakabaModule {
     
     static final String CHAN_NAME = "dva-ch.net";
-    private static final String DEFAULT_DOMAIN = "dva-ch.net";
-    private static final String DOMAINS_HINT = "dva-ch.net, 2ch.rip";
+    private static final String DEFAULT_DOMAIN = "dva-ch.com";
+    private static final String DOMAINS_HINT = "dva-ch.com, 2ch.rip";
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, "2ch.rip" };
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "Обсуждения", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Дискуссии о Два.ч ", "Обсуждения", false),
@@ -140,7 +141,7 @@ public class DvachnetModule extends AbstractWakabaModule {
     
     @Override
     public String getDisplayingName() {
-        return "Два.ч (dva-ch.net)";
+        return "Два.ч (dva-ch.com)";
     }
     
     @Override
@@ -156,9 +157,12 @@ public class DvachnetModule extends AbstractWakabaModule {
     
     @Override
     protected String[] getAllDomains() {
-        if (!getChanName().equals(CHAN_NAME) || getUsingDomain().equals(DEFAULT_DOMAIN))
-            return super.getAllDomains();
-        return new String[] { DEFAULT_DOMAIN, getUsingDomain() };
+        String domain = getUsingDomain();
+        for (String d : DOMAINS) if (domain.equals(d)) return DOMAINS;
+        String[] domains = new String[DOMAINS.length + 1];
+        for (int i=0; i<DOMAINS.length; ++i) domains[i] = DOMAINS[i];
+        domains[DOMAINS.length] = domain;
+        return domains;
     }
     
     @Override
