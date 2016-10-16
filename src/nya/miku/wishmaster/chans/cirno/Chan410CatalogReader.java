@@ -45,7 +45,8 @@ public class Chan410CatalogReader implements Closeable {
     private static final int FILTER_SUBJECT = 2;
     private static final int FILTER_COMMENT = 3;
     private static final int FILTER_OMITTED = 4;
-    private static final int FILTER_END = 5;
+    private static final int FILTER_STATUS = 5;
+    private static final int FILTER_END = 6;
     
     public static final char[][] FILTERS_OPEN = {
         "<a href=\"".toCharArray(),
@@ -53,6 +54,7 @@ public class Chan410CatalogReader implements Closeable {
         "<span class=\"catalogsubject\">".toCharArray(),
         "<span class=\"catalogmsg\">".toCharArray(),
         "<span class=\"catalogposts\">".toCharArray(),
+        "<div class=\"catalogthread".toCharArray(),
         "</a>".toCharArray()
     };
     
@@ -62,6 +64,7 @@ public class Chan410CatalogReader implements Closeable {
         "</span>".toCharArray(),
         "</span>".toCharArray(),
         "</span>".toCharArray(),
+        "\"".toCharArray(),
         null
     };
     
@@ -164,6 +167,11 @@ public class Chan410CatalogReader implements Closeable {
                     postsOmitted = Integer.parseInt(readUntilSequence(FILTERS_CLOSE[filterIndex]));
                 } catch(NumberFormatException e) {}
                 if (postsOmitted > 0) currentThread.postsCount = 1 + postsOmitted;
+                break;
+            case FILTER_STATUS:
+                String status = readUntilSequence(FILTERS_CLOSE[filterIndex]);
+                if (status.contains("closed")) currentThread.isClosed = true;
+                if (status.contains("sticked")) currentThread.isSticky = true;
                 break;
             case FILTER_END:
                 finalizeThread();
