@@ -145,6 +145,36 @@ public class Database {
         return result;
     }
     
+    public static class HiddenEntry {
+        public final String chan;
+        public final String board;
+        public final String thread;
+        public final String post;
+        public HiddenEntry(String chan, String board, String thread, String post) {
+            this.chan = chan;
+            this.board = board;
+            this.thread = thread;
+            this.post = post;
+        }
+    }
+
+    public List<HiddenEntry> getHidden() {
+        List<HiddenEntry> list = new ArrayList<HiddenEntry>();
+        Cursor c = dbHelper.getReadableDatabase().query(TABLE_HIDDEN, null, null, null, null, null, null, null);
+        if (c != null && c.moveToFirst()) {
+            int chanIndex = c.getColumnIndex(COL_CHAN);
+            int boardIndex = c.getColumnIndex(COL_BOARD);
+            int threadIndex = c.getColumnIndex(COL_THREAD);
+            int postIndex = c.getColumnIndex(COL_POST);
+            do {
+                list.add(new HiddenEntry(c.getString(chanIndex), c.getString(boardIndex),
+                        c.getString(threadIndex), c.getString(postIndex)));
+            } while (c.moveToNext());
+        }
+        if (c != null) c.close();
+        return list;
+    }
+
     /* *********************** HISTORY *********************** */
     
     public static class HistoryEntry {
@@ -167,6 +197,10 @@ public class Database {
     }
     
     public void addHistory(String chan, String board, String boardPage, String thread, String title, String url) {
+        addHistory(chan, board, boardPage, thread, title, url, System.currentTimeMillis());
+    }
+
+    public void addHistory(String chan, String board, String boardPage, String thread, String title, String url, Long date) {
         removeHistory(chan, board, boardPage, thread);
         ContentValues values = new ContentValues(6);
         values.put(COL_CHAN, fixNull(chan));
@@ -175,7 +209,7 @@ public class Database {
         values.put(COL_THREAD, fixNull(thread));
         values.put(COL_TITLE, fixNull(title));
         values.put(COL_URL, fixNull(url));
-        values.put(COL_DATE, System.currentTimeMillis());
+        values.put(COL_DATE, date);
         dbHelper.getWritableDatabase().insert(TABLE_HISTORY, null, values);
     }
     
