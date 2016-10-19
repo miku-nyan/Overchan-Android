@@ -260,13 +260,6 @@ public class InfinityModule extends AbstractVichanModule {
     }
     
     @Override
-    protected ThreadModel mapThreadModel(JSONObject opPost, String boardName) {
-        ThreadModel model = super.mapThreadModel(opPost, boardName);
-        model.isClosed = opPost.optInt("locked") == 1;
-        return model;
-    }
-    
-    @Override
     protected PostModel mapPostModel(JSONObject object, String boardName) {
         PostModel model = super.mapPostModel(object, boardName);
         try {
