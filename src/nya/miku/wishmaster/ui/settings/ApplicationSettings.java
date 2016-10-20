@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.ui.settings;
 
 import java.io.File;
+import java.util.Map;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
@@ -479,5 +480,10 @@ public class ApplicationSettings {
         container.hideActionBar = hideActionBar();
         container.scrollVolumeButtons = scrollVolumeButtons();
     }
-    
+
+    public Map<String, ?> getSharedPreferences(){
+        Map<String, ?> preferencesMap = preferences.getAll();
+        return preferencesMap;
+    }
+
 }
