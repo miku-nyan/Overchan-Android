@@ -19,6 +19,8 @@
 package nya.miku.wishmaster.chans.infinity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +75,8 @@ public class InfinityModule extends AbstractVichanModule {
     
     private static final String CHAN_NAME = "8chan";
     private static final String DEFAULT_DOMAIN = "8ch.net";
+    private static final String MEDIA_DOMAIN = "media.8ch.net";
+    private static final String MEDIA2_DOMAIN = "media2.8ch.net";
     private static final String ONION_DOMAIN = "oxwugzccvk3dk6tj.onion";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "8chan.co" };
     
@@ -282,11 +286,36 @@ public class InfinityModule extends AbstractVichanModule {
                 attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
                         (thumbLocation + tim + thumbnail_ext);
                 attachment.path = fileLocation + tim + ext;
-
+                if (getUsingDomain().equals(DEFAULT_DOMAIN)){
+                    attachment.thumbnail = fixRelativeUrl(attachment.thumbnail).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                    attachment.path = fixRelativeUrl(attachment.path).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                }
                 return attachment;
             }
         }
         return attachment;
+    }
+
+    @Override
+    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
+        String fixedUrl = fixRelativeUrl(url);
+        URL mURL = new URL(fixedUrl);
+        try {
+            super.downloadFile(fixedUrl, out, listener, task);
+        } catch (HttpWrongStatusCodeException e) {
+            if ((url.contains("/file_store/") || url.contains("/src/")) && e.getStatusCode() == 404) {
+                switch (mURL.getHost()){
+                    case MEDIA_DOMAIN:
+                        downloadFile(fixedUrl.replaceFirst(MEDIA_DOMAIN, MEDIA2_DOMAIN), out, listener, task);
+                        break;
+                    case MEDIA2_DOMAIN:
+                        downloadFile(fixedUrl.replaceFirst(MEDIA2_DOMAIN, DEFAULT_DOMAIN), out, listener, task);
+                        break;
+                    default:
+                        throw e;
+                }
+            }
+        }
     }
     
     @Override
