@@ -201,6 +201,23 @@ public class Subscriptions {
         return Arrays.asList(comment.replaceAll("[\\*%_]", "").replaceAll("\\[[^\\]]*\\]", "").replaceAll("[^\\w\\d\\s]", " ").trim().split("\\s+"));
     }
     
+    public static class SubscriptionEntry {
+        public final String chan;
+        public final String board;
+        public final String thread;
+        public final String post;
+        public SubscriptionEntry(String chan, String board, String thread, String post) {
+            this.chan = chan;
+            this.board = board;
+            this.thread = thread;
+            this.post = post;
+        }
+    }
+
+    public List<SubscriptionEntry> getSubscriptions() {
+        return database.getSubscriptions();
+    }
+
     private static class SubscriptionsDB {
         private static final int DB_VERSION = 1000;
         private static final String DB_NAME = "subscriptions.db";
@@ -265,6 +282,23 @@ public class Subscriptions {
             }
             if (c != null) c.close();
             return result;
+        }
+        
+        public List<SubscriptionEntry> getSubscriptions() {
+            List<SubscriptionEntry> list = new ArrayList<SubscriptionEntry>();
+            Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, null, null, null, null, null, null);
+            if (c != null && c.moveToFirst()) {
+                int chanIndex = c.getColumnIndex(COL_CHAN);
+                int boardIndex = c.getColumnIndex(COL_BOARD);
+                int threadIndex = c.getColumnIndex(COL_THREAD);
+                int postIndex = c.getColumnIndex(COL_POST);
+                do {
+                    list.add(new SubscriptionEntry(c.getString(chanIndex), c.getString(boardIndex),
+                            c.getString(threadIndex), c.getString(postIndex)));
+                } while (c.moveToNext());
+            }
+            if (c != null) c.close();
+            return list;
         }
         
         public void resetDB() {
