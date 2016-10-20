@@ -96,7 +96,7 @@ public class AllchanModule extends CloudflareChanModule {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); }
     
-    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=\"quotation\">", Pattern.LITERAL);
+    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=['\"]quotation['\"]>");
     
     private HashMap<String, BoardModel> boardsMap;
     
