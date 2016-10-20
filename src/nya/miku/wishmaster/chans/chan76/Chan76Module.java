@@ -88,6 +88,7 @@ public class Chan76Module extends AbstractVichanModule {
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
         model.bumpLimit = 250;
+        model.attachmentsMaxCount = 5;
         model.allowCustomMark = true;
         model.customMarkDescription = "Spoiler";
         return model;

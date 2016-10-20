@@ -74,8 +74,9 @@ import android.content.res.Resources;
 public abstract class AbstractVichanModule extends AbstractWakabaModule {
     private static final Pattern ATTACHMENT_EMBEDDED_LINK = Pattern.compile("<a[^>]*href=\"([^\">]*)\"[^>]*>");
     private static final Pattern ATTACHMENT_EMBEDDED_THUMB = Pattern.compile("<img[^>]*src=\"([^\">]*)\"[^>]*>");
-    
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
+    
+    private static final String[] ATTACHMENT_KEYS = new String[] { "file", "file2", "file3", "file4", "file5" };
     
     public AbstractVichanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -313,8 +314,10 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
                 default: val = pair.getValue();
             }
             if (pair.getKey().equals("file")) {
-                if (model.attachments != null && model.attachments.length > 0) {
-                    postEntityBuilder.addFile(pair.getKey(), model.attachments[0], model.randomHash);
+                if (model.attachments != null) {
+                    for (int i=0; i<model.attachments.length && i<ATTACHMENT_KEYS.length; ++i) {
+                        postEntityBuilder.addFile(ATTACHMENT_KEYS[i], model.attachments[i], model.randomHash);
+                    }
                 } else {
                     postEntityBuilder.addPart(pair.getKey(), new ByteArrayBody(new byte[0], ""));
                 }
