@@ -40,6 +40,7 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class Subscriptions {
     private static final String TAG = "Subscriptions";
@@ -206,12 +207,44 @@ public class Subscriptions {
         public final String board;
         public final String thread;
         public final String post;
+        public SubscriptionEntry(JSONObject json) {
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.thread = json.getString("thread");
+            this.post = json.getString("post");
+        }
+     
         public SubscriptionEntry(String chan, String board, String thread, String post) {
             this.chan = chan;
             this.board = board;
             this.thread = thread;
             this.post = post;
         }
+        
+        public String getChan(){
+            return this.chan;
+        }
+        
+        public String getBoard(){
+            return this.board;
+        }
+        
+        public String getThread(){
+            return this.thread;
+        }
+        
+        public String getPost(){
+            return this.post;
+        }
+    }
+    
+    public void addSubscription(SubscriptionEntry subscription) {
+        addSubscription(
+            subscription.chan,
+            subscription.board,
+            subscription.thread,
+            subscription.post
+        );
     }
 
     public List<SubscriptionEntry> getSubscriptions() {

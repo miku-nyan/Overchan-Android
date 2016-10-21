@@ -25,6 +25,8 @@ import java.util.List;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -150,12 +152,44 @@ public class Database {
         public final String board;
         public final String thread;
         public final String post;
+        public HiddenEntry(JSONObject json) {
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.thread = json.getString("thread");
+            this.post = json.getString("post");
+        }
+        
         public HiddenEntry(String chan, String board, String thread, String post) {
             this.chan = chan;
             this.board = board;
             this.thread = thread;
             this.post = post;
         }
+        
+        public String getChan(){
+            return this.chan;    
+        }
+
+        public String getBoard(){
+            return this.board;    
+        }
+
+        public String getThread(){
+            return this.thread;    
+        }
+        
+        public String getPost(){
+            return this.post;    
+        }
+    }
+
+    public void addHidden(HiddenEntry hidden){
+        addHidden(
+            hidden.chan,
+            hidden.board,
+            hidden.thread,
+            hidden.post
+        );
     }
 
     public List<HiddenEntry> getHidden() {
@@ -185,6 +219,16 @@ public class Database {
         public final String title;
         public final String url;
         public final long date;
+        public HistoryEntry(JSONObject json){
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.boardPage = json.getString("boardPage");
+            this.thread = json.getString("thread");
+            this.title = json.getString("title");
+            this.url = json.getString("url");
+            this.date = json.getLong("date");
+        }
+        
         public HistoryEntry(String chan, String board, String boardPage, String thread, String title, String url, long date) {
             this.chan = chan;
             this.board = board;
@@ -194,6 +238,46 @@ public class Database {
             this.url = url;
             this.date = date;
         }
+
+        public String getChan(){
+            return this.chan;
+        }
+        
+        public String getBoard(){
+            return this.board;
+        }
+        
+        public String getBoardPage(){
+            return this.boardPage;
+        }
+        
+        public String getThread(){
+            return this.thread;
+        }
+        
+        public String getTitle(){
+            return this.title;
+        }
+        
+        public String getUrl(){
+            return this.url;
+        }
+        
+        public long   getDate(){
+            return this.date;
+        }
+    }
+
+    public void addHistory(HistoryEntry history) {
+        addHistory(
+            history.chan,
+            history.board,
+            history.boardPage,
+            history.thread,
+            history.title,
+            history.url,
+            history.date  
+        );
     }
     
     public void addHistory(String chan, String board, String boardPage, String thread, String title, String url) {
@@ -252,6 +336,15 @@ public class Database {
         public final String thread;
         public final String title;
         public final String url;
+        private FavoritesEntry(JSONObject json) {
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.boardPage = json.getString("boardPage");
+            this.thread = json.getString("thread");
+            this.title = json.getString("title");
+            this.url = json.getString("url");
+        }        
+        
         private FavoritesEntry(String chan, String board, String boardPage, String thread, String title, String url) {
             this.chan = chan;
             this.board = board;
@@ -260,6 +353,41 @@ public class Database {
             this.title = title;
             this.url = url;
         }
+        
+        public String getChan(){
+            return this.chan;
+        }
+        
+        public String getBoard(){
+            return this.board;
+        }
+        
+        public String getBoardPage(){
+            return this.boardPage;
+        }
+        
+        public String getThread(){
+            return this.thread;
+        }
+        
+        public String getTitle(){
+            return this.title;
+        }
+        
+        public String getUrl(){
+            return this.url;
+        }
+    }
+
+    public void addFavorite(FavoritesEntry favorite) {
+        addFavorite(
+            favorite.chan,
+            favorite.board,
+            favorite.boardPage,
+            favorite.thread,
+            favorite.title,
+            favorite.url
+        );
     }
     
     public int getCnf() {
