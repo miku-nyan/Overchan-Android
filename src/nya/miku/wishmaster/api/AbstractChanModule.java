@@ -332,7 +332,7 @@ public abstract class AbstractChanModule implements HttpChanModule {
     @Override
     public String fixRelativeUrl(String url) {
         if (url == null) return null;
-        if (Uri.parse(url).getScheme() != null) return url;
+        if ((Uri.parse(url).getScheme() != null) && !Uri.parse(url).getScheme().contains("/")) return url; //RFC 3986
         UrlPageModel model = new UrlPageModel();
         model.chanName = getChanName();
         model.type = UrlPageModel.TYPE_OTHERPAGE;
