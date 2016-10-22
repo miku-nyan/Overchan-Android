@@ -617,5 +617,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_settings_export_title">Export</string>
     <string name="pref_key_settings_import_overwrite_title">Overwrite</string>
     <string name="pref_key_settings_import_overwrite_summary">Overwrite existing data when importing</string>
-    <string name="pref_key_settings_import_title">Import</string>
+    <string name="pref_key_settings_import_title">Import</string>    
+    <string name="app_settings_exporting">Exporting</string>
+    <string name="app_settings_export_completed">Export to file successfully completed</string>
 </resources>
