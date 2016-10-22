@@ -367,6 +367,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:key="@string/pref_key_clear_subscriptions"
             android:title="@string/pref_clear_subscriptions_title" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="@string/pref_key_settings_ie"
+        android:title="@string/pref_key_settings_ie_title" >
+
+        <Preference
+            android:key="@string/pref_key_settings_export"
+            android:title="@string/pref_key_settings_export_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_settings_import_overwrite"
+            android:title="@string/pref_key_settings_import_overwrite_title"
+            android:summary="@string/pref_key_settings_import_overwrite_summary"/>
+
+        <Preference
+            android:key="@string/pref_key_settings_import"
+            android:title="@string/pref_key_settings_import_title" />
+    </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_cache">
         <EditTextPreference

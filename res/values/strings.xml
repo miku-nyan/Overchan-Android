@@ -609,4 +609,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="pref_captcha_auto_update">Auto-update CAPTCHA</string>
     <string name="mark_code">Code</string>
+    <string name="pref_key_settings_ie">PREF_KEY_SETTINGS_IE</string>
+    <string name="pref_key_settings_export">PREF_KEY_SETTINGS_EXPORT</string>
+    <string name="pref_key_settings_import_overwrite">PREF_KEY_SETTINGS_IMPORT_OVERWRITE</string>
+    <string name="pref_key_settings_import">PREF_KEY_SETTINGS_IMPORT</string>
+    <string name="pref_key_settings_ie_title">Preferences import/export</string>
+    <string name="pref_key_settings_export_title">Export</string>
+    <string name="pref_key_settings_import_overwrite_title">Overwrite</string>
+    <string name="pref_key_settings_import_overwrite_summary">Overwrite existing data when importing</string>
+    <string name="pref_key_settings_import_title">Import</string>
 </resources>
