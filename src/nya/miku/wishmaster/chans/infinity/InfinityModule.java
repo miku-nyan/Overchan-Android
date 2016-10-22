@@ -364,7 +364,7 @@ public class InfinityModule extends AbstractVichanModule {
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        if (!needNewThreadCaptcha && needTorCaptcha) checkCaptcha(model.captchaAnswer, task);
+        if (needTorCaptcha && !needNewThreadCaptcha) checkCaptcha(model.captchaAnswer, task);
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
         String url = getUsingUrl() + "post.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).

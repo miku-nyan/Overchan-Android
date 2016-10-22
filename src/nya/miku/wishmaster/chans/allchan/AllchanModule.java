@@ -627,7 +627,6 @@ public class AllchanModule extends CloudflareChanModule {
                 return model;
             } catch (Exception e) {}
         }
-        urlPath = urlPath.replaceAll("#\\w+-", "#");
-        return WakabaUtils.parseUrlPath(urlPath, CHAN_NAME);
+        return WakabaUtils.parseUrlPath(urlPath.replaceAll("#\\D+", "#"), CHAN_NAME);
     }
 }

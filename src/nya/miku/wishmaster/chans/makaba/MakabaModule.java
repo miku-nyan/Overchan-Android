@@ -462,7 +462,7 @@ public class MakabaModule extends CloudflareChanModule {
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         String url = domainUrl + "api/captcha/2chaptcha/id?board=" + boardName + (threadNumber != null ? "&thread=" + threadNumber : "");
         JSONObject response = downloadJSONObject(url, false, listener, task);
-        switch (response.optInt("result")) {
+        switch (response.optInt("result", -1)) {
             case 1: //Enabled
                 String id = response.optString("id");
                 url = domainUrl + "api/captcha/2chaptcha/image/" + id;
