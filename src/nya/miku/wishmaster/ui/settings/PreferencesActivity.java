@@ -136,7 +136,14 @@ public class PreferencesActivity extends PreferenceActivity {
                 return true;
             }
         });
-        
+        final Preference exportPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_settings_export));
+        exportPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                SettingsExporter.Export(MainApplication.getInstance().settings.getDownloadDirectory(), PreferencesActivity.this);
+                return true;
+            }
+        });
         Preference aboutPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_version));
         try {
             String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
