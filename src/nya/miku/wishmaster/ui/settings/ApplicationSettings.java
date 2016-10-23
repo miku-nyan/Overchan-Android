@@ -522,4 +522,8 @@ public class ApplicationSettings {
         editor.commit();
     }
     
+    public boolean getImportOverwrite(){
+        return preferences.getBoolean(resources.getString(R.string.pref_key_settings_import_overwrite), false);
+    }
+    
 }
