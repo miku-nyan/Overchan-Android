@@ -329,23 +329,23 @@ public class Database {
     
     /* *********************** FAVORITES *********************** */
     
-    public class FavoritesEntry {
+    public static class FavoritesEntry {
         public final String chan;
         public final String board;
         public final String boardPage;
         public final String thread;
         public final String title;
         public final String url;
-        private FavoritesEntry(JSONObject json) {
+        public FavoritesEntry(JSONObject json) {
             this.chan = json.getString("chan");
             this.board = json.getString("board");
             this.boardPage = json.getString("boardPage");
             this.thread = json.getString("thread");
             this.title = json.getString("title");
             this.url = json.getString("url");
-        }        
-        
-        private FavoritesEntry(String chan, String board, String boardPage, String thread, String title, String url) {
+        }
+
+        public FavoritesEntry(String chan, String board, String boardPage, String thread, String title, String url) {
             this.chan = chan;
             this.board = board;
             this.boardPage = boardPage;
