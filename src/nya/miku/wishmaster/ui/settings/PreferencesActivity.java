@@ -24,8 +24,10 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
+import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.NewTabFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
@@ -49,10 +51,14 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.Toast;
 
+import java.io.File;
+
 //отсутствует альтернатива, поддерживающая API 4 
 @SuppressWarnings("deprecation")
 
 public class PreferencesActivity extends PreferenceActivity {
+    private static final int REQUEST_CODE_SELECT_SETTINGS_FILE = 1;
+    
     private static final String TAG = "PreferencesActivity";
     
     public static boolean needUpdateChansScreen = false;
@@ -141,6 +147,20 @@ public class PreferencesActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 SettingsExporter.Export(MainApplication.getInstance().settings.getDownloadDirectory(), PreferencesActivity.this);
+                return true;
+            }
+        });
+        final Preference importPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_settings_import));
+        importPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (!CompatibilityUtils.hasAccessStorage(PreferencesActivity.this)) return true;
+                Intent selectFile = new Intent(PreferencesActivity.this, FileDialogActivity.class);
+                selectFile.putExtra(FileDialogActivity.CAN_SELECT_DIR, false);
+                selectFile.putExtra(FileDialogActivity.START_PATH, MainApplication.getInstance().settings.getDownloadDirectory().toString());
+                selectFile.putExtra(FileDialogActivity.SELECTION_MODE, FileDialogActivity.SELECTION_MODE_OPEN);
+                selectFile.putExtra(FileDialogActivity.FORMAT_FILTER, new String[] { "json" });
+                startActivityForResult(selectFile, REQUEST_CODE_SELECT_SETTINGS_FILE);
                 return true;
             }
         });
@@ -431,6 +451,15 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
             });
             chansCat.addPreference(rearrange);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SELECT_SETTINGS_FILE) {
+            String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
+            SettingsImporter.Import(new File(path), MainApplication.getInstance().settings.getImportOverwrite(), this);
         }
     }
     
