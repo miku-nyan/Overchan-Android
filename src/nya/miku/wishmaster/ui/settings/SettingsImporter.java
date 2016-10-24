@@ -39,54 +39,52 @@ public class SettingsImporter {
         Async.runAsync(new Runnable() {
             @Override
             public void run() {
-                FileInputStream inputStream = null;
                 try {
-                    inputStream = new FileInputStream(filename);
-                } catch (FileNotFoundException e) {
+                    Import();
+                } catch (Exception e) {
+                    showMessage(e.getMessage());
                     Logger.e(TAG, e);
                     return;
                 }
+                showMessage(activity.getString(R.string.app_settings_import_completed));
+            }
+
+            private void Import() throws Exception {
+                FileInputStream inputStream = null;
+                inputStream = new FileInputStream(filename);
                 StringBuffer json_string = new StringBuffer("");
                 byte[] buffer = new byte[1024];
                 int d;
-                try {
-                    while ((d = inputStream.read(buffer)) != -1)
-                    {
-                        json_string.append(new String(buffer, 0, d));
-                    }
-                } catch (IOException e) {
-                    Logger.e(TAG, e);
-                    return;
+                while ((d = inputStream.read(buffer)) != -1) {
+                    json_string.append(new String(buffer, 0, d));
                 }
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    Logger.e(TAG, e);
-                    return;
-                }
+                inputStream.close();
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 JSONObject json = new JSONObject(json_string.toString());
                 // TODO Check version
                 int version = json.getInt("version");
-                
                 JSONArray history = json.getJSONArray("history");
                 for (int i = 0; i < history.length(); i++) {
                     MainApplication.getInstance().database.addHistory(new Database.HistoryEntry(history.getJSONObject(i)));
                 }
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 JSONArray favorites = json.getJSONArray("favorites");
                 for (int i = 0; i < favorites.length(); i++) {
                     MainApplication.getInstance().database.addFavorite(new Database.FavoritesEntry(favorites.getJSONObject(i)));
                 }
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 JSONArray hidden = json.getJSONArray("hidden");
                 for (int i = 0; i < hidden.length(); i++) {
                     MainApplication.getInstance().database.addHidden(new Database.HiddenEntry(hidden.getJSONObject(i)));
                 }
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 JSONArray subscriptions = json.getJSONArray("subscriptions");
                 for (int i = 0; i < subscriptions.length(); i++) {
                     MainApplication.getInstance().subscriptions.addSubscription(new Subscriptions.SubscriptionEntry(subscriptions.getJSONObject(i)));
                 }
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 JSONObject preferences = json.getJSONObject("preferences");
                 MainApplication.getInstance().settings.setSharedPreferences(preferences);
-                showMessage(activity.getString(R.string.app_settings_import_completed));
             }
 
             private void showMessage(final String message) {
