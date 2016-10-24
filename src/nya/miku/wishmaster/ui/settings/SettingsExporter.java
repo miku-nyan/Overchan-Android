@@ -46,13 +46,20 @@ public class SettingsExporter {
         Async.runAsync(new Runnable() {
             @Override
             public void run() {
-                JSONObject json = new JSONObject();
+                String filename = "";
                 try {
-                    json.put("version", MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
-                } catch (PackageManager.NameNotFoundException e) {
+                    filename = Export();
+                } catch (Exception e){
+                    showMessage(e.getMessage());
                     Logger.e(TAG, e);
                     return;
                 }
+                showMessage(activity.getString(R.string.app_settings_export_completed) + "\n" + filename);
+            }
+
+            private String Export() throws Exception {
+                JSONObject json = new JSONObject();
+                json.put("version", MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
                 json.put("history",
                         new JSONArray(
                                 ListToArray(
@@ -61,6 +68,7 @@ public class SettingsExporter {
                                 )
                         )
                 );
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 json.put("favorites",
                         new JSONArray(
                                 ListToArray(
@@ -69,6 +77,7 @@ public class SettingsExporter {
                                 )
                         )
                 );
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 json.put("hidden",
                         new JSONArray(
                                 ListToArray(
@@ -77,6 +86,7 @@ public class SettingsExporter {
                                 )
                         )
                 );
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 json.put("subscriptions",
                         new JSONArray(
                                 ListToArray(
@@ -85,32 +95,15 @@ public class SettingsExporter {
                                 )
                         )
                 );
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 json.put("preferences", new JSONObject(MainApplication.getInstance().settings.getSharedPreferences()));
-                if (task.isCancelled()) {
-                    return;
-                }
+                if (task.isCancelled()) throw new Exception("Interrupted");
                 File filename = new File(dir, "Overchan_settings_" + System.currentTimeMillis() + ".json");
                 FileOutputStream outputStream = null;
-                try {
-                    outputStream = new FileOutputStream(filename);
-                } catch (FileNotFoundException e) {
-                    Logger.e(TAG, e);
-                    return;
-                }
-                try {
-                    outputStream.write(json.toString().getBytes());
-                } catch (IOException e) {
-                    Logger.e(TAG, e);
-                    return;
-                }
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    Logger.e(TAG, e);
-                    return;
-                }
-                
-                showMessage(activity.getString(R.string.app_settings_export_completed) + "\n" + filename.toString());
+                outputStream = new FileOutputStream(filename);
+                outputStream.write(json.toString().getBytes());
+                outputStream.close();
+                return filename.toString();
             }
 
             private void showMessage(final String message) {
@@ -128,7 +121,7 @@ public class SettingsExporter {
                         Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
                     }
                 });
-            }            
+            }
         });
     }
 }
