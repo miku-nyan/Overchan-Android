@@ -28,6 +28,9 @@ public class SettingsImporter {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = new ProgressDialog(activity);
         progressDialog.setMessage(activity.getString(R.string.app_settings_importing));
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setMax(5);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -50,6 +53,7 @@ public class SettingsImporter {
             }
 
             private void Import() throws Exception {
+                progressDialog.setProgress(0);
                 FileInputStream inputStream = null;
                 inputStream = new FileInputStream(filename);
                 StringBuffer json_string = new StringBuffer("");
@@ -63,26 +67,31 @@ public class SettingsImporter {
                 JSONObject json = new JSONObject(json_string.toString());
                 // TODO Check version
                 int version = json.getInt("version");
+                progressDialog.setProgress(1);
                 JSONArray history = json.getJSONArray("history");
                 for (int i = 0; i < history.length(); i++) {
                     MainApplication.getInstance().database.addHistory(new Database.HistoryEntry(history.getJSONObject(i)));
                 }
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(2);
                 JSONArray favorites = json.getJSONArray("favorites");
                 for (int i = 0; i < favorites.length(); i++) {
                     MainApplication.getInstance().database.addFavorite(new Database.FavoritesEntry(favorites.getJSONObject(i)));
                 }
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(3);
                 JSONArray hidden = json.getJSONArray("hidden");
                 for (int i = 0; i < hidden.length(); i++) {
                     MainApplication.getInstance().database.addHidden(new Database.HiddenEntry(hidden.getJSONObject(i)));
                 }
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(4);
                 JSONArray subscriptions = json.getJSONArray("subscriptions");
                 for (int i = 0; i < subscriptions.length(); i++) {
                     MainApplication.getInstance().subscriptions.addSubscription(new Subscriptions.SubscriptionEntry(subscriptions.getJSONObject(i)));
                 }
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(5);
                 JSONObject preferences = json.getJSONObject("preferences");
                 MainApplication.getInstance().settings.setSharedPreferences(preferences);
             }

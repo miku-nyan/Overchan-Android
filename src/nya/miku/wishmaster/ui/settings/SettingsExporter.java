@@ -35,6 +35,9 @@ public class SettingsExporter {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = new ProgressDialog(activity);
         progressDialog.setMessage(activity.getString(R.string.app_settings_exporting));
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setMax(5);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -58,6 +61,7 @@ public class SettingsExporter {
             }
 
             private String Export() throws Exception {
+                progressDialog.setProgress(0);
                 JSONObject json = new JSONObject();
                 json.put("version", MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
                 json.put("history",
@@ -69,6 +73,7 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(1);
                 json.put("favorites",
                         new JSONArray(
                                 ListToArray(
@@ -78,6 +83,7 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(2);
                 json.put("hidden",
                         new JSONArray(
                                 ListToArray(
@@ -87,6 +93,7 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(3);
                 json.put("subscriptions",
                         new JSONArray(
                                 ListToArray(
@@ -96,8 +103,10 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(4);
                 json.put("preferences", new JSONObject(MainApplication.getInstance().settings.getSharedPreferences()));
                 if (task.isCancelled()) throw new Exception("Interrupted");
+                progressDialog.setProgress(5);
                 File filename = new File(dir, "Overchan_settings_" + System.currentTimeMillis() + ".json");
                 FileOutputStream outputStream = null;
                 outputStream = new FileOutputStream(filename);
