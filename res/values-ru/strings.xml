@@ -621,4 +621,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_settings_importing">Импорт</string>
     <string name="app_settings_import_completed">Импорт успешно завершен</string>
     <string name="app_settings_export_completed">Экспорт успешно завершен</string>
+    <string name="app_import_overwrite_warning">Внимание!</string>
+    <string name="app_import_overwrite_warning_message">Все данные будут необратимо перезаписаны</string>
+    <string name="pref_key_settings_import_title">Импорт</string>
+    <string name="pref_key_settings_import_overwrite_title">Переписывать</string>
+    <string name="pref_key_settings_import_overwrite_summary">Переписать существующие данные при импорте</string>
+    <string name="pref_key_settings_ie_title">Импорт и экспорт настроек</string>
+    <string name="pref_key_settings_export_title">Экспорт</string>
 </resources>

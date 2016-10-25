@@ -612,6 +612,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_settings_importing">Importieren</string>
     <string name="app_settings_import_completed">Import erfolgreich abgeschlossen</string>
     <string name="app_settings_export_completed">Export erfolgreich abgeschlossen</string>
+    <string name="app_import_overwrite_warning">Warnung!</string>
+    <string name="app_import_overwrite_warning_message">Alle Daten werden irreversibel überschrieben</string>
+    <string name="pref_key_settings_import_title">Import</string>
+    <string name="pref_key_settings_import_overwrite_title">Überschreiben</string>
+    <string name="pref_key_settings_import_overwrite_summary">Vorhandene Daten beim Import überschreiben</string>
+    <string name="pref_key_settings_ie_title">Einstellungen Import/Export</string>
+    <string name="pref_key_settings_export_title">Export</string>
     <!--
         TODO: Translate pref_captcha_auto_update
     <string name="pref_captcha_auto_update">Auto-update CAPTCHA</string>

@@ -625,4 +625,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_settings_importing">Імпорт</string>
     <string name="app_settings_import_completed">Імпорт успішно завершений</string>
     <string name="app_settings_export_completed">Експорт успішно завершений</string>
+    <string name="app_import_overwrite_warning">УВАГА!</string>
+    <string name="app_import_overwrite_warning_message">Всі дані будуть безповоротно перезаписані</string>
+    <string name="pref_key_settings_import_title">Імпорт</string>
+    <string name="pref_key_settings_import_overwrite_title">Затирати</string>
+    <string name="pref_key_settings_import_overwrite_summary">Переписати існуючі дані при імпорті</string>
+    <string name="pref_key_settings_ie_title">Імпорт та експорт налаштувань</string>
+    <string name="pref_key_settings_export_title">Експорт</string>
 </resources>
