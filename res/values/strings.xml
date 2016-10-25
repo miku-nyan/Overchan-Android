@@ -622,4 +622,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_settings_export_completed">Export to file successfully completed</string>
     <string name="app_settings_import_completed">Import successfully completed</string>
     <string name="app_settings_importing">Importing</string>
+    <string name="app_import_overwrite_warning">Warning!</string>
+    <string name="app_import_overwrite_warning_message">All data will be irreversibly overwritten</string>
 </resources>

@@ -458,8 +458,23 @@ public class PreferencesActivity extends PreferenceActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SELECT_SETTINGS_FILE) {
-            String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
-            SettingsImporter.Import(new File(path), MainApplication.getInstance().settings.getImportOverwrite(), this);
+            final String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
+            DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SettingsImporter.Import(new File(path), MainApplication.getInstance().settings.getImportOverwrite(), PreferencesActivity.this);
+                }
+            };
+            if (MainApplication.getInstance().settings.getImportOverwrite()) {
+                new AlertDialog.Builder(this).
+                        setTitle(R.string.app_import_overwrite_warning).
+                        setMessage(R.string.app_import_overwrite_warning_message).
+                        setPositiveButton(android.R.string.yes, onClickYes).
+                        setNegativeButton(android.R.string.no, null).
+                        show();
+            } else {
+                SettingsImporter.Import(new File(path), MainApplication.getInstance().settings.getImportOverwrite(), this);
+            }
         }
     }
     
