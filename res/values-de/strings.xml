@@ -608,6 +608,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>45\uff05</item>
         <item>50\uff05</item>
     </string-array>
+    <string name="app_settings_exporting">Exportieren</string>
+    <string name="app_settings_importing">Importieren</string>
+    <string name="app_settings_import_completed">Import erfolgreich abgeschlossen</string>
+    <string name="app_settings_export_completed">Export erfolgreich abgeschlossen</string>
     <!--
         TODO: Translate pref_captcha_auto_update
     <string name="pref_captcha_auto_update">Auto-update CAPTCHA</string>

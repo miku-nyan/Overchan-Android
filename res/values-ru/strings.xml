@@ -617,4 +617,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>50\uff05</item>
     </string-array>
     <string name="pref_captcha_auto_update">Автоматическое обновление капчи</string>
+    <string name="app_settings_exporting">Экспорт</string>
+    <string name="app_settings_importing">Импорт</string>
+    <string name="app_settings_import_completed">Импорт успешно завершен</string>
+    <string name="app_settings_export_completed">Экспорт успешно завершен</string>
 </resources>
