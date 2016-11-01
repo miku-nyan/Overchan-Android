@@ -114,11 +114,8 @@ public class SettingsImporter {
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 progressDialog.setProgress(3);
                 JSONArray hidden = json.getJSONArray("hidden");
-                /**
-                 * TODO implement database.clearHidden()
-                 * if (overwrite)
-                 *     MainApplication.getInstance().database.clearHidden();
-                 */
+                if (overwrite)
+                     MainApplication.getInstance().database.clearHidden();
                 for (int i = 0; i < hidden.length(); i++) {
                     MainApplication.getInstance().database.addHidden(new Database.HiddenEntry(hidden.getJSONObject(i)));
                 }

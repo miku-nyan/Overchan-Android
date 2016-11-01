@@ -208,6 +208,10 @@ public class Database {
         if (c != null) c.close();
         return list;
     }
+    
+    public void clearHidden(){
+        dbHelper.recreateHidden();
+    }
 
     /* *********************** HISTORY *********************** */
     
@@ -595,6 +599,10 @@ public class Database {
             getWritableDatabase().execSQL(dropTable(TABLE_FAVORITES));
             getWritableDatabase().execSQL(createTable(TABLE_FAVORITES,
                     new String[] { COL_CHAN, COL_BOARD, COL_BOARDPAGE, COL_THREAD, COL_TITLE, COL_URL }));
+        }
+        public void recreateHidden() {
+            getWritableDatabase().execSQL(dropTable(TABLE_HIDDEN));
+            getWritableDatabase().execSQL(createTable(TABLE_HIDDEN, new String[] { COL_CHAN, COL_BOARD, COL_THREAD, COL_POST }));
         }
     }
 }
