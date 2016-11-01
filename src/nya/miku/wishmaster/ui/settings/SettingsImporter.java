@@ -8,8 +8,12 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -52,7 +56,33 @@ public class SettingsImporter {
                 }
                 showMessage(activity.getString(R.string.app_settings_import_completed));
             }
-
+            
+            private JSONArray mergeAutohide(JSONObject preferences){
+                JSONArray autohide = new JSONArray();
+                try {
+                    autohide = new JSONArray(preferences.getString(activity.getString(R.string.pref_key_autohide_json)));
+                } catch (JSONException e) {
+                    Logger.e(TAG, e);
+                }
+                JSONArray current_autohide = new JSONArray(MainApplication.getInstance().settings.getAutohideRulesJson());
+                Map<Integer, AutohideActivity.AutohideRule> autohide_set = new HashMap<Integer, AutohideActivity.AutohideRule>();
+                for (int i = 0; i < autohide.length(); i++){
+                    AutohideActivity.AutohideRule item = AutohideActivity.AutohideRule.fromJson(autohide.getJSONObject(i));
+                    autohide_set.put(item.hashCode(), item);
+                }
+                for (int i = 0; i < current_autohide.length(); i++){
+                    AutohideActivity.AutohideRule item = AutohideActivity.AutohideRule.fromJson(autohide.getJSONObject(i));
+                    autohide_set.put(item.hashCode(), item);
+                }
+                JSONArray autohide_unique = new JSONArray();
+                Iterator<Integer> iter = autohide_set.keySet().iterator();
+                while (iter.hasNext()) {
+                    AutohideActivity.AutohideRule item = autohide_set.get(iter.next());
+                    autohide_unique.put(item.toJson());
+                }
+                return autohide_unique;
+            }
+            
             private void Import() throws Exception {
                 progressDialog.setProgress(0);
                 FileInputStream inputStream = null;
@@ -134,14 +164,8 @@ public class SettingsImporter {
                             }
                     }
                     preferences = new JSONObject(preferences, keys.toArray(new String [keys.size()]));
-                    JSONArray autohide = new JSONArray();
-                    try {
-                        autohide = new JSONArray(preferences.getString("PREF_KEY_AUTOHIDE_JSON"));
-                    } catch (JSONException e) {
-                        Logger.e(TAG, e);
-                    }
-                    JSONArray current_autohide = new JSONArray(MainApplication.getInstance().settings.getAutohideRulesJson());
-                    //TODO implement merging of autohide rules
+                    JSONArray autohide = mergeAutohide(preferences);
+                    preferences.put(activity.getString(R.string.pref_key_autohide_json), autohide.toString());
                 }
                 MainApplication.getInstance().settings.setSharedPreferences(preferences);
             }
