@@ -56,20 +56,27 @@ public class SettingsImporter {
             }
             
             private JSONArray mergeAutohide(JSONObject preferences){
-                JSONArray autohide = new JSONArray();
+                JSONArray autohide;
                 try {
                     autohide = new JSONArray(preferences.getString(activity.getString(R.string.pref_key_autohide_json)));
                 } catch (JSONException e) {
+                    autohide = new JSONArray();
                     Logger.e(TAG, e);
                 }
-                JSONArray current_autohide = new JSONArray(MainApplication.getInstance().settings.getAutohideRulesJson());
+                JSONArray current_autohide;
+                try {
+                    current_autohide = new JSONArray(MainApplication.getInstance().settings.getAutohideRulesJson());
+                } catch (JSONException e) {
+                    current_autohide = new JSONArray();
+                    Logger.e(TAG, e);
+                }
                 Map<Integer, AutohideActivity.AutohideRule> autohide_set = new HashMap<Integer, AutohideActivity.AutohideRule>();
                 for (int i = 0; i < autohide.length(); i++){
                     AutohideActivity.AutohideRule item = AutohideActivity.AutohideRule.fromJson(autohide.getJSONObject(i));
                     autohide_set.put(item.hashCode(), item);
                 }
                 for (int i = 0; i < current_autohide.length(); i++){
-                    AutohideActivity.AutohideRule item = AutohideActivity.AutohideRule.fromJson(autohide.getJSONObject(i));
+                    AutohideActivity.AutohideRule item = AutohideActivity.AutohideRule.fromJson(current_autohide.getJSONObject(i));
                     autohide_set.put(item.hashCode(), item);
                 }
                 JSONArray autohide_unique = new JSONArray();
