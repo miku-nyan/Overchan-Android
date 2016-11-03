@@ -163,7 +163,21 @@ public class SettingsImporter {
                     JSONArray autohide = mergeAutohide(preferences);
                     preferences.put(activity.getString(R.string.pref_key_autohide_json), autohide.toString());
                 }
+                try {
+                    String dir = preferences.getString(activity.getString(R.string.pref_key_download_dir));
+                    File download_dir = new File(dir);
+                    if (!download_dir.isDirectory()) {
+                        preferences.remove(activity.getString(R.string.pref_key_download_dir));
+                    }
+                } catch (JSONException e) {
+                    Logger.e(TAG, e);
+                }
                 MainApplication.getInstance().settings.setSharedPreferences(preferences);
+                String theme = preferences.getString(activity.getString(R.string.pref_key_theme));
+                if (theme.equals(activity.getString(R.string.pref_theme_value_custom)))
+                    MainApplication.getInstance().settings.setCustomTheme(
+                            preferences.getString(activity.getString(R.string.pref_key_custom_theme_json))
+                    );
             }
 
             private void showMessage(final String message) {
