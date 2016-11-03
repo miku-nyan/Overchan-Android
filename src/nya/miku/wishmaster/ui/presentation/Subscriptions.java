@@ -84,11 +84,19 @@ public class Subscriptions {
         return -1;
     }
     
+    public void importSubscriptions(SubscriptionEntry[] subscription, Boolean overwrite){
+        if (overwrite) {
+            reset();
+            MainApplication.getInstance().settings.setSubscriptionsClear(true);
+        }
+        database.importSubscriptions(subscription, overwrite);
+    }
+    
     /**
      * Добавить отслеживаемый пост
      */
     public void addSubscription(String chan, String board, String thread, String post) {
-        database.put(chan, board, thread, post);
+        database.put(chan, board, thread, post, true);
         Object[] tuple = cached;
         if (tuple != null && tuple[0].equals(chan) && tuple[1].equals(board) && tuple[2].equals(thread))
             cached = null;
@@ -237,15 +245,6 @@ public class Subscriptions {
             return this.post;
         }
     }
-    
-    public void addSubscription(SubscriptionEntry subscription) {
-        addSubscription(
-            subscription.chan,
-            subscription.board,
-            subscription.thread,
-            subscription.post
-        );
-    }
 
     public List<SubscriptionEntry> getSubscriptions() {
         return database.getSubscriptions();
@@ -275,12 +274,28 @@ public class Subscriptions {
             if (c != null) c.close();
             return result;
         }
-        
-        public void put(String chan, String board, String thread, String post) {
-            if (hasSubscription(chan, board, thread, post)) {
-                Logger.d(TAG, "entry is already exists");
-                return;
+
+        public void importSubscriptions(SubscriptionEntry[] subscription, Boolean overwrite){
+            dbHelper.getWritableDatabase().beginTransaction();
+            for (SubscriptionEntry entry : subscription) {
+                put(
+                        entry.chan,
+                        entry.board,
+                        entry.thread,
+                        entry.post,
+                        !overwrite
+                );
             }
+            dbHelper.getWritableDatabase().setTransactionSuccessful();
+            dbHelper.getWritableDatabase().endTransaction();
+        }
+        
+        public void put(String chan, String board, String thread, String post, Boolean check_existence) {
+            if (check_existence)
+                if (hasSubscription(chan, board, thread, post)) {
+                    Logger.d(TAG, "entry is already exists");
+                    return;
+                }
             ContentValues value = new ContentValues(4);
             value.put(COL_CHAN, chan);
             value.put(COL_BOARD, board);

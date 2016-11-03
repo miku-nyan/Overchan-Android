@@ -117,12 +117,34 @@ public class Database {
             }
         };
     }
+
+    public void importHidden(HiddenEntry[] hidden, Boolean overwrite){
+        if (overwrite)
+            clearHidden();
+        dbHelper.getWritableDatabase().beginTransaction();
+        for (HiddenEntry entry : hidden) {
+            addHidden(
+                    entry.chan,
+                    entry.board,
+                    entry.thread,
+                    entry.post,
+                    !overwrite
+            );
+        }
+        dbHelper.getWritableDatabase().setTransactionSuccessful();
+        dbHelper.getWritableDatabase().endTransaction();
+    }
     
     public void addHidden(String chan, String board, String thread, String post) {
-        if (isHidden(chan, board, thread, post)) {
-            Logger.d(TAG, "entry is already exists");
-            return;
-        }
+        addHidden(chan, board, thread, post, true);
+    }
+    
+    public void addHidden(String chan, String board, String thread, String post, Boolean check_existence) {
+        if (check_existence) 
+            if (isHidden(chan, board, thread, post)) {
+                Logger.d(TAG, "entry is already exists");
+                return;
+            }
         ContentValues value = new ContentValues(4);
         value.put(COL_CHAN, fixNull(chan));
         value.put(COL_BOARD, fixNull(board));
@@ -181,15 +203,6 @@ public class Database {
         public String getPost(){
             return this.post;    
         }
-    }
-
-    public void addHidden(HiddenEntry hidden){
-        addHidden(
-            hidden.chan,
-            hidden.board,
-            hidden.thread,
-            hidden.post
-        );
     }
 
     public List<HiddenEntry> getHidden() {
@@ -272,24 +285,33 @@ public class Database {
         }
     }
 
-    public void addHistory(HistoryEntry history) {
-        addHistory(
-            history.chan,
-            history.board,
-            history.boardPage,
-            history.thread,
-            history.title,
-            history.url,
-            history.date  
-        );
+    public void importHistory(HistoryEntry[] history, Boolean overwrite){
+        if (overwrite) 
+            clearHistory();
+        dbHelper.getWritableDatabase().beginTransaction();
+        for (HistoryEntry entry : history) {
+            addHistory(
+                    entry.chan,
+                    entry.board,
+                    entry.boardPage,
+                    entry.thread,
+                    entry.title,
+                    entry.url,
+                    entry.date,
+                    !overwrite
+            );
+        }
+        dbHelper.getWritableDatabase().setTransactionSuccessful();
+        dbHelper.getWritableDatabase().endTransaction();
     }
     
     public void addHistory(String chan, String board, String boardPage, String thread, String title, String url) {
-        addHistory(chan, board, boardPage, thread, title, url, System.currentTimeMillis());
+        addHistory(chan, board, boardPage, thread, title, url, System.currentTimeMillis(), true);
     }
 
-    public void addHistory(String chan, String board, String boardPage, String thread, String title, String url, Long date) {
-        removeHistory(chan, board, boardPage, thread);
+    public void addHistory(String chan, String board, String boardPage, String thread, String title, String url, Long date, Boolean check_existence) {
+        if (check_existence)
+            removeHistory(chan, board, boardPage, thread);
         ContentValues values = new ContentValues(6);
         values.put(COL_CHAN, fixNull(chan));
         values.put(COL_BOARD, fixNull(board));
@@ -382,17 +404,6 @@ public class Database {
             return this.url;
         }
     }
-
-    public void addFavorite(FavoritesEntry favorite) {
-        addFavorite(
-            favorite.chan,
-            favorite.board,
-            favorite.boardPage,
-            favorite.thread,
-            favorite.title,
-            favorite.url
-        );
-    }
     
     public int getCnf() {
         Cursor c = dbHelper.getReadableDatabase().query(TABLE_FAVORITES, null, null, null, null, null, BaseColumns._ID + " desc");
@@ -400,9 +411,33 @@ public class Database {
         if (c != null) c.close();
         return r;
     }
-    
+
+    public void importFavorites(FavoritesEntry[] favorite, Boolean overwrite){
+        if (overwrite)
+            clearFavorites();
+        dbHelper.getWritableDatabase().beginTransaction();
+        for (FavoritesEntry entry : favorite) {
+            addFavorite(
+                    entry.chan,
+                    entry.board,
+                    entry.boardPage,
+                    entry.thread,
+                    entry.title,
+                    entry.url,
+                    !overwrite
+            );
+        }
+        dbHelper.getWritableDatabase().setTransactionSuccessful();
+        dbHelper.getWritableDatabase().endTransaction();
+    }
+
     public void addFavorite(String chan, String board, String boardPage, String thread, String title, String url) {
-        removeFavorite(chan, board, boardPage, thread);
+        addFavorite(chan, board, boardPage, thread, title, url, true);
+    }
+
+    public void addFavorite(String chan, String board, String boardPage, String thread, String title, String url, Boolean check_existence) {
+        if (check_existence)
+            removeFavorite(chan, board, boardPage, thread);
         ContentValues values = new ContentValues(6);
         values.put(COL_CHAN, fixNull(chan));
         values.put(COL_BOARD, fixNull(board));

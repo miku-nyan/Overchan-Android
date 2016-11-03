@@ -98,37 +98,31 @@ public class SettingsImporter {
                 int version = json.getInt("version");
                 progressDialog.setProgress(1);
                 JSONArray history = json.getJSONArray("history");
-                if (overwrite)
-                    MainApplication.getInstance().database.clearHistory();
-                for (int i = 0; i < history.length(); i++) {
-                    MainApplication.getInstance().database.addHistory(new Database.HistoryEntry(history.getJSONObject(i)));
-                }
+                List<Database.HistoryEntry> history_list = new ArrayList<Database.HistoryEntry>();
+                for (int i = 0; i < history.length(); i++)
+                    history_list.add(new Database.HistoryEntry(history.getJSONObject(i)));
+                MainApplication.getInstance().database.importHistory(history_list.toArray(new Database.HistoryEntry[history_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 progressDialog.setProgress(2);
                 JSONArray favorites = json.getJSONArray("favorites");
-                if (overwrite)
-                    MainApplication.getInstance().database.clearFavorites();
-                for (int i = 0; i < favorites.length(); i++) {
-                    MainApplication.getInstance().database.addFavorite(new Database.FavoritesEntry(favorites.getJSONObject(i)));
-                }
+                List<Database.FavoritesEntry> favorites_list = new ArrayList<Database.FavoritesEntry>();
+                for (int i = 0; i < favorites.length(); i++)
+                    favorites_list.add(new Database.FavoritesEntry(favorites.getJSONObject(i)));
+                MainApplication.getInstance().database.importFavorites(favorites_list.toArray(new Database.FavoritesEntry[favorites_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 progressDialog.setProgress(3);
                 JSONArray hidden = json.getJSONArray("hidden");
-                if (overwrite)
-                     MainApplication.getInstance().database.clearHidden();
-                for (int i = 0; i < hidden.length(); i++) {
-                    MainApplication.getInstance().database.addHidden(new Database.HiddenEntry(hidden.getJSONObject(i)));
-                }
+                List<Database.HiddenEntry> hidden_list = new ArrayList<Database.HiddenEntry>();
+                for (int i = 0; i < hidden.length(); i++)
+                    hidden_list.add(new Database.HiddenEntry(hidden.getJSONObject(i)));
+                MainApplication.getInstance().database.importHidden(hidden_list.toArray(new Database.HiddenEntry[hidden_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 progressDialog.setProgress(4);
                 JSONArray subscriptions = json.getJSONArray("subscriptions");
-                if (overwrite) {
-                    MainApplication.getInstance().subscriptions.reset();
-                    MainApplication.getInstance().settings.setSubscriptionsClear(true);
-                }
-                for (int i = 0; i < subscriptions.length(); i++) {
-                    MainApplication.getInstance().subscriptions.addSubscription(new Subscriptions.SubscriptionEntry(subscriptions.getJSONObject(i)));
-                }
+                List<Subscriptions.SubscriptionEntry> subscriptions_list = new ArrayList<Subscriptions.SubscriptionEntry>();
+                for (int i = 0; i < subscriptions.length(); i++)
+                    subscriptions_list.add(new Subscriptions.SubscriptionEntry(subscriptions.getJSONObject(i)));
+                MainApplication.getInstance().subscriptions.importSubscriptions(subscriptions_list.toArray(new Subscriptions.SubscriptionEntry[subscriptions_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 progressDialog.setProgress(5);
                 JSONObject preferences = json.getJSONObject("preferences");
