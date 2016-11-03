@@ -61,7 +61,7 @@ public class SettingsExporter {
             }
 
             private String Export() throws Exception {
-                progressDialog.setProgress(0);
+                updateProgress(0);
                 JSONObject json = new JSONObject();
                 json.put("version", MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
                 json.put("history",
@@ -73,7 +73,7 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(1);
+                updateProgress(1);
                 json.put("favorites",
                         new JSONArray(
                                 ListToArray(
@@ -83,7 +83,7 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(2);
+                updateProgress(2);
                 json.put("hidden",
                         new JSONArray(
                                 ListToArray(
@@ -93,7 +93,7 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(3);
+                updateProgress(3);
                 json.put("subscriptions",
                         new JSONArray(
                                 ListToArray(
@@ -103,16 +103,32 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(4);
+                updateProgress(4);
                 json.put("preferences", new JSONObject(MainApplication.getInstance().settings.getSharedPreferences()));
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(5);
+                updateProgress(5);
                 File filename = new File(dir, "Overchan_settings_" + System.currentTimeMillis() + ".json");
                 FileOutputStream outputStream = null;
                 outputStream = new FileOutputStream(filename);
                 outputStream.write(json.toString().getBytes());
                 outputStream.close();
                 return filename.toString();
+            }
+            
+            private void updateProgress(final int progress) {
+                if (task.isCancelled()) return;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (task.isCancelled()) return;
+                        try {
+                            progressDialog.setProgress(progress);
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                            return;
+                        }
+                    }
+                });
             }
 
             private void showMessage(final String message) {

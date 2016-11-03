@@ -89,7 +89,7 @@ public class SettingsImporter {
             }
             
             private void Import() throws Exception {
-                progressDialog.setProgress(0);
+                updateProgress(0);
                 FileInputStream inputStream = null;
                 inputStream = new FileInputStream(filename);
                 StringBuffer json_string = new StringBuffer("");
@@ -103,35 +103,35 @@ public class SettingsImporter {
                 JSONObject json = new JSONObject(json_string.toString());
                 // TODO Check version
                 int version = json.getInt("version");
-                progressDialog.setProgress(1);
+                updateProgress(1);
                 JSONArray history = json.getJSONArray("history");
                 List<Database.HistoryEntry> history_list = new ArrayList<Database.HistoryEntry>();
                 for (int i = 0; i < history.length(); i++)
                     history_list.add(new Database.HistoryEntry(history.getJSONObject(i)));
                 MainApplication.getInstance().database.importHistory(history_list.toArray(new Database.HistoryEntry[history_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(2);
+                updateProgress(2);
                 JSONArray favorites = json.getJSONArray("favorites");
                 List<Database.FavoritesEntry> favorites_list = new ArrayList<Database.FavoritesEntry>();
                 for (int i = 0; i < favorites.length(); i++)
                     favorites_list.add(new Database.FavoritesEntry(favorites.getJSONObject(i)));
                 MainApplication.getInstance().database.importFavorites(favorites_list.toArray(new Database.FavoritesEntry[favorites_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(3);
+                updateProgress(3);
                 JSONArray hidden = json.getJSONArray("hidden");
                 List<Database.HiddenEntry> hidden_list = new ArrayList<Database.HiddenEntry>();
                 for (int i = 0; i < hidden.length(); i++)
                     hidden_list.add(new Database.HiddenEntry(hidden.getJSONObject(i)));
                 MainApplication.getInstance().database.importHidden(hidden_list.toArray(new Database.HiddenEntry[hidden_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(4);
+                updateProgress(4);
                 JSONArray subscriptions = json.getJSONArray("subscriptions");
                 List<Subscriptions.SubscriptionEntry> subscriptions_list = new ArrayList<Subscriptions.SubscriptionEntry>();
                 for (int i = 0; i < subscriptions.length(); i++)
                     subscriptions_list.add(new Subscriptions.SubscriptionEntry(subscriptions.getJSONObject(i)));
                 MainApplication.getInstance().subscriptions.importSubscriptions(subscriptions_list.toArray(new Subscriptions.SubscriptionEntry[subscriptions_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                progressDialog.setProgress(5);
+                updateProgress(5);
                 JSONObject preferences = json.getJSONObject("preferences");
 
                 if (!overwrite) {
@@ -180,6 +180,22 @@ public class SettingsImporter {
                     );
             }
 
+            private void updateProgress(final int progress) {
+                if (task.isCancelled()) return;
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (task.isCancelled()) return;
+                        try {
+                            progressDialog.setProgress(progress);
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                            return;
+                        }
+                    }
+                });
+            }
+            
             private void showMessage(final String message) {
                 if (task.isCancelled()) return;
                 activity.runOnUiThread(new Runnable() {
