@@ -54,7 +54,7 @@ public class ArhivachBoardReader implements Closeable {
             "<a".toCharArray(),
             "<img".toCharArray(),
 
-            "<div class=\"thread_text\">".toCharArray(),
+            "<div class=\"thread_text\"".toCharArray(),
 
             "<a".toCharArray(),
 

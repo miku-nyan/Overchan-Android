@@ -209,6 +209,8 @@ public class MakabaJsonMapper {
             model.height = source.getInt("height");
             model.thumbnail = fixAttachmentPath(source.getString("thumbnail"), boardName);
             model.path = fixAttachmentPath(source.getString("path"), boardName);
+            String originalName = source.optString("displayname");
+            if (originalName.length() > 0) model.originalName = originalName;
             model.type = AttachmentModel.TYPE_IMAGE_STATIC;
             String pathLower = model.path.toLowerCase(Locale.US);
             if (pathLower.endsWith(".gif")) model.type = AttachmentModel.TYPE_IMAGE_GIF;

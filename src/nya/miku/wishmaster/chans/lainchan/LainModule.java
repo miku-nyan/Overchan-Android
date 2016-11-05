@@ -26,6 +26,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractVichanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
@@ -86,6 +87,15 @@ public class LainModule extends AbstractVichanModule {
     @Override
     protected SimpleBoardModel[] getBoardsList() {
         return BOARDS;
+    }
+    
+    @Override
+    public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
+        BoardModel model = super.getBoard(shortName, listener, task);
+        model.attachmentsMaxCount = 3;
+        model.allowCustomMark = true;
+        model.customMarkDescription = "Spoiler";
+        return model;
     }
     
     @Override
