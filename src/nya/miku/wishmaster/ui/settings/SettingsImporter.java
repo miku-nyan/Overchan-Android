@@ -220,8 +220,12 @@ public class SettingsImporter {
                             preferences.getString(activity.getString(R.string.pref_key_custom_theme_json))
                     );
                 updateProgress(6);
-                JSONArray tabs = json.getJSONArray("tabs");
-                ImportTabs(tabs);
+                try {
+                    JSONArray tabs = json.getJSONArray("tabs");
+                    ImportTabs(tabs);
+                } catch (JSONException e) {
+                    Logger.e(TAG, e);
+                }
             }
 
             private void updateProgress(final int progress) {
