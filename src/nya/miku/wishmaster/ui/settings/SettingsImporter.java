@@ -15,6 +15,7 @@ import java.util.Map;
 
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -23,6 +24,7 @@ import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.presentation.Subscriptions;
+import nya.miku.wishmaster.ui.tabs.TabModel;
 
 public class SettingsImporter {
     private static final String TAG = "SettingsImporter";
@@ -33,7 +35,7 @@ public class SettingsImporter {
         progressDialog.setMessage(activity.getString(R.string.app_settings_importing));
         progressDialog.setIndeterminate(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setMax(5);
+        progressDialog.setMax(6);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -87,7 +89,46 @@ public class SettingsImporter {
                 }
                 return autohide_unique;
             }
+
+            private String getStringOrNull(JSONObject o, String key){
+                try {
+                    return o.getString(key);
+                } catch (JSONException e) {
+                    return null;
+                }
+            }
             
+            private int getIntOrNull(JSONObject o, String key){
+                try {
+                    return o.getInt(key);
+                } catch (JSONException e) {
+                    return 0;
+                }
+            }
+            
+            private void ImportTabs(JSONArray tabs) {
+                List<TabModel> pages = new ArrayList<TabModel>();
+                for (int i = 0; i < tabs.length(); i++) {
+                    JSONObject tab = tabs.getJSONObject(i);
+                    
+                    UrlPageModel page = new UrlPageModel();
+                    page.type = getIntOrNull(tab, "type");
+                    page.chanName = getStringOrNull(tab, "chanName");
+                    page.boardName = getStringOrNull(tab, "boardName");
+                    page.boardPage = getIntOrNull(tab, "boardPage");
+                    page.catalogType = getIntOrNull(tab, "catalogType");
+                    page.threadNumber = getStringOrNull(tab, "threadNumber");
+                    page.postNumber = getStringOrNull(tab, "postNumber");
+                    page.searchRequest = getStringOrNull(tab, "searchRequest");
+                    page.otherPath = getStringOrNull(tab, "otherPath");
+                    TabModel tabModel = new TabModel();
+                    tabModel.title = getStringOrNull(tab, "title");
+                    tabModel.pageModel = page;
+                    pages.add(0, tabModel);
+                }
+                MainApplication.getInstance().pagesToOpen = pages;
+            }
+
             private void Import() throws Exception {
                 updateProgress(0);
                 FileInputStream inputStream = null;
@@ -178,6 +219,9 @@ public class SettingsImporter {
                     MainApplication.getInstance().settings.setCustomTheme(
                             preferences.getString(activity.getString(R.string.pref_key_custom_theme_json))
                     );
+                updateProgress(6);
+                JSONArray tabs = json.getJSONArray("tabs");
+                ImportTabs(tabs);
             }
 
             private void updateProgress(final int progress) {

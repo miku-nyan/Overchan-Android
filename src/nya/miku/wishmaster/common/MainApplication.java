@@ -41,6 +41,7 @@ import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.presentation.Subscriptions;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import nya.miku.wishmaster.ui.settings.Wifi;
+import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 
@@ -143,6 +144,8 @@ public class MainApplication extends Application {
     
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
+    
+    public List<TabModel> pagesToOpen = null;
     
     public List<ChanModule> chanModulesList;
     private Map<String, Integer> chanModulesIndex;
