@@ -3,13 +3,10 @@ package nya.miku.wishmaster.ui.settings;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.List;
 
@@ -22,6 +19,7 @@ import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.presentation.Subscriptions;
+import nya.miku.wishmaster.ui.tabs.TabModel;
 
 public class SettingsExporter {
     private static final String TAG = "SettingsExporter";
@@ -31,13 +29,25 @@ public class SettingsExporter {
         return (T[]) list.toArray((T[]) Array.newInstance(itemClass, list.size()));
     }
 
+    private static JSONArray getPagesJSON(){
+        List<TabModel> list = MainApplication.getInstance().tabsState.tabsArray;
+        JSONArray result = new JSONArray();
+        String[] fields = {"type", "chanName", "boardName", "boardPage", "catalogType", "threadNumber", "postNumber", "searchRequest", "otherPath"};
+        for (TabModel tab : list){
+            JSONObject page = new JSONObject(tab.pageModel, fields);
+            page.put("title", tab.title);
+            result.put(page);
+        }
+        return result;
+    }
+    
     public static void Export(final File dir, final Activity activity) {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = new ProgressDialog(activity);
         progressDialog.setMessage(activity.getString(R.string.app_settings_exporting));
         progressDialog.setIndeterminate(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setMax(5);
+        progressDialog.setMax(6);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -105,8 +115,10 @@ public class SettingsExporter {
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 updateProgress(4);
                 json.put("preferences", new JSONObject(MainApplication.getInstance().settings.getSharedPreferences()));
-                if (task.isCancelled()) throw new Exception("Interrupted");
                 updateProgress(5);
+                json.put("tabs", getPagesJSON());
+                if (task.isCancelled()) throw new Exception("Interrupted");
+                updateProgress(6);
                 File filename = new File(dir, "Overchan_settings_" + System.currentTimeMillis() + ".json");
                 FileOutputStream outputStream = null;
                 outputStream = new FileOutputStream(filename);
