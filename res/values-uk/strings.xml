@@ -632,4 +632,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_settings_import_overwrite_summary">Затирати існуючі дані при імпорті</string>
     <string name="pref_key_settings_ie_title">Імпорт та експорт налаштувань</string>
     <string name="pref_key_settings_export_title">Експорт</string>
+    <string name="mark_code">Код</string>
 </resources>
