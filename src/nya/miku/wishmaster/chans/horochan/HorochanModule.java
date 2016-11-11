@@ -249,6 +249,7 @@ public class HorochanModule extends CloudflareChanModule {
             embedded.type = AttachmentModel.TYPE_OTHER_NOTFILE;
             embedded.path = "http://youtube.com/watch?v=" + embed;
             embedded.thumbnail = "http://img.youtube.com/vi/" + embed + "/default.jpg";
+            embedded.size = -1;
             attachments[attachments.length - 1] = embedded;
             model.attachments = attachments;
         }

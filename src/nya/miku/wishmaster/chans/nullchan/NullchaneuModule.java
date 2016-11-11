@@ -174,6 +174,7 @@ public class NullchaneuModule extends AbstractInstant0chan {
                     String id = url.substring(url.indexOf("v/") + 2);
                     AttachmentModel attachment = new AttachmentModel();
                     attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    attachment.size = -1;
                     attachment.path = "http://www.youtube.com/watch?v=" + id;
                     attachment.thumbnail = "http://img.youtube.com/vi/" + id + "/default.jpg";
                     int oldCount = post.attachments != null ? post.attachments.length : 0;
