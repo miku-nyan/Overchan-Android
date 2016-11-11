@@ -18,10 +18,15 @@
 
 package nya.miku.wishmaster.chans.clairews;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.EditTextPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.InputType;
+import android.text.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
@@ -34,6 +39,7 @@ public class ClairewsModule extends AbstractInstant0chan {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sg", "steins;gate", "Boards", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "video;games", "Boards", false)
     };
+    private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     
     public ClairewsModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -55,7 +61,15 @@ public class ClairewsModule extends AbstractInstant0chan {
     
     @Override
     protected String getUsingDomain() {
-        return DOMAIN;
+        String domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DOMAIN);
+        return TextUtils.isEmpty(domain) ? DOMAIN : domain;
+    }
+    
+    @Override
+    protected String[] getAllDomains() {
+        if (!getChanName().equals(CHAN_NAME) || getUsingDomain().equals(DOMAIN))
+            return super.getAllDomains();
+        return new String[] { DOMAIN, getUsingDomain() };
     }
     
     @Override
@@ -66,6 +80,24 @@ public class ClairewsModule extends AbstractInstant0chan {
     @Override
     protected boolean canCloudflare() {
         return true;
+    }
+    
+    private void addDomainPreference(PreferenceGroup group) {
+        Context context = group.getContext();
+        EditTextPreference domainPref = new EditTextPreference(context);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
+        domainPref.getEditText().setHint(DOMAIN);
+        domainPref.getEditText().setSingleLine();
+        domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        group.addPreference(domainPref);
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addDomainPreference(preferenceGroup);
+        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
