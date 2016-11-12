@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -199,12 +201,12 @@ public class KurisachModule extends AbstractInstant0chan {
         PostModel model = new PostModel();
         model.number = json.optString("id", null);
         if (model.number == null) throw new RuntimeException();
-        model.name = RegexUtils.removeHtmlTags(json.optString("name"));
-        model.subject = RegexUtils.removeHtmlTags(json.optString("subject"));
+        model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlTags(json.optString("name")));
+        model.subject = StringEscapeUtils.unescapeHtml4(json.optString("subject"));
         model.comment = json.optString("text").
                 replace("\\\"", "\"").replace("\\'", "'");
         model.email = json.optString("email");
-        model.trip = json.optString("trip");
+        model.trip = json.optString("tripcode");
         model.icons = null;
         model.op = false;
         model.sage = model.email.toLowerCase(Locale.US).equals("sage");
