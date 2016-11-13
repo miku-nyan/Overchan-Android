@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
@@ -530,7 +531,12 @@ public class ApplicationSettings {
     
     public int getPostThumbnailSize(){
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        int result = Integer.parseInt(preferences.getString(resources.getString(R.string.pref_key_post_thumbnail_size), "-1"));
+        int result;
+        try {
+            result = Integer.parseInt(preferences.getString(resources.getString(R.string.pref_key_post_thumbnail_size), "-1"));
+        } catch (NumberFormatException e) {
+            result = -1;
+        }
         if (result != -1) {
             result = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, result, metrics);
         } else {
