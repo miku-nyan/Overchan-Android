@@ -629,4 +629,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_settings_ie_title">Импорт и экспорт настроек</string>
     <string name="pref_key_settings_export_title">Экспорт</string>
     <string name="mark_code">Код</string>
+    <string name="pref_post_thumbnail_size_title">Размер эскизов</string>
+    <string name="pref_post_thumbnail_size_summary">Установка нестандартного размера эскизов (dp)</string>
 </resources>

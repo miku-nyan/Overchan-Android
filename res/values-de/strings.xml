@@ -621,4 +621,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_settings_export_title">Export</string>
     <string name="pref_captcha_auto_update">Auto-update CAPTCHA</string>
     <string name="mark_code">Code</string>
+    <string name="pref_post_thumbnail_size_title">Thumbnail-Größe</string>
+    <string name="pref_post_thumbnail_size_summary"></string>
 </resources>

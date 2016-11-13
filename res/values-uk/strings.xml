@@ -633,4 +633,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_settings_ie_title">Імпорт та експорт налаштувань</string>
     <string name="pref_key_settings_export_title">Експорт</string>
     <string name="mark_code">Код</string>
+    <string name="pref_post_thumbnail_size_title">Розмір ескізів</string>
+    <string name="pref_post_thumbnail_size_summary">Установка нестандартного розміру ескізів (dp)</string>
 </resources>
