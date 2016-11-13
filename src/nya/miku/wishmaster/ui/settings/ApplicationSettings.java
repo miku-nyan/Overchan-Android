@@ -34,6 +34,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Environment;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 public class ApplicationSettings {
     private final SharedPreferences preferences;
@@ -526,4 +528,14 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_settings_import_overwrite), false);
     }
     
+    public int getPostThumbnailSize(){
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        int result = Integer.parseInt(preferences.getString(resources.getString(R.string.pref_key_post_thumbnail_size), "-1"));
+        if (result != -1) {
+            result = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, result, metrics);
+        } else {
+            result = resources.getDimensionPixelSize(R.dimen.post_thumbnail_size);
+        }
+        return result;
+    }    
 }

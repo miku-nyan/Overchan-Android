@@ -573,6 +573,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         return super.onOptionsItemSelected(item);
     }
     
+    protected static void setViewSize(View view, int size){
+        ViewGroup.LayoutParams viewLayoutParams = view.getLayoutParams();
+        viewLayoutParams.width = size;
+        viewLayoutParams.height = size;
+        view.setLayoutParams(viewLayoutParams);
+    }
+    
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -583,6 +590,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             AttachmentModel model = (AttachmentModel) v.getTag();
             
             View tnView = v.findViewById(R.id.post_thumbnail_image);
+            setViewSize(tnView, settings.getPostThumbnailSize());
             if (tnView != null && tnView.getTag() == Boolean.FALSE && !downloadThumbnails()) {
                 menu.add(Menu.NONE, R.id.context_menu_thumb_load_thumb, 1, R.string.context_menu_show_thumbnail).
                         setOnMenuItemClickListener(contextMenuListener);
@@ -701,7 +709,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 bitmapCache.asyncGet(
                         ChanModels.hashAttachmentModel((AttachmentModel) lastContextMenuAttachment.getTag()),
                         ((AttachmentModel) lastContextMenuAttachment.getTag()).thumbnail,
-                        resources.getDimensionPixelSize(R.dimen.post_thumbnail_size),
+                        settings.getPostThumbnailSize(),
                         chan,
                         null,
                         imagesDownloadTask,
@@ -1022,10 +1030,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         int textWidth = postItemWidth = rootWidth - postItemPadding;
         
         View thumbnailView = view.findViewById(R.id.post_thumbnail);
+        View thumbnailImage = thumbnailView.findViewById(R.id.post_thumbnail_image);
+        setViewSize(thumbnailImage, settings.getPostThumbnailSize());
         ViewGroup.MarginLayoutParams thumbnailLayoutParams = (ViewGroup.MarginLayoutParams)thumbnailView.getLayoutParams();
         thumbnailMargin = thumbnailLayoutParams.leftMargin + thumbnailLayoutParams.rightMargin;
         
         View attachmentTypeView = thumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
+        ((TextView)attachmentTypeView).setMaxWidth(settings.getPostThumbnailSize());
         FloatingModel[] floatingModels = new FloatingModel[2];
         
         attachmentTypeView.setVisibility(View.GONE);
@@ -1848,6 +1859,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 tag.badgeText = (TextView) view.findViewById(R.id.post_badge_title);
                 tag.multiThumbnailsViewContainer = (LinearLayout) view.findViewById(R.id.post_multi_thumbnails_container);
                 tag.singleThumbnailView = view.findViewById(R.id.post_thumbnail);
+                View thumbnailImage = tag.singleThumbnailView.findViewById(R.id.post_thumbnail_image);
+                setViewSize(thumbnailImage, MainApplication.getInstance().settings.getPostThumbnailSize());
+                TextView size = (TextView) tag.singleThumbnailView.findViewById(R.id.post_thumbnail_attachment_size);
+                size.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
+                TextView type = (TextView) tag.singleThumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
+                type.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
                 tag.commentView = (ClickableLinksTextView) view.findViewById(R.id.post_comment);
                 tag.showFullTextView = (TextView) view.findViewById(R.id.post_show_full_text);
                 tag.repliesView = (JellyBeanSpanFixTextView) view.findViewById(R.id.post_replies);
@@ -2024,6 +2041,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 for (int i=tag.multiThumbnailsInflatedCount; i<attachmentsCount; ++i) {
                     int curLayout = i / currentThumbnailsInRowCount;
                     tag.multiThumbnails[i] = inflater.inflate(R.layout.post_thumbnail, tag.multiThumbnailsRows[curLayout], false);
+                    View thumbnailImage = tag.multiThumbnails[i].findViewById(R.id.post_thumbnail_image);
+                    setViewSize(thumbnailImage, MainApplication.getInstance().settings.getPostThumbnailSize());
+                    TextView size = (TextView) tag.multiThumbnails[i].findViewById(R.id.post_thumbnail_attachment_size);
+                    size.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
+                    TextView type = (TextView) tag.multiThumbnails[i].findViewById(R.id.post_thumbnail_attachment_type);
+                    type.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
                     ((ViewGroup.MarginLayoutParams)tag.multiThumbnails[i].getLayoutParams()).setMargins(0, 0, fragment().thumbnailMargin, 0);
                     tag.multiThumbnailsRows[curLayout].addView(tag.multiThumbnails[i]);
                     ++tag.multiThumbnailsInflatedCount;
@@ -2308,8 +2331,11 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             thumbnailView.setOnClickListener(onAttachmentClickListener);
             thumbnailView.setTag(attachment);
             ImageView thumbnailPic = (ImageView) thumbnailView.findViewById(R.id.post_thumbnail_image);
+            setViewSize(thumbnailPic, MainApplication.getInstance().settings.getPostThumbnailSize());
             TextView size = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_size);
+            size.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
             TextView type = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
+            type.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
             setImageViewSpoiler(thumbnailPic, attachment.isSpoiler || fragment.staticSettings.maskPictures);
             switch (attachment.type) {
                 case AttachmentModel.TYPE_IMAGE_GIF:
@@ -2355,7 +2381,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 fragment.bitmapCache.asyncGet(
                         hash,
                         attachment.thumbnail,
-                        fragment.resources.getDimensionPixelSize(R.dimen.post_thumbnail_size),
+                        fragment.settings.getPostThumbnailSize(),
                         fragment.chan,
                         fragment.tabModel.type == TabModel.TYPE_LOCAL ? fragment.localFile : null,
                         imagesDownloadTask,
@@ -3359,7 +3385,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     @SuppressLint("InlinedApi")
     private void openGridGallery() {
-        final int tnSize = resources.getDimensionPixelSize(R.dimen.post_thumbnail_size);
+        final int tnSize = settings.getPostThumbnailSize();
         
         class GridGalleryAdapter extends ArrayAdapter<Triple<AttachmentModel, String, String>>
                 implements View.OnClickListener, AbsListView.OnScrollListener {
@@ -3398,6 +3424,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     tnImage.setLayoutParams(new FrameLayout.LayoutParams(tnSize, tnSize, Gravity.CENTER));
                     tnImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                     tnImage.setId(R.id.post_thumbnail_image);
+                    setViewSize(tnImage, MainApplication.getInstance().settings.getPostThumbnailSize());
                     ((FrameLayout) convertView).addView(tnImage);
                 }
                 convertView.setTag(getItem(position).getLeft());
@@ -3454,6 +3481,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 AttachmentModel attachment = getItem(position).getLeft();
                 String attachmentHash = getItem(position).getMiddle();
                 ImageView tnImage = (ImageView) view.findViewById(R.id.post_thumbnail_image);
+                setViewSize(tnImage, MainApplication.getInstance().settings.getPostThumbnailSize());
                 if (attachment.thumbnail == null || attachment.thumbnail.length() == 0) {
                     tnImage.setTag(Boolean.TRUE);
                     tnImage.setImageResource(Attachments.getDefaultThumbnailResId(attachment.type));
