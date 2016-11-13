@@ -1,5 +1,7 @@
 package nya.miku.wishmaster.ui.settings;
 
+import static nya.miku.wishmaster.ui.settings.ImportExportConstants.*;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -44,10 +46,12 @@ public class SettingsExporter {
     public static void Export(final File dir, final Activity activity) {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = new ProgressDialog(activity);
+        final Database database = MainApplication.getInstance().database;
         progressDialog.setMessage(activity.getString(R.string.app_settings_exporting));
         progressDialog.setIndeterminate(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setMax(6);
+        progressDialog.setProgress(0);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -71,40 +75,39 @@ public class SettingsExporter {
             }
 
             private String Export() throws Exception {
-                updateProgress(0);
                 JSONObject json = new JSONObject();
-                json.put("version", MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
-                json.put("history",
+                json.put(JSON_KEY_VERSION, MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
+                json.put(JSON_KEY_HISTORY,
                         new JSONArray(
                                 ListToArray(
-                                        MainApplication.getInstance().database.getHistory(),
+                                        database.getHistory(),
                                         Database.HistoryEntry.class
                                 )
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(1);
-                json.put("favorites",
+                updateProgress();
+                json.put(JSON_KEY_FAVORITES,
                         new JSONArray(
                                 ListToArray(
-                                        MainApplication.getInstance().database.getFavorites(),
+                                        database.getFavorites(),
                                         Database.FavoritesEntry.class
                                 )
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(2);
-                json.put("hidden",
+                updateProgress();
+                json.put(JSON_KEY_HIDDEN,
                         new JSONArray(
                                 ListToArray(
-                                        MainApplication.getInstance().database.getHidden(),
+                                        database.getHidden(),
                                         Database.HiddenEntry.class
                                 )
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(3);
-                json.put("subscriptions",
+                updateProgress();
+                json.put(JSON_KEY_SUBSCRIPTIONS,
                         new JSONArray(
                                 ListToArray(
                                         MainApplication.getInstance().subscriptions.getSubscriptions(),
@@ -113,12 +116,12 @@ public class SettingsExporter {
                         )
                 );
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(4);
-                json.put("preferences", new JSONObject(MainApplication.getInstance().settings.getSharedPreferences()));
-                updateProgress(5);
-                json.put("tabs", getPagesJSON());
+                updateProgress();
+                json.put(JSON_KEY_PREFERENCES, new JSONObject(MainApplication.getInstance().settings.getSharedPreferences()));
+                updateProgress();
+                json.put(JSON_KEY_TABS, getPagesJSON());
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(6);
+                updateProgress();
                 File filename = new File(dir, "Overchan_settings_" + System.currentTimeMillis() + ".json");
                 FileOutputStream outputStream = null;
                 outputStream = new FileOutputStream(filename);
@@ -127,14 +130,14 @@ public class SettingsExporter {
                 return filename.toString();
             }
             
-            private void updateProgress(final int progress) {
+            private void updateProgress() {
                 if (task.isCancelled()) return;
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (task.isCancelled()) return;
                         try {
-                            progressDialog.setProgress(progress);
+                            progressDialog.incrementProgressBy(1);
                         } catch (Exception e) {
                             Logger.e(TAG, e);
                             return;

@@ -1,5 +1,7 @@
 package nya.miku.wishmaster.ui.settings;
 
+import static nya.miku.wishmaster.ui.settings.ImportExportConstants.*;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -28,14 +30,17 @@ import nya.miku.wishmaster.ui.tabs.TabModel;
 
 public class SettingsImporter {
     private static final String TAG = "SettingsImporter";
-
+    
     public static void Import(final File filename, final boolean overwrite, final Activity activity) {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = new ProgressDialog(activity);
+        final Database database = MainApplication.getInstance().database;
+        final ApplicationSettings settings = MainApplication.getInstance().settings;
         progressDialog.setMessage(activity.getString(R.string.app_settings_importing));
         progressDialog.setIndeterminate(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setMax(6);
+        progressDialog.setProgress(0);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -67,7 +72,7 @@ public class SettingsImporter {
                 }
                 JSONArray current_autohide;
                 try {
-                    current_autohide = new JSONArray(MainApplication.getInstance().settings.getAutohideRulesJson());
+                    current_autohide = new JSONArray(settings.getAutohideRulesJson());
                 } catch (JSONException e) {
                     current_autohide = new JSONArray();
                     Logger.e(TAG, e);
@@ -129,8 +134,20 @@ public class SettingsImporter {
                 MainApplication.getInstance().pagesToOpen = pages;
             }
 
+            private String[] filterKeys(List<String> keys, String[] exclude){
+                Iterator<String> iter = keys.iterator();
+                while (iter.hasNext()) {
+                    String key = iter.next();
+                    for (String ex : exclude)
+                        if (key.contains(ex)) {
+                            iter.remove();
+                            break;
+                        }
+                }
+                return keys.toArray(new String [keys.size()]);
+            }
+            
             private void Import() throws Exception {
-                updateProgress(0);
                 FileInputStream inputStream = null;
                 inputStream = new FileInputStream(filename);
                 StringBuffer json_string = new StringBuffer("");
@@ -143,37 +160,37 @@ public class SettingsImporter {
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 JSONObject json = new JSONObject(json_string.toString());
                 // TODO Check version
-                int version = json.getInt("version");
-                updateProgress(1);
-                JSONArray history = json.getJSONArray("history");
+                int version = json.getInt(JSON_KEY_VERSION);
+                updateProgress();
+                JSONArray history = json.getJSONArray(JSON_KEY_HISTORY);
                 List<Database.HistoryEntry> history_list = new ArrayList<Database.HistoryEntry>();
                 for (int i = 0; i < history.length(); i++)
                     history_list.add(new Database.HistoryEntry(history.getJSONObject(i)));
-                MainApplication.getInstance().database.importHistory(history_list.toArray(new Database.HistoryEntry[history_list.size()]), overwrite);
+                database.importHistory(history_list.toArray(new Database.HistoryEntry[history_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(2);
-                JSONArray favorites = json.getJSONArray("favorites");
+                updateProgress();
+                JSONArray favorites = json.getJSONArray(JSON_KEY_FAVORITES);
                 List<Database.FavoritesEntry> favorites_list = new ArrayList<Database.FavoritesEntry>();
                 for (int i = 0; i < favorites.length(); i++)
                     favorites_list.add(new Database.FavoritesEntry(favorites.getJSONObject(i)));
-                MainApplication.getInstance().database.importFavorites(favorites_list.toArray(new Database.FavoritesEntry[favorites_list.size()]), overwrite);
+                database.importFavorites(favorites_list.toArray(new Database.FavoritesEntry[favorites_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(3);
-                JSONArray hidden = json.getJSONArray("hidden");
+                updateProgress();
+                JSONArray hidden = json.getJSONArray(JSON_KEY_HIDDEN);
                 List<Database.HiddenEntry> hidden_list = new ArrayList<Database.HiddenEntry>();
                 for (int i = 0; i < hidden.length(); i++)
                     hidden_list.add(new Database.HiddenEntry(hidden.getJSONObject(i)));
-                MainApplication.getInstance().database.importHidden(hidden_list.toArray(new Database.HiddenEntry[hidden_list.size()]), overwrite);
+                database.importHidden(hidden_list.toArray(new Database.HiddenEntry[hidden_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(4);
-                JSONArray subscriptions = json.getJSONArray("subscriptions");
+                updateProgress();
+                JSONArray subscriptions = json.getJSONArray(JSON_KEY_SUBSCRIPTIONS);
                 List<Subscriptions.SubscriptionEntry> subscriptions_list = new ArrayList<Subscriptions.SubscriptionEntry>();
                 for (int i = 0; i < subscriptions.length(); i++)
                     subscriptions_list.add(new Subscriptions.SubscriptionEntry(subscriptions.getJSONObject(i)));
                 MainApplication.getInstance().subscriptions.importSubscriptions(subscriptions_list.toArray(new Subscriptions.SubscriptionEntry[subscriptions_list.size()]), overwrite);
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                updateProgress(5);
-                JSONObject preferences = json.getJSONObject("preferences");
+                updateProgress();
+                JSONObject preferences = json.getJSONObject(JSON_KEY_PREFERENCES);
 
                 if (!overwrite) {
                     // TODO replace hard coded strings with resources
@@ -190,17 +207,10 @@ public class SettingsImporter {
                             "PREF_KEY_CACHE_MAXSIZE",
                             "PREF_KEY_SETTINGS_IMPORT_OVERWRITE",
                     };
-                    List<String> keys = new ArrayList<String>(preferences.keySet());
-                    Iterator<String> iter = keys.iterator();
-                    while (iter.hasNext()) {
-                        String key = iter.next();
-                        for (String ex : exclude)
-                            if (key.contains(ex)) {
-                                iter.remove();
-                                break;
-                            }
-                    }
-                    preferences = new JSONObject(preferences, keys.toArray(new String [keys.size()]));
+                    preferences = new JSONObject(
+                            preferences, 
+                            filterKeys(new ArrayList<String>(preferences.keySet()), exclude)
+                    );
                     JSONArray autohide = mergeAutohide(preferences);
                     preferences.put(activity.getString(R.string.pref_key_autohide_json), autohide.toString());
                 }
@@ -213,29 +223,29 @@ public class SettingsImporter {
                 } catch (JSONException e) {
                     Logger.e(TAG, e);
                 }
-                MainApplication.getInstance().settings.setSharedPreferences(preferences);
+                settings.setSharedPreferences(preferences);
                 String theme = preferences.getString(activity.getString(R.string.pref_key_theme));
                 if (theme.equals(activity.getString(R.string.pref_theme_value_custom)))
-                    MainApplication.getInstance().settings.setCustomTheme(
+                    settings.setCustomTheme(
                             preferences.getString(activity.getString(R.string.pref_key_custom_theme_json))
                     );
-                updateProgress(6);
+                updateProgress();
                 try {
-                    JSONArray tabs = json.getJSONArray("tabs");
+                    JSONArray tabs = json.getJSONArray(JSON_KEY_TABS);
                     ImportTabs(tabs);
                 } catch (JSONException e) {
                     Logger.e(TAG, e);
                 }
             }
 
-            private void updateProgress(final int progress) {
+            private void updateProgress() {
                 if (task.isCancelled()) return;
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (task.isCancelled()) return;
                         try {
-                            progressDialog.setProgress(progress);
+                            progressDialog.incrementProgressBy(1);
                         } catch (Exception e) {
                             Logger.e(TAG, e);
                             return;
