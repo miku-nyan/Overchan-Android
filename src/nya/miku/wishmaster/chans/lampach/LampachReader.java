@@ -124,18 +124,26 @@ public class LampachReader extends WakabaReader {
     
     @Override
     protected void postprocessPost(PostModel post) {
-        post.comment = post.comment.replaceAll("/>",">")
-                .replaceAll("href=\"(?:../)?res/", "href=\"/" + boardName + "/res/");
+        post.comment = post.comment.replace("/>",">").
+                replaceAll("(href=['\"])(?:\\.\\./)?res/", "$1/" + boardName + "/res/");
         if (post.attachments != null) {
             for (AttachmentModel attachment : post.attachments) {
                 if (attachment.path != null) {
-                    attachment.path = "/" + boardName + "/" + attachment.path.replace("../","");
+                    attachment.path = fixAttachmentPath(attachment.path);
                 }
                 if (attachment.thumbnail != null) {
-                    attachment.thumbnail = "/" + boardName + "/" + attachment.thumbnail.replace("../","");
+                    attachment.thumbnail = fixAttachmentPath(attachment.thumbnail);
                 }
             }
         }
     }
     
+    private String fixAttachmentPath(String url) {
+        if (url.startsWith("/") || url.startsWith("http://") || url.startsWith("https://")) {
+            return url;
+        } else if (url.startsWith("../")) {
+            url = url.substring(3);
+        }
+        return "/" + boardName + "/" + url;
+    }
 }
