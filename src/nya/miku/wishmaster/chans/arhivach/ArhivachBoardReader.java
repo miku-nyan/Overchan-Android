@@ -14,6 +14,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
@@ -236,11 +238,11 @@ public class ArhivachBoardReader implements Closeable {
         String commentData = readUntilSequence(FILTERS_CLOSE[FILTER_END_COMMENT]);
         matcher = Pattern.compile("<b>(.*)</b>\\s*&mdash;\\s*").matcher(commentData);
         if (matcher.find()) {
-            currentPost.subject = matcher.group(1);
+            currentPost.subject = StringEscapeUtils.unescapeHtml4(matcher.group(1));
             currentPost.comment = commentData.substring(matcher.group(0).length());
-        } else
+        } else {
             currentPost.comment = commentData;
-        
+        }
     }
     
     private void parseOmittedString(String omitted) {
