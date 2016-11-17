@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 
 /**
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 03.07.2015.
@@ -178,6 +179,8 @@ public class ArhivachBoardReader implements Closeable {
             if (currentPost.comment == null) currentPost.comment = "";
             if (currentPost.email == null) currentPost.email = "";
             if (currentPost.trip == null) currentPost.trip = "";
+            currentPost.comment = CryptoUtils.fixCloudflareEmails(currentPost.comment);
+            currentPost.subject = CryptoUtils.fixCloudflareEmails(currentPost.subject);
             postsBuf.add(currentPost);
         }
         initPostModel();
