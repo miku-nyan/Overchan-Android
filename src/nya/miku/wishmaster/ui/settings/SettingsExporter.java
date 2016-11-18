@@ -76,7 +76,9 @@ public class SettingsExporter {
 
             private String Export() throws Exception {
                 JSONObject json = new JSONObject();
+                json.put(JSON_KEY_FILE_VERSION, FILE_VERSION);
                 json.put(JSON_KEY_VERSION, MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
+                json.put(JSON_KEY_TABLET, MainApplication.getInstance().settings.isRealTablet());
                 json.put(JSON_KEY_HISTORY,
                         new JSONArray(
                                 ListToArray(

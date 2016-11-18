@@ -160,7 +160,16 @@ public class SettingsImporter {
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 JSONObject json = new JSONObject(json_string.toString());
                 // TODO Check version
+                long file_version;
+                try {
+                    file_version = json.getLong(JSON_KEY_FILE_VERSION);
+                } catch (JSONException e) {
+                    file_version = 0;
+                }
                 int version = json.getInt(JSON_KEY_VERSION);
+                boolean tablet = settings.isRealTablet();
+                if (file_version > 0)
+                    tablet = json.getBoolean(JSON_KEY_TABLET);
                 updateProgress();
                 JSONArray history = json.getJSONArray(JSON_KEY_HISTORY);
                 List<Database.HistoryEntry> history_list = new ArrayList<Database.HistoryEntry>();
