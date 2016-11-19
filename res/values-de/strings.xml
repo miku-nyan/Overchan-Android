@@ -622,4 +622,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_captcha_auto_update">Auto-update CAPTCHA</string>
     <string name="mark_code">Code</string>
     <string name="pref_post_thumbnail_scale_title">Thumbnail-Größe</string>
+    <string name="pref_key_post_thumbnail_scale_toast">Es wird empfohlen, den Cache zu löschen</string>
 </resources>

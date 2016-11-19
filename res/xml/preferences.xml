@@ -169,6 +169,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:title="@string/pref_gallery_nativegif_title"
                 android:summary="@string/pref_gallery_nativegif_summary" />
         </PreferenceScreen>
+        
         <ListPreference
             android:key="@string/pref_key_post_thumbnail_scale"
             android:title="@string/pref_post_thumbnail_scale_title"
