@@ -59,7 +59,7 @@ public class BackgroundThumbDownloader implements Runnable {
         this.task = task;
         this.settings = MainApplication.getInstance().settings;
         this.cache = MainApplication.getInstance().bitmapCache;
-        this.maxSize = MainApplication.getInstance().resources.getDimensionPixelSize(R.dimen.post_thumbnail_size);
+        this.maxSize = settings.getPostThumbnailSize();
     }
     
     @Override

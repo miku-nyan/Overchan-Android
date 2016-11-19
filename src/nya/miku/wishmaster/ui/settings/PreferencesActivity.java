@@ -201,6 +201,16 @@ public class PreferencesActivity extends PreferenceActivity {
             ((PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_advanced))).
                     removePreference(certificatesPreference);
         }
+
+        ListPreference thumbnailScalePreference = 
+                (ListPreference) getPreferenceManager().findPreference(getString(R.string.pref_key_post_thumbnail_scale));
+        thumbnailScalePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Toast.makeText(PreferencesActivity.this, R.string.pref_key_post_thumbnail_scale_toast, Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
         
         getPreferenceManager().findPreference(getString(R.string.pref_key_autohide)).setOnPreferenceClickListener(
                 new Preference.OnPreferenceClickListener() {
@@ -247,14 +257,14 @@ public class PreferencesActivity extends PreferenceActivity {
         
         getPreferenceManager().findPreference(getString(R.string.pref_key_theme)).setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if (getString(R.string.pref_theme_value_custom).equals(newValue)) {
-                    startActivity(new Intent(PreferencesActivity.this, CustomThemeListActivity.class));
-                    return false;
-                }
-                return true;
-            }
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        if (getString(R.string.pref_theme_value_custom).equals(newValue)) {
+                            startActivity(new Intent(PreferencesActivity.this, CustomThemeListActivity.class));
+                            return false;
+                        }
+                        return true;
+                    }
         });
         
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {

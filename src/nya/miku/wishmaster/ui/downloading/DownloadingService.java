@@ -693,7 +693,7 @@ public class DownloadingService extends Service {
                                 if (bmp == null && (attachment.thumbnail == null || attachment.thumbnail.length() == 0 ||
                                         item.downloadingThreadMode == MODE_ONLY_CACHE)) continue;
                                 if (bmp == null) bmp = bitmapCache.download(curHash, attachment.thumbnail,
-                                        getResources().getDimensionPixelSize(R.dimen.post_thumbnail_size),
+                                        settings.getPostThumbnailSize(),
                                         MainApplication.getInstance().getChanModule(item.chanName), this);
                                 if (isCancelled()) throw new Exception();
                                 if (bmp != null) {

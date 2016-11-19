@@ -620,4 +620,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="app_settings_importing">Importing</string>
     <string name="app_import_overwrite_warning">Warning!</string>
     <string name="app_import_overwrite_warning_message">All data will be irreversibly overwritten</string>
+    <string name="pref_post_thumbnail_scale_title">Post thumbnail size</string>
+    <string name="pref_key_post_thumbnail_scale_toast">It\'s recommended to clear cache after thumbnail scale has been changed</string>
 </resources>
