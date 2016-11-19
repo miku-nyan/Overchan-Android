@@ -1,7 +1,5 @@
 package nya.miku.wishmaster.ui.settings;
 
-import static nya.miku.wishmaster.ui.settings.ImportExportConstants.*;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -9,6 +7,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,10 +27,40 @@ import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.presentation.Subscriptions;
 import nya.miku.wishmaster.ui.tabs.TabModel;
 
+import static nya.miku.wishmaster.ui.settings.ImportExportConstants.*;
+
 public class SettingsImporter {
     private static final String TAG = "SettingsImporter";
-    
+
+    /**
+     * Импортирует настройки из строки в формате JSON
+     *
+     * @param json      настройки в виде строки в формате JSON
+     * @param overwrite перезапись настроек, если true
+     * @param activity
+     */
+    public static void Import(final String json, final boolean overwrite, final Activity activity) {
+        Import(null, json, overwrite, activity);
+    }
+
+    /**
+     * Импортирует настройки из файла в формате JSON
+     *
+     * @param filename  файл из которого нужно импортировать настройки
+     * @param overwrite перезапись настроек, если true
+     * @param activity
+     */
     public static void Import(final File filename, final boolean overwrite, final Activity activity) {
+        Import(filename, null, overwrite, activity);
+    }
+
+    /**
+     * @param filename  файл из которого нужно импортировать настройки, может быть null
+     * @param json_     настройки в виде строки в формате JSON, может быть null
+     * @param overwrite перезапись настроек, если true
+     * @param activity
+     */
+    private static void Import(final File filename, final String json_, final boolean overwrite, final Activity activity) {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = new ProgressDialog(activity);
         final Database database = MainApplication.getInstance().database;
@@ -146,8 +175,8 @@ public class SettingsImporter {
                 }
                 return keys.toArray(new String [keys.size()]);
             }
-            
-            private void Import() throws Exception {
+
+            private String loadFromFile(final File filename) throws IOException {
                 FileInputStream inputStream = null;
                 inputStream = new FileInputStream(filename);
                 StringBuffer json_string = new StringBuffer("");
@@ -157,19 +186,20 @@ public class SettingsImporter {
                     json_string.append(new String(buffer, 0, d));
                 }
                 inputStream.close();
+                return json_string.toString();
+            }
+
+            private void Import() throws Exception {
                 if (task.isCancelled()) throw new Exception("Interrupted");
-                JSONObject json = new JSONObject(json_string.toString());
-                // TODO Check version
-                long file_version;
-                try {
-                    file_version = json.getLong(JSON_KEY_FILE_VERSION);
-                } catch (JSONException e) {
-                    file_version = 0;
+                String json_string = null;
+                if (filename != null) {
+                    json_string = loadFromFile(filename);
+                } else if (json_ != null) {
+                    json_string = json_;
                 }
+                JSONObject json = new JSONObject(json_string);
+                // TODO Check version
                 int version = json.getInt(JSON_KEY_VERSION);
-                boolean tablet = settings.isRealTablet();
-                if (file_version > 0)
-                    tablet = json.getBoolean(JSON_KEY_TABLET);
                 updateProgress();
                 JSONArray history = json.getJSONArray(JSON_KEY_HISTORY);
                 List<Database.HistoryEntry> history_list = new ArrayList<Database.HistoryEntry>();
@@ -203,19 +233,6 @@ public class SettingsImporter {
 
                 if (!overwrite) {
                     // TODO replace hard coded strings with resources
-                    String[] exclude = {
-                            "PREF_KEY_CLOUDFLARE_COOKIE",
-                            "PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN",
-                            "PREF_KEY_USE_PROXY",
-                            "PREF_KEY_PROXY_HOST",
-                            "PREF_KEY_PROXY_PORT",
-                            "PREF_KEY_PASSWORD",
-                            "PREF_KEY_USE_HTTPS",
-                            "PREF_KEY_ONLY_NEW_POSTS",
-                            "PREF_KEY_CAPTCHA_AUTO_UPDATE",
-                            "PREF_KEY_CACHE_MAXSIZE",
-                            "PREF_KEY_SETTINGS_IMPORT_OVERWRITE",
-                    };
                     preferences = new JSONObject(
                             preferences, 
                             filterKeys(new ArrayList<String>(preferences.keySet()), exclude)

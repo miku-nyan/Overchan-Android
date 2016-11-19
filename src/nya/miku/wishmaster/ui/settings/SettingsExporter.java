@@ -1,7 +1,5 @@
 package nya.miku.wishmaster.ui.settings;
 
-import static nya.miku.wishmaster.ui.settings.ImportExportConstants.*;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -9,6 +7,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.List;
 
@@ -23,6 +22,8 @@ import nya.miku.wishmaster.ui.Database;
 import nya.miku.wishmaster.ui.presentation.Subscriptions;
 import nya.miku.wishmaster.ui.tabs.TabModel;
 
+import static nya.miku.wishmaster.ui.settings.ImportExportConstants.*;
+
 public class SettingsExporter {
     private static final String TAG = "SettingsExporter";
     
@@ -31,6 +32,11 @@ public class SettingsExporter {
         return (T[]) list.toArray((T[]) Array.newInstance(itemClass, list.size()));
     }
 
+    /**
+     * Преобразует информацию о вкладках в формат JSON
+     *
+     * @return
+     */
     private static JSONArray getPagesJSON(){
         List<TabModel> list = MainApplication.getInstance().tabsState.tabsArray;
         JSONArray result = new JSONArray();
@@ -42,8 +48,32 @@ public class SettingsExporter {
         }
         return result;
     }
-    
+
+    /**
+     * Экспорт с сохранением в файл
+     * @param dir директория куда будет сохранен файл
+     * @param activity
+     */
     public static void Export(final File dir, final Activity activity) {
+        Export(dir, activity, null);
+    }
+
+    /**
+     * Экспорт без сохранения в файл. Передает результат экспорта через callback
+     *
+     * @param activity
+     * @param callback интерфейс для обратного вызова по завершению экспорта
+     */
+    public static void Export(final Activity activity, final exportComplete callback) {
+        Export(null, activity, callback);
+    }
+
+    /**
+     * @param dir      директория куда будет сохранен файл, может быть null
+     * @param activity
+     * @param callback интерфейс для обратного вызова по завершению экспорта, может быть null
+     */
+    private static void Export(final File dir, final Activity activity, final exportComplete callback) {
         final CancellableTask task = new CancellableTask.BaseCancellableTask();
         final ProgressDialog progressDialog = new ProgressDialog(activity);
         final Database database = MainApplication.getInstance().database;
@@ -76,9 +106,7 @@ public class SettingsExporter {
 
             private String Export() throws Exception {
                 JSONObject json = new JSONObject();
-                json.put(JSON_KEY_FILE_VERSION, FILE_VERSION);
                 json.put(JSON_KEY_VERSION, MainApplication.getInstance().getPackageManager().getPackageInfo(MainApplication.getInstance().getPackageName(), 0).versionCode);
-                json.put(JSON_KEY_TABLET, MainApplication.getInstance().settings.isRealTablet());
                 json.put(JSON_KEY_HISTORY,
                         new JSONArray(
                                 ListToArray(
@@ -124,12 +152,22 @@ public class SettingsExporter {
                 json.put(JSON_KEY_TABS, getPagesJSON());
                 if (task.isCancelled()) throw new Exception("Interrupted");
                 updateProgress();
-                File filename = new File(dir, "Overchan_settings_" + System.currentTimeMillis() + ".json");
-                FileOutputStream outputStream = null;
-                outputStream = new FileOutputStream(filename);
-                outputStream.write(json.toString().getBytes());
+                if (dir != null) {
+                    File filename = new File(dir, "Overchan_settings_" + System.currentTimeMillis() + ".json");
+                    saveToFile(filename, json.toString());
+                    return filename.toString();
+                } else {
+                    if (callback != null) {
+                        callback.onExportComplete(json.toString());
+                    }
+                }
+                return "";
+            }
+
+            private void saveToFile(final File filename, final String s) throws IOException {
+                FileOutputStream outputStream = new FileOutputStream(filename);
+                outputStream.write(s.getBytes());
                 outputStream.close();
-                return filename.toString();
             }
             
             private void updateProgress() {
@@ -165,5 +203,15 @@ public class SettingsExporter {
                 });
             }
         });
+    }
+
+    /**
+     * Интерфейс для реализации обратного вызова по завершению экспорта
+     */
+    public interface exportComplete {
+        /**
+         * @param json результат экспорта
+         */
+        void onExportComplete(String json);
     }
 }
