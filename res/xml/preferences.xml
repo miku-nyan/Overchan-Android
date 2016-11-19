@@ -169,13 +169,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:title="@string/pref_gallery_nativegif_title"
                 android:summary="@string/pref_gallery_nativegif_summary" />
         </PreferenceScreen>
-        <EditTextPreference
-            android:key="@string/pref_key_post_thumbnail_size"
-            android:title="@string/pref_post_thumbnail_size_title"
-            android:summary="@string/pref_post_thumbnail_size_summary"
-            android:inputType="number"
-            android:singleLine="true"
-            android:maxLength="4" />
+        <ListPreference
+            android:key="@string/pref_key_post_thumbnail_scale"
+            android:title="@string/pref_post_thumbnail_scale_title"
+            android:dialogTitle="@string/pref_post_thumbnail_scale_title"
+            android:entries="@array/pref_post_thumbnail_scale_choices"
+            android:entryValues="@array/pref_post_thumbnail_scale_values"
+            android:defaultValue="@string/pref_post_thumbnail_scale_value_default" />
     </PreferenceCategory>
     
     <PreferenceCategory

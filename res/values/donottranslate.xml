@@ -154,5 +154,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_key_settings_export">PREF_KEY_SETTINGS_EXPORT</string>
     <string name="pref_key_settings_import_overwrite">PREF_KEY_SETTINGS_IMPORT_OVERWRITE</string>
     <string name="pref_key_settings_import">PREF_KEY_SETTINGS_IMPORT</string>
-    <string name="pref_key_post_thumbnail_size">PREF_KEY_POST_THUMBNAIL_SIZE</string>
+    <string name="pref_key_post_thumbnail_scale">PREF_KEY_POST_THUMBNAIL_SCALE</string>
+    <string-array name="pref_post_thumbnail_scale_choices" translatable="false">
+        <item>50\uff05</item>
+        <item>100\uff05</item>
+        <item>150\uff05</item>
+        <item>200\uff05</item>
+    </string-array>
+    <string name="pref_post_thumbnail_scale_value_default">@string/pref_post_thumbnail_scale_value_100percent</string>
+    <string name="pref_post_thumbnail_scale_value_50percent">PREF_POST_THUMBNAIL_SCALE_VALUE_50PERCENT</string>
+    <string name="pref_post_thumbnail_scale_value_100percent">PREF_POST_THUMBNAIL_SCALE_VALUE_100PERCENT</string>
+    <string name="pref_post_thumbnail_scale_value_150percent">PREF_POST_THUMBNAIL_SCALE_VALUE_150PERCENT</string>
+    <string name="pref_post_thumbnail_scale_value_200percent">PREF_POST_THUMBNAIL_SCALE_VALUE_200PERCENT</string>
+    <string-array name="pref_post_thumbnail_scale_values" translatable="false">
+        <item>@string/pref_post_thumbnail_scale_value_50percent</item>
+        <item>@string/pref_post_thumbnail_scale_value_100percent</item>
+        <item>@string/pref_post_thumbnail_scale_value_150percent</item>
+        <item>@string/pref_post_thumbnail_scale_value_200percent</item>
+    </string-array>
 </resources>
