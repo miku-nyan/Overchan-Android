@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,47 +41,15 @@ import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
-import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
+import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.lib.org_json.JSONException;
 
 public class NullchaneuModule extends AbstractInstant0chan {
     private static final String CHAN_NAME = "0chan.eu";
     private static final String DEFAULT_DOMAIN = "0chan.eu";
-    private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "all", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Рисунки", "all", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "Реквесты", "all", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "0", "О Нульчане", "all", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "e", "Радиоэлектроника", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "t", "Технологии", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "hw", "Железо", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "s", "Софт", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "c", "Быдлокодинг", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "Видеоигры", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "8", "8-bit и pixel art", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "bg", "Настольные игры", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "wh", "Warhammer", "geek", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аниме", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "au", "Автомобили", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "bo", "Книги", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "co", "Комиксы", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cook", "Лепка супов", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "Flash", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fa", "Мода и стиль", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fl", "Иностранные языки", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "m", "Музыка", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "med", "Медицина", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ne", "Кошки", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ph", "Фотографии", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tv", "Кино и сериалы", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "wp", "Обои", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "war", "Вооружение", "other", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Хентай", "adult", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "g", "Девушки", "adult", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fur", "Фурри", "adult", true)
-    };
     
     public NullchaneuModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -116,8 +86,29 @@ public class NullchaneuModule extends AbstractInstant0chan {
     }
     
     @Override
-    protected SimpleBoardModel[] getBoardsList() {
-        return BOARDS;
+    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
+        String url = getUsingUrl() + "boards10.json";
+        try {
+            JSONArray json = downloadJSONArray(url, oldBoardsList != null, listener, task);
+            if (json == null) return oldBoardsList;
+            List<SimpleBoardModel> list = new ArrayList<SimpleBoardModel>();
+            for (int i=0; i<json.length(); ++i) {
+                String currentCategory = json.getJSONObject(i).optString("name");
+                JSONArray boards = json.getJSONObject(i).getJSONArray("boards");
+                for (int j=0; j<boards.length(); ++j) {
+                    SimpleBoardModel model = new SimpleBoardModel();
+                    model.chan = getChanName();
+                    model.boardName = boards.getJSONObject(j).getString("dir");
+                    model.boardDescription = boards.getJSONObject(j).optString("desc", model.boardName);
+                    model.boardCategory = currentCategory;
+                    model.nsfw = model.boardName.equals("b") || currentCategory.equals("adult");
+                    list.add(model);
+                }
+            }
+            return list.toArray(new SimpleBoardModel[list.size()]);
+        } catch (JSONException e) {
+            return new SimpleBoardModel[0];
+        }
     }
     
     @Override
