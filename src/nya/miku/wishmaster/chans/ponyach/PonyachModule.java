@@ -84,7 +84,8 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 public class PonyachModule extends AbstractWakabaModule {
     private static final String CHAN_NAME = "ponyach";
     private static final String DEFAULT_DOMAIN = "ponyach.ru";
-    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, "ponychan.ru", "ponya.ch", "ponyach.cf", "ponyach.ga", "ponyach.ml" };
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, "ponyach.cf", "ponyach.ga", "ponyach.ml",
+            "cafe-asylum.cf", "cafe-bb.cf", "cafe-bb.ga", "cafe-bb.gq", "cafe-bb.ml", "cafe-bb.tk" };
     
     private static final DateFormat DATE_FORMAT;
     static {
@@ -97,8 +98,8 @@ public class PonyachModule extends AbstractWakabaModule {
     
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "/b/ - was never good", "", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cafe", "2chru.cafe/b", "", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Жалобы и предложения", "", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cafe", "2chru.cafe asylum", "", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "test", "Полигон", "", false),
             //ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r34", "r34", "", true),
         };
@@ -356,6 +357,13 @@ public class PonyachModule extends AbstractWakabaModule {
                 post.comment = post.comment.replaceAll("<a[^>]*href=\"javascript:.*?</a>", "");
                 post.attachments = myAttachments.toArray(new AttachmentModel[myAttachments.size()]);
                 myAttachments.clear();
+            }
+            
+            @Override
+            protected void parseThumbnail(String imgTag) {
+                super.parseThumbnail(imgTag);
+                if (imgTag.contains("/css/icons/locked.png")) currentThread.isClosed = true;
+                if (imgTag.contains("/css/icons/sticky.png")) currentThread.isSticky = true;
             }
         };
     }
