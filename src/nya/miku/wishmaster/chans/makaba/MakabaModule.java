@@ -644,15 +644,11 @@ public class MakabaModule extends CloudflareChanModule {
         try {
             if (path.contains("/catalog")) {
                 model.type = UrlPageModel.TYPE_CATALOGPAGE;
-                Matcher matcher = Pattern.compile("(.+?)/(catalog(?:_.+?)?).html").matcher(path);
+                Matcher matcher = Pattern.compile("(.+?)/(catalog(?:_.+?)?)\\.html").matcher(path);
                 if (!matcher.find()) throw new Exception();
                 model.boardName = matcher.group(1);
-                if (matcher.group(2) == null) {
-                    model.catalogType = 0;
-                } else {
-                    int index = Arrays.asList(CATALOG_TYPES).indexOf(matcher.group(2));
-                    model.catalogType = index == -1 ? 0 : index;
-                }
+                int index = Arrays.asList(CATALOG_TYPES).indexOf(matcher.group(2));
+                model.catalogType = index == -1 ? 0 : index;
             } else if (path.startsWith("makaba/makaba.fcgi?") && path.contains("task=hashtags") && path.contains("board=")) {
                 model.type = UrlPageModel.TYPE_SEARCHPAGE;
                 String boardName = path.substring(path.indexOf("board=") + 6);
