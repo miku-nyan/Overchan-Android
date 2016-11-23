@@ -90,13 +90,13 @@ public class TumbachModule extends CloudflareChanModule {
     public static final String[] CATALOG_DESCRIPTIONS = new String[] {
             "Сортировать по дате создания", "Сортировать по дате последнего поста", "Сортировать по количеству бампов" };
     
-    private static final List<String> SFW_BOARDS = Arrays.asList("a", "d", "mu", "news", "soc", "vg");
+    private static final List<String> SFW_BOARDS = Arrays.asList("a", "art", "d", "mu", "news", "s", "vg");
     private static final String[] RATINGS = new String[] { "SFW", "R-15", "R-18", "R-18G" };
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); }
     
-    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=\"quotation\">", Pattern.LITERAL);
+    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=['\"]quotation['\"]>");
     
     private HashMap<String, BoardModel> boardsMap;
     
@@ -626,6 +626,7 @@ public class TumbachModule extends CloudflareChanModule {
                 return model;
             } catch (Exception e) {}
         }
+        if (urlPath.contains("#")) urlPath = urlPath.replaceAll("#\\D+", "#");
         return WakabaUtils.parseUrlPath(urlPath, CHAN_NAME);
     }
 }
