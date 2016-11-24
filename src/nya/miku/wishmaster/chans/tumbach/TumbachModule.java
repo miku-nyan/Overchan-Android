@@ -242,7 +242,7 @@ public class TumbachModule extends CloudflareChanModule {
         model.allowNames = true;
         model.allowSubjects = true;
         model.allowSage = true;
-        model.allowEmails = true;
+        model.allowEmails = false;
         model.ignoreEmailIfSage = true;
         model.allowCustomMark = true;
         model.allowRandomHash = true;
@@ -414,7 +414,11 @@ public class TumbachModule extends CloudflareChanModule {
         }
         model.icons = null;
         model.op = json.optBoolean("isOp");
-        model.sage = model.email.toLowerCase(Locale.US).contains("sage");
+        JSONObject options = json.optJSONObject("options");
+        model.sage = options.optBoolean("sage") || model.email.toLowerCase(Locale.US).equals("sage");
+        if (options.optBoolean("bannedFor")) {
+            model.comment += "<br/><br/><font color=\"red\">Потребитель был запрещен для этого столба</font>";
+        }
         try {
             model.timestamp = DATE_FORMAT.parse(json.optString("createdAt")).getTime();
         } catch (Exception e) {
