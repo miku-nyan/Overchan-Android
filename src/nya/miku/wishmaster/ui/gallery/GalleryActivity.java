@@ -47,6 +47,7 @@ import nya.miku.wishmaster.lib.gifdrawable.GifDrawable;
 import nya.miku.wishmaster.ui.AppearanceUtils;
 import nya.miku.wishmaster.ui.Attachments;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
+import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.ReverseImageSearch;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
 import nya.miku.wishmaster.ui.presentation.BoardFragment;
@@ -408,6 +409,7 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
                 updateItem();
                 return true;
             case R.id.menu_save_attachment:
+                if (!CompatibilityUtils.hasAccessStorage(this)) return true;
                 downloadAttachment();
                 return true;
             case R.id.menu_open_external:
