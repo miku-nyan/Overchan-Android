@@ -878,7 +878,21 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     model.postNumber = postModel.number; 
                 }
             }
-            UrlHandler.open(model, activity);
+            String tabTitle = null;
+            if (pageType == TYPE_THREADSLIST) {
+                String subject = adapter.getItem(position).sourceModel.subject;
+                if (subject != null && subject.length() != 0) {
+                    tabTitle = subject;
+                } else {
+                    Spanned spannedComment = adapter.getItem(position).spannedComment;
+                    if (spannedComment != null) {
+                        tabTitle = spannedComment.toString().replace('\n', ' ');
+                        if (tabTitle.length() > MAX_TITLE_LENGHT) tabTitle = tabTitle.substring(0, MAX_TITLE_LENGHT);
+                    }
+                }
+                if (tabTitle != null) tabTitle = resources.getString(R.string.tabs_title_threadpage_loaded, model.boardName, tabTitle);
+            }
+            UrlHandler.open(model, activity, true, tabTitle);
         }
     }
     
