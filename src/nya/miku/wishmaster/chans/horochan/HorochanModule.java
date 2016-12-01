@@ -417,7 +417,7 @@ public class HorochanModule extends CloudflareChanModule {
                     return url.append(model.boardName).append('/').append(model.boardPage).toString();
                 case UrlPageModel.TYPE_THREADPAGE:
                     return url.append(model.boardName).append("/thread/").append(model.threadNumber).
-                            append(model.postNumber == null || model.postNumber.length() == 0 ? "" : ("/#" + model.postNumber)).toString();
+                            append(model.postNumber == null || model.postNumber.length() == 0 ? "" : ("#" + model.postNumber)).toString();
                 case UrlPageModel.TYPE_OTHERPAGE:
                     return url.append(model.otherPath.startsWith("/") ? model.otherPath.substring(1) : model.otherPath).toString();
             }
