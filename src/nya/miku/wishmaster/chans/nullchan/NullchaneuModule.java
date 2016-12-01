@@ -27,10 +27,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.EditTextPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.InputType;
+import android.text.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
@@ -49,7 +54,9 @@ import nya.miku.wishmaster.lib.org_json.JSONException;
 
 public class NullchaneuModule extends AbstractInstant0chan {
     private static final String CHAN_NAME = "0chan.eu";
-    private static final String DEFAULT_DOMAIN = "0chan.eu";
+    private static final String DEFAULT_DOMAIN = "0chan.ru.net";
+    private static final String DOMAINS_HINT = "0chan.ru.net, 0chan.eu";
+    private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     
     public NullchaneuModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -62,7 +69,7 @@ public class NullchaneuModule extends AbstractInstant0chan {
     
     @Override
     public String getDisplayingName() {
-        return "Øчан (0chan.eu)";
+        return "Øчан (0chan.ru.net)";
     }
     
     @Override
@@ -72,7 +79,15 @@ public class NullchaneuModule extends AbstractInstant0chan {
     
     @Override
     protected String getUsingDomain() {
-        return DEFAULT_DOMAIN;
+        String domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN);
+        return TextUtils.isEmpty(domain) ? DEFAULT_DOMAIN : domain;
+    }
+    
+    @Override
+    protected String[] getAllDomains() {
+        if (!getChanName().equals(CHAN_NAME) || getUsingDomain().equals(DEFAULT_DOMAIN))
+            return super.getAllDomains();
+        return new String[] { DEFAULT_DOMAIN, getUsingDomain() };
     }
     
     @Override
@@ -83,6 +98,25 @@ public class NullchaneuModule extends AbstractInstant0chan {
     @Override
     protected boolean canCloudflare() {
         return true;
+    }
+    
+    private void addDomainPreference(PreferenceGroup group) {
+        Context context = group.getContext();
+        EditTextPreference domainPref = new EditTextPreference(context);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
+        domainPref.getEditText().setHint(DEFAULT_DOMAIN);
+        domainPref.getEditText().setSingleLine();
+        domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        group.addPreference(domainPref);
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addDomainPreference(preferenceGroup);
+        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
