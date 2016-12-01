@@ -213,7 +213,7 @@ public class TumbachModule extends CloudflareChanModule {
             }
             return list;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -270,7 +270,7 @@ public class TumbachModule extends CloudflareChanModule {
             addToMap(board);
             return board;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -295,7 +295,7 @@ public class TumbachModule extends CloudflareChanModule {
             return list;
         } catch (JSONException e) {
             Logger.e(TAG, e);
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -318,7 +318,7 @@ public class TumbachModule extends CloudflareChanModule {
             }
             return list;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -367,7 +367,7 @@ public class TumbachModule extends CloudflareChanModule {
             if (oldList == null) return newList;
             return ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(newList));
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -572,7 +572,7 @@ public class TumbachModule extends CloudflareChanModule {
                 return getUsingUrl() + model.boardName + "/res/" + result.getInt("threadNumber") + ".html";
             }
         } catch (JSONException e) {
-            throw new Exception(result.getString("errorDescription"));
+            throw new Exception(result.getString("message"));
         }
     }
     
@@ -601,7 +601,7 @@ public class TumbachModule extends CloudflareChanModule {
                     addString("password", model.password);
             HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
             JSONObject result = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, false);
-            String error = result.optString("errorDescription");
+            String error = result.optString("message");
             if (error.length() > 0) throw new Exception(error);
         }
         return null;
