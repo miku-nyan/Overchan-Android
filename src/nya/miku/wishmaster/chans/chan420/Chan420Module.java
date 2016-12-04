@@ -88,7 +88,7 @@ public class Chan420Module extends AbstractChanModule {
     }
     
     private boolean useHttps() {
-        return false;
+        return true;
     }
     
     @Override
