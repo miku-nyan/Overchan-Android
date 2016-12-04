@@ -39,10 +39,10 @@ public class LampachReader extends WakabaReader {
     private static final Pattern ADMIN_MARK_PATTERN = Pattern.compile("<span style=\"color: red;\">(.*?)</span>");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("<a[^>]*href=\"mailto:([^\"]*)\"");
     
-    private static final DateFormat OLD_DATE_FORMAT;
+    private static final DateFormat DATE_FORMAT;
     static {
-        OLD_DATE_FORMAT = new SimpleDateFormat("dd MMM yyy(EEE)HH:mm", Locale.US);
-        OLD_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+        DATE_FORMAT = new SimpleDateFormat("dd MMM yy(EEE)HH:mm:ss", Locale.US);
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
     
     private static final char[] LABELOPEN_FILTER = "<label>".toCharArray();
@@ -114,11 +114,10 @@ public class LampachReader extends WakabaReader {
     
     @Override
     protected void parseDate(String date) {
-        super.parseDate(date);
-        if (currentPost.timestamp == 0) {
-            try {
-                currentPost.timestamp = OLD_DATE_FORMAT.parse(date).getTime();
-            } catch (Exception e) {}
+        try {
+            currentPost.timestamp = DATE_FORMAT.parse(date.replace("|", "")).getTime();
+        } catch (Exception e) {
+            super.parseDate(date);
         }
     }
     
