@@ -21,6 +21,7 @@ package nya.miku.wishmaster.chans.cirno;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -88,12 +89,16 @@ public class Chan410Module extends AbstractChanModule {
     protected void initHttpClient() {
         JSONObject savedCookies = new JSONObject(preferences.getString(getSharedKey(PREF_KEY_FAPTCHA_COOKIES), "{}"));
         for (String board : Chan410Boards.ALL_BOARDS_SET) {
-            String value = savedCookies.optString(board);
-            if (value != null && value.length() > 0) {
-                BasicClientCookie c = new BasicClientCookie(board, value);
-                c.setDomain("." + CHAN410_DOMAIN);
-                c.setPath("/");
-                httpClient.getCookieStore().addCookie(c);
+            JSONObject cookie = savedCookies.optJSONObject(board);
+            if (cookie != null) {
+                String value = cookie.optString("value");
+                if (value.length() > 0) {
+                    BasicClientCookie c = new BasicClientCookie(board, value);
+                    c.setDomain("." + CHAN410_DOMAIN);
+                    c.setPath("/");
+                    c.setExpiryDate(new Date(cookie.optLong("expires")));
+                    httpClient.getCookieStore().addCookie(c);
+                }
             }
         }
     }
@@ -103,7 +108,10 @@ public class Chan410Module extends AbstractChanModule {
         List<Cookie> cookies = httpClient.getCookieStore().getCookies();
         for (Cookie cookie : cookies) {
             if (cookie.getName().length() <= 3 && Chan410Boards.ALL_BOARDS_SET.contains(cookie.getName())) {
-                savedCookies.put(cookie.getName(), cookie.getValue());
+                JSONObject cookieValues = new JSONObject();
+                cookieValues.put("value", cookie.getValue());
+                cookieValues.put("expires", cookie.getExpiryDate().getTime());
+                savedCookies.put(cookie.getName(), cookieValues);
             }
         }
         preferences.edit().putString(getSharedKey(PREF_KEY_FAPTCHA_COOKIES), savedCookies.toString()).commit();
