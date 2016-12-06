@@ -94,7 +94,7 @@ public class Chan410Module extends AbstractChanModule {
                 String value = cookie.optString("value");
                 if (value.length() > 0) {
                     BasicClientCookie c = new BasicClientCookie(board, value);
-                    c.setDomain("." + CHAN410_DOMAIN);
+                    c.setDomain(CHAN410_DOMAIN);
                     c.setPath("/");
                     c.setExpiryDate(new Date(cookie.optLong("expires")));
                     httpClient.getCookieStore().addCookie(c);
