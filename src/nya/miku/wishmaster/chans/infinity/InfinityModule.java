@@ -291,7 +291,9 @@ public class InfinityModule extends AbstractVichanModule {
                         (thumbLocation + tim + thumbnail_ext);
                 attachment.path = fileLocation + tim + ext;
                 if (getUsingDomain().equals(DEFAULT_DOMAIN)){
-                    attachment.thumbnail = fixRelativeUrl(attachment.thumbnail).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                    if (attachment.thumbnail != null) {
+                        attachment.thumbnail = fixRelativeUrl(attachment.thumbnail).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                    }
                     attachment.path = fixRelativeUrl(attachment.path).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
                 }
                 return attachment;
