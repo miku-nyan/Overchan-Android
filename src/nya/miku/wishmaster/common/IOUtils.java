@@ -292,4 +292,44 @@ public class IOUtils {
     public static class InterruptedStreamException extends IOException {
         private static final long serialVersionUID = 1L;
     }
+
+    public static class CountingOutputStream extends FilterOutputStream {
+        private long size = 0;
+
+        public CountingOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+        }
+
+        @Override
+        public void flush() throws IOException {
+            super.flush();
+        }
+
+        @Override
+        public void write(byte[] buffer) throws IOException {
+            this.write(buffer, 0, buffer.length);
+        }
+
+        @Override
+        public void write(byte[] buffer, int offset, int count) throws IOException {
+            super.write(buffer, offset, count);
+            size += count;
+        }
+
+        @Override
+        public void write(int oneByte) throws IOException {
+            super.write(oneByte);
+            size++;
+        }
+
+        public long getSize() {
+            return this.size;
+        }
+
+    }
 }
