@@ -403,15 +403,19 @@ public class HttpStreamer {
             CancellableTask task, boolean anyCode) throws IOException, HttpRequestException, HttpWrongStatusCodeException {
         HttpResponseModel responseModel = null;
         IOUtils.CountingOutputStream content_stream = new IOUtils.CountingOutputStream(out);
+        long downloaded_size = 0; // сколько загружено в предыдущем запросе
+        long content_length = 0;  // сколько загружено в текущем запросе
         try {
             for (int i = 0; i < 5; i++) {
-                responseModel = getFromUrl(url, requestModel, httpClient, listener, task, content_stream.getSize());
+                downloaded_size = content_stream.getSize();
+                responseModel = getFromUrl(url, requestModel, httpClient, listener, task, downloaded_size);
+                content_length = responseModel.contentLength;
                 if ((responseModel.statusCode == 200) || (responseModel.statusCode == 206)) {
                     try {
                         IOUtils.copyStream(responseModel.stream, content_stream);
                         break;
                     } catch (IOException e) {
-                        if (responseModel.contentLength != content_stream.getSize()) {
+                        if ((content_length + downloaded_size) != content_stream.getSize()) {
                             Header accept_ranges_header = null;
                             for (Header header : responseModel.headers) {
                                 if ("Accept-Ranges".equalsIgnoreCase(header.getName())) {
@@ -440,6 +444,8 @@ public class HttpStreamer {
                     }
                 }
             }
+            if ((content_length + downloaded_size) != content_stream.getSize())
+                throw new IOException("Content-length mismatch");
         } catch (Exception e) {
             if (responseModel != null) removeFromModifiedMap(url);
             throw e;

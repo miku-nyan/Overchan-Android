@@ -301,29 +301,20 @@ public class IOUtils {
         }
 
         @Override
-        public void close() throws IOException {
-            super.close();
-        }
-
-        @Override
-        public void flush() throws IOException {
-            super.flush();
-        }
-
-        @Override
         public void write(byte[] buffer) throws IOException {
-            this.write(buffer, 0, buffer.length);
+            out.write(buffer, 0, buffer.length);
+            size += buffer.length;
         }
 
         @Override
         public void write(byte[] buffer, int offset, int count) throws IOException {
-            super.write(buffer, offset, count);
+            out.write(buffer, offset, count);
             size += count;
         }
 
         @Override
         public void write(int oneByte) throws IOException {
-            super.write(oneByte);
+            out.write(oneByte);
             size++;
         }
 
