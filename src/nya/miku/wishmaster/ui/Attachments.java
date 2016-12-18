@@ -139,9 +139,10 @@ public class Attachments {
      */
     public static String getAttachmentExtention(AttachmentModel attachment) {
         if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return null;
-        int dotLastPos = attachment.path.lastIndexOf('.');
+        String filename = attachment.path.substring(attachment.path.lastIndexOf('/') + 1);
+        int dotLastPos = filename.lastIndexOf('.');
         if (dotLastPos == -1) return "";
-        return attachment.path.substring(dotLastPos);
+        return filename.substring(dotLastPos);
     }
     
     /**
