@@ -415,7 +415,7 @@ public class HttpStreamer {
                         IOUtils.copyStream(responseModel.stream, content_stream);
                         break;
                     } catch (IOException e) {
-                        if ((content_length + downloaded_size) != content_stream.getSize()) {
+                        if (((content_length + downloaded_size) != content_stream.getSize()) && (content_length != -1)) {
                             Header accept_ranges_header = null;
                             for (Header header : responseModel.headers) {
                                 if ("Accept-Ranges".equalsIgnoreCase(header.getName())) {
@@ -444,7 +444,7 @@ public class HttpStreamer {
                     }
                 }
             }
-            if ((content_length + downloaded_size) != content_stream.getSize())
+            if (((content_length + downloaded_size) != content_stream.getSize()) && (content_length != -1))
                 throw new IOException("Content-length mismatch");
         } catch (Exception e) {
             if (responseModel != null) removeFromModifiedMap(url);
