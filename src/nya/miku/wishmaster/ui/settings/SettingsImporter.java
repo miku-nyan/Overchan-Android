@@ -123,22 +123,6 @@ public class SettingsImporter {
                 }
                 return autohide_unique;
             }
-
-            private String getStringOrNull(JSONObject o, String key){
-                try {
-                    return o.getString(key);
-                } catch (JSONException e) {
-                    return null;
-                }
-            }
-            
-            private int getIntOrNull(JSONObject o, String key){
-                try {
-                    return o.getInt(key);
-                } catch (JSONException e) {
-                    return 0;
-                }
-            }
             
             private void ImportTabs(JSONArray tabs) {
                 List<TabModel> pages = new ArrayList<TabModel>();
@@ -146,17 +130,17 @@ public class SettingsImporter {
                     JSONObject tab = tabs.getJSONObject(i);
                     
                     UrlPageModel page = new UrlPageModel();
-                    page.type = getIntOrNull(tab, "type");
-                    page.chanName = getStringOrNull(tab, "chanName");
-                    page.boardName = getStringOrNull(tab, "boardName");
-                    page.boardPage = getIntOrNull(tab, "boardPage");
-                    page.catalogType = getIntOrNull(tab, "catalogType");
-                    page.threadNumber = getStringOrNull(tab, "threadNumber");
-                    page.postNumber = getStringOrNull(tab, "postNumber");
-                    page.searchRequest = getStringOrNull(tab, "searchRequest");
-                    page.otherPath = getStringOrNull(tab, "otherPath");
+                    page.type = tab.optInt("type", 0);
+                    page.chanName = tab.optString("chanName", "");
+                    page.boardName = tab.optString("boardName", "");
+                    page.boardPage = tab.optInt("boardPage", 0);
+                    page.catalogType = tab.optInt("catalogType", 0);
+                    page.threadNumber = tab.optString("threadNumber", "");
+                    page.postNumber = tab.optString("postNumber", "");
+                    page.searchRequest = tab.optString("searchRequest", "");
+                    page.otherPath = tab.optString("otherPath", "");
                     TabModel tabModel = new TabModel();
-                    tabModel.title = getStringOrNull(tab, "title");
+                    tabModel.title = tab.optString("title", "");
                     tabModel.pageModel = page;
                     pages.add(0, tabModel);
                 }
