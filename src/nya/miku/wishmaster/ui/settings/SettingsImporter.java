@@ -142,7 +142,7 @@ public class SettingsImporter {
                     TabModel tabModel = new TabModel();
                     tabModel.title = tab.optString("title", "");
                     tabModel.pageModel = page;
-                    pages.add(0, tabModel);
+                    pages.add(tabModel);
                 }
                 MainApplication.getInstance().pagesToOpen = pages;
             }
