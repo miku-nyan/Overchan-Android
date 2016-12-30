@@ -14,9 +14,12 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 
 /**
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 03.07.2015.
@@ -176,6 +179,8 @@ public class ArhivachBoardReader implements Closeable {
             if (currentPost.comment == null) currentPost.comment = "";
             if (currentPost.email == null) currentPost.email = "";
             if (currentPost.trip == null) currentPost.trip = "";
+            currentPost.comment = CryptoUtils.fixCloudflareEmails(currentPost.comment);
+            currentPost.subject = CryptoUtils.fixCloudflareEmails(currentPost.subject);
             postsBuf.add(currentPost);
         }
         initPostModel();
@@ -236,11 +241,11 @@ public class ArhivachBoardReader implements Closeable {
         String commentData = readUntilSequence(FILTERS_CLOSE[FILTER_END_COMMENT]);
         matcher = Pattern.compile("<b>(.*)</b>\\s*&mdash;\\s*").matcher(commentData);
         if (matcher.find()) {
-            currentPost.subject = matcher.group(1);
+            currentPost.subject = StringEscapeUtils.unescapeHtml4(matcher.group(1));
             currentPost.comment = commentData.substring(matcher.group(0).length());
-        } else
+        } else {
             currentPost.comment = commentData;
-        
+        }
     }
     
     private void parseOmittedString(String omitted) {

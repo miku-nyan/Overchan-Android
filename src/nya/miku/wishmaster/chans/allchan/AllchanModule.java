@@ -90,7 +90,7 @@ public class AllchanModule extends CloudflareChanModule {
     public static final String[] CATALOG_DESCRIPTIONS = new String[] {
             "Сортировать по дате создания", "Сортировать по дате последнего поста", "Сортировать по количеству бампов" };
     
-    private static final List<String> SFW_BOARDS = Arrays.asList("a", "cg", "d", "echo", "int", "mlp", "po", "pr", "rf", "rpg", "soc", "vg");
+    private static final List<String> SFW_BOARDS = Arrays.asList("a", "d", "po", "pr", "rpg", "s", "vg");
     private static final String[] RATINGS = new String[] { "SFW", "R-15", "R-18", "R-18G" };
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
@@ -413,9 +413,12 @@ public class AllchanModule extends CloudflareChanModule {
             else if (level.equals("ADMIN") || level.equals("MODER")) model.trip += "## Mod";    
         }
         model.icons = null;
-        JSONObject options = json.optJSONObject("options");
         model.op = json.optBoolean("isOp");
-        model.sage = options.optBoolean("sage") || model.email.toLowerCase(Locale.US).contains("sage");
+        JSONObject options = json.optJSONObject("options");
+        model.sage = options.optBoolean("sage") || model.email.toLowerCase(Locale.US).equals("sage");
+        if (options.optBoolean("bannedFor")) {
+            model.comment += "<br/><br/><font color=\"red\">Потребитель был запрещен для этого столба</font>";
+        }
         try {
             model.timestamp = DATE_FORMAT.parse(json.optString("createdAt")).getTime();
         } catch (Exception e) {

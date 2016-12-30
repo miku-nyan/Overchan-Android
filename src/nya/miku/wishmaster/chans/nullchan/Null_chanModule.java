@@ -52,6 +52,7 @@ public class Null_chanModule extends InfinityModule {
     private static final String CHAN_NAME = "0-chan.ru";
     private static final String DOMAIN = "0-chan.ru";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Новый Движок", null, true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tmp", "Временное убежище", null, true)
     };
     
@@ -111,11 +112,11 @@ public class Null_chanModule extends InfinityModule {
     
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
-        //BoardModel board = super.getBoard(shortName, listener, task);
         SimpleBoardModel simpleModel = getBoardsMap(listener, task).get(shortName);
         BoardModel board = new BoardModel();
         board.chan = getChanName();
         board.boardName = shortName;
+        board.boardDescription = shortName;
         board.uniqueAttachmentNames = true;
         board.timeZoneId = "US/Eastern";
         board.defaultUserName = "Anonymous";

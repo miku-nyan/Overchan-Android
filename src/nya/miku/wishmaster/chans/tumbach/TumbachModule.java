@@ -90,13 +90,13 @@ public class TumbachModule extends CloudflareChanModule {
     public static final String[] CATALOG_DESCRIPTIONS = new String[] {
             "Сортировать по дате создания", "Сортировать по дате последнего поста", "Сортировать по количеству бампов" };
     
-    private static final List<String> SFW_BOARDS = Arrays.asList("a", "d", "mu", "news", "soc", "vg");
+    private static final List<String> SFW_BOARDS = Arrays.asList("a", "art", "d", "mu", "news", "s", "vg");
     private static final String[] RATINGS = new String[] { "SFW", "R-15", "R-18", "R-18G" };
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); }
     
-    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=\"quotation\">", Pattern.LITERAL);
+    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=['\"]quotation['\"]>");
     
     private HashMap<String, BoardModel> boardsMap;
     
@@ -213,7 +213,7 @@ public class TumbachModule extends CloudflareChanModule {
             }
             return list;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -242,7 +242,7 @@ public class TumbachModule extends CloudflareChanModule {
         model.allowNames = true;
         model.allowSubjects = true;
         model.allowSage = true;
-        model.allowEmails = true;
+        model.allowEmails = false;
         model.ignoreEmailIfSage = true;
         model.allowCustomMark = true;
         model.allowRandomHash = true;
@@ -270,7 +270,7 @@ public class TumbachModule extends CloudflareChanModule {
             addToMap(board);
             return board;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -295,7 +295,7 @@ public class TumbachModule extends CloudflareChanModule {
             return list;
         } catch (JSONException e) {
             Logger.e(TAG, e);
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -318,7 +318,7 @@ public class TumbachModule extends CloudflareChanModule {
             }
             return list;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -367,7 +367,7 @@ public class TumbachModule extends CloudflareChanModule {
             if (oldList == null) return newList;
             return ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(newList));
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -414,7 +414,11 @@ public class TumbachModule extends CloudflareChanModule {
         }
         model.icons = null;
         model.op = json.optBoolean("isOp");
-        model.sage = model.email.toLowerCase(Locale.US).contains("sage");
+        JSONObject options = json.optJSONObject("options");
+        model.sage = options.optBoolean("sage") || model.email.toLowerCase(Locale.US).equals("sage");
+        if (options.optBoolean("bannedFor")) {
+            model.comment += "<br/><br/><font color=\"red\">Потребитель был запрещен для этого столба</font>";
+        }
         try {
             model.timestamp = DATE_FORMAT.parse(json.optString("createdAt")).getTime();
         } catch (Exception e) {
@@ -568,7 +572,7 @@ public class TumbachModule extends CloudflareChanModule {
                 return getUsingUrl() + model.boardName + "/res/" + result.getInt("threadNumber") + ".html";
             }
         } catch (JSONException e) {
-            throw new Exception(result.getString("errorDescription"));
+            throw new Exception(result.getString("message"));
         }
     }
     
@@ -597,7 +601,7 @@ public class TumbachModule extends CloudflareChanModule {
                     addString("password", model.password);
             HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
             JSONObject result = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, false);
-            String error = result.optString("errorDescription");
+            String error = result.optString("message");
             if (error.length() > 0) throw new Exception(error);
         }
         return null;
@@ -626,6 +630,7 @@ public class TumbachModule extends CloudflareChanModule {
                 return model;
             } catch (Exception e) {}
         }
+        if (urlPath.contains("#")) urlPath = urlPath.replaceAll("#\\D+", "#");
         return WakabaUtils.parseUrlPath(urlPath, CHAN_NAME);
     }
 }

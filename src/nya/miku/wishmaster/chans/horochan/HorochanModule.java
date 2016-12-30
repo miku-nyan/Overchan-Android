@@ -249,6 +249,7 @@ public class HorochanModule extends CloudflareChanModule {
             embedded.type = AttachmentModel.TYPE_OTHER_NOTFILE;
             embedded.path = "http://youtube.com/watch?v=" + embed;
             embedded.thumbnail = "http://img.youtube.com/vi/" + embed + "/default.jpg";
+            embedded.size = -1;
             attachments[attachments.length - 1] = embedded;
             model.attachments = attachments;
         }
@@ -416,7 +417,7 @@ public class HorochanModule extends CloudflareChanModule {
                     return url.append(model.boardName).append('/').append(model.boardPage).toString();
                 case UrlPageModel.TYPE_THREADPAGE:
                     return url.append(model.boardName).append("/thread/").append(model.threadNumber).
-                            append(model.postNumber == null || model.postNumber.length() == 0 ? "" : ("/#" + model.postNumber)).toString();
+                            append(model.postNumber == null || model.postNumber.length() == 0 ? "" : ("#" + model.postNumber)).toString();
                 case UrlPageModel.TYPE_OTHERPAGE:
                     return url.append(model.otherPath.startsWith("/") ? model.otherPath.substring(1) : model.otherPath).toString();
             }

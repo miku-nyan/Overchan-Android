@@ -132,6 +132,9 @@ public class BrchanModule extends InfinityModule {
                 postEntityBuilder.addFile(images[i], model.attachments[i], model.randomHash);
             }
         }
+        if (needNewThreadCaptcha) {
+            postEntityBuilder.addString("captcha_text", model.captchaAnswer).addString("captcha_cookie", newThreadCaptchaId);
+        }
         
         UrlPageModel refererPage = new UrlPageModel();
         refererPage.chanName = getChanName();
@@ -150,6 +153,9 @@ public class BrchanModule extends InfinityModule {
         if (json.has("error")) {
             String error = json.optString("error");
             if (error.equals("true") && json.optBoolean("banned")) throw new Exception("You are banned! ;_;");
+            if (error.contains("/entrypoint")) {
+                throw new Exception("Você errou o codigo de verificação.");
+            }
             throw new Exception(error);
         } else {
             String redirect = json.optString("redirect", "");

@@ -114,8 +114,8 @@ public class InfinityModule extends AbstractVichanModule {
     private Set<String> boardsPostCaptcha = new HashSet<>();
     private boolean needTorCaptcha = false;
     private String torCaptchaCookie = null;
-    private boolean needNewThreadCaptcha = false;
-    private String newThreadCaptchaId = null;
+    protected boolean needNewThreadCaptcha = false;
+    protected String newThreadCaptchaId = null;
     
     
     public InfinityModule(SharedPreferences preferences, Resources resources) {
@@ -255,10 +255,10 @@ public class InfinityModule extends AbstractVichanModule {
         boardsMap.put(shortName, model);
         JSONObject captcha = json.optJSONObject("captcha");
         if ((captcha != null) && captcha.optBoolean("enabled")) {
-            boardsPostCaptcha.add(model.boardName);
-            boardsThreadCaptcha.add(model.boardName);
+            boardsPostCaptcha.add(shortName);
+            boardsThreadCaptcha.add(shortName);
         } else if (json.optBoolean("new_thread_capt")) {
-            boardsThreadCaptcha.add(model.boardName);
+            boardsThreadCaptcha.add(shortName);
         }
         return model;
     }
@@ -291,7 +291,9 @@ public class InfinityModule extends AbstractVichanModule {
                         (thumbLocation + tim + thumbnail_ext);
                 attachment.path = fileLocation + tim + ext;
                 if (getUsingDomain().equals(DEFAULT_DOMAIN)){
-                    attachment.thumbnail = fixRelativeUrl(attachment.thumbnail).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                    if (attachment.thumbnail != null) {
+                        attachment.thumbnail = fixRelativeUrl(attachment.thumbnail).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                    }
                     attachment.path = fixRelativeUrl(attachment.path).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
                 }
                 return attachment;

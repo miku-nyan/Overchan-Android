@@ -89,7 +89,7 @@ public class LampachModule extends AbstractWakabaModule {
     }
     
     @Override
-    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
+    public SimpleBoardModel[] getBoardsList() {
         return BOARDS;
     }
     

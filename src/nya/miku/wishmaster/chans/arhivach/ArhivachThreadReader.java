@@ -21,6 +21,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.common.Logger;
 
 /**
@@ -55,12 +56,14 @@ public class ArhivachThreadReader  implements Closeable {
 
     private static final int FILTER_SAGE = 7;
     private static final int FILTER_NAME = 8;
-    private static final int FILTER_TIME = 9;
-    private static final int FILTER_ID_START = 10;
-    private static final int FILTER_SUBJECT = 11;
-    private static final int FILTER_ID = 12;
-    private static final int FILTER_MAIL = 13;
-    private static final int FILTER_OP = 14;
+    private static final int FILTER_TRIP = 9;
+    private static final int FILTER_TIME = 10;
+    private static final int FILTER_ID_START = 11;
+    private static final int FILTER_SUBJECT = 12;
+    private static final int FILTER_ID = 13;
+    private static final int FILTER_MAIL = 14;
+    private static final int FILTER_OP = 15;
+    private static final int FILTER_DELETED = 16;
 
     public static final char[][] FILTERS_OPEN = {
             "</html>".toCharArray(),
@@ -81,6 +84,8 @@ public class ArhivachThreadReader  implements Closeable {
 
             "class=\"poster_name\">".toCharArray(),
 
+            "class=\"poster_trip\"".toCharArray(),
+
             "class=\"post_time\">".toCharArray(),
 
             "class=\"post_id\"".toCharArray(),
@@ -92,6 +97,8 @@ public class ArhivachThreadReader  implements Closeable {
             "href=\"mailto:".toCharArray(),
 
             "label-success\">OP".toCharArray(),
+
+            "class=\"post post_deleted\"".toCharArray(),
     };
 
     private static final char[][] FILTERS_CLOSE = {
@@ -117,6 +124,8 @@ public class ArhivachThreadReader  implements Closeable {
 
             "</span>".toCharArray(),
 
+            "</span>".toCharArray(),
+
             "</".toCharArray(),
 
             "\"".toCharArray(),
@@ -124,6 +133,8 @@ public class ArhivachThreadReader  implements Closeable {
             ">".toCharArray(),
 
             "</span>".toCharArray(),
+
+            ">".toCharArray(),
     };
 
     private final Reader _in;
@@ -211,6 +222,8 @@ public class ArhivachThreadReader  implements Closeable {
             if (currentPost.comment == null) currentPost.comment = "";
             if (currentPost.email == null) currentPost.email = "";
             if (currentPost.trip == null) currentPost.trip = "";
+            currentPost.comment = CryptoUtils.fixCloudflareEmails(currentPost.comment);
+            currentPost.subject = CryptoUtils.fixCloudflareEmails(currentPost.subject);
             postsBuf.add(currentPost);
         }
         initPostModel();
@@ -237,6 +250,10 @@ public class ArhivachThreadReader  implements Closeable {
             case FILTER_NAME:
                 parseName(readUntilSequence(FILTERS_CLOSE[filterIndex]));
                 break;
+            case FILTER_TRIP:
+                skipUntilSequence(">".toCharArray());
+                currentPost.trip = readUntilSequence(FILTERS_CLOSE[filterIndex]);
+                break;
             case FILTER_TIME:
                 parseDate(readUntilSequence(FILTERS_CLOSE[filterIndex]));
                 break;
@@ -255,7 +272,10 @@ public class ArhivachThreadReader  implements Closeable {
                 skipUntilSequence(FILTERS_CLOSE[filterIndex]);
                 currentPost.op=true;
                 break;
-
+            case FILTER_DELETED:
+                skipUntilSequence(FILTERS_CLOSE[filterIndex]);
+                currentPost.deleted = true;
+                break;
         }
     }
 
