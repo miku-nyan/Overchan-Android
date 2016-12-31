@@ -233,7 +233,7 @@ public class BitmapCache {
                     int height = (int) (bmp.getHeight() * scale);
                     if (Math.min(width, height) > 0) {
                         Bitmap scaled = Bitmap.createScaledBitmap(bmp, width, height, true);
-                        bmp.recycle();
+                        if (!scaled.equals(bmp)) bmp.recycle(); // see createScaledBitmap docs
                         bmp = scaled;
                     }
             }
