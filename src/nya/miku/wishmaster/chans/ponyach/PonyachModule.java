@@ -445,4 +445,10 @@ public class PonyachModule extends AbstractWakabaModule {
         }
     }
     
+    @Override
+    public String fixRelativeUrl(String url) {
+        if (url.startsWith("//")) return (useHttps() ? "https:" : "http:") + url;
+        return super.fixRelativeUrl(url);
+    }
+    
 }
