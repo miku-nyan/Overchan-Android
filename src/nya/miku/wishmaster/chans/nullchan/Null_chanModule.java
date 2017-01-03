@@ -81,7 +81,6 @@ public class Null_chanModule extends InfinityModule {
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
-        addPasswordPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     
