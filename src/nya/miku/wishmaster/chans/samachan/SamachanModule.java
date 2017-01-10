@@ -91,7 +91,7 @@ public class SamachanModule extends AbstractVichanModule {
     }
 
     @Override
-    protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+    public AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         AttachmentModel attachment = super.mapAttachment(object, boardName, isSpoiler);
         if (attachment != null) {
             String ext = object.optString("ext", "");

@@ -135,7 +135,7 @@ public class SynchModule extends AbstractVichanModule {
     }
     
     @Override
-    protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+    public AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         AttachmentModel model = super.mapAttachment(object, boardName, isSpoiler);
         if (model != null) {
             if (model.thumbnail != null) model.thumbnail = model.thumbnail.replace("//", "/").replaceAll("^/\\w+", "");
