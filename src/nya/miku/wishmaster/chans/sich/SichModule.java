@@ -149,7 +149,7 @@ public class SichModule extends AbstractVichanModule {
     }
     
     @Override
-    protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+    public AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         String ext = object.optString("ext", "");
         if (!ext.equals("")) {
             AttachmentModel attachment = new AttachmentModel();

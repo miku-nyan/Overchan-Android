@@ -241,7 +241,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         return model;
     }
     
-    protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+    public AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         String ext = object.optString("ext", "");
         if (!ext.equals("")) {
             AttachmentModel attachment = new AttachmentModel();

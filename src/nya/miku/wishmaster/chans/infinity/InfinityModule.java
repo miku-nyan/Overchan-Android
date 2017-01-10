@@ -46,6 +46,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractVichanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
@@ -449,6 +450,53 @@ public class InfinityModule extends AbstractVichanModule {
         } finally {
             if (response != null) response.release();
         }
+    }
+
+
+    @Override
+    public AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+        String ext = object.optString("ext", "");
+        if (!ext.equals("")) {
+            AttachmentModel attachment = new AttachmentModel();
+            switch (ext) {
+                case ".jpeg":
+                case ".jpg":
+                case ".png":
+                    attachment.type = AttachmentModel.TYPE_IMAGE_STATIC;
+                    break;
+                case ".gif":
+                    attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
+                    break;
+                case ".svg":
+                case ".svgz":
+                    attachment.type = AttachmentModel.TYPE_IMAGE_SVG;
+                    break;
+                case ".mp3":
+                case ".ogg":
+                    attachment.type = AttachmentModel.TYPE_AUDIO;
+                    break;
+                case ".webm":
+                case ".mp4":
+                    attachment.type = AttachmentModel.TYPE_VIDEO;
+                    break;
+                default:
+                    attachment.type = AttachmentModel.TYPE_OTHER_FILE;
+            }
+            attachment.size = object.optInt("fsize", -1);
+            if (attachment.size > 0) attachment.size = Math.round(attachment.size / 1024f);
+            attachment.width = object.optInt("w", -1);
+            attachment.height = object.optInt("h", -1);
+            attachment.originalName = object.optString("filename", "") + ext;
+            attachment.isSpoiler = isSpoiler;
+            String tim = object.optString("tim", "");
+            if (tim.length() > 0) {
+                attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
+                        ("/file_store/thumb/" + tim + ".jpg");
+                attachment.path = "/file_store/" + tim + ext;
+                return attachment;
+            }
+        }
+        return null;
     }
     
 }
