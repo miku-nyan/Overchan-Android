@@ -110,8 +110,8 @@ public class InfinityModule extends AbstractVichanModule {
     protected static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
     
     private Map<String, BoardModel> boardsMap = new HashMap<>();
-    private Set<String> boardsThreadCaptcha = new HashSet<>();
-    private Set<String> boardsPostCaptcha = new HashSet<>();
+    protected Set<String> boardsThreadCaptcha = new HashSet<>();
+    protected Set<String> boardsPostCaptcha = new HashSet<>();
     private boolean needTorCaptcha = false;
     private String torCaptchaCookie = null;
     protected boolean needNewThreadCaptcha = false;

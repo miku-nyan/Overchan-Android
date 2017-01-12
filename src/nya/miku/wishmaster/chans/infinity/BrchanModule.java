@@ -20,10 +20,12 @@ package nya.miku.wishmaster.chans.infinity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
@@ -38,6 +40,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
@@ -46,13 +49,16 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class BrchanModule extends InfinityModule {
     private static final String CHAN_NAME = "brchan.org";
     private static final String DEFAULT_DOMAIN = "brchan.org";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN };
+    
     private static final Pattern PROTECTED_URL_PATTERN = Pattern.compile("<a[^>]*href=\"https?://privatelink.de/\\?([^\"]*)\"[^>]*>");
+    private static final Pattern CAPTCHA_BASE64 = Pattern.compile("data:image/png;base64,([^\"]+)\"");
     
     public BrchanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -101,6 +107,7 @@ public class BrchanModule extends InfinityModule {
         BoardModel model = super.getBoard(shortName, listener, task);
         if (model.attachmentsMaxCount > 0) model.attachmentsMaxCount = 3;
         model.timeZoneId = "Brazil/East";
+        model.markType = BoardModel.MARK_BBCODE;
         return model;
     }
     
@@ -109,6 +116,28 @@ public class BrchanModule extends InfinityModule {
         PostModel model = super.mapPostModel(object, boardName);
         model.comment = RegexUtils.replaceAll(model.comment, PROTECTED_URL_PATTERN, "<a href=\"$1\">");
         return model;
+    }
+    
+    @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        needNewThreadCaptcha = threadNumber == null ?
+                boardsThreadCaptcha.contains(boardName) :
+                    boardsPostCaptcha.contains(boardName);
+        if (needNewThreadCaptcha) {
+            String url = getUsingUrl() + "captcha.php?board=" + boardName;
+            HttpRequestModel request = HttpRequestModel.builder().setGET().
+                    setCustomHeaders(new Header[] { new BasicHeader(HttpHeaders.CACHE_CONTROL, "max-age=0") }).build();
+            String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
+            Matcher base64Matcher = CAPTCHA_BASE64.matcher(response);
+            if (base64Matcher.find()) {
+                byte[] bitmap = Base64.decode(base64Matcher.group(1), Base64.DEFAULT);
+                CaptchaModel captcha = new CaptchaModel();
+                captcha.type = CaptchaModel.TYPE_NORMAL;
+                captcha.bitmap = BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length);
+                return captcha;
+            }
+        }
+        return null;
     }
     
     @Override
@@ -133,7 +162,7 @@ public class BrchanModule extends InfinityModule {
             }
         }
         if (needNewThreadCaptcha) {
-            postEntityBuilder.addString("captcha_text", model.captchaAnswer).addString("captcha_cookie", newThreadCaptchaId);
+            postEntityBuilder.addString("captcha_text", model.captchaAnswer);
         }
         
         UrlPageModel refererPage = new UrlPageModel();
@@ -153,9 +182,6 @@ public class BrchanModule extends InfinityModule {
         if (json.has("error")) {
             String error = json.optString("error");
             if (error.equals("true") && json.optBoolean("banned")) throw new Exception("You are banned! ;_;");
-            if (error.contains("/entrypoint")) {
-                throw new Exception("Você errou o codigo de verificação.");
-            }
             throw new Exception(error);
         } else {
             String redirect = json.optString("redirect", "");
