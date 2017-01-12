@@ -49,10 +49,13 @@ public class LampachReader extends WakabaReader {
     private static final char[] LABELCLOSE_FILTER = "</label>".toCharArray();
     private static final char[] BLOCKQUOTE_OPEN = "<div class=\"message\">".toCharArray();
     private static final char[] BLOCKQUOTE_CLOSE = "</div>".toCharArray();
+    private static final char[] NUMBEROPEN_FILTER = "<a id=\"".toCharArray();
+    private static final char[] NUMBERCLOSE_FILTER = "\"".toCharArray();
     
     private int curLabelOpenPos = 0;
     private int curLabelClosePos = 0;
     private int curCommentPos = 0;
+    private int curNumberPos = 0;
     private StringBuilder labelBuf = new StringBuilder();
     private boolean inLabel = false;
     private String boardName;
@@ -65,6 +68,16 @@ public class LampachReader extends WakabaReader {
     @Override
     protected void customFilters(int ch) throws IOException {
         if (inLabel) labelBuf.append((char) ch);
+        
+        if (ch == NUMBEROPEN_FILTER[curNumberPos]) {
+            ++curNumberPos;
+            if (curNumberPos == NUMBEROPEN_FILTER.length) {
+                currentPost.number = readUntilSequence(NUMBERCLOSE_FILTER);
+                curNumberPos = 0;
+            }
+        } else {
+            if (curNumberPos != 0) curNumberPos = ch == NUMBEROPEN_FILTER[0] ? 1 : 0;
+        }
         
         if (ch == BLOCKQUOTE_OPEN[curCommentPos]) {
             ++curCommentPos;
@@ -103,7 +116,6 @@ public class LampachReader extends WakabaReader {
                 if (adminMark.find()) {
                     currentPost.trip = adminMark.group(1);
                 }
-                
                 curLabelClosePos = 0;
             }
         } else {
