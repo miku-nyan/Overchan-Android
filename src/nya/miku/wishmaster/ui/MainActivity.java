@@ -917,4 +917,18 @@ public class MainActivity extends FragmentActivity {
             intent.setData(null);
         }
     }
+    
+    @Override
+    public void startActivity(Intent intent){
+        if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_CHOOSER)) {
+            Fragment currentFragment = MainApplication.getInstance().tabsSwitcher.currentFragment;
+            if (currentFragment instanceof BoardFragment) {
+                Intent sendIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
+                if (sendIntent != null) {
+                    ((BoardFragment) currentFragment).setIntentExtras(sendIntent);
+                }
+            }
+        }
+        super.startActivity(intent);
+    }
 }

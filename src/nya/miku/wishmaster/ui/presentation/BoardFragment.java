@@ -160,6 +160,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     public static final String BROADCAST_PAGE_LOADED = "nya.miku.wishmaster.BROADCAST_ACTION_PAGE_LOADED";
     
+    public static View lastFocusedView = null;
+    
     private boolean isFailInstance = false;
     
     private PagesCache pagesCache = MainApplication.getInstance().pagesCache;
@@ -1575,6 +1577,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
     }
     
+    public Intent setIntentExtras(Intent sendIntent) {
+        return adapter.setIntentExtras(lastFocusedView, sendIntent);
+    }
+    
     private static class PostsListAdapter extends ArrayAdapter<PresentationItemModel> {
         private static final int ITEM_VIEW_TYPE_NORMAL = 0;
         private static final int ITEM_VIEW_TYPE_HIDDEN = 1;
@@ -1715,6 +1721,40 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             public boolean postsCountIsVisible = false;
         }
         
+        public Intent setIntentExtras(View v, Intent sendIntent) {
+            if (v == null) return sendIntent;
+            Object tag = v.getTag();
+            if ((tag != null) && (tag instanceof PostViewTag)) {
+                String quote = getSelectedText((PostViewTag) tag);
+                SendPostModel sendReplyModel = fragment().getSendPostModel();
+                sendReplyModel.password = null;
+                PresentationItemModel item = fragment().adapter.getItem(((PostViewTag) tag).position);
+                String postNumber = item.sourceModel.number;
+                MainApplication instance = MainApplication.getInstance();
+                ChanModule chan = instance.getChanModule(sendReplyModel.chanName);
+                UrlPageModel model = new UrlPageModel();
+                model.type = model.TYPE_THREADPAGE;
+                model.chanName = sendReplyModel.chanName;
+                model.boardName = sendReplyModel.boardName;
+                model.threadNumber = sendReplyModel.threadNumber;
+                model.postNumber = postNumber;
+                String postURI = chan.buildUrl(model);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(fragment().getString(R.string.intent_overchan_send_post_model), sendReplyModel);
+                bundle.putString(fragment().getString(R.string.intent_overchan_quote_text), quote);
+                bundle.putString(fragment().getString(R.string.intent_overchan_post_number), postNumber);
+                bundle.putString(fragment().getString(R.string.intent_overchan_post_uri), postURI);
+                sendIntent.putExtra(fragment().getString(R.string.intent_overchan_extras), bundle);
+            }
+            return sendIntent;
+        }
+        
+        private String getSelectedText(PostViewTag tag) {
+            int start = tag.commentView.getSelectionStart();
+            int end = tag.commentView.getSelectionEnd();
+            return tag.commentView.getText().subSequence(start, end).toString();
+        }
+
         @Override
         public int getCount() {
             return currentCount;
@@ -1880,6 +1920,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 TextView type = (TextView) tag.singleThumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
                 type.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
                 tag.commentView = (ClickableLinksTextView) view.findViewById(R.id.post_comment);
+                tag.commentView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        if (hasFocus) lastFocusedView = view;
+                    }
+                });
                 tag.showFullTextView = (TextView) view.findViewById(R.id.post_show_full_text);
                 tag.repliesView = (JellyBeanSpanFixTextView) view.findViewById(R.id.post_replies);
                 tag.postsCountView = (TextView) view.findViewById(R.id.post_posts_count);
@@ -1891,9 +1937,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         @Override
                         public void onClick() {
                             try {
-                                int start = tag.commentView.getSelectionStart();
-                                int end = tag.commentView.getSelectionEnd();
-                                String quote = tag.commentView.getText().subSequence(start, end).toString();
+                                String quote = getSelectedText(tag);
                                 fragment().openReply(tag.position, true, quote);
                             } catch (Exception e) {
                                 Logger.e(TAG, e);

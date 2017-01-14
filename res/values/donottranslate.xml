@@ -172,4 +172,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_post_thumbnail_scale_value_150percent</item>
         <item>@string/pref_post_thumbnail_scale_value_200percent</item>
     </string-array>
+    <string name="intent_overchan_extras">OVERCHAN_EXTRAS</string>
+    <string name="intent_overchan_send_post_model">OVERCHAN_SEND_POST_MODEL</string>
+    <string name="intent_overchan_quote_text">OVERCHAN_QUOTE_TEXT</string>
+    <string name="intent_overchan_post_number">OVERCHAN_POST_NUMBER</string>
+    <string name="intent_overchan_post_uri">OVERCHAN_POST_URI</string>
 </resources>
