@@ -107,7 +107,7 @@ public class KurisachModule extends AbstractInstant0chan {
     public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
             throws Exception {
         String url = getUsingUrl() + "api.php?id=1&method=get_part_of_board&board=" + boardName
-                + "&start=" + (page * THREADS_PER_PAGE + 1) + "&threadnum=" + THREADS_PER_PAGE + "&previewnum=3";
+                + "&start=" + (page * THREADS_PER_PAGE) + "&threadnum=" + THREADS_PER_PAGE + "&previewnum=3";
         JSONObject json = downloadJSONObject(url, false, listener, task);
         try {
             JSONArray threads = json.getJSONArray("result");
@@ -297,4 +297,31 @@ public class KurisachModule extends AbstractInstant0chan {
             return response.optString("error");
         }
     }
+    
+    @Override
+    public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
+        if (!model.chanName.equals(getChanName())) throw new IllegalArgumentException("wrong chan");
+        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return getUsingUrl() + model.boardName + "/catalog.html";
+        return WakabaUtils.buildUrl(model, getUsingUrl());
+    }
+    
+    @Override
+    public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
+        if (url.contains("/catalog.html")) {
+            try {
+                int index = url.indexOf("/catalog.html");
+                String path = url.substring(0, index);
+                UrlPageModel model = new UrlPageModel();
+                model.chanName = getChanName();
+                model.type = UrlPageModel.TYPE_CATALOGPAGE;
+                model.boardName = path.substring(path.lastIndexOf('/') + 1);
+                model.catalogType = 0;
+                return model;
+            } catch (Exception e) {}
+        }
+        return WakabaUtils.parseUrlPath(urlPath, getChanName());
+    }
+    
 }
