@@ -55,6 +55,7 @@ public class KurisachModule extends AbstractInstant0chan {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "video;games", "Boards", false)
     };
     private static final int THREADS_PER_PAGE = 15;
+    private static final long TIMEZONE_CORRECTION = 10800000;    //UTC+3 offset. Remove when timestamp will be fixed on server
     
     public KurisachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -106,7 +107,7 @@ public class KurisachModule extends AbstractInstant0chan {
     public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
             throws Exception {
         String url = getUsingUrl() + "api.php?id=1&method=get_part_of_board&board=" + boardName
-                + "&start=" + (page * THREADS_PER_PAGE) + "&threadnum=" + THREADS_PER_PAGE + "&previewnum=3";
+                + "&start=" + (page * THREADS_PER_PAGE + 1) + "&threadnum=" + THREADS_PER_PAGE + "&previewnum=3";
         JSONObject json = downloadJSONObject(url, false, listener, task);
         try {
             JSONArray threads = json.getJSONArray("result");
@@ -125,7 +126,8 @@ public class KurisachModule extends AbstractInstant0chan {
             throws Exception {
         if (loadOnlyNewPosts() && (oldList != null) && (oldList.length > 0)) {
             String url = getUsingUrl() + "api.php?id=1&method=get_updates_to_thread&board=" + boardName
-                    + "&thread_id=" + threadNumber + "&timestamp=" + (oldList[oldList.length - 1].timestamp / 1000);
+                    + "&thread_id=" + threadNumber + "&timestamp="
+                        + (oldList[oldList.length - 1].timestamp + TIMEZONE_CORRECTION) / 1000;
             JSONObject jsonResponse = null;
             try {
                 jsonResponse = downloadJSONObject(url, false, listener, task);
@@ -207,10 +209,11 @@ public class KurisachModule extends AbstractInstant0chan {
                 replace("\\\"", "\"").replace("\\'", "'");
         model.email = json.optString("email");
         model.trip = json.optString("tripcode");
+        if (!model.trip.isEmpty() && !model.trip.startsWith("!")) model.trip = "!" + model.trip;
         model.icons = null;
         model.op = false;
         model.sage = model.email.toLowerCase(Locale.US).equals("sage");
-        model.timestamp = json.optLong("datetime") * 1000;
+        model.timestamp = json.optLong("datetime") * 1000 - TIMEZONE_CORRECTION;
         model.parentThread = json.optString("thread", model.number);
         String ext = json.optString("filetype");
         if (ext.length() > 0) {
@@ -274,7 +277,7 @@ public class KurisachModule extends AbstractInstant0chan {
         Collections.sort(keys, new Comparator<String>() {
             @Override
             public int compare(String key1, String key2) {
-                return Integer.valueOf(key1) - Integer.valueOf(key2);
+                return Integer.valueOf(key1).compareTo(Integer.valueOf(key2));
             }
         });
         for (int i=0; i<keys.size(); ++i) {
