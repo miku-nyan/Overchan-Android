@@ -673,6 +673,12 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     }
     
     @Override
+    protected void onResume() {
+        super.onResume();
+        readSendPostModel();
+    }
+    
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (currentTask != null) currentTask.cancel();

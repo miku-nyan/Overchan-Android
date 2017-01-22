@@ -235,6 +235,7 @@ public class ShareActivity extends ListActivity {
         addPostIntent.putExtra(PostingService.EXTRA_PAGE_HASH, item.getLeft().hash);
         addPostIntent.putExtra(PostingService.EXTRA_BOARD_MODEL, item.getRight().boardModel);
         addPostIntent.putExtra(PostingService.EXTRA_SEND_POST_MODEL, draft);
+        addPostIntent.setFlags(addPostIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
         finish();
         startActivity(addPostIntent);
     }
