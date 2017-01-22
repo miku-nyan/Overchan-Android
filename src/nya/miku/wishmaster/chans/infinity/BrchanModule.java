@@ -105,7 +105,7 @@ public class BrchanModule extends InfinityModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
-        if (model.attachmentsMaxCount > 0) model.attachmentsMaxCount = 3;
+        if (model.attachmentsMaxCount > 0) model.attachmentsMaxCount = 4;
         model.timeZoneId = "Brazil/East";
         model.markType = BoardModel.MARK_BBCODE;
         return model;
@@ -156,7 +156,7 @@ public class BrchanModule extends InfinityModule {
         postEntityBuilder.addString("password", TextUtils.isEmpty(model.password) ? getDefaultPassword() : model.password).
                 addString("json_response", "1");
         if (model.attachments != null) {
-            String[] images = new String[] { "file", "file2", "file3" };
+            String[] images = new String[] { "file", "file2", "file3", "file4" };
             for (int i=0; i<model.attachments.length; ++i) {
                 postEntityBuilder.addFile(images[i], model.attachments[i], model.randomHash);
             }
