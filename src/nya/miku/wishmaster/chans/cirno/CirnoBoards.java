@@ -34,16 +34,17 @@ public class CirnoBoards {
     
     private static final List<String> IICHAN_SPOILER_MARK_BOARDS = Arrays.asList("bro", "maid", "med", "tv", "a", "fi", "to", "vn", "vg");
     
+    private static final List<String> IICHAN_READONLY_BOARDS = Arrays.asList("o", "w", "abe", "ma", "azu", "me", "hau", "sos", "mo");
+    
     private static final List<BoardModel> LIST_IICHAN = new ArrayList<BoardModel>();
     private static final Map<String, BoardModel> MAP_IICHAN = new HashMap<String, BoardModel>();
     private static final SimpleBoardModel[] SIMPLE_ARRAY_IICHAN;
     
     static {
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
-        addBoard("au", "Автомобили", "Общее", "Джереми Кларксон", false);
-        addBoard("es", "Бесконечное лето", "Общее", "Пионер", false);
+        addBoard("bg", "Настольные игры", "К удалению", "Аноним", false);
+        addBoard("sp", "Спорт", "К удалению", "Спортакус", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
-        addBoard("vg", "Видеоигры", "Общее", "Марио", false);
         addBoard("hr", "Высокое разрешение", "Общее", "Аноним", false);
         addBoard("gf", "gif- и flash-анимация", "Общее", "Аноним", true); //???
         addBoard("ci", "Городская жизнь", "Общее", "Аноним", false);
@@ -57,24 +58,22 @@ public class CirnoBoards {
         addBoard("bro", "My Little Pony", "Общее", "Эпплджек", false);
         addBoard("m", "Картинки-макросы и копипаста", "Общее", "Копипаста-гей", false);
         addBoard("med", "Медицина", "Общее", "Антон Буслов", false);
-        addBoard("mo", "Мотоциклы", "Общее", "Аноним", false);
         addBoard("mu", "Музыка", "Общее", "Виктор Цой", false);
-        addBoard("bg", "Настольные игры", "Общее", "Аноним", false);
         addBoard("sci", "Наука", "Общее", "Гриша Перельман", false);
-        //addBoard("w", "Обои", "Общее", "Аноним", false);
         addBoard("mi", "Оружие", "Общее", "Й. Швейк", false);
         addBoard("o", "Оэкаки", "Общее", "Аноним", false);
         addBoard("x", "Паранормальные явления", "Общее", "Эмма Ай", false);
-        //addBoard("p", "Политика", "Общее", "Аноним", true); //???
         addBoard("r", "Просьбы", "Общее", "Аноним", false);
         addBoard("dev", "Разработка", "Общее", "Стив Балмер", false);
         addBoard("maid", "Служанки", "Общее", "Госюдзин-сама", false);
-        addBoard("sp", "Спорт", "Общее", "Спортакус", false);
-        addBoard("tr", "Транспорт", "Общее", "Аноним", false);
         addBoard("tu", "Туризм", "Общее", "Аноним", false);
         addBoard("ph", "Фото", "Общее", "Аноним", false);
         addBoard("fr", "Фурри", "Общее", "Аноним", false);
         addBoard("s", "Электроника и ПО", "Общее", "Чии", false);
+        addBoard("es", "Бесконечное лето", "Игры", "Пионер", false);
+        addBoard("vg", "Видеоигры", "Игры", "Марио", false);
+        addBoard("au", "Автомобили", "Транспорт", "Джереми Кларксон", false);
+        addBoard("tr", "Транспорт", "Транспорт", "Аноним", false);
         addBoard("a", "Аниме и манга", "Японская культура", "Мокона", false);
         addBoard("aa", "Аниме-арт", "Японская культура", "Ракка", false);
         addBoard("vn", "Визуальные новеллы", "Японская культура", "Сэйбер", false);
@@ -82,10 +81,8 @@ public class CirnoBoards {
         addBoard("abe", "ёситоси абэ", "Японская культура", "Chada", false);
         addBoard("c", "Косплей", "Японская культура", "Аноним", false);
         addBoard("ls", "Lucky☆Star", "Японская культура", "Цукаса", false);
-        //addBoard("ma", "Манга", "Японская культура", "Иноуэ Орихимэ", false);
         addBoard("rm", "Rozen Maiden", "Японская культура", "Суйгинто", false);
         addBoard("tan", "Сетевые персонажи", "Японская культура", "Уныл-тян", false);
-        addBoard("sos", "Suzumiya Haruhi no Yūutsu", "Японская культура", "Кёнко", false);
         addBoard("to", "Touhou", "Японская культура", "Нитори", false);
         addBoard("fi", "Фигурки", "Японская культура", "Фигурка анонима", false);
         addBoard("ts", "Цундере", "Японская культура", "Baka Inu", false);
@@ -127,7 +124,7 @@ public class CirnoBoards {
         model.defaultUserName = defaultPosterName;
         model.bumpLimit = 500;
         
-        model.readonlyBoard = name.equals("o") || name.equals("w") || name.equals("abe") || name.equals("ma");
+        model.readonlyBoard = IICHAN_READONLY_BOARDS.indexOf(name) != -1;
         model.requiredFileForNewThread = !name.equals("d");
         model.allowDeletePosts = true;
         model.allowDeleteFiles = true;
