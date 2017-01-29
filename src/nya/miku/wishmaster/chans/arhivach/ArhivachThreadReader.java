@@ -283,12 +283,12 @@ public class ArhivachThreadReader  implements Closeable {
         int index = s.indexOf("<");
         if (index>0) {
             currentPost.name = s.substring(0, index);
-            Matcher matcher = Pattern.compile("src=\"([^\"]*)\"",Pattern.MULTILINE).matcher(s);
+            Matcher matcher = Pattern.compile("src=\"([^\"]*)\"(?:.*?title=\"([^\"]*)\")?",Pattern.MULTILINE).matcher(s);
             ArrayList<BadgeIconModel> icons=new ArrayList<BadgeIconModel>();
             while (matcher.find()) {
                 BadgeIconModel icon = new BadgeIconModel();
                 icon.source=matcher.group(1);
-                icon.description=null;
+                icon.description=matcher.group(2);
                 icons.add(icon);
             }
             if (icons.size()>0)
