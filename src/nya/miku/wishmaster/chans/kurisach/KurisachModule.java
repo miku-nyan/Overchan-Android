@@ -39,8 +39,11 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
+import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.chans.nullchan.AbstractInstant0chan;
 import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
@@ -55,6 +58,7 @@ public class KurisachModule extends AbstractInstant0chan {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "video;games", "Boards", false)
     };
     private static final int THREADS_PER_PAGE = 15;
+    private static final long TIMEZONE_CORRECTION = 10800000;    //UTC+3 offset. Remove when timestamp will be fixed on server
     
     public KurisachModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -125,7 +129,8 @@ public class KurisachModule extends AbstractInstant0chan {
             throws Exception {
         if (loadOnlyNewPosts() && (oldList != null) && (oldList.length > 0)) {
             String url = getUsingUrl() + "api.php?id=1&method=get_updates_to_thread&board=" + boardName
-                    + "&thread_id=" + threadNumber + "&timestamp=" + (oldList[oldList.length - 1].timestamp / 1000);
+                    + "&thread_id=" + threadNumber + "&timestamp="
+                        + (oldList[oldList.length - 1].timestamp + TIMEZONE_CORRECTION) / 1000;
             JSONObject jsonResponse = null;
             try {
                 jsonResponse = downloadJSONObject(url, false, listener, task);
@@ -207,10 +212,11 @@ public class KurisachModule extends AbstractInstant0chan {
                 replace("\\\"", "\"").replace("\\'", "'");
         model.email = json.optString("email");
         model.trip = json.optString("tripcode");
+        if (!model.trip.isEmpty() && !model.trip.startsWith("!")) model.trip = "!" + model.trip;
         model.icons = null;
         model.op = false;
         model.sage = model.email.toLowerCase(Locale.US).equals("sage");
-        model.timestamp = json.optLong("datetime") * 1000;
+        model.timestamp = json.optLong("datetime") * 1000 - TIMEZONE_CORRECTION;
         model.parentThread = json.optString("thread", model.number);
         String ext = json.optString("filetype");
         if (ext.length() > 0) {
@@ -274,7 +280,7 @@ public class KurisachModule extends AbstractInstant0chan {
         Collections.sort(keys, new Comparator<String>() {
             @Override
             public int compare(String key1, String key2) {
-                return Integer.valueOf(key1) - Integer.valueOf(key2);
+                return Integer.valueOf(key1).compareTo(Integer.valueOf(key2));
             }
         });
         for (int i=0; i<keys.size(); ++i) {
@@ -294,4 +300,31 @@ public class KurisachModule extends AbstractInstant0chan {
             return response.optString("error");
         }
     }
+    
+    @Override
+    public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
+        if (!model.chanName.equals(getChanName())) throw new IllegalArgumentException("wrong chan");
+        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return getUsingUrl() + model.boardName + "/catalog.html";
+        return WakabaUtils.buildUrl(model, getUsingUrl());
+    }
+    
+    @Override
+    public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
+        if (url.contains("/catalog.html")) {
+            try {
+                int index = url.indexOf("/catalog.html");
+                String path = url.substring(0, index);
+                UrlPageModel model = new UrlPageModel();
+                model.chanName = getChanName();
+                model.type = UrlPageModel.TYPE_CATALOGPAGE;
+                model.boardName = path.substring(path.lastIndexOf('/') + 1);
+                model.catalogType = 0;
+                return model;
+            } catch (Exception e) {}
+        }
+        return WakabaUtils.parseUrlPath(urlPath, getChanName());
+    }
+    
 }

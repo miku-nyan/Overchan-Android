@@ -136,6 +136,7 @@ public class HorochanModule extends CloudflareChanModule {
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
         Context context = preferenceGroup.getContext();
+        addPasswordPreference(preferenceGroup);
         addOnlyNewPostsPreference(preferenceGroup, true);
         CheckBoxPreference fallbackRecaptchaPref = new LazyPreferences.CheckBoxPreference(context); // recaptcha fallback
         fallbackRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha_fallback);

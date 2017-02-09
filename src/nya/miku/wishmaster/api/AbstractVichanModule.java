@@ -239,8 +239,9 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     
     protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         String ext = object.optString("ext", "");
-        if (!ext.equals("")) {
+        if (!ext.isEmpty()) {
             AttachmentModel attachment = new AttachmentModel();
+            ext = ext.toLowerCase(Locale.US);
             switch (ext) {
                 case ".jpeg":
                 case ".jpg":
@@ -314,7 +315,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
                 default: val = pair.getValue();
             }
             if (pair.getKey().equals("file")) {
-                if (model.attachments != null) {
+                if (model.attachments != null && model.attachments.length > 0) {
                     for (int i=0; i<model.attachments.length && i<ATTACHMENT_KEYS.length; ++i) {
                         postEntityBuilder.addFile(ATTACHMENT_KEYS[i], model.attachments[i], model.randomHash);
                     }

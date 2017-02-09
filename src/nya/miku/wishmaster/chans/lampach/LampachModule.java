@@ -47,12 +47,13 @@ import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
 public class LampachModule extends AbstractWakabaModule {
-    
     private static final String CHAN_NAME = "lampach.net";
     private static final String DOMAIN = "lampach.net";
     private static final String[] FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
@@ -60,8 +61,10 @@ public class LampachModule extends AbstractWakabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "Lampa chan", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ku", "Kuroki", null, false)
     };
+    private static final String RECAPTCHA_KEY = "6LcauyUTAAAAAKsJWyOBVOEXEjs5fVnrse_507E8";
+    private static final String RECAPTCHA_BOARD = "r";
     
-    private static final Pattern ERROR_PATTERN = Pattern.compile("<div style=[^>]*>(.*?)<");
+    private static final Pattern ERROR_PATTERN = Pattern.compile("<div style=[^>]*>(.*?)</div>");
     private static final Pattern REDIRECT_PATTERN = Pattern.compile("url=res/(\\d+)\\.html#(\\d+)");
     
     public LampachModule(SharedPreferences preferences, Resources resources) {
@@ -123,6 +126,7 @@ public class LampachModule extends AbstractWakabaModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (RECAPTCHA_BOARD.equals(boardName)) return null;
         String captchaUrl = getUsingUrl() + boardName + "/inc/captcha.php";
         return downloadCaptcha(captchaUrl, listener, task);
     }
@@ -135,8 +139,16 @@ public class LampachModule extends AbstractWakabaModule {
                 addString("email", model.sage ? "sage" : ((TextUtils.isEmpty(model.email)) ? "noko" : model.email)).
                 addString("subject", model.subject).
                 addString("message", model.comment).
-                addString("captcha", TextUtils.isEmpty(model.captchaAnswer) ? "" : model.captchaAnswer).
                 addString("password", model.password);
+        if (RECAPTCHA_BOARD.equals(model.boardName)) {
+            String response = Recaptcha2solved.pop(RECAPTCHA_KEY);
+            if (response == null) {
+                throw Recaptcha2.obtain(getUsingUrl(), RECAPTCHA_KEY, null, CHAN_NAME, false);
+            }
+            postEntityBuilder.addString("g-recaptcha-response", response);
+        } else {
+            postEntityBuilder.addString("captcha", model.captchaAnswer);
+        }
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("file", model.attachments[0], model.randomHash);
         

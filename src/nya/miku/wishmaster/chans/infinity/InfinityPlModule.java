@@ -89,6 +89,9 @@ public class InfinityPlModule extends InfinityModule {
                 postEntityBuilder.addFile(images[i], model.attachments[i], model.randomHash);
             }
         }
+        if (needNewThreadCaptcha) {
+            postEntityBuilder.addString("captcha_text", model.captchaAnswer).addString("captcha_cookie", newThreadCaptchaId);
+        }
         
         UrlPageModel refererPage = new UrlPageModel();
         refererPage.chanName = getChanName();

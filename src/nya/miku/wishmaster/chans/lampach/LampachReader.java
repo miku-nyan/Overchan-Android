@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.chans.lampach;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,14 +30,17 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
 
 @SuppressLint("SimpleDateFormat")
 public class LampachReader extends WakabaReader {
     
-    private static final Pattern ADMIN_MARK_PATTERN = Pattern.compile("<span style=\"color: red;\">(.*?)</span>");
+    private static final Pattern SPAN_ADMIN_PATTERN = Pattern.compile("<span\\s*style=\"color:\\s*(\\w+)[^\"]*\">(.*?)</span>(.*)");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("<a[^>]*href=\"mailto:([^\"]*)\"");
     
     private static final DateFormat DATE_FORMAT;
@@ -49,10 +53,13 @@ public class LampachReader extends WakabaReader {
     private static final char[] LABELCLOSE_FILTER = "</label>".toCharArray();
     private static final char[] BLOCKQUOTE_OPEN = "<div class=\"message\">".toCharArray();
     private static final char[] BLOCKQUOTE_CLOSE = "</div>".toCharArray();
+    private static final char[] NUMBEROPEN_FILTER = "<a id=\"".toCharArray();
+    private static final char[] NUMBERCLOSE_FILTER = "\"".toCharArray();
     
     private int curLabelOpenPos = 0;
     private int curLabelClosePos = 0;
     private int curCommentPos = 0;
+    private int curNumberPos = 0;
     private StringBuilder labelBuf = new StringBuilder();
     private boolean inLabel = false;
     private String boardName;
@@ -65,6 +72,16 @@ public class LampachReader extends WakabaReader {
     @Override
     protected void customFilters(int ch) throws IOException {
         if (inLabel) labelBuf.append((char) ch);
+        
+        if (ch == NUMBEROPEN_FILTER[curNumberPos]) {
+            ++curNumberPos;
+            if (curNumberPos == NUMBEROPEN_FILTER.length) {
+                currentPost.number = readUntilSequence(NUMBERCLOSE_FILTER);
+                curNumberPos = 0;
+            }
+        } else {
+            if (curNumberPos != 0) curNumberPos = ch == NUMBEROPEN_FILTER[0] ? 1 : 0;
+        }
         
         if (ch == BLOCKQUOTE_OPEN[curCommentPos]) {
             ++curCommentPos;
@@ -99,11 +116,6 @@ public class LampachReader extends WakabaReader {
                         currentPost.sage = true;
                     }
                 }
-                Matcher adminMark = ADMIN_MARK_PATTERN.matcher(labelBuf.toString());
-                if (adminMark.find()) {
-                    currentPost.trip = adminMark.group(1);
-                }
-                
                 curLabelClosePos = 0;
             }
         } else {
@@ -114,6 +126,16 @@ public class LampachReader extends WakabaReader {
     
     @Override
     protected void parseDate(String date) {
+        Matcher matcher = SPAN_ADMIN_PATTERN.matcher(date);
+        if (matcher.find()) {
+            currentPost.trip = (currentPost.trip == null ? "" : currentPost.trip)
+                    + StringEscapeUtils.unescapeHtml4(matcher.group(2));
+            currentPost.color = Color.parseColor(matcher.group(1));
+            date = matcher.group(3);
+        } else {
+            if (date.startsWith("<")) date = RegexUtils.removeHtmlTags(date);
+        }
+        
         try {
             currentPost.timestamp = DATE_FORMAT.parse(date.replace("|", "")).getTime();
         } catch (Exception e) {
