@@ -163,7 +163,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
             }
         } else {
             if (position < selectedItem) --selectedItem;
-            setSelectedItem(selectedItem, true, false); //serialize
+            setSelectedItem(selectedItem, true, MainApplication.getInstance().settings.scrollToActiveTab()); //serialize
         }
     }
     

@@ -624,4 +624,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_post_thumbnail_scale_title">Thumbnail-Größe</string>
     <string name="pref_key_post_thumbnail_scale_toast">Es wird empfohlen, den Cache zu löschen</string>
     <string name="newtab_select_local_directory">Speicherort angeben</string>
+    <string name="pref_scroll_to_active_tab_title">Blättern Sie zur aktiven Registerkarte</string>
+    <string name="pref_scroll_to_active_tab_summary">Blättern Sie zum aktiven Tab, wenn Sie die inaktive Registerkarte schließen</string>
 </resources>

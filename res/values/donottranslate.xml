@@ -177,4 +177,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="intent_overchan_quote_text">OVERCHAN_QUOTE_TEXT</string>
     <string name="intent_overchan_post_number">OVERCHAN_POST_NUMBER</string>
     <string name="intent_overchan_post_uri">OVERCHAN_POST_URI</string>
+    <string name="pref_key_scroll_to_active_tab">PREF_KEY_SCROLL_TO_ACTIVE_TAB</string>
 </resources>

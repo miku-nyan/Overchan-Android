@@ -636,4 +636,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_post_thumbnail_scale_title">Розмір ескізів</string>
     <string name="pref_key_post_thumbnail_scale_toast">Рекомендується очистити кеш</string>
     <string name="newtab_select_local_directory">Вказати розташування каталогу</string>
+    <string name="pref_scroll_to_active_tab_summary">Прокручувати до активної вкладки при закритті неактивній вкладки</string>
+    <string name="pref_scroll_to_active_tab_title">Прокрутка до активної вкладки</string>
 </resources>

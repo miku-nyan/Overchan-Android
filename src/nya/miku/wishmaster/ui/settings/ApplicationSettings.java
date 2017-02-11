@@ -78,7 +78,11 @@ public class ApplicationSettings {
     public boolean isDisplayDate() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_date), true);
     }
-    
+
+    public boolean scrollToActiveTab() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_scroll_to_active_tab), true);
+    }
+
     public enum DownloadThumbnailsMode {
         ALWAYS,
         WIFI_ONLY,

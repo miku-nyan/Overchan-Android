@@ -623,4 +623,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_post_thumbnail_scale_title">Post thumbnail size</string>
     <string name="pref_key_post_thumbnail_scale_toast">It\'s recommended to clear cache after thumbnail scale has been changed</string>
     <string name="newtab_select_local_directory">Specify directory location</string>
+    <string name="pref_scroll_to_active_tab_summary">Scroll to the active tab when closing inactive tab</string>
+    <string name="pref_scroll_to_active_tab_title">Scroll to the active tab</string>
 </resources>

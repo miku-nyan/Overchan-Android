@@ -257,6 +257,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:key="@string/pref_key_pin_markup"
             android:title="@string/pref_pin_markup_title"
             android:summary="@string/pref_pin_markup_summary" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_scroll_to_active_tab"
+            android:title="@string/pref_scroll_to_active_tab_title"
+            android:summary="@string/pref_scroll_to_active_tab_summary" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_downloads" >
