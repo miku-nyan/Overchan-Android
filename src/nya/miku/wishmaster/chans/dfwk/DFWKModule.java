@@ -94,6 +94,16 @@ public class DFWKModule extends AbstractKusabaModule {
     }
     
     @Override
+    protected boolean canHttps() {
+        return true;
+    }
+    
+    @Override
+    protected boolean useHttpsDefaultValue() {
+        return false;
+    }
+    
+    @Override
     protected SimpleBoardModel[] getBoardsList() {
         return BOARDS;
     }

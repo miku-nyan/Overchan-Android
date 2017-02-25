@@ -123,8 +123,17 @@ public class AnonFmModule extends AbstractChanModule {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_anonfm, null);
     }
     
+    private boolean useHttps() {
+        return useHttps(false);
+    }
+    
+    private String getUsingUrl() {
+        return (useHttps() ? "https://" : "http://") + DOMAIN + "/";
+    }
+    
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addHttpsPreference(preferenceGroup, false);
         addProxyPreferences(preferenceGroup);
     }
     
@@ -158,7 +167,7 @@ public class AnonFmModule extends AbstractChanModule {
         postHeader.number = threadNumber;
         postHeader.subject = "Кукареканье со стороны диджейки";
         postHeader.name = "";
-        postHeader.comment = !newThreadLink ? "" : ("<a href=\"http://" + DOMAIN + "/#_" +
+        postHeader.comment = !newThreadLink ? "" : ("<a href=\"" + getUsingUrl() + "#_" +
                 Integer.toString(Integer.parseInt(getCurrentThreadNumber().substring(1)) + 1) + "\">Перейти на новую страницу</a>");
         return postHeader;
     }
@@ -178,7 +187,7 @@ public class AnonFmModule extends AbstractChanModule {
     
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
-        String url = "http://" + DOMAIN + "/";
+        String url = getUsingUrl();
         if (model.threadNumber != null && model.threadNumber.length() > 0) url += "#" + model.threadNumber;
         return url;
     }
@@ -196,7 +205,7 @@ public class AnonFmModule extends AbstractChanModule {
             throws Exception {
         if (!boardName.equals(BOARD.boardName)) throw new IllegalArgumentException();
         setCurrentThreadNumber(threadNumber);
-        String url = "http://" + DOMAIN + "/answers.js";
+        String url = getUsingUrl() + "answers.js";
         HttpRequestModel request = HttpRequestModel.builder().setGET().setCheckIfModified(oldList != null).build();
         JSONArray json = HttpStreamer.getInstance().getJSONArrayFromUrl(url, request, httpClient, listener, task, false);
         if (json == null) return oldList;
@@ -228,13 +237,13 @@ public class AnonFmModule extends AbstractChanModule {
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         HttpRequestModel request = HttpRequestModel.builder().setGET().setCustomHeaders(HTTP_HEADER_FEEDBACK).build();
-        String postFormHtml = HttpStreamer.getInstance().getStringFromUrl("http://" + DOMAIN + "/feedback", request, httpClient, null, task, false);
+        String postFormHtml = HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "feedback", request, httpClient, null, task, false);
         Matcher matcher = CID_PATTERN.matcher(postFormHtml);
         if (!matcher.find()) throw new Exception("Couldn't get captcha");
         
         String cid = matcher.group(1);
         this.cid = cid;
-        String captchaUrl = "http://" + DOMAIN + "/feedback/" + cid + ".gif";
+        String captchaUrl = getUsingUrl() + "feedback/" + cid + ".gif";
         
         Bitmap captchaBitmap = null;
         HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, request, httpClient, listener, task);
@@ -263,12 +272,12 @@ public class AnonFmModule extends AbstractChanModule {
                 HttpRequestModel.builder().setPOST(new UrlEncodedFormEntity(pairs, "UTF-8")).setCustomHeaders(HTTP_HEADER_FEEDBACK).build();
         HttpResponseModel response = null;
         try {
-            response = HttpStreamer.getInstance().getFromUrl("http://" + DOMAIN + "/feedback", request, httpClient, null, task);
+            response = HttpStreamer.getInstance().getFromUrl(getUsingUrl() + "feedback", request, httpClient, null, task);
             if (response.statusCode == 200) {
                 ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
                 IOUtils.copyStream(response.stream, output);
                 String htmlResponse = output.toString("UTF-8");
-                if (htmlResponse.contains("window.close,10000")) return "http://" + DOMAIN + "/#" + getCurrentThreadNumber();
+                if (htmlResponse.contains("window.close,10000")) return getUsingUrl() + "#" + getCurrentThreadNumber();
                 if (htmlResponse.contains("Неверный код подтверждения")) throw new Exception("Неверный код подтверждения");
                 throw new Exception("Ошибка отправки");
             } else {
