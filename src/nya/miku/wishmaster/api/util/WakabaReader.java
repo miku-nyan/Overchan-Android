@@ -59,7 +59,8 @@ public class WakabaReader implements Closeable {
         }
     }
     
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("<a[^>]*href=\"([^\"]*)\"[^>]*>(.*)</a>", Pattern.DOTALL);
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("<a[^>]*href=\"([^\"]*)\"[^>]*>(.*)</a>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern ATTACHMENT_SIZE_PATTERN =
             Pattern.compile("([,\\.\\d]+) ?([кkмm])?i?[бb]", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern ATTACHMENT_PX_SIZE_PATTERN = Pattern.compile("(\\d+)[x×х](\\d+)"); // \u0078 \u00D7 \u0445
