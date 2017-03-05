@@ -18,27 +18,36 @@
 
 package nya.miku.wishmaster.chans.hispachan;
 
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
-import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.http.streamer.HttpRequestModel;
+import nya.miku.wishmaster.http.streamer.HttpResponseModel;
+import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
 @SuppressLint("SimpleDateFormat")
 public class HispachanModule extends AbstractKusabaModule {
@@ -70,6 +79,12 @@ public class HispachanModule extends AbstractKusabaModule {
     };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "gif", "jpg", "png", "pdf", "swf", "webm" };
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy HH:mm");
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+    
+    private static final Pattern EMAIL_OPTIONS = Pattern.compile("^(noko|dado|OP|fortuna)?(sage)?$");
+    private static final Pattern ERROR_POSTING = Pattern.compile("<div class=\"diverror\"[^>]*>(?:.*<br[^>]*>)?(.*?)</div>", Pattern.DOTALL);
     
     public HispachanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -129,8 +144,10 @@ public class HispachanModule extends AbstractKusabaModule {
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
         model.defaultUserName = shortName.equals("fun") ? "Hanonymouz" : "Anónimo";
+        model.allowDeletePosts = false;
+        model.allowDeleteFiles = false;
         model.allowNames = false;
-        model.allowEmails = false;
+        model.ignoreEmailIfSage = false;
         model.allowCustomMark = true;
         model.customMarkDescription = "Spoiler";
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
@@ -139,11 +156,63 @@ public class HispachanModule extends AbstractKusabaModule {
     }
     
     @Override
-    public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
-            throws Exception {
-        PostModel[] result = super.getPostsList(boardName, threadNumber, listener, task, oldList);
-        if (result != null && result.length > 0) result[0].number = threadNumber;
-        return result;
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "board.php";
+        ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
+        Matcher matcher = EMAIL_OPTIONS.matcher(model.email);
+        String emOptions;
+        if (matcher.matches()) {
+            emOptions = matcher.group(1) != null ? matcher.group(1) : "noko";
+            if (model.sage || matcher.group(2) != null) emOptions += "sage";
+        } else {
+            emOptions = model.sage ? "nokosage" : "noko";
+        }
+        postEntityBuilder.
+            addString("board", model.boardName).
+            addString("replythread", model.threadNumber == null ? "0" : model.threadNumber).
+            addString("name", model.name).
+            addString("em", emOptions).
+            addString("subject", model.subject).
+            addString("message", model.comment);
+        setSendPostEntityAttachments(model, postEntityBuilder);
+        
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
+        HttpResponseModel response = null;
+        try {
+            response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
+            if (response.statusCode == 302) {
+                if (!model.email.startsWith("noko")) return null;
+                for (Header header : response.headers) {
+                    if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
+                        return fixRelativeUrl(header.getValue());
+                    }
+                }
+            } else if (response.statusCode == 200) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
+                IOUtils.copyStream(response.stream, output);
+                String htmlResponse = output.toString("UTF-8");
+                if (htmlResponse.contains("<div class=\"divban\">")) {
+                    //parse ban message
+                    throw new Exception("¡ESTÁS BANEADO!");
+                }
+                Matcher errorMatcher = ERROR_POSTING.matcher(htmlResponse);
+                if (errorMatcher.find()) {
+                    throw new Exception(StringEscapeUtils.unescapeHtml4(errorMatcher.group(1).trim()));
+                }
+            } else {
+                throw new Exception(response.statusCode + " - " + response.statusReason);
+            }
+        } finally {
+            if (response != null) response.release();
+        }
+        return null;
     }
+    
+    @Override
+    protected String getReportFormValue(DeletePostModel model) {
+        return "Reportar";
+    }
+    
+    //TODO: Implement Hispachan reader
     
 }
