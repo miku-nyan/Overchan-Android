@@ -83,7 +83,7 @@ public class HispachanModule extends AbstractKusabaModule {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
     
-    private static final Pattern EMAIL_OPTIONS = Pattern.compile("^(noko|dado|OP|fortuna)?(sage)?$");
+    private static final String[] EMAIL_OPTIONS = new String[] { "Opciones", "noko", "dado", "OP", "fortuna", "nokosage", "dadosage", "OPsage", "fortunasage" };
     private static final Pattern ERROR_POSTING = Pattern.compile("<div class=\"diverror\"[^>]*>(?:.*<br[^>]*>)?(.*?)</div>", Pattern.DOTALL);
     
     public HispachanModule(SharedPreferences preferences, Resources resources) {
@@ -147,9 +147,12 @@ public class HispachanModule extends AbstractKusabaModule {
         model.allowDeletePosts = false;
         model.allowDeleteFiles = false;
         model.allowNames = false;
-        model.ignoreEmailIfSage = false;
-        model.allowCustomMark = true;
+        model.allowSage = false;
+        model.allowEmails = false;
+        model.allowCustomMark = !model.nsfw;
         model.customMarkDescription = "Spoiler";
+        model.allowIcons = true;
+        model.iconDescriptions = EMAIL_OPTIONS;
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         model.markType = BoardModel.MARK_BBCODE;
         return model;
@@ -159,14 +162,7 @@ public class HispachanModule extends AbstractKusabaModule {
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String url = getUsingUrl() + "board.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task);
-        Matcher matcher = EMAIL_OPTIONS.matcher(model.email);
-        String emOptions;
-        if (matcher.matches()) {
-            emOptions = matcher.group(1) != null ? matcher.group(1) : "noko";
-            if (model.sage || matcher.group(2) != null) emOptions += "sage";
-        } else {
-            emOptions = model.sage ? "nokosage" : "noko";
-        }
+        String emOptions = (model.icon > 0 && model.icon < EMAIL_OPTIONS.length) ? EMAIL_OPTIONS[model.icon] : "noko";
         postEntityBuilder.
             addString("board", model.boardName).
             addString("replythread", model.threadNumber == null ? "0" : model.threadNumber).
@@ -181,7 +177,7 @@ public class HispachanModule extends AbstractKusabaModule {
         try {
             response = HttpStreamer.getInstance().getFromUrl(url, request, httpClient, null, task);
             if (response.statusCode == 302) {
-                if (!model.email.startsWith("noko")) return null;
+                if (!emOptions.startsWith("noko")) return null;
                 for (Header header : response.headers) {
                     if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
                         return fixRelativeUrl(header.getValue());
