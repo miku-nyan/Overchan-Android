@@ -19,6 +19,8 @@
 package nya.miku.wishmaster.http.cloudflare;
 
 import java.util.Date;
+import java.util.Locale;
+
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.HttpConstants;
@@ -249,7 +251,7 @@ public class CloudflareChecker {
             }
             
             String urlCookie = "." + Uri.parse(url).getHost();
-            if (cookieName.equals(requiredCookieName) && cookieDomain.equalsIgnoreCase(urlCookie)) {
+            if (cookieName.equals(requiredCookieName) && urlCookie.endsWith(cookieDomain.toLowerCase(Locale.US))) {
                 return true;
             }
         } catch (Exception e) {
