@@ -306,6 +306,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     handleFile(UriFileUtils.getFile(this, imageUri));
                     break;
             }
+            saveSendPostModel();
         }
     }
     
@@ -544,6 +545,8 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         if (boardModel.allowCustomMark) custommarkChkbox.setChecked(sendPostModel.custommark);
         captchaField.setText(sendPostModel.captchaAnswer != null ? sendPostModel.captchaAnswer : "");
         if (sendPostModel.attachments != null) {
+            attachmentsLayout.removeAllViews();
+            attachments.clear();
             for (File attachment : sendPostModel.attachments) {
                 handleFile(attachment);
             }
