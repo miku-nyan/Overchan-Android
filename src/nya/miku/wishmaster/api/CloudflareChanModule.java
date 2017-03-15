@@ -92,7 +92,7 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
             }
         } else if (e.getStatusCode() == 503) {
             String html = e.getHtmlString();
-            if (html != null && html.contains("Just a moment...")) {
+            if (html != null && html.contains("Checking your browser")) {
                 throw CloudflareException.antiDDOS(url, getChanName());
             }
         }
