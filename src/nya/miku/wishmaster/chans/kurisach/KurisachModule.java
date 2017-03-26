@@ -94,13 +94,15 @@ public class KurisachModule extends AbstractInstant0chan {
     }
     
     @Override
-    protected SimpleBoardModel[] getBoardsList() {
+    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
         return BOARDS;
     }
     
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
+        model.allowCustomMark = true;
+        model.customMarkDescription = "Спойлер";
         model.catalogAllowed = true;
         model.timeZoneId = "GMT";
         return model;
@@ -263,7 +265,7 @@ public class KurisachModule extends AbstractInstant0chan {
                     attachment.path = (useHttps() ? "https" : "http")
                             + "://coub.com/view/" + fileName;
                 } else {
-                    attachment.thumbnail = (attachment.type == AttachmentModel.TYPE_AUDIO
+                    attachment.thumbnail = (attachment.isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO
                             || attachment.type == AttachmentModel.TYPE_VIDEO) ? null :
                                 "/" + boardName + "/thumb/" + fileName  + "s." + ext;
                     attachment.path = "/" + boardName + "/src/" + fileName + "." + ext;

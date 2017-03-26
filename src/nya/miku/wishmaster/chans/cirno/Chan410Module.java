@@ -35,6 +35,7 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractChanModule;
@@ -85,6 +86,14 @@ public class Chan410Module extends AbstractChanModule {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_410chan, null);
     }
     
+    private boolean useHttps() {
+        return useHttps(false);
+    }
+    
+    private String getUsingUrl() {
+        return (useHttps() ? "https://" : "http://") + CHAN410_DOMAIN + "/";
+    }
+    
     @Override
     protected void initHttpClient() {
         JSONObject savedCookies = new JSONObject(preferences.getString(getSharedKey(PREF_KEY_FAPTCHA_COOKIES), "{}"));
@@ -115,6 +124,12 @@ public class Chan410Module extends AbstractChanModule {
             }
         }
         preferences.edit().putString(getSharedKey(PREF_KEY_FAPTCHA_COOKIES), savedCookies.toString()).commit();
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addHttpsPreference(preferenceGroup, false);
+        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
@@ -221,16 +236,16 @@ public class Chan410Module extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String checkUrl = CHAN410_URL + "api_adaptive.php?board=" + boardName;
+        String checkUrl = getUsingUrl() + "api_adaptive.php?board=" + boardName;
         if (HttpStreamer.getInstance().getStringFromUrl(checkUrl, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false).trim().
                 equals("1")) return null;
-        String captchaUrl = CHAN410_URL + "faptcha.php?board=" + boardName;
+        String captchaUrl = getUsingUrl() + "faptcha.php?board=" + boardName;
         return downloadCaptcha(captchaUrl, listener, task);
     }
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = CHAN410_URL + "board.php";
+        String url = getUsingUrl() + "board.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("board", model.boardName).
                 addString("replythread", model.threadNumber != null ? model.threadNumber : "0").
@@ -279,7 +294,7 @@ public class Chan410Module extends AbstractChanModule {
     
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = CHAN410_URL + "board.php";
+        String url = getUsingUrl() + "board.php";
         
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("board", model.boardName));
@@ -296,7 +311,7 @@ public class Chan410Module extends AbstractChanModule {
     
     @Override
     public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = CHAN410_URL + "board.php";
+        String url = getUsingUrl() + "board.php";
         
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("board", model.boardName));
@@ -312,8 +327,8 @@ public class Chan410Module extends AbstractChanModule {
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN410_NAME)) throw new IllegalArgumentException("wrong chan");
-        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return CHAN410_URL + model.boardName + "/catalog.html";
-        return WakabaUtils.buildUrl(model, CHAN410_URL);
+        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return getUsingUrl() + model.boardName + "/catalog.html";
+        return WakabaUtils.buildUrl(model, getUsingUrl());
     }
     
     @Override

@@ -93,6 +93,16 @@ public class TohnoChanModule extends AbstractKusabaModule {
     }
     
     @Override
+    protected boolean canHttps() {
+        return true;
+    }
+    
+    @Override
+    protected boolean useHttpsDefaultValue() {
+        return false;
+    }
+    
+    @Override
     protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
         return new TohnoChanReader(stream, canCloudflare());
     }

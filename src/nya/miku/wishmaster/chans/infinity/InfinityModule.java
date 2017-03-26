@@ -77,6 +77,7 @@ public class InfinityModule extends AbstractVichanModule {
     
     private static final String CHAN_NAME = "8chan";
     private static final String DEFAULT_DOMAIN = "8ch.net";
+    private static final String SYSTEM_DOMAIN = "sys.8ch.net";
     private static final String MEDIA_DOMAIN = "media.8ch.net";
     private static final String MEDIA2_DOMAIN = "media2.8ch.net";
     private static final String ONION_DOMAIN = "oxwugzccvk3dk6tj.onion";
@@ -401,7 +402,12 @@ public class InfinityModule extends AbstractVichanModule {
             }
         }
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
-        String url = getUsingUrl() + "post.php";
+        String url;
+        if (DEFAULT_DOMAIN.equals(getUsingDomain())) {
+            url = (useHttps() ? "https://" : "http://") + SYSTEM_DOMAIN + "/post.php";
+        } else {
+            url = getUsingUrl() + "post.php";
+        }
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("name", model.name).
                 addString("email", model.sage ? "sage" : model.email).

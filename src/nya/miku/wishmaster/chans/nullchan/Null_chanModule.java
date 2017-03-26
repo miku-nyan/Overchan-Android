@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
@@ -36,6 +37,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
@@ -46,6 +48,7 @@ import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class Null_chanModule extends InfinityModule {
@@ -58,6 +61,7 @@ public class Null_chanModule extends InfinityModule {
     
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "gif", "png", "webm", "mp4" };
     
+    private static final Pattern CAPTCHA_BASE64 = Pattern.compile("data:image/png;base64,([^\"]+)\"");
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
     
     public Null_chanModule(SharedPreferences preferences, Resources resources) {
@@ -148,6 +152,24 @@ public class Null_chanModule extends InfinityModule {
     }
     
     @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + "8chan-captcha/entrypoint.php?mode=get&extra=abcdefghijklmnopqrstuvwxyz";
+        HttpRequestModel request = HttpRequestModel.builder().setGET()
+                .setCustomHeaders(new Header[] { new BasicHeader(HttpHeaders.CACHE_CONTROL, "max-age=0") }).build();
+        JSONObject jsonResponse = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, listener, task, false);
+        Matcher base64Matcher = CAPTCHA_BASE64.matcher(jsonResponse.optString("captchahtml"));
+        if (jsonResponse.has("cookie") && base64Matcher.find()) {
+            byte[] bitmap = Base64.decode(base64Matcher.group(1), Base64.DEFAULT);
+            newThreadCaptchaId = jsonResponse.getString("cookie");
+            CaptchaModel captcha = new CaptchaModel();
+            captcha.type = CaptchaModel.TYPE_NORMAL;
+            captcha.bitmap = BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length);
+            return captcha;
+        }
+        return null;
+    }
+    
+    @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
         String url = getUsingUrl() + "post.php";
@@ -158,6 +180,8 @@ public class Null_chanModule extends InfinityModule {
                 addString("body", model.comment).
                 addString("post", model.threadNumber == null ? "New Topic" : "New Reply").
                 addString("board", model.boardName).
+                addString("captcha_text", model.captchaAnswer).
+                addString("captcha_cookie", newThreadCaptchaId).
                 addString("json_response", "1");
         if (model.threadNumber != null) postEntityBuilder.addString("thread", model.threadNumber);
         if (model.custommark) postEntityBuilder.addString("spoiler", "on");
@@ -188,6 +212,8 @@ public class Null_chanModule extends InfinityModule {
                 String htmlResponse = output.toString("UTF-8");
                 if (htmlResponse.contains("banned")) {
                     throw new Exception("You are banned! ;_;");
+                } else if (htmlResponse.contains("/entrypoint")) {
+                    throw new Exception("You seem to have mistyped the verification, or your CAPTCHA expired. Please fill it out again.");
                 }
                 JSONObject result = new JSONObject(htmlResponse);
                 if (result.has("error")) {
