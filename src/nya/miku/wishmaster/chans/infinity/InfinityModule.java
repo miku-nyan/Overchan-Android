@@ -20,7 +20,6 @@ package nya.miku.wishmaster.chans.infinity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +42,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
@@ -237,7 +237,7 @@ public class InfinityModule extends AbstractVichanModule {
         model.requiredFileForNewThread = json.optBoolean("force_image_op", false);
         model.allowDeletePosts = json.optBoolean("allow_delete", false);
         model.allowDeleteFiles = model.allowDeletePosts;
-        model.allowNames = true;
+        model.allowNames = !json.optBoolean("field_disable_name", false);
         model.allowSubjects = true;
         model.allowSage = true;
         model.allowEmails = true;
@@ -246,7 +246,7 @@ public class InfinityModule extends AbstractVichanModule {
         model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false;
-        model.attachmentsMaxCount = json.optBoolean("disable_images", false) ? 0 : 5;
+        model.attachmentsMaxCount = json.optBoolean("disable_images", false) ? 0 : json.optInt("max_images", 5);
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         model.markType = BoardModel.MARK_NOMARK;
         model.firstPage = 1;
@@ -306,12 +306,11 @@ public class InfinityModule extends AbstractVichanModule {
     @Override
     public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
         String fixedUrl = fixRelativeUrl(url);
-        URL mURL = new URL(fixedUrl);
         try {
             super.downloadFile(fixedUrl, out, listener, task);
         } catch (HttpWrongStatusCodeException e) {
-            if ((url.contains("/file_store/") || url.contains("/src/")) && e.getStatusCode() == 404) {
-                switch (mURL.getHost()){
+            if (e.getStatusCode() == 404 && (url.contains("/file_store/") || url.contains("/src/"))) {
+                switch (Uri.parse(fixedUrl).getHost()) {
                     case MEDIA_DOMAIN:
                         downloadFile(fixedUrl.replaceFirst(MEDIA_DOMAIN, MEDIA2_DOMAIN), out, listener, task);
                         break;
@@ -321,6 +320,8 @@ public class InfinityModule extends AbstractVichanModule {
                     default:
                         throw e;
                 }
+            } else {
+                throw e;
             }
         }
     }
