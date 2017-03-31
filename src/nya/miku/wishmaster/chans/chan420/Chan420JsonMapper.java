@@ -90,7 +90,7 @@ public class Chan420JsonMapper {
         model.allowDeletePosts = false;
         model.allowDeleteFiles = false;
         model.allowReport = BoardModel.REPORT_WITH_COMMENT;
-        model.allowNames = !boardName.equals("b");
+        model.allowNames = !boardName.equals("b") && !boardName.equals("420");
         model.allowSubjects = true;
         model.allowSage = true;
         model.allowEmails = false;
@@ -116,13 +116,13 @@ public class Chan420JsonMapper {
         model.op = false;
         String id = object.optString("id", "");
         model.sage = id.equalsIgnoreCase("Heaven");
-        if (!id.equals("")) model.name += (" ID:" + id);
+        if (!id.isEmpty()) model.name += (" ID:" + id);
         model.timestamp = object.getLong("time") * 1000;
         model.parentThread = object.optString("resto", "0");
         if (model.parentThread.equals("0")) model.parentThread = model.number;
         model.comment = toHtml(model.comment, boardName, model.parentThread);
         String ext = object.optString("ext", "");
-        if (!ext.equals("")) {
+        if (!ext.isEmpty()) {
             AttachmentModel attachment = new AttachmentModel();
             switch (ext) {
                 case ".jpg":
@@ -150,8 +150,13 @@ public class Chan420JsonMapper {
             attachment.isSpoiler = object.optInt("spoiler") == 1;
             long tim = object.optLong("filename");
             if (tim != 0) {
-                attachment.thumbnail = "/" + boardName + "/thumb/" + Long.toString(tim) + "s.jpg";
                 attachment.path = "/" + boardName + "/src/" + Long.toString(tim) + ext;
+                if ((attachment.type == AttachmentModel.TYPE_IMAGE_STATIC || attachment.type == AttachmentModel.TYPE_IMAGE_GIF)
+                        && attachment.width == object.optInt("tn_w", 0) && attachment.height == object.optInt("tn_h", 0)) {
+                    attachment.thumbnail = attachment.path; // Image equal or smaller than 200x200 pixels
+                } else {
+                    attachment.thumbnail = "/" + boardName + "/thumb/" + Long.toString(tim) + "s.jpg";
+                }
             } else {
                 String filename = attachment.originalName;
                 try {
