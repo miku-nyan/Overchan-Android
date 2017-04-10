@@ -125,7 +125,7 @@ public class BoardModel implements Serializable {
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - без разметки */
     public static final int MARK_NOMARK = 0;
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - модифицированный wakabamark.<br>
-     *  *italic* **bold** %%spoiler%% strike^H^H^H^H^H^H */
+     *  *italic* **bold** %%spoiler%% strike^H^H^H^H^H^H `code` */
     public static final int MARK_WAKABAMARK = 1;
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - BBCode.<br>
      *  [i]italic[/i] [b]bold[/b] [u]underline[/u] [spoiler]spoiler[/spoiler] [s]strike[/s] */
@@ -133,6 +133,9 @@ public class BoardModel implements Serializable {
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - 4chan.<br>
      *  *italic* **bold** __underline__ [spoiler]spoiler[/spoiler] */
     public static final int MARK_4CHAN = 3;
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - 0chan.hk.<br>
+     *  *italic* **bold** %%spoiler%% -strike- `code` */
+    public static final int MARK_NULL_CHAN = 4;
     
     /** Константное значение, если на данной доске нет возможности пожаловаться на сообщения */
     public static final int REPORT_NOT_ALLOWED = 0;
