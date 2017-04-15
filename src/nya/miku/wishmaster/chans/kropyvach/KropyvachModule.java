@@ -49,6 +49,7 @@ public class KropyvachModule extends AbstractVichanModule {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "m", "Музика", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "l", "Література", "", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "p", "Політика", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "t", "Тренування", "", false),
     };
     
     public KropyvachModule(SharedPreferences preferences, Resources resources) {

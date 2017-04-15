@@ -33,21 +33,18 @@ import nya.miku.wishmaster.api.util.ChanModels;
 
 public class Chan76Module extends AbstractVichanModule {
     private static final String CHAN_NAME = "76chan.org";
-    
+    private static final String CHAN_DOMAIN = "76chan.org";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "76", "76chan Discussion", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "br", "The Brothel", null, true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "s", "Spaghetti", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "s", "Spaghetti", null, true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "Film", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "i", "Information + Fileshare", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "v", "Video Games", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "int", "International", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "i", "Invasion", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fit", "Fitness", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "new", "Current Events", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r7k", "Robot 7600", null, false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r7k", "Robot 7602", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Aneemay", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sp", "Sports", null, false),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Hobbies", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lounge", "Comfy", null, false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tv", "TEE VEE", null, false)
     };
     
     public Chan76Module(SharedPreferences preferences, Resources resources) {
@@ -61,7 +58,7 @@ public class Chan76Module extends AbstractVichanModule {
     
     @Override
     public String getDisplayingName() {
-        return CHAN_NAME;
+        return "76chan";
     }
     
     @Override
@@ -71,7 +68,7 @@ public class Chan76Module extends AbstractVichanModule {
     
     @Override
     protected String getUsingDomain() {
-        return CHAN_NAME;
+        return CHAN_DOMAIN;
     }
     
     @Override

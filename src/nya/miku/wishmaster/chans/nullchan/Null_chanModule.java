@@ -55,7 +55,7 @@ public class Null_chanModule extends InfinityModule {
     private static final String CHAN_NAME = "0-chan.ru";
     private static final String DOMAIN = "0-chan.ru";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Новый Движок", null, true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Нульчан", null, true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tmp", "Временное убежище", null, true)
     };
     
@@ -105,7 +105,7 @@ public class Null_chanModule extends InfinityModule {
     
     @Override
     protected boolean useHttps() {
-        return useHttps(false);
+        return false;
     }
     
     @Override
