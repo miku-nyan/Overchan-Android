@@ -30,6 +30,7 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
@@ -108,9 +109,9 @@ public class Chan420JsonMapper {
     public static PostModel mapPostModel(JSONObject object, String boardName) {
         PostModel model = new PostModel();
         model.number = Long.toString(object.getLong("no"));
-        model.name = StringEscapeUtils.unescapeHtml4(object.optString("name", "Anonymous").replaceAll("</?span[^>]*?>", ""));
-        model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
-        model.comment = object.optString("com", "");
+        model.name = StringEscapeUtils.unescapeHtml4(toUtf8(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous"))));
+        model.subject = StringEscapeUtils.unescapeHtml4(toUtf8(object.optString("sub", "")));
+        model.comment = toUtf8(object.optString("com", ""));
         model.email = null;
         model.trip = object.optString("trip", "");
         model.op = false;
@@ -198,4 +199,13 @@ public class Chan420JsonMapper {
         
         return com;
     }
+    
+    private static String toUtf8(String text) {
+        try {
+            return new String(text.getBytes("Windows-1252"), "UTF-8");
+        } catch (Exception e) {
+            return text;
+        }
+    }
+    
 }
