@@ -50,6 +50,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -197,8 +198,8 @@ public class NewNullchanModule extends CloudflareChanModule {
     public ThreadModel[] getThreadsList(String boardName, int page, ProgressListener listener, CancellableTask task, ThreadModel[] oldList) throws Exception {
         updateSession(listener, task);
         String cursor = boardCursors.get(boardName);
-        String url = getUsingUrl() + "api/board?dir=" + boardName + "&page=" + (page + 1) + "&session=" + sessionId;
-        if (cursor != null && page > 0) {
+        String url = getUsingUrl() + "api/board?dir=" + boardName + (page > 1 ? "&page=" + Integer.toString(page) : "") + "&session=" + sessionId;
+        if (cursor != null && page > 1) {
             url = url + "&cursor=" + cursor;
         }
         JSONObject response = downloadJSONObject(url, oldList != null, listener, task);
@@ -305,7 +306,11 @@ public class NewNullchanModule extends CloudflareChanModule {
             throw e;
         }
         JSONObject result = new JSONObject(response);
-        if (!result.optBoolean("ok", false)) throw new Exception(result.toString());
+        if (!result.optBoolean("ok", false)) {
+            String errorMessage = result.optString("reason");
+            if (errorMessage.length() > 0) throw new Exception(errorMessage);
+            throw new Exception(result.toString());
+        }
         String token = result.getJSONObject("attachment").getString("token");
         if (!token.equals("")) imageTokens.put(token, attachment.getPath());
         return token;
@@ -357,14 +362,16 @@ public class NewNullchanModule extends CloudflareChanModule {
 
         String url = null;
         String parent = null;
+        String comment = model.comment;
 
         if (model.threadNumber != null) {
-            Matcher matcher = Pattern.compile("(>>\\d+)").matcher(model.comment);
+            Pattern referencePattern = Pattern.compile(">>(\\d+)");
+            Matcher matcher = referencePattern.matcher(comment);
             if (matcher.find()) {
-                parent = matcher.group(1).replace(">>", "");
+                parent = matcher.group(1);
                 JSONObject post = getPost(parent, listener, task);
                 if (post.optString("threadId").equals(model.threadNumber)) {
-                    model.comment = model.comment.replace(matcher.group(1), "");
+                    comment = RegexUtils.replaceAll(comment, referencePattern, "");
                 } else {
                     parent = getOpPostID(model, listener, task);
                 }
@@ -379,7 +386,7 @@ public class NewNullchanModule extends CloudflareChanModule {
         jsonPayload.put("board", model.boardName);
         jsonPayload.put("thread", model.threadNumber != null ? model.threadNumber : JSONObject.NULL);
         jsonPayload.put("parent", parent != null ? parent : JSONObject.NULL);
-        jsonPayload.put("message", model.comment);
+        jsonPayload.put("message", comment);
         
         if (model.attachments != null && model.attachments.length > 0) {
             JSONArray images = new JSONArray();
@@ -421,7 +428,7 @@ public class NewNullchanModule extends CloudflareChanModule {
         }
         result = new JSONObject(response);
         if (!result.optBoolean("ok", false)) {
-            String errorMessage = result.optString("error", "");
+            String errorMessage = result.optString("reason", "");
             if (errorMessage.length() > 0) throw new Exception(errorMessage);
             throw new Exception(response);
         }
@@ -434,6 +441,8 @@ public class NewNullchanModule extends CloudflareChanModule {
         urlModel.postNumber = post.optString("id", null);
         return this.buildUrl(urlModel);
     }
+
+    //TODO: implement reportPost method
 
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {

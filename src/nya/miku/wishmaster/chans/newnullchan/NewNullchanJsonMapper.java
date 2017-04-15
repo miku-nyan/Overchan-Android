@@ -71,7 +71,7 @@ public class NewNullchanJsonMapper {
         model.attachmentsMaxCount = 8;
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         model.markType = BoardModel.MARK_NULL_CHAN;
-        model.firstPage = 0;
+        model.firstPage = 1;
         model.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
         model.searchAllowed = false;
         model.catalogAllowed = false;

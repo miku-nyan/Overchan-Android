@@ -113,6 +113,7 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.tohnochan.TohnoChanModule",
             "nya.miku.wishmaster.chans.chan76.Chan76Module",
             "nya.miku.wishmaster.chans.dfwk.DFWKModule",
+            "nya.miku.wishmaster.chans.newnullchan.NewNullchanModule",
             "nya.miku.wishmaster.chans.anonfm.AnonFmModule",
             "nya.miku.wishmaster.chans.makaba.MakabaModule",
             "nya.miku.wishmaster.chans.arhivach.ArhivachModule",
