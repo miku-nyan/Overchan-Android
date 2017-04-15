@@ -139,7 +139,7 @@ public class LampachModule extends AbstractWakabaModule {
                 addString("subject", model.subject).
                 addString("message", model.comment).
                 addString("password", model.password);
-        if (model.sage) postEntityBuilder("sage", "sage");
+        if (model.sage) postEntityBuilder.addString("sage", "sage");
         if (RECAPTCHA_BOARD.equals(model.boardName)) {
             String response = Recaptcha2solved.pop(RECAPTCHA_KEY);
             if (response == null) {

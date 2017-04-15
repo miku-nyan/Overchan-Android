@@ -97,6 +97,7 @@ public class AllchanModule extends CloudflareChanModule {
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); }
     
     private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=['\"]quotation['\"]>");
+    private static final Pattern COMMENT_CODE = Pattern.compile("<div class=['\"]code-block[^>]*>(.*?)</div>");
     
     private HashMap<String, BoardModel> boardsMap;
     
@@ -403,6 +404,7 @@ public class AllchanModule extends CloudflareChanModule {
             model.subject = "";
         }
         String text = RegexUtils.replaceAll(json.optString("text"), COMMENT_QUOTE, "<span class=\"unkfunc\">");
+        text = RegexUtils.replaceAll(text, COMMENT_CODE, "<code>$1</code>");
         model.comment = model.comment != null ? (model.comment + text) : text;
         model.email = json.optString("email");
         model.trip = json.optString("tripcode");
