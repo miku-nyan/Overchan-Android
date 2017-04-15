@@ -61,6 +61,7 @@ import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -79,6 +80,10 @@ public class KrautModule extends CloudflareChanModule {
     private static final String PREF_KEY_KOMPTURCODE_COOKIE = "PREF_KEY_KOMPTURCODE_COOKIE";
     
     private static final String KOMTURCODE_COOKIE_NAME = "desuchan.komturcode";
+    
+    private static final Pattern THREADPAGE_PATTERN = Pattern.compile("([^/]+)/thread-(\\d+)\\.html[^#]*(?:#(\\d+))?");
+    private static final Pattern CATALOGPAGE_PATTERN = Pattern.compile("catalog/(\\w+)");
+    private static final Pattern BOARDPAGE_PATTERN = Pattern.compile("([^/]+)(?:/(\\d+)\\.html?)?");
     
     private Map<String, BoardModel> boardsMap = null;
     private String lastCaptchaId = null;
@@ -151,12 +156,16 @@ public class KrautModule extends CloudflareChanModule {
         return useHttps(true);
     }
     
+    private String getUsingUrl() {
+        return (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/";
+    }
+    
     /**
      * If (url == null) returns boards list (SimpleBoardModel[]), thread/threads page (ThreadModel[]) otherwise
      */
     private Object readPage(String url, ProgressListener listener, CancellableTask task, boolean checkIfModified) throws Exception {
         boolean boardsList = url == null;
-        if (boardsList) url = (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/nav";
+        if (boardsList) url = getUsingUrl() + "nav";
         boolean catalog = boardsList ? false : url.contains("/catalog/");
         
         HttpResponseModel responseModel = null;
@@ -273,14 +282,14 @@ public class KrautModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/ajax/checkpost?board=" + boardName;
+        String url = getUsingUrl() + "ajax/checkpost?board=" + boardName;
         try {
             JSONObject data = HttpStreamer.getInstance().
                     getJSONObjectFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, true).
                     getJSONObject("data");
             if (data.optString("captchas", "").equals("always")) {
-                StringBuilder captchaUrlBuilder = new StringBuilder();
-                captchaUrlBuilder.append(useHttps() ? "https://" : "http://").append(CHAN_DOMAIN).append("/captcha?id=");
+                StringBuilder captchaUrlBuilder = new StringBuilder(getUsingUrl());
+                captchaUrlBuilder.append("captcha?id=");
                 StringBuilder captchaIdBuilder = new StringBuilder();
                 captchaIdBuilder.append(boardName);
                 if (threadNumber != null) captchaIdBuilder.append(threadNumber);
@@ -311,7 +320,7 @@ public class KrautModule extends CloudflareChanModule {
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/post";
+        String url = getUsingUrl() + "post";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("internal_n", model.name).
                 addString("internal_s", model.subject);
@@ -377,7 +386,7 @@ public class KrautModule extends CloudflareChanModule {
     
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = (useHttps() ? "https://" : "http://") + CHAN_DOMAIN + "/delete";
+        String url = getUsingUrl() + "delete";
         
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("post_" + model.postNumber, "delete"));
@@ -423,8 +432,7 @@ public class KrautModule extends CloudflareChanModule {
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN_NAME)) throw new IllegalArgumentException("wrong chan");
         if (model.boardName != null && !model.boardName.matches("\\w*")) throw new IllegalArgumentException("wrong board name");
-        StringBuilder url = new StringBuilder();
-        url.append(useHttps() ? "https://" : "http://").append(CHAN_DOMAIN).append('/');
+        StringBuilder url = new StringBuilder(getUsingUrl());
         switch (model.type) {
             case UrlPageModel.TYPE_INDEXPAGE:
                 return url.toString();
@@ -444,28 +452,19 @@ public class KrautModule extends CloudflareChanModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        String domain;
-        String path = "";
-        Matcher parseUrl = Pattern.compile("https?://(?:www\\.)?(.+)", Pattern.CASE_INSENSITIVE).matcher(url);
-        if (!parseUrl.find()) throw new IllegalArgumentException("incorrect url");
-        Matcher parsePath = Pattern.compile("(.+?)(?:/(.*))").matcher(parseUrl.group(1));
-        if (parsePath.find()) {
-            domain = parsePath.group(1).toLowerCase(Locale.US);
-            path = parsePath.group(2);
-        } else {
-            domain = parseUrl.group(1).toLowerCase(Locale.US);
-        }
-        if (!domain.equals(CHAN_DOMAIN)) throw new IllegalArgumentException("wrong chan");
+        String urlPath = UrlPathUtils.getUrlPath(url, CHAN_DOMAIN);
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
+        urlPath = urlPath.toLowerCase(Locale.US);
         
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;
         
-        if (path.length() == 0) {
+        if (urlPath.length() == 0) {
             model.type = UrlPageModel.TYPE_INDEXPAGE;
             return model;
         }
         
-        Matcher threadPage = Pattern.compile("([^/]+)/thread-(\\d+)\\.html[^#]*(?:#(\\d+))?").matcher(path);
+        Matcher threadPage = THREADPAGE_PATTERN.matcher(urlPath);
         if (threadPage.find()) {
             model.type = UrlPageModel.TYPE_THREADPAGE;
             model.boardName = threadPage.group(1);
@@ -474,7 +473,7 @@ public class KrautModule extends CloudflareChanModule {
             return model;
         }
         
-        Matcher catalogPage = Pattern.compile("catalog/(\\w+)").matcher(path);
+        Matcher catalogPage = CATALOGPAGE_PATTERN.matcher(urlPath);
         if (catalogPage.find()) {
             model.boardName = catalogPage.group(1);
             model.type = UrlPageModel.TYPE_CATALOGPAGE;
@@ -482,7 +481,7 @@ public class KrautModule extends CloudflareChanModule {
             return model;
         }
         
-        Matcher boardPage = Pattern.compile("([^/]+)(?:/(\\d+)\\.html?)?").matcher(path);
+        Matcher boardPage = BOARDPAGE_PATTERN.matcher(urlPath);
         if (boardPage.find()) {
             model.type = UrlPageModel.TYPE_BOARDPAGE;
             model.boardName = boardPage.group(1);
