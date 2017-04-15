@@ -547,13 +547,13 @@ public class TumbachModule extends CloudflareChanModule {
                 break;
         }
         postEntityBuilder.
-                addString("email", model.sage ? "sage" : model.email).
                 addString("name", model.name).
                 addString("subject", model.subject).
                 addString("text", model.comment).
                 addString("signAsOp", model.custommark ? "true" : "false").
                 addString("password", model.password).
                 addString("markupMode", "EXTENDED_WAKABA_MARK,BB_CODE");
+        if (model.sage) postEntityBuilder.addString("sage", "true");
         String rating = (model.icon >= 0 && model.icon < RATINGS.length) ? RATINGS[model.icon] : "SFW";
         if (model.attachments != null && model.attachments.length > 0) {
             for (int i=0; i<model.attachments.length; ++i) {

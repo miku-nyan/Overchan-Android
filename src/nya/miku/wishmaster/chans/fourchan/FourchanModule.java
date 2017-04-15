@@ -329,7 +329,7 @@ public class FourchanModule extends CloudflareChanModule {
     }
     
     private boolean useNewRecaptcha(boolean newThread) {
-        return newThread ? true : preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
+        return newThread || preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
     }
     
     private boolean newRecaptchaFallback() {

@@ -32,7 +32,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
-import android.text.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractWakabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -109,7 +108,7 @@ public class LampachModule extends AbstractWakabaModule {
         board.allowSubjects = true;
         board.allowSage = true;
         board.ignoreEmailIfSage = true;
-        board.allowEmails = true;
+        board.allowEmails = false;
         board.allowCustomMark = false;
         board.allowRandomHash = true;
         board.allowIcons = false;
@@ -136,10 +135,11 @@ public class LampachModule extends AbstractWakabaModule {
         String url = getUsingUrl() + model.boardName + "/imgboard.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("parent", model.threadNumber != null ? model.threadNumber : "0").
-                addString("email", model.sage ? "sage" : ((TextUtils.isEmpty(model.email)) ? "noko" : model.email)).
+                addString("email", "noko").
                 addString("subject", model.subject).
                 addString("message", model.comment).
                 addString("password", model.password);
+        if (model.sage) postEntityBuilder("sage", "sage");
         if (RECAPTCHA_BOARD.equals(model.boardName)) {
             String response = Recaptcha2solved.pop(RECAPTCHA_KEY);
             if (response == null) {

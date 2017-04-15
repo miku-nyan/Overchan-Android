@@ -218,7 +218,7 @@ public class BrchanModule extends InfinityModule {
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return super.parseUrl(url.replaceAll("\\+\\d+.html", ".html"));
+        return super.parseUrl(url.replaceAll("\\+\\w+.html", ".html"));
     }
     
 }

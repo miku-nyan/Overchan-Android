@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -320,6 +321,8 @@ public class ArhivachModule extends CloudflareChanModule {
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String urlPath  = UrlPathUtils.getUrlPath(url, DOMAINS);
         if (urlPath == null) throw new IllegalArgumentException("wrong domain");
+        urlPath = urlPath.toLowerCase(Locale.US);
+        
         UrlPageModel model = new UrlPageModel();
         model.chanName = getChanName();
         try {
