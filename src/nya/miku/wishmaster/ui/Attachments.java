@@ -118,7 +118,7 @@ public class Attachments {
             String boardSuff = boardModel.boardName == null || boardModel.boardName.length() == 0 ? "" : '-' + boardModel.boardName;
             suffix = boardModel.uniqueAttachmentNames ? boardSuff : boardSuff + '-' + ChanModels.hashAttachmentModel(attachment).substring(0, 4);
         }
-        return getLocalFilename(attachment.path, suffix);
+        return getLocalFilename(removeQueryString(attachment.path), suffix);
     }
     
     /**
@@ -142,7 +142,7 @@ public class Attachments {
         String filename = attachment.path.substring(attachment.path.lastIndexOf('/') + 1);
         int dotLastPos = filename.lastIndexOf('.');
         if (dotLastPos == -1) return "";
-        return filename.substring(dotLastPos);
+        return removeQueryString(filename.substring(dotLastPos));
     }
     
     /**
@@ -153,6 +153,7 @@ public class Attachments {
     private static String getLocalFilename(String url, String suffix) {
         if (url == null) return null;
         String filename = url.substring(url.lastIndexOf('/') + 1);
+        filename = removeQueryString(filename);
         if (filename.length() == 0) return null;
         try {
             filename = URLDecoder.decode(filename, "UTF-8");
@@ -171,6 +172,15 @@ public class Attachments {
             filenameMain = filenameMain.replaceFirst("(?i)^(con|prn|aux|nul|com\\d|lpt\\d)", "___");
         
         return filenameMain + filenameSuff;
+    }
+
+    /**
+     * Удалить строку GET запроса из URL
+     * @param url URL
+     * @return
+     */
+    private static String removeQueryString(String url) {
+        return url.contains("?") ? url.split("\\?")[0] : url;
     }
     
     private static final Pattern INCORRECT_CHARACTERS = Pattern.compile("[\\n\\r\\t\\f\\?\\*\\|\\\\\"\0<>:`]");
