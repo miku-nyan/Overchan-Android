@@ -179,6 +179,7 @@ public class ApplicationSettings {
         if (theme.equals(resources.getString(R.string.pref_theme_value_gurochan))) return R.style.Theme_Gurochan;
         if (theme.equals(resources.getString(R.string.pref_theme_value_tomorrow))) return R.style.Theme_Tomorrow;
         if (theme.equals(resources.getString(R.string.pref_theme_value_mikuba))) return R.style.Theme_Mikuba;
+        if (theme.equals(resources.getString(R.string.pref_theme_value_dark_mint))) return R.style.Theme_Dark_Mint;
         return R.style.Theme_Futaba;
     }
     

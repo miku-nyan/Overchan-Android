@@ -106,6 +106,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_theme_value_gurochan">PREF_THEME_VALUE_GUROCHAN</string>
     <string name="pref_theme_value_tomorrow">PREF_THEME_VALUE_TOMORROW</string>
     <string name="pref_theme_value_mikuba">PREF_THEME_VALUE_MIKUBA</string>
+    <string name="pref_theme_value_dark_mint">PREF_THEME_VALUE_DARK_MINT</string>
     <string name="pref_theme_value_custom">PREF_THEME_VALUE_CUSTOM</string>
     <string-array name="pref_theme_values" translatable="false">
         <item>@string/pref_theme_value_futaba</item>
@@ -114,6 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_theme_value_gurochan</item>
         <item>@string/pref_theme_value_tomorrow</item>
         <item>@string/pref_theme_value_mikuba</item>
+        <item>@string/pref_theme_value_dark_mint</item>
         <item>@string/pref_theme_value_custom</item>
     </string-array>
     <string name="pref_key_font_size">PREF_KEY_FONT_SIZE</string>
