@@ -197,7 +197,7 @@ public class MakabaJsonMapper {
                 model.comment = model.comment + "<br/><em><font color=\"red\">(Автор этого поста был предупрежден.)</font></em>";
                 break;
         }
-        
+        if (NO_SUBJECTS_BOARDS.indexOf(boardName) >= 0) model.subject = "";
         return model;
     }
     
