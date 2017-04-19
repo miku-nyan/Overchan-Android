@@ -559,7 +559,7 @@ public class Database {
     
     public List<SavedThreadEntry> getSavedThreads() {
         List<SavedThreadEntry> list = new ArrayList<SavedThreadEntry>();
-        Cursor c = dbHelper.getReadableDatabase().query(TABLE_SAVED, null, null, null, null, null, BaseColumns._ID + " desc", "200");
+        Cursor c = dbHelper.getReadableDatabase().query(TABLE_SAVED, null, null, null, null, null, BaseColumns._ID + " desc", null);
         if (c != null && c.moveToFirst()) {
             int chanIndex = c.getColumnIndex(COL_CHAN);
             int titleIndex = c.getColumnIndex(COL_TITLE);
