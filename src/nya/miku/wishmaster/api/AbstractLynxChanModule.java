@@ -152,7 +152,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         board.allowIcons = false;
         board.attachmentsMaxCount = 1;
         board.attachmentsFormatFilters = null;
-        board.markType = BoardModel.MARK_NOMARK;
+        board.markType = BoardModel.MARK_INFINITY;
         board.firstPage = 1;
         board.catalogAllowed = true;
         board.boardName = shortName;

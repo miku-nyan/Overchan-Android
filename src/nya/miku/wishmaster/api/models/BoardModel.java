@@ -136,6 +136,9 @@ public class BoardModel implements Serializable {
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - 0chan.hk.<br>
      *  *italic* **bold** %%spoiler%% -strike- `code` */
     public static final int MARK_NULL_CHAN = 4;
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - Infinity.<br>
+     *  ''italic'' '''bold''' __underline__ **spoiler** ~~strike~~ */
+    public static final int MARK_INFINITY = 5;
     
     /** Константное значение, если на данной доске нет возможности пожаловаться на сообщения */
     public static final int REPORT_NOT_ALLOWED = 0;
