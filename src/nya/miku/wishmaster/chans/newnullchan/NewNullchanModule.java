@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 
@@ -320,7 +321,7 @@ public class NewNullchanModule extends CloudflareChanModule {
         if (captchaID == null) return null;
         String captchaAnswer = captchas.get(captchaID);
         if (captchaAnswer == null) return null;
-        String url = getUsingUrl() + "api/captcha?captcha=" + captchaID + "&answer=" + captchaAnswer + "&session=" + sessionId;
+        String url = getUsingUrl() + "api/captcha?captcha=" + captchaID + "&answer=" + Uri.encode(captchaAnswer) + "&session=" + sessionId;
         JSONObject response = null;
         try {
             response = downloadJSONObject(url, false, listener, task);
