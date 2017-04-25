@@ -90,6 +90,7 @@ public class MainActivity extends FragmentActivity {
     public TabsAdapter tabsAdapter = null;
     public StaticSettingsContainer settings;
     private GenericThemeEntry theme;
+    private int thumbnailSize;
     private int autohideRulesHash;
     private float rootViewWeight = 0;
     private boolean tabsPanelRight;
@@ -367,6 +368,7 @@ public class MainActivity extends FragmentActivity {
         swipeToHideThread = MainApplication.getInstance().settings.swipeToHideThread();
         isHorizontalOrientation = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         (theme = MainApplication.getInstance().settings.getTheme()).setTo(this);
+        thumbnailSize = MainApplication.getInstance().settings.getPostThumbnailSize();
         super.onCreate(savedInstanceState);
         if (MainApplication.getInstance().settings.showSidePanel()) {
             setContentView(tabsPanelRight ? R.layout.main_activity_tablet_right : R.layout.main_activity_tablet);
@@ -507,6 +509,12 @@ public class MainActivity extends FragmentActivity {
             shouldReloadBoardFragment = true;
         }
         
+        if (thumbnailSize != MainApplication.getInstance().settings.getPostThumbnailSize()) {
+            shouldClearCache = true;
+            shouldReloadBoardFragment = true;
+            thumbnailSize = MainApplication.getInstance().settings.getPostThumbnailSize();
+        }
+
         MainApplication.getInstance().settings.setSubscriptionsClear(false);
         
         if (settings.repliesOnlyQuantity != newSettings.repliesOnlyQuantity ||
