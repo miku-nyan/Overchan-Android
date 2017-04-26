@@ -118,12 +118,12 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.tumbach.TumbachModule",
             "nya.miku.wishmaster.chans.wizchan.WizchanModule",
             "nya.miku.wishmaster.chans.infinity.BrchanModule",
-            //"nya.miku.wishmaster.chans.nullchdvach.NullchdvachModule",
             "nya.miku.wishmaster.chans.lampach.LampachModule",
             "nya.miku.wishmaster.chans.kropyvach.KropyvachModule",
             "nya.miku.wishmaster.chans.mentachnet.MentachnetModule",
             "nya.miku.wishmaster.chans.hispachan.HispachanModule",
             "nya.miku.wishmaster.chans.ernstchan.ErnstModule",
+            "nya.miku.wishmaster.chans.nullchan.NullchanoneModule",
     };
     
     private static MainApplication instance;
