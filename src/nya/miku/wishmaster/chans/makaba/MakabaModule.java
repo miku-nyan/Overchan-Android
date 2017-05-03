@@ -455,27 +455,32 @@ public class MakabaModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String response;
-        String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "") + ("&board=" + boardName);
+        JSONObject response;
+        String checkURL = domainUrl + "/api/captcha/settings/" + boardName;
         try {
-            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, null, task, true);
+            if (!HttpStreamer.getInstance().
+                    getJSONObjectFromUrl(checkURL, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false).
+                    getString("enabled").equals("1")) return null;
+        } catch (Exception e) {
+            Logger.e(TAG, "captcha", e);
+        }
+
+        String url = domainUrl + "api/captcha/2chaptcha/id?board=" + boardName + (threadNumber != null ? ("&thread=" + threadNumber) : "");
+        try {
+            response = HttpStreamer.getInstance().getJSONObjectFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, null, task, true);
+            String captcha_id = response.getString("id");
+            String captcha_type = response.getString("type");
             if (task != null && task.isCancelled()) throw new Exception("interrupted");
-            if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
-                captchaId = null;
-                return null;
-            } else if (!response.startsWith("CHECK")) {
-                throw new Exception("Invalid captcha response");
-            }
+            captchaId = captcha_id;
+            captchaType = captcha_type;
         } catch (HttpWrongStatusCodeException e) {
             checkCloudflareError(e, url);
             throw e;
         }
-        
-        String id = response.substring(response.indexOf('\n') + 1);
-        url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
+
+        url = domainUrl + "api/captcha/2chaptcha/image/" + captchaId;
         CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
         captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
-        captchaId = id;
         return captchaModel;
     }
 
