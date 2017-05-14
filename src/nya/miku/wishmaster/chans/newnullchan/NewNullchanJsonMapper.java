@@ -37,7 +37,7 @@ public class NewNullchanJsonMapper {
 
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
 
-    private static final Pattern SPOILER_MARK_PATTERN = Pattern.compile("<mark>(.*?)</mark>");
+    private static final Pattern SPOILER_MARK_PATTERN = Pattern.compile("<mark>(.*?)</mark>", Pattern.DOTALL);
     private static final Pattern BLOCKQUOTE_MARK_PATTERN = Pattern.compile("<blockquote>(.*?)</blockquote>");
 
     static BoardModel mapBoardModel(JSONObject object) {
