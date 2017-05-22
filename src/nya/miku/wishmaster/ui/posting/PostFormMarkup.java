@@ -176,7 +176,7 @@ public class PostFormMarkup {
                     commentField.setSelection(selectionStart + 2);
                     break;
                 case FEATURE_SPOILER:
-                    comment.replace(selectionStart, selectionEnd, "%%" + text.replace("\n", "%%\n%%") + "%%");
+                    comment.replace(selectionStart, selectionEnd, "**" + text.replace("\n", "**\n**") + "**");
                     commentField.setSelection(selectionStart + 2);
                     break;
                 case FEATURE_QUOTE:
