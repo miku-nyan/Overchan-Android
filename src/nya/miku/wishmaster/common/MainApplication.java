@@ -299,6 +299,7 @@ public class MainApplication extends Application {
     }
     
     private void clearCaches() {
+        if (isGalleryProcess()) return;
         pagesCache.clearLru();
         bitmapCache.clearLru();
         draftsCache.clearLru();
