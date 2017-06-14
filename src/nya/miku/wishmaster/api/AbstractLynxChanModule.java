@@ -20,7 +20,18 @@ package nya.miku.wishmaster.api;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.webkit.MimeTypeMap;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,12 +46,15 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import cz.msebera.android.httpclient.Header;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.PostModel;
+import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
@@ -49,7 +63,14 @@ import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
+import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.http.JSONEntry;
+import nya.miku.wishmaster.http.streamer.HttpRequestModel;
+import nya.miku.wishmaster.http.streamer.HttpResponseModel;
+import nya.miku.wishmaster.http.streamer.HttpStreamer;
+import nya.miku.wishmaster.lib.base64.Base64;
+import nya.miku.wishmaster.lib.base64.Base64OutputStream;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
@@ -66,6 +87,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
     private static final Pattern REPLY_NUMBER_PATTERN = Pattern.compile("&gt&gt(\\d+)");
     protected Map<String, BoardModel> boardsMap = null;
     private Map<String, Map<String, String>> flagsMap = null;
+    private static String lastCaptchaId;
     
     public AbstractLynxChanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -375,6 +397,156 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
     public String fixRelativeUrl(String url) {
         if (url.startsWith("?/")) url = url.substring(1);
         return super.fixRelativeUrl(url);
+    }
+
+    protected CaptchaModel downloadCaptcha(String captchaUrl, ProgressListener listener, CancellableTask task) throws Exception {
+        Bitmap captchaBitmap = null;
+        HttpRequestModel requestModel = HttpRequestModel.DEFAULT_GET;
+        HttpResponseModel responseModel = HttpStreamer.getInstance().getFromUrl(captchaUrl, requestModel, httpClient, listener, task);
+        String captchaId = null;
+        for (Header header : responseModel.headers) {
+            if (header != null && "Set-Cookie".equalsIgnoreCase(header.getName())) {
+                String cookie = header.getValue();
+                if (cookie.contains("captchaid")) {
+                    try {
+                        captchaId = cookie.split(";")[0].split("=")[1];
+                    } catch (Exception e) {
+                    }
+                }
+                if (captchaId != null) break;
+            }
+        }
+        try {
+            InputStream imageStream = responseModel.stream;
+            captchaBitmap = BitmapFactory.decodeStream(imageStream);
+        } finally {
+            responseModel.release();
+        }
+        CaptchaModel captchaModel = new CaptchaModel();
+        captchaModel.type = CaptchaModel.TYPE_NORMAL;
+        captchaModel.bitmap = captchaBitmap;
+        lastCaptchaId = captchaId;
+        return captchaModel;
+    }
+
+    @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        String captchaUrl = getUsingUrl() + "captcha.js?d=" + Double.toString(Math.random());
+        return downloadCaptcha(captchaUrl, listener, task);
+    }
+
+    private String computeFileMD5(File file) throws NoSuchAlgorithmException, IOException {
+        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+        messageDigest.reset();
+
+        FileInputStream fis = new FileInputStream(file);
+        byte[] byteArray = new byte[1024];
+        int bytesCount;
+        while ((bytesCount = fis.read(byteArray)) != -1) {
+            messageDigest.update(byteArray, 0, bytesCount);
+        }
+        fis.close();
+
+        byte[] digest = messageDigest.digest();
+        BigInteger bigInt = new BigInteger(1, digest);
+        String md5Hex = bigInt.toString(16);
+        if (md5Hex.length() < 32) {
+            char[] head = new char[32 - md5Hex.length()];
+            Arrays.fill(head, '0');
+            md5Hex = new StringBuilder(32).append(head).append(md5Hex).toString();
+        }
+        return md5Hex;
+    }
+
+    private String checkFileIdentifier(File file, String mime, ProgressListener listener, CancellableTask task) {
+        String hash;
+        try {
+            hash = computeFileMD5(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        String identifier = hash + "-" + mime.replace("/", "");
+        String url = getUsingUrl() + "checkFileIdentifier.js?identifier=" + identifier;
+        String response = "";
+        try {
+            response = HttpStreamer.getInstance().getStringFromUrl(url, null, httpClient, listener, task, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        if (response.contains("true")) return hash;
+        return null;
+    }
+
+    private String base64EncodeFile(File file) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        Base64OutputStream b64os = new Base64OutputStream(os, Base64.NO_WRAP);
+        FileInputStream fis = new FileInputStream(file);
+        IOUtils.copyStream(fis, b64os);
+        return os.toString();
+    }
+
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = getUsingUrl() + ".api/" + (model.threadNumber == null ? "newThread" : "replyThread");
+
+        JSONObject jsonPayload = new JSONObject();
+        JSONObject jsonParameters = new JSONObject();
+        jsonPayload.put("captchaId", lastCaptchaId);
+        jsonParameters.put("name", model.name);
+        jsonParameters.put("password", model.password);
+        jsonParameters.put("subject", model.subject);
+        jsonParameters.put("message", model.comment);
+        jsonParameters.put("boardUri", model.boardName);
+        if (model.threadNumber != null)
+            jsonParameters.put("threadId", model.threadNumber);
+        if (model.captchaAnswer != null && model.captchaAnswer.length() > 0)
+            jsonParameters.put("captcha", model.captchaAnswer);
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        if (model.attachments != null && model.attachments.length > 0) {
+            JSONArray files = new JSONArray();
+            for (int i = 0; i < model.attachments.length; ++i) {
+                String ext = MimeTypeMap.getFileExtensionFromUrl(model.attachments[i].toURI().toString());
+                String mime = mimeTypeMap.getMimeTypeFromExtension(ext);
+                String md5 = checkFileIdentifier(model.attachments[i], mime, listener, task);
+                JSONObject file = new JSONObject();
+                file.put("name", model.attachments[i].getName());
+                if (md5 != null) {
+                    file.put("md5", md5);
+                    file.put("mime", mime);
+                } else {
+                    file.put("content", "data:" + mime + ";base64," + base64EncodeFile(model.attachments[i]));
+                }
+                file.put("spoiler", false);
+                files.put(file);
+            }
+            jsonParameters.put("files", files);
+        }
+        jsonPayload.put("parameters", jsonParameters);
+        JSONEntry payload = new JSONEntry(jsonPayload);
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(payload).setNoRedirect(true).build();
+        String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, null, task, true);
+        JSONObject result = new JSONObject(response);
+        String status = result.optString("status");
+        if ("ok".equals(status)) {
+            UrlPageModel urlPageModel = new UrlPageModel();
+            urlPageModel.type = UrlPageModel.TYPE_THREADPAGE;
+            urlPageModel.chanName = getChanName();
+            urlPageModel.boardName = model.boardName;
+            urlPageModel.threadNumber = model.threadNumber;
+            if (model.threadNumber == null) {
+                urlPageModel.threadNumber = Integer.toString(result.optInt("data"));
+            } else {
+                urlPageModel.postNumber = Integer.toString(result.optInt("data"));
+            }
+            return buildUrl(urlPageModel);
+        } else if (status.contains("error") || status.contains("blank")) {
+            String errorMessage = result.optString("data");
+            if (errorMessage.length() > 0) {
+                throw new Exception(errorMessage);
+            }
+        }
+        throw new Exception("Unknown Error");
     }
     
 }
