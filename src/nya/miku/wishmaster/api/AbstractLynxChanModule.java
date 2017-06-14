@@ -53,6 +53,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
+import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
@@ -66,6 +67,7 @@ import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.JSONEntry;
+import nya.miku.wishmaster.http.interactive.SimpleCaptchaException;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
@@ -88,6 +90,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
     protected Map<String, BoardModel> boardsMap = null;
     private Map<String, Map<String, String>> flagsMap = null;
     private static String lastCaptchaId;
+    private static String lastCaptchaAnswer;
     
     public AbstractLynxChanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -498,6 +501,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         jsonParameters.put("subject", model.subject);
         jsonParameters.put("message", model.comment);
         jsonParameters.put("boardUri", model.boardName);
+        jsonParameters.put("email", model.sage ? "sage" : model.email);
         if (model.threadNumber != null)
             jsonParameters.put("threadId", model.threadNumber);
         if (model.captchaAnswer != null && model.captchaAnswer.length() > 0)
@@ -517,7 +521,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
                 } else {
                     file.put("content", "data:" + mime + ";base64," + base64EncodeFile(model.attachments[i]));
                 }
-                file.put("spoiler", false);
+                file.put("spoiler", model.custommark);
                 files.put(file);
             }
             jsonParameters.put("files", files);
@@ -526,6 +530,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         JSONEntry payload = new JSONEntry(jsonPayload);
         HttpRequestModel request = HttpRequestModel.builder().setPOST(payload).setNoRedirect(true).build();
         String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, null, task, true);
+        lastCaptchaId = null;
         JSONObject result = new JSONObject(response);
         String status = result.optString("status");
         if ("ok".equals(status)) {
@@ -547,6 +552,56 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
             }
         }
         throw new Exception("Unknown Error");
+    }
+
+    @Override
+    public String deletePost(DeletePostModel model, final ProgressListener listener, final CancellableTask task) throws Exception {
+        String url = getUsingUrl() + ".api/" + "deleteContent";
+        
+        if (lastCaptchaAnswer == null) {
+            throw new SimpleCaptchaException() {
+                private static final long serialVersionUID = 1L;
+                @Override
+                protected Bitmap getNewCaptcha() throws Exception {
+                    return AbstractLynxChanModule.this.getNewCaptcha("", "", listener, task).bitmap;
+                }
+                @Override
+                protected void storeResponse(String response) {
+                    lastCaptchaAnswer = response;
+                }
+            };
+        }
+        
+        JSONObject jsonPayload = new JSONObject();
+        JSONObject jsonParameters = new JSONObject();
+        jsonPayload.put("captchaId", lastCaptchaId);
+        jsonParameters.put("password", model.password);
+        if (lastCaptchaAnswer != null && lastCaptchaAnswer.length() > 0)
+            jsonParameters.put("captcha", lastCaptchaAnswer);
+        jsonParameters.put("deleteMedia", true);
+        if (model.onlyFiles) {
+            jsonParameters.put("deleteUploads", true);
+        }
+        JSONArray jsonArray = new JSONArray();
+        JSONObject post = new JSONObject();
+        post.put("board", model.boardName);
+        post.put("thread", model.threadNumber);
+        if (!model.postNumber.equals(model.threadNumber)) post.put("post", model.postNumber);
+        jsonParameters.put("postings", jsonArray);
+        jsonPayload.put("parameters", jsonParameters);
+        JSONEntry payload = new JSONEntry(jsonPayload);
+        HttpRequestModel request = HttpRequestModel.builder().setPOST(payload).setNoRedirect(true).build();
+        String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, null, task, true);
+        lastCaptchaId = null;
+        lastCaptchaAnswer = null;
+        JSONObject result = new JSONObject(response);
+        if (result.optString("status").equals("error")) {
+            String errorMessage = result.optString("data");
+            if (errorMessage.length() > 0) {
+                throw new Exception(errorMessage);
+            }
+        }
+        return null;
     }
     
 }
