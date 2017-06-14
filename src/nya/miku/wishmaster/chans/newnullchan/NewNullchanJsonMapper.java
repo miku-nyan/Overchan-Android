@@ -30,13 +30,14 @@ import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.lib.org_json.JSONException;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class NewNullchanJsonMapper {
 
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
 
-    private static final Pattern SPOILER_MARK_PATTERN = Pattern.compile("<mark>(.*?)</mark>");
+    private static final Pattern SPOILER_MARK_PATTERN = Pattern.compile("<mark>(.*?)</mark>", Pattern.DOTALL);
     private static final Pattern BLOCKQUOTE_MARK_PATTERN = Pattern.compile("<blockquote>(.*?)</blockquote>");
 
     static BoardModel mapBoardModel(JSONObject object) {
@@ -60,7 +61,7 @@ public class NewNullchanJsonMapper {
         model.requiredFileForNewThread = false;
         model.allowDeletePosts = false;
         model.allowDeleteFiles = false;
-        model.allowReport = BoardModel.REPORT_NOT_ALLOWED;
+        model.allowReport = BoardModel.REPORT_WITH_COMMENT;
         model.allowNames = false;
         model.allowSubjects = false;
         model.allowSage = false;
@@ -127,45 +128,87 @@ public class NewNullchanJsonMapper {
         }
 
         if (replies != null) {
-            String references = "";
+            StringBuilder references = new StringBuilder();
             for (int i = 0; i < replies.size(); i++) {
                 String postNumber = replies.get(i);
                 if (model.parentThread.equals(postNumber)) continue;
                 String url = buildReplyUrl(chan.getChanName(), board, object.optString("threadId"), postNumber, chan);
-                references += String.format("<a href=\"%s\">&gt;&gt;%s</a><br />", url, postNumber);
+                references.append(String.format("<a href=\"%s\">&gt;&gt;%s</a><br />", url, postNumber));
             }
-            model.comment = references + model.comment;
+            references.append(model.comment);
+            model.comment = references.toString();
         }
         model.comment = RegexUtils.replaceAll(model.comment, SPOILER_MARK_PATTERN, "<span class=\"spoiler\">$1</span>");
         model.comment = RegexUtils.replaceAll(model.comment, BLOCKQUOTE_MARK_PATTERN, "<span class=\"quote\">$1</span>");
         // TODO: convert content of <pre> to html
         JSONArray attachments = object.optJSONArray("attachments");
-        if (attachments != null) {
+        if (attachments != null && attachments.length() > 0) {
             model.attachments = new AttachmentModel[attachments.length()];
-            for (int i = 0; i < attachments.length(); i++) {
-                AttachmentModel attachment = new AttachmentModel();
-                JSONObject images = attachments.getJSONObject(i).getJSONObject("images");
-                JSONObject original = images.getJSONObject("original");
-                JSONObject thumb = images.getJSONObject("thumb_200px");
-                boolean isNsfw = attachments.getJSONObject(i).optBoolean("isNsfw", false);
-                attachment.originalName = original.optString("name");
-                attachment.height = original.optInt("height", -1);
-                attachment.width = original.optInt("width", -1);
-                attachment.size = (int) original.optDouble("size_kb", -1.0);
-                attachment.isSpoiler = isNsfw;
-                attachment.path = original.optString("url");
-                if (attachment.path.startsWith("//")) {
-                    attachment.path = (useHttps ? "https:" : "http:") + attachment.path;
-                }
-                attachment.thumbnail = thumb.optString("url");
-                if (attachment.thumbnail.startsWith("//")) {
-                    attachment.thumbnail = (useHttps ? "https:" : "http:") + attachment.thumbnail;
-                }
-                
-                model.attachments[i] = attachment;
+            for (int i = 0, len=attachments.length(); i < len; ++i) {
+                model.attachments[i] = mapAttachment(attachments.getJSONObject(i), useHttps);
             }
         }
         return model;
+    }
+    
+    static AttachmentModel mapAttachment(JSONObject object, boolean useHttps) throws JSONException {
+        AttachmentModel attachment = new AttachmentModel();
+        JSONObject images = object.getJSONObject("images");
+        JSONObject thumb = images.optJSONObject("thumb_200px");
+        if (thumb != null) {
+            attachment.thumbnail = thumb.optString("url");
+            if (attachment.thumbnail.startsWith("//")) {
+                attachment.thumbnail = (useHttps ? "https:" : "http:") + attachment.thumbnail;
+            }
+        }
+        attachment.isSpoiler = object.optBoolean("isNsfw", false);
+        JSONObject embed = object.optJSONObject("embed");
+        if (embed != null) {
+            String service = embed.optString("service");
+            String id = embed.optString("embedId");
+            switch (service) {
+                case "youtube":
+                    attachment.path = "https://www.youtube.com/watch?v=" + id;
+                    break;
+                case "vimeo":
+                    attachment.path = "https://vimeo.com/" + id;
+                    break;
+                case "coub":
+                    attachment.path = "http://coub.com/view/" + id;
+                    break;
+                case "ted":
+                    attachment.path = "http://www.ted.com/talks/" + id;
+                    break;
+                default:
+                    String html = embed.optString("html");
+                    int startSrc, endSrc;
+                    if ((startSrc = html.indexOf("src=\"")) != -1 && (endSrc = html.indexOf('\"', startSrc + 5)) != -1) {
+                        attachment.path = html.substring(startSrc + 5, endSrc);
+                    }
+            }
+            attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+            attachment.originalName = embed.optString("title");
+            attachment.size = -1;
+        } else {
+            JSONObject original = images.getJSONObject("original");
+            attachment.path = original.optString("url");
+            if (attachment.path.startsWith("//")) {
+                attachment.path = (useHttps ? "https:" : "http:") + attachment.path;
+            }
+            String ext = attachment.path.substring(attachment.path.lastIndexOf('.') + 1);
+            if (ext.contains("?")) {
+                ext = ext.split("\\?")[0];
+            }
+            
+            if (ext.equals("gif")) attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
+            else attachment.type = AttachmentModel.TYPE_IMAGE_STATIC;
+            
+            attachment.originalName = original.optString("name");
+            attachment.height = original.optInt("height", -1);
+            attachment.width = original.optInt("width", -1);
+            attachment.size = (int) Math.round(original.optDouble("size_kb", -1.0));
+        }
+        return attachment;
     }
     
 }

@@ -21,38 +21,42 @@ package nya.miku.wishmaster.chans.lainchan;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractVichanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
+
 
 public class LainModule extends AbstractVichanModule {
     private static final String CHAN_NAME = "lainchan.org";
+    private static final String CHAN_DOMAIN = "lainchan.org";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sec", "Cybersecurity", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tech", "consumer technology", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "λ", "programming", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "DIY & Electronics", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "layer", "the solution to layer:04", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "zzz", "dream", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "feels", "Feelings", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "drg", "drugs 2.0", "", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "literature", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cult", "Culture", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "civ", "Civics", "", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "q", "questions and complaints", " ", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cyb", "cyberpunk", "Closed", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "w", "weeb", "Closed", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "art", "ars gratia artis", "Closed", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "random", "Closed", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "f", "fileboard", "Closed", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "λ", "Programming", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "Δ", "Do It Yourself", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sec", "Security", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "Ω", "Technology", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "inter", "Games and Interactive Media", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "Literature", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "music", "Musical and Audible Media", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vis", "Visual Media", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "hum", "Humanity", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "drg", "Drugs 3.0", "", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "zzz", "Consciousness and Dreams", "", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "layer", "layer", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "q", "Questions and Complaints", " ", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "Random", " ", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lambda", "Programming", "Duplicated", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "Do It Yourself", "Duplicated", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tech", "Technology", "Duplicated", false),
     };
     
     public LainModule(SharedPreferences preferences, Resources resources) {
@@ -76,7 +80,7 @@ public class LainModule extends AbstractVichanModule {
     
     @Override
     protected String getUsingDomain() {
-        return "lainchan.org";
+        return CHAN_DOMAIN;
     }
     
     @Override
@@ -99,28 +103,37 @@ public class LainModule extends AbstractVichanModule {
     }
     
     @Override
-    protected JSONObject downloadJSONObject(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        return super.downloadJSONObject(url.replace("λ", "%CE%BB"), checkIfModidied, listener, task);
+    protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+        AttachmentModel attachment = super.mapAttachment(object, boardName, isSpoiler);
+        if (attachment != null && attachment.type == AttachmentModel.TYPE_VIDEO) {
+            attachment.thumbnail = null;
+        }
+        return attachment;
     }
     
     @Override
-    protected JSONArray downloadJSONArray(String url, boolean checkIfModidied, ProgressListener listener, CancellableTask task) throws Exception {
-        return super.downloadJSONArray(url.replace("λ", "%CE%BB"), checkIfModidied, listener, task);
+    public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        String url = super.sendPost(model, listener, task);
+        try {
+            url = encodeLainUrl(new String(url.getBytes("ISO-8859-1"), "UTF-8"));
+        } catch (Exception e) {}
+        return url;
     }
     
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
-        return super.buildUrl(model).replace("λ", "%CE%BB");
+        return encodeLainUrl(super.buildUrl(model));
     }
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return super.parseUrl(url.replace("%CE%BB", "λ"));
+        UrlPageModel model = super.parseUrl(url);
+        model.boardName = Uri.decode(model.boardName);
+        return model;
     }
     
-    @Override
-    public String fixRelativeUrl(String url) {
-        return super.fixRelativeUrl(url.replace("\u00CE\u00BB", "%CE%BB")); 
+    private String encodeLainUrl(String url) {
+        //TODO: convert url path to percent-encoding
+        return url.replace("λ", "%CE%BB").replace("Δ","%CE%94").replace("Ω", "%CE%A9");
     }
-    
 }

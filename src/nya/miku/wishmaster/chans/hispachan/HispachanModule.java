@@ -19,15 +19,12 @@
 package nya.miku.wishmaster.chans.hispachan;
 
 import java.io.ByteArrayOutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
+import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -42,14 +39,17 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
+import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.WakabaReader;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
+import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
 import nya.miku.wishmaster.http.streamer.HttpResponseModel;
 import nya.miku.wishmaster.http.streamer.HttpStreamer;
 
-@SuppressLint("SimpleDateFormat")
 public class HispachanModule extends AbstractKusabaModule {
     private static final String CHAN_NAME = "hispachan";
     private static final String[] DOMAINS = { "www.hispachan.org", "hispachan.org" };
@@ -78,12 +78,11 @@ public class HispachanModule extends AbstractKusabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ve", "Venezuela", "Regional", true)
     };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "gif", "jpg", "png", "pdf", "swf", "webm" };
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy HH:mm");
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
+    private static final String[] EMAIL_OPTIONS = new String[] {
+            "Opciones", "sage", "noko", "dado", "OP", "fortuna", "nokosage", "dadosage", "OPsage", "fortunasage" };
     
-    private static final String[] EMAIL_OPTIONS = new String[] { "Opciones", "noko", "dado", "OP", "fortuna", "nokosage", "dadosage", "OPsage", "fortunasage" };
+    private static final String RECAPTCHA_KEY = "6Ld8dgkTAAAAAB9znPHkLX31dnP80eIQvY4YnXWc";
+    
     private static final Pattern ERROR_POSTING = Pattern.compile("<div class=\"diverror\"[^>]*>(?:.*<br[^>]*>)?(.*?)</div>", Pattern.DOTALL);
     
     public HispachanModule(SharedPreferences preferences, Resources resources) {
@@ -126,13 +125,8 @@ public class HispachanModule extends AbstractKusabaModule {
     }
     
     @Override
-    protected DateFormat getDateFormat() {
-        return DATE_FORMAT;
-    }
-    
-    @Override
-    protected int getKusabaFlags() {
-        return ~(KusabaReader.FLAG_HANDLE_EMBEDDED_POST_POSTPROCESS|KusabaReader.FLAG_OMITTED_STRING_REMOVE_HREF);
+    protected WakabaReader getKusabaReader(InputStream stream, UrlPageModel urlModel) {
+        return new HispachanReader(stream, canCloudflare());
     }
     
     @Override
@@ -143,8 +137,9 @@ public class HispachanModule extends AbstractKusabaModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
-        model.defaultUserName = shortName.equals("fun") ? "Hanonymouz" : "Anónimo";
-        model.allowDeletePosts = false;
+        if (shortName.equals("col")) model.defaultUserName = "Anonymous";
+        else if (shortName.equals("fun")) model.defaultUserName = "Hanonymouz";
+        else model.defaultUserName = "Anónimo";
         model.allowDeleteFiles = false;
         model.allowNames = false;
         model.allowSage = false;
@@ -169,8 +164,19 @@ public class HispachanModule extends AbstractKusabaModule {
             addString("name", model.name).
             addString("em", emOptions).
             addString("subject", model.subject).
-            addString("message", model.comment);
+            addString("message", model.comment).
+            addString("postpassword", model.password);
         setSendPostEntityAttachments(model, postEntityBuilder);
+        
+        String checkCaptchaUrl = getUsingUrl() + "cl_captcha.php?board="+ model.boardName + "&v" + (model.threadNumber != null ? "&rp" : "");
+        if (HttpStreamer.getInstance().getStringFromUrl(checkCaptchaUrl, HttpRequestModel.DEFAULT_GET,
+                httpClient, null, task, false).equals("1")) {
+            String response = Recaptcha2solved.pop(RECAPTCHA_KEY);
+            if (response == null) {
+                throw Recaptcha2.obtain(getUsingUrl(), RECAPTCHA_KEY, null, CHAN_NAME, false);
+            }
+            postEntityBuilder.addString("g-recaptcha-response", response);
+        }
         
         HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setNoRedirect(true).build();
         HttpResponseModel response = null;
@@ -188,7 +194,6 @@ public class HispachanModule extends AbstractKusabaModule {
                 IOUtils.copyStream(response.stream, output);
                 String htmlResponse = output.toString("UTF-8");
                 if (htmlResponse.contains("<div class=\"divban\">")) {
-                    //parse ban message
                     throw new Exception("¡ESTÁS BANEADO!");
                 }
                 Matcher errorMatcher = ERROR_POSTING.matcher(htmlResponse);
@@ -205,10 +210,26 @@ public class HispachanModule extends AbstractKusabaModule {
     }
     
     @Override
+    protected void checkDeletePostResult(DeletePostModel model, String result) throws Exception {
+        if (StringEscapeUtils.unescapeHtml4(result).contains("No puedes realizar esta acción")) {
+            throw new Exception("No puedes realizar esta acción");
+        }
+    }
+    
+    @Override
+    protected void checkReportPostResult(DeletePostModel model, String result) throws Exception {
+        if (StringEscapeUtils.unescapeHtml4(result).contains("Post reportado correctamente")) return;
+        throw new Exception(result);
+    }
+    
+    @Override
+    protected String getDeleteFormValue(DeletePostModel model) {
+        return "Eliminar";
+    }
+    
+    @Override
     protected String getReportFormValue(DeletePostModel model) {
         return "Reportar";
     }
-    
-    //TODO: Implement Hispachan reader
     
 }

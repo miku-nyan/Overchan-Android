@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
@@ -43,6 +45,7 @@ import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaUtils;
@@ -75,8 +78,8 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         JSONObject boardsJson = downloadJSONObject(url, (oldBoardsList != null && boardsMap != null), listener, task);
         if (boardsJson == null) return oldBoardsList;
         JSONArray boards = boardsJson.getJSONArray("boards");
+        BoardModel model;
         for (int i = 0, len = boards.length(); i < len; ++i) {
-            BoardModel model;
             model = mapBoardModel(boards.getJSONObject(i));
             list.add(new SimpleBoardModel(model));
         }
@@ -101,7 +104,9 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
     private BoardModel mapBoardModel(ProgressListener listener, CancellableTask task, BoardModel model) throws Exception {
         String url = getUsingUrl() + model.boardName + "/1.json";
         JSONObject boardJson = downloadJSONObject(url, false, listener, task);
-        model.attachmentsMaxCount = boardJson.optInt("maxFileCount");
+        model.boardDescription = boardJson.optString("boardName", model.boardName);
+        model.attachmentsMaxCount = boardJson.optInt("maxFileCount", 5);
+        model.lastPage = boardJson.optInt("pageCount", BoardModel.LAST_PAGE_UNDEFINED);
         JSONArray flags = boardJson.optJSONArray("flagData");
         if (flags != null) {
             model.allowIcons = true;
@@ -117,7 +122,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         JSONArray settingsJson = boardJson.optJSONArray("settings");
         ArrayList<String> settings = new ArrayList<String>();
         for(int i = 0, len = settingsJson.length(); i < len; ++i) settings.add(settingsJson.getString(i));
-        model.allowNames = settings.contains("forceAnonymity");
+        model.allowNames = !settings.contains("forceAnonymity");
         model.allowDeleteFiles = settings.contains("blockDeletion");
         model.allowDeletePosts = settings.contains("blockDeletion");
         model.requiredFileForNewThread = settings.contains("requireThreadFile");
@@ -126,10 +131,16 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         model.attachmentsMaxCount = settings.contains("textBoard") ? 0 : model.attachmentsMaxCount;
         return model;
     }
-    
+
     private BoardModel mapBoardModel(JSONObject object) {
         BoardModel model = getDefaultBoardModel(object.optString("boardUri"));
-        model.boardDescription = object.optString("boardName");
+        model.boardDescription = object.optString("boardName", model.boardName);
+        try {
+            String settings = object.getJSONArray("specialSettings").toString();
+            model.nsfw = !settings.contains("\"sfw\"");
+        } catch (Exception e) {
+            model.nsfw = true;
+        }
         return model;
     }
 
@@ -147,13 +158,15 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         board.allowSage = true;
         board.allowEmails = true;
         board.ignoreEmailIfSage = true;
-        board.allowCustomMark = false;
+        board.allowCustomMark = true;
+        board.customMarkDescription = "Spoiler";
         board.allowRandomHash = true;
         board.allowIcons = false;
         board.attachmentsMaxCount = 1;
         board.attachmentsFormatFilters = null;
-        board.markType = BoardModel.MARK_NOMARK;
+        board.markType = BoardModel.MARK_INFINITY;
         board.firstPage = 1;
+        board.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
         board.catalogAllowed = true;
         board.boardName = shortName;
         board.bumpLimit = 500;
@@ -224,6 +237,8 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         model.postsCount = object.optInt("postCount");
         model.attachmentsCount = object.optInt("fileCount");
         PostModel post = mapPostModel(object);
+        post.number = model.threadNumber;
+        post.parentThread = model.threadNumber;
         String thumb = object.optString("thumb", "");
         if (thumb.length() > 0) {
             AttachmentModel attachment = new AttachmentModel();
@@ -232,11 +247,9 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
             attachment.height = -1;
             attachment.width = -1;
             attachment.size = -1;
-            post.attachments = new AttachmentModel[1];
-            post.attachments[0] = attachment;
+            post.attachments = new AttachmentModel[] { attachment };
         }
-        model.posts = new PostModel[1];
-        model.posts[0] = post;
+        model.posts = new PostModel[] { post };
         return model;
     }
     
@@ -252,12 +265,13 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
     private PostModel mapPostModel(JSONObject object) {
         PostModel model = new PostModel();
         try {
-            model.timestamp = CHAN_DATEFORMAT.parse(object.getString("creation")).getTime();
+            model.timestamp = CHAN_DATEFORMAT.parse(object.optString("creation")).getTime();
         } catch (ParseException e) {
             Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
         }
+        model.name = StringEscapeUtils.unescapeHtml4(object.optString("name"));
         model.email = object.optString("email");
-        model.subject = object.optString("subject");
+        model.subject = StringEscapeUtils.unescapeHtml4(object.optString("subject"));
         model.comment = object.optString("markdown", object.optString("message"));
         model.comment = RegexUtils.replaceAll(model.comment, RED_TEXT_MARK_PATTERN, "<font color=\"red\"><b>$1</b></font>");
         model.comment = RegexUtils.replaceAll(model.comment, GREEN_TEXT_MARK_PATTERN, "<span class=\"quote\">$1</span>");
@@ -265,7 +279,6 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         String banMessage = object.optString("banMessage", "");
         if (!banMessage.equals(""))
             model.comment = model.comment + "<br/><em><font color=\"red\">("+banMessage+")</font></em>";
-        model.name = object.optString("name");
         String flag = object.optString("flag", "");
         if (!flag.equals("")) {
             BadgeIconModel icon = new BadgeIconModel();
@@ -284,12 +297,16 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         if (!signedRole.equals("")) model.trip = "##" + signedRole;
         String id = object.optString("id", "");
         model.sage = id.equalsIgnoreCase("Heaven") || model.email.toLowerCase(Locale.US).contains("sage");
-        if (!id.equals("")) model.name += (" ID:" + id);
+        if (!id.equals("")) {
+            model.name += (" ID:" + id);
+            model.color = CryptoUtils.hashIdColor(id);
+        }
         JSONArray files = object.optJSONArray("files");
-        if (files == null) return model;
-        model.attachments = new AttachmentModel[files.length()];
-        for (int i = 0, len = files.length(); i < len; ++i) {
-            model.attachments[i] = mapAttachment(files.getJSONObject(i));
+        if (files != null) {
+            model.attachments = new AttachmentModel[files.length()];
+            for (int i = 0, len = files.length(); i < len; ++i) {
+                model.attachments[i] = mapAttachment(files.getJSONObject(i));
+            }
         }
         return model;
     }
@@ -329,6 +346,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         return url;
     }
 
+    //TODO: parse case-sensitive board names
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());

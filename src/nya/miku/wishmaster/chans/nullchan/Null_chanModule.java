@@ -59,7 +59,7 @@ public class Null_chanModule extends InfinityModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tmp", "Временное убежище", null, true)
     };
     
-    private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "gif", "png", "webm", "mp4" };
+    private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "gif", "png" };
     
     private static final Pattern CAPTCHA_BASE64 = Pattern.compile("data:image/png;base64,([^\"]+)\"");
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
@@ -136,7 +136,7 @@ public class Null_chanModule extends InfinityModule {
         board.allowRandomHash = true;
         board.allowIcons = false;
         board.attachmentsFormatFilters = ATTACHMENT_FORMATS;
-        board.markType = BoardModel.MARK_NOMARK;
+        board.markType = BoardModel.MARK_INFINITY;
         board.firstPage = 1;
         board.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
         board.searchAllowed = false;

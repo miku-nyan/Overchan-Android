@@ -74,6 +74,7 @@ import android.content.res.Resources;
 public abstract class AbstractVichanModule extends AbstractWakabaModule {
     private static final Pattern ATTACHMENT_EMBEDDED_LINK = Pattern.compile("<a[^>]*href=\"([^\">]*)\"[^>]*>");
     private static final Pattern ATTACHMENT_EMBEDDED_THUMB = Pattern.compile("<img[^>]*src=\"([^\">]*)\"[^>]*>");
+    private static final Pattern COMMENT_HEADING_PATTERN = Pattern.compile("<span[^>]*class=\"heading\">(.*?)</span>");
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
     
     private static final String[] ATTACHMENT_KEYS = new String[] { "file", "file2", "file3", "file4", "file5" };
@@ -181,6 +182,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous")));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
         model.comment = object.optString("com", "");
+        model.comment = RegexUtils.replaceAll(model.comment, COMMENT_HEADING_PATTERN, "<font color=\"#AF0A0F\"><b>$1</b></font>");
         model.email = object.optString("email", "");
         model.trip = object.optString("trip", "");
         String capcode = object.optString("capcode", "none");
