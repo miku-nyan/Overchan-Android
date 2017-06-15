@@ -88,7 +88,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
     private static final Pattern GREEN_TEXT_MARK_PATTERN = Pattern.compile("<span class=\"greenText\">(.*?)</span>");
     private static final Pattern REPLY_NUMBER_PATTERN = Pattern.compile("&gt&gt(\\d+)");
     protected Map<String, BoardModel> boardsMap = null;
-    private Map<String, Map<String, String>> flagsMap = null;
+    private Map<String, ArrayList<String>> flagsMap = null;
     private static String lastCaptchaId;
     private static String lastCaptchaAnswer;
     
@@ -132,28 +132,32 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         model.boardDescription = boardJson.optString("boardName", model.boardName);
         model.attachmentsMaxCount = boardJson.optInt("maxFileCount", 5);
         model.lastPage = boardJson.optInt("pageCount", BoardModel.LAST_PAGE_UNDEFINED);
-        JSONArray flags = boardJson.optJSONArray("flagData");
-        if (flags != null) {
-            model.allowIcons = true;
-            model.iconDescriptions = new String[flags.length()];
-            if (flagsMap == null) flagsMap = new HashMap<String, Map<String, String>>();
-            Map<String, String> boardFlags = new HashMap<String, String>();
-            for(int i = 0, len = flags.length(); i < len; ++i) {
-                boardFlags.put(flags.getJSONObject(i).getString("name"), flags.getJSONObject(i).getString("_id"));
-                model.iconDescriptions[i] = flags.getJSONObject(i).getString("name");
-            }
-            flagsMap.put(model.boardName, boardFlags);
-        }
         JSONArray settingsJson = boardJson.optJSONArray("settings");
         ArrayList<String> settings = new ArrayList<String>();
         for(int i = 0, len = settingsJson.length(); i < len; ++i) settings.add(settingsJson.getString(i));
         model.allowNames = !settings.contains("forceAnonymity");
-        model.allowDeleteFiles = settings.contains("blockDeletion");
-        model.allowDeletePosts = settings.contains("blockDeletion");
+        model.allowDeletePosts = !settings.contains("blockDeletion");
+        model.allowDeleteFiles = model.allowDeletePosts;
         model.requiredFileForNewThread = settings.contains("requireThreadFile");
         model.allowRandomHash = settings.contains("uniqueFiles");
         model.uniqueAttachmentNames = settings.contains("uniqueFiles");
         model.attachmentsMaxCount = settings.contains("textBoard") ? 0 : model.attachmentsMaxCount;
+        try {
+            JSONArray flags = boardJson.getJSONArray("flagData");
+            if (flags.length() > 0) {
+                String[] icons = new String[flags.length() + 1];
+                icons[0] = "No flag";
+                if (flagsMap == null) flagsMap = new HashMap<String, ArrayList<String>>();
+                ArrayList<String> boardFlagIds = new ArrayList<String>();
+                for(int i = 0, len = flags.length(); i < len; ++i) {
+                    boardFlagIds.add(flags.getJSONObject(i).getString("_id"));
+                    icons[i + 1] = flags.getJSONObject(i).getString("name");
+                }
+                flagsMap.put(model.boardName, boardFlagIds);
+                model.allowIcons = true;
+                model.iconDescriptions = icons;
+            }
+        } catch (Exception e) {}
         return model;
     }
 
@@ -295,7 +299,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
             Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
         }
         model.name = StringEscapeUtils.unescapeHtml4(object.optString("name"));
-        model.email = object.optString("email");
+        model.email = StringEscapeUtils.unescapeHtml4(object.optString("email"));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("subject"));
         model.comment = object.optString("markdown", object.optString("message"));
         model.comment = RegexUtils.replaceAll(model.comment, RED_TEXT_MARK_PATTERN, "<font color=\"red\"><b>$1</b></font>");
@@ -309,8 +313,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
             BadgeIconModel icon = new BadgeIconModel();
             icon.description = object.optString("flagName");
             icon.source = flag;
-            model.icons = new BadgeIconModel[1];
-            model.icons[0] = icon;
+            model.icons = new BadgeIconModel[] { icon };
         }
         int post_number = object.optInt("postId", -1);
         model.number = post_number == -1 ? null : Integer.toString(post_number);
@@ -506,6 +509,8 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
             jsonParameters.put("threadId", model.threadNumber);
         if (model.captchaAnswer != null && model.captchaAnswer.length() > 0)
             jsonParameters.put("captcha", model.captchaAnswer);
+        if (model.icon > 0)
+            jsonParameters.put("flag", flagsMap.get(model.boardName).get(model.icon - 1));
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         if (model.attachments != null && model.attachments.length > 0) {
             JSONArray files = new JSONArray();
