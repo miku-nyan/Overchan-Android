@@ -22,8 +22,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,22 +38,16 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
-import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.PostModel;
-import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.CryptoUtils;
-import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
-import nya.miku.wishmaster.lib.org_json.JSONArray;
-import nya.miku.wishmaster.lib.org_json.JSONException;
 
 public class NullchaneuModule extends AbstractInstant0chan {
     private static final String CHAN_NAME = "0chan.eu";
     private static final String DEFAULT_DOMAIN = "0chan.ru.net";
-    private static final String DOMAINS_HINT = "0chan.ru.net, 0chan.eu";
     private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
     
     public NullchaneuModule(SharedPreferences preferences, Resources resources) {
@@ -104,7 +96,6 @@ public class NullchaneuModule extends AbstractInstant0chan {
         Context context = group.getContext();
         EditTextPreference domainPref = new EditTextPreference(context);
         domainPref.setTitle(R.string.pref_domain);
-        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
         domainPref.setDialogTitle(R.string.pref_domain);
         domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
         domainPref.getEditText().setHint(DEFAULT_DOMAIN);
@@ -120,35 +111,10 @@ public class NullchaneuModule extends AbstractInstant0chan {
     }
     
     @Override
-    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
-        String url = getUsingUrl() + "boards10.json";
-        try {
-            JSONArray json = downloadJSONArray(url, oldBoardsList != null, listener, task);
-            if (json == null) return oldBoardsList;
-            List<SimpleBoardModel> list = new ArrayList<SimpleBoardModel>();
-            for (int i=0; i<json.length(); ++i) {
-                String currentCategory = json.getJSONObject(i).optString("name");
-                JSONArray boards = json.getJSONObject(i).getJSONArray("boards");
-                for (int j=0; j<boards.length(); ++j) {
-                    SimpleBoardModel model = new SimpleBoardModel();
-                    model.chan = getChanName();
-                    model.boardName = boards.getJSONObject(j).getString("dir");
-                    model.boardDescription = boards.getJSONObject(j).optString("desc", model.boardName);
-                    model.boardCategory = currentCategory;
-                    model.nsfw = model.boardName.equals("b") || currentCategory.equals("adult");
-                    list.add(model);
-                }
-            }
-            return list.toArray(new SimpleBoardModel[list.size()]);
-        } catch (JSONException e) {
-            return new SimpleBoardModel[0];
-        }
-    }
-    
-    @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
         model.defaultUserName = "Аноним";
+        model.catalogAllowed = false;
         return model;
     }
     
@@ -167,19 +133,10 @@ public class NullchaneuModule extends AbstractInstant0chan {
         captcha.type = CaptchaModel.TYPE_NORMAL;
         return captcha;
     }
-	
-    @Override
-    public String fixRelativeUrl(String url) {
-        if (useHttps()) url = url.replace("http://0chan.eu", "https://0chan.eu");
-        return super.fixRelativeUrl(url);
-    }
     
     private static class NulleuReader extends Instant0chanReader {
         private static final Pattern PATTERN_EMBEDDED = Pattern.compile("<param name=\"movie\"(?:[^>]*)value=\"([^\"]+)\"(?:[^>]*)>", Pattern.DOTALL);
-        private static final Pattern PATTERN_COUNTRYBALL = Pattern.compile("class=\"_country_\"(?:.*)src=\"(.+)\"", Pattern.DOTALL);
-        private static final Pattern PATTERN_TABULATION = Pattern.compile("^\\t+", Pattern.MULTILINE);
         private static final char[] USERID_FILTER = "<span class=\"hand\"".toCharArray();
-        
         private int curUserIdPos = 0;
         
         public NulleuReader(InputStream stream, boolean canCloudflare) {
@@ -189,8 +146,6 @@ public class NullchaneuModule extends AbstractInstant0chan {
         @Override
         protected void postprocessPost(PostModel post) {
             super.postprocessPost(post);
-            //TODO: Remove indents in post by html parser
-            post.comment = RegexUtils.replaceAll(post.comment, PATTERN_TABULATION , "");
             
             Matcher matcher = PATTERN_EMBEDDED.matcher(post.comment);
             if (matcher.find()) {
@@ -229,21 +184,6 @@ public class NullchaneuModule extends AbstractInstant0chan {
                 }
             } else {
                 if (curUserIdPos != 0) curUserIdPos = ch == USERID_FILTER[0] ? 1 : 0;
-            }
-        }
-        
-        @Override
-        protected void parseThumbnail(String imgTag) {
-            super.parseThumbnail(imgTag);
-            Matcher matcher = PATTERN_COUNTRYBALL.matcher(imgTag);
-            if (matcher.find()) {
-                BadgeIconModel iconModel = new BadgeIconModel();
-                iconModel.source = matcher.group(1);
-                int currentIconsCount = currentPost.icons == null ? 0 : currentPost.icons.length;
-                BadgeIconModel[] newIconsArray = new BadgeIconModel[currentIconsCount + 1];
-                for (int i=0; i<currentIconsCount; ++i) newIconsArray[i] = currentPost.icons[i];
-                newIconsArray[currentIconsCount] = iconModel;
-                currentPost.icons = newIconsArray;
             }
         }
     }
