@@ -72,7 +72,6 @@ public class CirnoModule extends AbstractChanModule {
     
     static final String IICHAN_NAME = "iichan.hk";
     static final String IICHAN_DOMAIN = "iichan.hk";
-    static final String IICHAN_URL = "http://" + IICHAN_DOMAIN + "/";
     private static final String HARUHIISM_DOMAIN = "boards.haruhiism.net";
     private static final String HARUHIISM_URL = "http://" + HARUHIISM_DOMAIN + "/";
     
@@ -98,8 +97,18 @@ public class CirnoModule extends AbstractChanModule {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_cirno, null);
     }
     
+    private boolean useHttps() {
+        return useHttps(false);
+    }
+    
+    private String getUsingUrl() {
+        return (useHttps() ? "https://" : "http://") + IICHAN_DOMAIN + "/";
+    }
+    
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addHttpsPreference(preferenceGroup, false);
+        
         final Context context = preferenceGroup.getContext();
         EditTextPreference passwordPref = new EditTextPreference(context);
         passwordPref.setTitle(R.string.iichan_prefs_report_thread);
@@ -218,14 +227,14 @@ public class CirnoModule extends AbstractChanModule {
 
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String captchaUrl = IICHAN_URL + "/cgi-bin/captcha" + (boardName.equals("b") || boardName.equals("a") ? "1" : "") + ".pl/" +
+        String captchaUrl = getUsingUrl() + "/cgi-bin/captcha" + (boardName.equals("b") || boardName.equals("a") ? "1" : "") + ".pl/" +
                 boardName + "/?key=" + (threadNumber == null ? "mainpage" : ("res" + threadNumber));
         return downloadCaptcha(captchaUrl, listener, task);        
     }
 
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = IICHAN_URL + "cgi-bin/wakaba.pl/" + model.boardName + "/";
+        String url = getUsingUrl() + "cgi-bin/wakaba.pl/" + model.boardName + "/";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("task", "post");
         if (model.threadNumber != null) postEntityBuilder.addString("parent", model.threadNumber);
@@ -295,7 +304,7 @@ public class CirnoModule extends AbstractChanModule {
     
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = IICHAN_URL + "cgi-bin/wakaba.pl/" + model.boardName + "/";
+        String url = getUsingUrl() + "cgi-bin/wakaba.pl/" + model.boardName + "/";
         
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("delete", model.postNumber));
@@ -388,8 +397,8 @@ public class CirnoModule extends AbstractChanModule {
             }
         }
         boolean haruhiism = "abe".equals(model.boardName) || (model.otherPath != null && model.otherPath.startsWith("/abe"));
-        if (!haruhiism && model.type == UrlPageModel.TYPE_CATALOGPAGE) return IICHAN_URL + model.boardName + "/catalogue.html";
-        return WakabaUtils.buildUrl(model, haruhiism ? HARUHIISM_URL : IICHAN_URL);
+        if (!haruhiism && model.type == UrlPageModel.TYPE_CATALOGPAGE) return getUsingUrl() + model.boardName + "/catalogue.html";
+        return WakabaUtils.buildUrl(model, haruhiism ? HARUHIISM_URL : getUsingUrl());
     }
     
     @Override

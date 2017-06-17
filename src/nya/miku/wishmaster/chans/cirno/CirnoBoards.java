@@ -34,7 +34,7 @@ public class CirnoBoards {
     
     private static final List<String> IICHAN_SPOILER_MARK_BOARDS = Arrays.asList("bro", "maid", "med", "tv", "a", "fi", "to", "vn", "vg");
     
-    private static final List<String> IICHAN_READONLY_BOARDS = Arrays.asList("o", "w", "abe", "ma", "azu", "me", "hau", "sos", "mo");
+    private static final List<String> IICHAN_READONLY_BOARDS = Arrays.asList("o", "w", "abe", "ma", "azu", "me", "hau", "sos", "mo", "sp", "bg");
     
     private static final List<BoardModel> LIST_IICHAN = new ArrayList<BoardModel>();
     private static final Map<String, BoardModel> MAP_IICHAN = new HashMap<String, BoardModel>();
@@ -42,8 +42,6 @@ public class CirnoBoards {
     
     static {
         addBoard("d", "Работа сайта", "Обсуждения", "Мод-тян", false);
-        addBoard("bg", "Настольные игры", "К удалению", "Аноним", false);
-        addBoard("sp", "Спорт", "К удалению", "Спортакус", false);
         addBoard("b", "Бред", "Общее", "Сырно", true);
         addBoard("hr", "Высокое разрешение", "Общее", "Аноним", false);
         addBoard("gf", "gif- и flash-анимация", "Общее", "Аноним", true); //???
@@ -132,7 +130,7 @@ public class CirnoBoards {
         model.allowNames = !name.equals("b") && !name.equals("bro");
         model.allowSubjects = true;
         model.allowSage = false;
-        model.allowEmails = true;
+        model.allowEmails = false;
         model.ignoreEmailIfSage = false;
         model.allowCustomMark = IICHAN_SPOILER_MARK_BOARDS.indexOf(name) != -1;
         model.customMarkDescription = "Spoiler";
