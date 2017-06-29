@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_post_number_search_header">%1$s (тред %2$s)</string>
     <string name="postitem_sticky_thread">Тред закреплен</string>
     <string name="postitem_closed_thread">Обсуждение закрыто</string>
+    <string name="postitem_cyclical_thread">Цикличный тред</string>
     <string name="postitem_deleted_mark">Сообщение удалено</string>
     <plurals name="postitem_posts_quantity">
         <item quantity="one">%d сообщение</item>

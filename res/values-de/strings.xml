@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_post_number_search_header">%1$s (thread %2$s)</string>
     <string name="postitem_sticky_thread">Thread ist wichtig</string>
     <string name="postitem_closed_thread">Thread ist geschlossen</string>
+    <string name="postitem_cyclical_thread">Thread ist zyklischen</string>
     <string name="postitem_deleted_mark">Post ist gelöscht</string>
     <plurals name="postitem_posts_quantity">
         <item quantity="one">%d Post</item>

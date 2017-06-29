@@ -173,6 +173,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         if (curThread.attachmentsCount >= 0) curThread.attachmentsCount += opPost.optInt("omitted_images", 0);
         curThread.isSticky = opPost.optInt("sticky") == 1;
         curThread.isClosed = opPost.optInt("locked") == 1;
+        curThread.isCyclical = opPost.optInt("cyclical") == 1;
         return curThread;
     }
     

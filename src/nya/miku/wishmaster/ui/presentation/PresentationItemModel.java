@@ -85,9 +85,9 @@ public class PresentationItemModel {
     /** Строка с количеством постов и вложений (для заголовка треда).
      *  Необходимо предварительно построить ({@link #buildPostsCountString(int, int)}) */
     public String postsCountString;
-    /** Строка с информацией о том, что тред прикреплен или закрыт (для заголовка треда).
-     *  Необходимо предварительно построить ({@link #buildStickyClosedString(boolean, boolean)}) */
-    public String stickyClosedString;
+    /** Строка с информацией о состоянии треда: прикреплен, закрыт, зациклен (для заголовка треда).
+     *  Необходимо предварительно построить ({@link #buildThreadConditionString(boolean, boolean, boolean)}) */
+    public String threadConditionString;
     /** spannable строка с комментарием поста */
     public Spanned spannedComment;
     /** spanned строка со ссылками на данный пост.
@@ -99,7 +99,7 @@ public class PresentationItemModel {
      *  Построение возможно, только если элемент - пост со страницы треда. */
     public Spanned referencesQuantityString;
     /** spanned строка с заголовком поста.
-     *  Если нужна, необходимо предварительно построить (метод {@link #buildSpannedHeader(int, int, String)}) */
+     *  Если нужна, необходимо предварительно построить (метод {@link #buildSpannedHeader(int, int, String, String, boolean)}) */
     public Spanned spannedHeader;
     
     /** список ссылок из этого поста */
@@ -456,16 +456,20 @@ public class PresentationItemModel {
     }
     
     /**
-     * Построить строку с информацией о том, что тред прикреплен или закрыт (для заголовка треда).
+     * Построить строку с информацией о состоянии треда: прикреплен, закрыт, зациклен (для заголовка треда).
      * @param isSticky является ли тред прикреплённым
      * @param isClosed является ли тред закрытым для обсуждения
+     * @param isCyclical является ли тред цикличным
      */
-    public void buildStickyClosedString(boolean isSticky, boolean isClosed) {
-        if (isSticky) stickyClosedString = resources.getString(R.string.postitem_sticky_thread);
-        else stickyClosedString = null; 
-        if (isClosed) {
-            if (isSticky) stickyClosedString += ", " + resources.getString(R.string.postitem_closed_thread);
-            else stickyClosedString = resources.getString(R.string.postitem_closed_thread);
+    public void buildThreadConditionString(boolean isSticky, boolean isClosed, boolean isCyclical) {
+        StringBuilder condition = new StringBuilder();
+        if (isSticky) condition.append(resources.getString(R.string.postitem_sticky_thread)).append(", ");
+        if (isClosed) condition.append(resources.getString(R.string.postitem_closed_thread)).append(", ");
+        if (isCyclical) condition.append(resources.getString(R.string.postitem_cyclical_thread));
+        if (condition.length() > 0) {
+            threadConditionString = condition.toString();
+            if (threadConditionString.endsWith(", "))
+                threadConditionString = threadConditionString.substring(0, threadConditionString.length() - 2);
         }
     }
     

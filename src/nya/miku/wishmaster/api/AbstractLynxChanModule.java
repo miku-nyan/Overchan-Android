@@ -287,6 +287,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         model.threadNumber = Integer.toString(object.optInt("threadId"));
         model.isSticky = object.optBoolean("pinned", false);
         model.isClosed = object.optBoolean("locked", false);
+        model.isCyclical = object.optBoolean("cyclic", false);
         model.postsCount = object.optInt("ommitedPosts", 0) + 1;
         return model;
     }

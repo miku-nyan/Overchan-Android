@@ -1686,8 +1686,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             public boolean unreadFrameIsVisible = false;
             
             public JellyBeanSpanFixTextView headerView;
-            public TextView stickyClosedThreadView;
-            public boolean stickyClosedThreadIsVisible = false;
+            public TextView threadConditionView;
+            public boolean threadConditionIsVisible = false;
             public View deletedPostView;
             public boolean deletedPostViewIsVisible = false;
             public TextView dateView;
@@ -1906,7 +1906,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 tag.unreadFrame.setOnClickListener(onUnreadFrameListener);
                 tag.unreadFrame.setOnLongClickListener(onUnreadFrameListener);
                 tag.headerView = (JellyBeanSpanFixTextView) view.findViewById(R.id.post_header);
-                tag.stickyClosedThreadView = (TextView) view.findViewById(R.id.post_sticky_closed_thread);
+                tag.threadConditionView = (TextView) view.findViewById(R.id.post_thread_condition);
                 tag.deletedPostView = view.findViewById(R.id.post_deleted_mark);
                 tag.dateView = (TextView) view.findViewById(R.id.post_date);
                 tag.badgeViewContainer = (LinearLayout) view.findViewById(R.id.post_badge_container);
@@ -2251,16 +2251,16 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         tag.postsCountIsVisible = false;
                     }
                 }
-                if (model.stickyClosedString != null) {
-                    tag.stickyClosedThreadView.setText(model.stickyClosedString);
-                    if (!tag.stickyClosedThreadIsVisible) {
-                        tag.stickyClosedThreadView.setVisibility(View.VISIBLE);
-                        tag.stickyClosedThreadIsVisible = true;
+                if (model.threadConditionString != null) {
+                    tag.threadConditionView.setText(model.threadConditionString);
+                    if (!tag.threadConditionIsVisible) {
+                        tag.threadConditionView.setVisibility(View.VISIBLE);
+                        tag.threadConditionIsVisible = true;
                     }
                 } else {
-                    if (tag.stickyClosedThreadIsVisible) {
-                        tag.stickyClosedThreadView.setVisibility(View.GONE);
-                        tag.stickyClosedThreadIsVisible = false;
+                    if (tag.threadConditionIsVisible) {
+                        tag.threadConditionView.setVisibility(View.GONE);
+                        tag.threadConditionIsVisible = false;
                     }
                 }
             }

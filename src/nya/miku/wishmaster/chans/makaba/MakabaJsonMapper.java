@@ -150,6 +150,7 @@ public class MakabaJsonMapper {
         }
         model.isSticky = getIntSafe(postsArray.getJSONObject(0), "sticky", 0) != 0;
         model.isClosed = getIntSafe(postsArray.getJSONObject(0), "closed", 0) != 0;
+        model.isCyclical = getIntSafe(postsArray.getJSONObject(0), "endless", 0) != 0;
         return model;
     }
     

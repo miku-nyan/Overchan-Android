@@ -216,7 +216,7 @@ public class PresentationModel {
     
     /**
      * Установить новые модели обтекания картинки текстом (и перестроить текст комментария в случае необходимости)
-     * @param floatingModels массив из двух моделей обтекания картинки текстом
+     * @param models массив из двух моделей обтекания картинки текстом
      */
     public void setFloatingModels(FloatingModel[] models) {
         if (!FlowTextHelper.IS_AVAILABLE) return;
@@ -361,7 +361,7 @@ public class PresentationModel {
             for (int i=0; i<source.threads.length; ++i) {
                 if (task.isCancelled()) return;
                 presentationList.get(i).buildPostsCountString(source.threads[i].postsCount, source.threads[i].attachmentsCount);
-                presentationList.get(i).buildStickyClosedString(source.threads[i].isSticky, source.threads[i].isClosed);
+                presentationList.get(i).buildThreadConditionString(source.threads[i].isSticky, source.threads[i].isClosed, source.threads[i].isCyclical);
             }
         }
         notReady = false;
