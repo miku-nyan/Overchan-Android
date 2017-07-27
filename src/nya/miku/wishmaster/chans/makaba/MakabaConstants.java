@@ -67,7 +67,7 @@ public class MakabaConstants {
     
     public static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif", "webm" };
     
-    public static final String[] CATALOG_TYPES = { "standart", "last_reply", "num", "image_size" };
+    public static final String[] CATALOG_TYPES = { "catalog", "catalog_num" };
     
     public static final String PREF_KEY_MOBILE_API = "mobile_api";
     public static final String PREF_KEY_USE_HTTPS_MAKABA = "use_https";

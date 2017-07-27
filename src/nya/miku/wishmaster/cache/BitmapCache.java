@@ -229,15 +229,13 @@ public class BitmapCache {
             
             if (maxSize > 0) { //ебучий шакал
                 double scale = (double)maxSize / Math.max(bmp.getWidth(), bmp.getHeight());
-                if (scale < 1.0) {
                     int width = (int) (bmp.getWidth() * scale);
                     int height = (int) (bmp.getHeight() * scale);
                     if (Math.min(width, height) > 0) {
                         Bitmap scaled = Bitmap.createScaledBitmap(bmp, width, height, true);
-                        bmp.recycle();
+                        if (!scaled.equals(bmp)) bmp.recycle(); // see createScaledBitmap docs
                         bmp = scaled;
                     }
-                }
             }
             
             OutputStream fileStream = null;
@@ -247,7 +245,7 @@ public class BitmapCache {
                 lru.put(hash, bmp);
                 file = fileCache.create(FileCache.PREFIX_BITMAPS + hash);
                 fileStream = new FileOutputStream(file);
-                if (!bmp.compress(Bitmap.CompressFormat.PNG, 100, fileStream)) {
+                if (bmp.isRecycled() || !bmp.compress(Bitmap.CompressFormat.PNG, 100, fileStream)) {
                     throw new Exception();
                 }
                 fileStream.close();

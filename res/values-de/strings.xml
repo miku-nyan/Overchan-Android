@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_post_number_search_header">%1$s (thread %2$s)</string>
     <string name="postitem_sticky_thread">Thread ist wichtig</string>
     <string name="postitem_closed_thread">Thread ist geschlossen</string>
+    <string name="postitem_cyclical_thread">Thread ist zyklischen</string>
     <string name="postitem_deleted_mark">Post ist gelöscht</string>
     <plurals name="postitem_posts_quantity">
         <item quantity="one">%d Post</item>
@@ -584,6 +585,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Gurochan</item>
         <item>Tomorrow</item>
         <item>Mikuba</item>
+        <item>Dark Mint</item>
         <item>Benutzerdefinierten</item>
     </string-array>
     <string name="pref_font_size_title">Textgröße</string>
@@ -608,4 +610,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>45\uff05</item>
         <item>50\uff05</item>
     </string-array>
+    <string name="app_settings_exporting">Exportieren</string>
+    <string name="app_settings_importing">Importieren</string>
+    <string name="app_settings_import_completed">Import erfolgreich abgeschlossen</string>
+    <string name="app_settings_export_completed">Export erfolgreich abgeschlossen</string>
+    <string name="app_import_overwrite_warning">Warnung!</string>
+    <string name="app_import_overwrite_warning_message">Alle Daten werden irreversibel überschrieben</string>
+    <string name="pref_key_settings_import_title">Import</string>
+    <string name="pref_key_settings_import_overwrite_title">Überschreiben</string>
+    <string name="pref_key_settings_import_overwrite_summary">Vorhandene Daten beim Import überschreiben</string>
+    <string name="pref_key_settings_ie_title">Einstellungen Import/Export</string>
+    <string name="pref_key_settings_export_title">Export</string>
+    <string name="pref_captcha_auto_update">Auto-update CAPTCHA</string>
+    <string name="mark_code">Code</string>
+    <string name="pref_post_thumbnail_scale_title">Thumbnail-Größe</string>
+    <string name="pref_key_post_thumbnail_scale_toast">Es wird empfohlen, den Cache zu löschen</string>
+    <string name="newtab_select_local_directory">Speicherort angeben</string>
+    <string name="pref_scroll_to_active_tab_title">Blättern Sie zur aktiven Registerkarte</string>
+    <string name="pref_scroll_to_active_tab_summary">Blättern Sie zum aktiven Tab, wenn Sie die inaktive Registerkarte schließen</string>
 </resources>

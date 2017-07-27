@@ -46,7 +46,6 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
     protected static final String PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN = "PREF_KEY_CLOUDFLARE_COOKIE_DOMAIN";
     
     protected static final String CLOUDFLARE_COOKIE_NAME = "cf_clearance";
-    protected static final String CLOUDFLARE_RECAPTCHA_KEY = "6LfOYgoTAAAAAInWDVTLSc8Yibqp-c9DaLimzNGM";
     
     public CloudflareChanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -93,7 +92,7 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
             }
         } else if (e.getStatusCode() == 503) {
             String html = e.getHtmlString();
-            if (html != null && html.contains("Just a moment...")) {
+            if (html != null && html.contains("Checking your browser")) {
                 throw CloudflareException.antiDDOS(url, getChanName());
             }
         }

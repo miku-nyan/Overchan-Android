@@ -63,7 +63,7 @@ public class ChanModels {
                 key.append("threadNumber").append(model.threadNumber);
                 break;
             case UrlPageModel.TYPE_SEARCHPAGE:
-                key.append("searchRequest").append(model.searchRequest);
+                key.append("searchRequest").append(model.searchRequest).append(SEPARATOR).append(model.boardPage);
                 break;
         }
         return CryptoUtils.computeMD5(key.toString());

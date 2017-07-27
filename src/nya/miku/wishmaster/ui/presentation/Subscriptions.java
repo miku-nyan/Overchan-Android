@@ -40,6 +40,7 @@ import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.cache.SerializablePage;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class Subscriptions {
     private static final String TAG = "Subscriptions";
@@ -83,11 +84,19 @@ public class Subscriptions {
         return -1;
     }
     
+    public void importSubscriptions(SubscriptionEntry[] subscription, Boolean overwrite){
+        if (overwrite) {
+            reset();
+            MainApplication.getInstance().settings.setSubscriptionsClear(true);
+        }
+        database.importSubscriptions(subscription, overwrite);
+    }
+    
     /**
      * Добавить отслеживаемый пост
      */
     public void addSubscription(String chan, String board, String thread, String post) {
-        database.put(chan, board, thread, post);
+        database.put(chan, board, thread, post, true);
         Object[] tuple = cached;
         if (tuple != null && tuple[0].equals(chan) && tuple[1].equals(board) && tuple[2].equals(thread))
             cached = null;
@@ -201,6 +210,46 @@ public class Subscriptions {
         return Arrays.asList(comment.replaceAll("[\\*%_]", "").replaceAll("\\[[^\\]]*\\]", "").replaceAll("[^\\w\\d\\s]", " ").trim().split("\\s+"));
     }
     
+    public static class SubscriptionEntry {
+        public final String chan;
+        public final String board;
+        public final String thread;
+        public final String post;
+        public SubscriptionEntry(JSONObject json) {
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.thread = json.getString("thread");
+            this.post = json.getString("post");
+        }
+     
+        public SubscriptionEntry(String chan, String board, String thread, String post) {
+            this.chan = chan;
+            this.board = board;
+            this.thread = thread;
+            this.post = post;
+        }
+        
+        public String getChan(){
+            return this.chan;
+        }
+        
+        public String getBoard(){
+            return this.board;
+        }
+        
+        public String getThread(){
+            return this.thread;
+        }
+        
+        public String getPost(){
+            return this.post;
+        }
+    }
+
+    public List<SubscriptionEntry> getSubscriptions() {
+        return database.getSubscriptions();
+    }
+
     private static class SubscriptionsDB {
         private static final int DB_VERSION = 1000;
         private static final String DB_NAME = "subscriptions.db";
@@ -225,12 +274,28 @@ public class Subscriptions {
             if (c != null) c.close();
             return result;
         }
-        
-        public void put(String chan, String board, String thread, String post) {
-            if (hasSubscription(chan, board, thread, post)) {
-                Logger.d(TAG, "entry is already exists");
-                return;
+
+        public void importSubscriptions(SubscriptionEntry[] subscription, Boolean overwrite){
+            dbHelper.getWritableDatabase().beginTransaction();
+            for (SubscriptionEntry entry : subscription) {
+                put(
+                        entry.chan,
+                        entry.board,
+                        entry.thread,
+                        entry.post,
+                        !overwrite
+                );
             }
+            dbHelper.getWritableDatabase().setTransactionSuccessful();
+            dbHelper.getWritableDatabase().endTransaction();
+        }
+        
+        public void put(String chan, String board, String thread, String post, Boolean check_existence) {
+            if (check_existence)
+                if (hasSubscription(chan, board, thread, post)) {
+                    Logger.d(TAG, "entry is already exists");
+                    return;
+                }
             ContentValues value = new ContentValues(4);
             value.put(COL_CHAN, chan);
             value.put(COL_BOARD, board);
@@ -265,6 +330,23 @@ public class Subscriptions {
             }
             if (c != null) c.close();
             return result;
+        }
+        
+        public List<SubscriptionEntry> getSubscriptions() {
+            List<SubscriptionEntry> list = new ArrayList<SubscriptionEntry>();
+            Cursor c = dbHelper.getReadableDatabase().query(TABLE_NAME, null, null, null, null, null, null, null);
+            if (c != null && c.moveToFirst()) {
+                int chanIndex = c.getColumnIndex(COL_CHAN);
+                int boardIndex = c.getColumnIndex(COL_BOARD);
+                int threadIndex = c.getColumnIndex(COL_THREAD);
+                int postIndex = c.getColumnIndex(COL_POST);
+                do {
+                    list.add(new SubscriptionEntry(c.getString(chanIndex), c.getString(boardIndex),
+                            c.getString(threadIndex), c.getString(postIndex)));
+                } while (c.moveToNext());
+            }
+            if (c != null) c.close();
+            return list;
         }
         
         public void resetDB() {

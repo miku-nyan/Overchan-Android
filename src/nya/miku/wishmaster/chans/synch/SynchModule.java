@@ -45,17 +45,15 @@ public class SynchModule extends AbstractVichanModule {
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бардак", "Основные", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Майдан", "Основные", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r", "Random", "Основные", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аниме", "Тематические", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "g", "Девушки", "Тематические", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "anon", "Anonymous", "Тематические", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mlp", "My Little Pony", "Тематические", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mu", "Музыка", "Тематические", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "po", "Politics", "Тематические", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r34", "Rule 34", "Тематические", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "s", "Программы", "Тематические", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tv", "Кино и сериалы", "Тематические", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "Видеоигры", "Тематические", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "wh", "Warhammer", "Тематические", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "int", "Le int", "Остальные", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "diy", "Хобби", "Тематические", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "old", "Чулан", "Остальные", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "test", "Старая школа", "Остальные", false),
     };
@@ -138,6 +136,7 @@ public class SynchModule extends AbstractVichanModule {
     protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         AttachmentModel model = super.mapAttachment(object, boardName, isSpoiler);
         if (model != null) {
+            if (model.type == AttachmentModel.TYPE_VIDEO) model.thumbnail = null;
             if (model.thumbnail != null) model.thumbnail = model.thumbnail.replace("//", "/").replaceAll("^/\\w+", "");
             if (model.path != null) model.path = model.path.replace("//", "/").replaceAll("^/\\w+", "");
         }

@@ -21,6 +21,7 @@ package nya.miku.wishmaster.chans.cirno;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -30,10 +31,10 @@ import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.cookie.Cookie;
 import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
-
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractChanModule;
@@ -84,16 +85,28 @@ public class Chan410Module extends AbstractChanModule {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_410chan, null);
     }
     
+    private boolean useHttps() {
+        return useHttps(false);
+    }
+    
+    private String getUsingUrl() {
+        return (useHttps() ? "https://" : "http://") + CHAN410_DOMAIN + "/";
+    }
+    
     @Override
     protected void initHttpClient() {
         JSONObject savedCookies = new JSONObject(preferences.getString(getSharedKey(PREF_KEY_FAPTCHA_COOKIES), "{}"));
         for (String board : Chan410Boards.ALL_BOARDS_SET) {
-            String value = savedCookies.optString(board);
-            if (value != null && value.length() > 0) {
-                BasicClientCookie c = new BasicClientCookie(board, value);
-                c.setDomain("." + CHAN410_DOMAIN);
-                c.setPath("/");
-                httpClient.getCookieStore().addCookie(c);
+            JSONObject cookie = savedCookies.optJSONObject(board);
+            if (cookie != null) {
+                String value = cookie.optString("value");
+                if (value.length() > 0) {
+                    BasicClientCookie c = new BasicClientCookie(board, value);
+                    c.setDomain(CHAN410_DOMAIN);
+                    c.setPath("/");
+                    c.setExpiryDate(new Date(cookie.optLong("expires")));
+                    httpClient.getCookieStore().addCookie(c);
+                }
             }
         }
     }
@@ -103,10 +116,19 @@ public class Chan410Module extends AbstractChanModule {
         List<Cookie> cookies = httpClient.getCookieStore().getCookies();
         for (Cookie cookie : cookies) {
             if (cookie.getName().length() <= 3 && Chan410Boards.ALL_BOARDS_SET.contains(cookie.getName())) {
-                savedCookies.put(cookie.getName(), cookie.getValue());
+                JSONObject cookieValues = new JSONObject();
+                cookieValues.put("value", cookie.getValue());
+                cookieValues.put("expires", cookie.getExpiryDate().getTime());
+                savedCookies.put(cookie.getName(), cookieValues);
             }
         }
         preferences.edit().putString(getSharedKey(PREF_KEY_FAPTCHA_COOKIES), savedCookies.toString()).commit();
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addHttpsPreference(preferenceGroup, false);
+        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
@@ -162,6 +184,37 @@ public class Chan410Module extends AbstractChanModule {
     }
     
     @Override
+    public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
+            throws Exception {
+        UrlPageModel urlModel = new UrlPageModel();
+        urlModel.chanName = CHAN410_NAME;
+        urlModel.type = UrlPageModel.TYPE_CATALOGPAGE;
+        urlModel.boardName = boardName;
+        String url = buildUrl(urlModel);
+        
+        HttpResponseModel responseModel = null;
+        Chan410CatalogReader in = null;
+        HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setCheckIfModified(oldList != null).build();
+        try {
+            responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, listener, task);
+            if (responseModel.statusCode == 200) {
+                in = new Chan410CatalogReader(responseModel.stream);
+                if (task != null && task.isCancelled()) throw new Exception("interrupted");
+                return in.readPage();
+            } else {
+                if (responseModel.notModified()) return oldList;
+                throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
+            }
+        } catch (Exception e) {
+            if (responseModel != null) HttpStreamer.getInstance().removeFromModifiedMap(url);
+            throw e;
+        } finally {
+            IOUtils.closeQuietly(in);
+            if (responseModel != null) responseModel.release();
+        }
+    }
+    
+    @Override
     public PostModel[] getPostsList(String boardName, String threadNumber, ProgressListener listener, CancellableTask task, PostModel[] oldList)
             throws Exception {
         UrlPageModel urlModel = new UrlPageModel();
@@ -182,16 +235,16 @@ public class Chan410Module extends AbstractChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String checkUrl = CHAN410_URL + "api_adaptive.php?board=" + boardName;
+        String checkUrl = getUsingUrl() + "api_adaptive.php?board=" + boardName;
         if (HttpStreamer.getInstance().getStringFromUrl(checkUrl, HttpRequestModel.DEFAULT_GET, httpClient, listener, task, false).trim().
                 equals("1")) return null;
-        String captchaUrl = CHAN410_URL + "faptcha.php?board=" + boardName;
+        String captchaUrl = getUsingUrl() + "faptcha.php?board=" + boardName;
         return downloadCaptcha(captchaUrl, listener, task);
     }
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = CHAN410_URL + "board.php";
+        String url = getUsingUrl() + "board.php";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("board", model.boardName).
                 addString("replythread", model.threadNumber != null ? model.threadNumber : "0").
@@ -212,8 +265,10 @@ public class Chan410Module extends AbstractChanModule {
             if (response.statusCode == 302) {
                 for (Header header : response.headers) {
                     if (header != null && HttpHeaders.LOCATION.equalsIgnoreCase(header.getName())) {
-                        if (header.getValue().trim().length() == 0) throw new Exception();
-                        return fixRelativeUrl(header.getValue());
+                        String redirectUrl = header.getValue().trim();
+                        if (redirectUrl.length() == 0) throw new Exception();
+                        if (redirectUrl.contains("banned.php")) throw new Exception("Вы забанены");
+                        return fixRelativeUrl(redirectUrl);
                     }
                 }
             } else if (response.statusCode == 200) {
@@ -240,7 +295,7 @@ public class Chan410Module extends AbstractChanModule {
     
     @Override
     public String deletePost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = CHAN410_URL + "board.php";
+        String url = getUsingUrl() + "board.php";
         
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("board", model.boardName));
@@ -257,7 +312,7 @@ public class Chan410Module extends AbstractChanModule {
     
     @Override
     public String reportPost(DeletePostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        String url = CHAN410_URL + "board.php";
+        String url = getUsingUrl() + "board.php";
         
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("board", model.boardName));
@@ -273,12 +328,19 @@ public class Chan410Module extends AbstractChanModule {
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN410_NAME)) throw new IllegalArgumentException("wrong chan");
-        return WakabaUtils.buildUrl(model, CHAN410_URL);
+        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return getUsingUrl() + model.boardName + "/catalog.html";
+        return WakabaUtils.buildUrl(model, getUsingUrl());
     }
     
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
-        return WakabaUtils.parseUrl(url, CHAN410_NAME, CHAN410_DOMAIN);
+        UrlPageModel model = WakabaUtils.parseUrl(url, CHAN410_NAME, CHAN410_DOMAIN);
+        if (model.type == UrlPageModel.TYPE_OTHERPAGE && model.otherPath != null && model.otherPath.endsWith("/catalog.html")) {
+            model.type = UrlPageModel.TYPE_CATALOGPAGE;
+            model.boardName = model.otherPath.substring(0, model.otherPath.length() - 13);
+            model.otherPath = null;
+        }
+        return model;
     }
     
 }

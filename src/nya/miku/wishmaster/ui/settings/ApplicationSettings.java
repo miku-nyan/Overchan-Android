@@ -19,8 +19,12 @@
 package nya.miku.wishmaster.ui.settings;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.lib.org_json.JSONException;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
 import nya.miku.wishmaster.ui.FavoritesFragment;
 import nya.miku.wishmaster.ui.downloading.DownloadingService;
@@ -74,7 +78,11 @@ public class ApplicationSettings {
     public boolean isDisplayDate() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_show_date), true);
     }
-    
+
+    public boolean scrollToActiveTab() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_scroll_to_active_tab), true);
+    }
+
     public enum DownloadThumbnailsMode {
         ALWAYS,
         WIFI_ONLY,
@@ -171,6 +179,7 @@ public class ApplicationSettings {
         if (theme.equals(resources.getString(R.string.pref_theme_value_gurochan))) return R.style.Theme_Gurochan;
         if (theme.equals(resources.getString(R.string.pref_theme_value_tomorrow))) return R.style.Theme_Tomorrow;
         if (theme.equals(resources.getString(R.string.pref_theme_value_mikuba))) return R.style.Theme_Mikuba;
+        if (theme.equals(resources.getString(R.string.pref_theme_value_dark_mint))) return R.style.Theme_Dark_Mint;
         return R.style.Theme_Futaba;
     }
     
@@ -479,5 +488,58 @@ public class ApplicationSettings {
         container.hideActionBar = hideActionBar();
         container.scrollVolumeButtons = scrollVolumeButtons();
     }
+
+    public Map<String, Object> getSharedPreferences(){
+        return new HashMap<String, Object>(preferences.getAll());
+    }
+
+    public void setSharedPreferences(JSONObject json){
+        Map<String, Object> preferencesMap = getSharedPreferences();
+        SharedPreferences.Editor editor  = preferences.edit();
+        for (Map.Entry<String, Object> entry : preferencesMap.entrySet()) {
+            String className = entry.getValue().getClass().getSimpleName();
+            try {
+                switch (className){
+                    case "Boolean":
+                        editor.putBoolean(entry.getKey(), json.getBoolean(entry.getKey()));
+                        break;
+                    case "Integer":
+                        editor.putInt(entry.getKey(), json.getInt(entry.getKey()));
+                        break;
+                    case "Long":
+                        editor.putLong(entry.getKey(), json.getLong(entry.getKey()));
+                        break;
+                    case "Float":
+                        editor.putFloat(entry.getKey(), (float) json.getDouble(entry.getKey()));
+                        break;
+                    case "String":
+                        editor.putString(entry.getKey(), json.getString(entry.getKey()));
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Not implemented!");
+                }
+            } catch (JSONException e) {
+                continue;
+            } catch (UnsupportedOperationException e) {
+                continue;
+            }
+        }
+        editor.commit();
+    }
     
+    public boolean getImportOverwrite(){
+        return preferences.getBoolean(resources.getString(R.string.pref_key_settings_import_overwrite), false);
+    }
+    
+    public int getPostThumbnailSize(){
+        double scale = 1.0;
+        String defaultThumbnailScale = resources.getString(R.string.pref_post_thumbnail_scale_value_default);
+        String thumbnailScale = preferences.getString(resources.getString(R.string.pref_key_post_thumbnail_scale), defaultThumbnailScale);
+        if (thumbnailScale.equals(resources.getString(R.string.pref_post_thumbnail_scale_value_50percent)))  scale = 0.5;
+        if (thumbnailScale.equals(resources.getString(R.string.pref_post_thumbnail_scale_value_100percent))) scale = 1.0;
+        if (thumbnailScale.equals(resources.getString(R.string.pref_post_thumbnail_scale_value_150percent))) scale = 1.5;
+        if (thumbnailScale.equals(resources.getString(R.string.pref_post_thumbnail_scale_value_200percent))) scale = 2.0;
+        int result = (int) (resources.getDimensionPixelSize(R.dimen.post_thumbnail_size) * scale);
+        return result;
+    }    
 }

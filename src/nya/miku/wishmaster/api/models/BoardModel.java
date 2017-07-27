@@ -111,6 +111,8 @@ public class BoardModel implements Serializable {
     
     /** Должно принимать true, если на данной доске реализована функция поиска по всей доске. */
     @Tag(27) public boolean searchAllowed;
+    /** Должно принимать true, если на данной доске реализована пагинация результатов поиска. */
+    @Tag(33) public boolean searchPagination;
     /** Должно принимать true, если на данной доске реализована функция каталога. */
     @Tag(28) public boolean catalogAllowed;
     /** Массив с описаниями способов показа каталога, например: ["Сортировка по бампам", "Сортировка по размеру изображения"].
@@ -123,7 +125,7 @@ public class BoardModel implements Serializable {
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - без разметки */
     public static final int MARK_NOMARK = 0;
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - модифицированный wakabamark.<br>
-     *  *italic* **bold** %%spoiler%% strike^H^H^H^H^H^H */
+     *  *italic* **bold** %%spoiler%% strike^H^H^H^H^H^H `code` */
     public static final int MARK_WAKABAMARK = 1;
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - BBCode.<br>
      *  [i]italic[/i] [b]bold[/b] [u]underline[/u] [spoiler]spoiler[/spoiler] [s]strike[/s] */
@@ -131,6 +133,12 @@ public class BoardModel implements Serializable {
     /** Константное значение для обозначения типа допустимой разметки при отправке поста - 4chan.<br>
      *  *italic* **bold** __underline__ [spoiler]spoiler[/spoiler] */
     public static final int MARK_4CHAN = 3;
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - 0chan.hk.<br>
+     *  *italic* **bold** %%spoiler%% -strike- `code` */
+    public static final int MARK_NULL_CHAN = 4;
+    /** Константное значение для обозначения типа допустимой разметки при отправке поста - Infinity.<br>
+     *  ''italic'' '''bold''' __underline__ **spoiler** ~~strike~~ */
+    public static final int MARK_INFINITY = 5;
     
     /** Константное значение, если на данной доске нет возможности пожаловаться на сообщения */
     public static final int REPORT_NOT_ALLOWED = 0;

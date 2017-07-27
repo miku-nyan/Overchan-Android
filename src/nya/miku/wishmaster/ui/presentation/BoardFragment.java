@@ -160,6 +160,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     public static final String BROADCAST_PAGE_LOADED = "nya.miku.wishmaster.BROADCAST_ACTION_PAGE_LOADED";
     
+    public static View lastFocusedView = null;
+    
     private boolean isFailInstance = false;
     
     private PagesCache pagesCache = MainApplication.getInstance().pagesCache;
@@ -573,6 +575,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         return super.onOptionsItemSelected(item);
     }
     
+    protected static void setViewSize(View view, int size){
+        ViewGroup.LayoutParams viewLayoutParams = view.getLayoutParams();
+        viewLayoutParams.width = size;
+        viewLayoutParams.height = size;
+        view.setLayoutParams(viewLayoutParams);
+    }
+    
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -583,6 +592,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             AttachmentModel model = (AttachmentModel) v.getTag();
             
             View tnView = v.findViewById(R.id.post_thumbnail_image);
+            setViewSize(tnView, settings.getPostThumbnailSize());
             if (tnView != null && tnView.getTag() == Boolean.FALSE && !downloadThumbnails()) {
                 menu.add(Menu.NONE, R.id.context_menu_thumb_load_thumb, 1, R.string.context_menu_show_thumbnail).
                         setOnMenuItemClickListener(contextMenuListener);
@@ -701,7 +711,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 bitmapCache.asyncGet(
                         ChanModels.hashAttachmentModel((AttachmentModel) lastContextMenuAttachment.getTag()),
                         ((AttachmentModel) lastContextMenuAttachment.getTag()).thumbnail,
-                        resources.getDimensionPixelSize(R.dimen.post_thumbnail_size),
+                        settings.getPostThumbnailSize(),
                         chan,
                         null,
                         imagesDownloadTask,
@@ -870,7 +880,21 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     model.postNumber = postModel.number; 
                 }
             }
-            UrlHandler.open(model, activity);
+            String tabTitle = null;
+            if (pageType == TYPE_THREADSLIST) {
+                String subject = adapter.getItem(position).sourceModel.subject;
+                if (subject != null && subject.length() != 0) {
+                    tabTitle = subject;
+                } else {
+                    Spanned spannedComment = adapter.getItem(position).spannedComment;
+                    if (spannedComment != null) {
+                        tabTitle = spannedComment.toString().replace('\n', ' ');
+                        if (tabTitle.length() > MAX_TITLE_LENGHT) tabTitle = tabTitle.substring(0, MAX_TITLE_LENGHT);
+                    }
+                }
+                if (tabTitle != null) tabTitle = resources.getString(R.string.tabs_title_threadpage_loaded, model.boardName, tabTitle);
+            }
+            UrlHandler.open(model, activity, true, tabTitle);
         }
     }
     
@@ -1022,10 +1046,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         int textWidth = postItemWidth = rootWidth - postItemPadding;
         
         View thumbnailView = view.findViewById(R.id.post_thumbnail);
+        View thumbnailImage = thumbnailView.findViewById(R.id.post_thumbnail_image);
+        setViewSize(thumbnailImage, settings.getPostThumbnailSize());
         ViewGroup.MarginLayoutParams thumbnailLayoutParams = (ViewGroup.MarginLayoutParams)thumbnailView.getLayoutParams();
         thumbnailMargin = thumbnailLayoutParams.leftMargin + thumbnailLayoutParams.rightMargin;
         
         View attachmentTypeView = thumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
+        ((TextView)attachmentTypeView).setMaxWidth(settings.getPostThumbnailSize());
         FloatingModel[] floatingModels = new FloatingModel[2];
         
         attachmentTypeView.setVisibility(View.GONE);
@@ -1088,7 +1115,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         errorView.setVisibility(View.GONE);
         pullableLayout.setVisibility(View.VISIBLE);
         catalogBarView.setVisibility(tabModel.pageModel.type == UrlPageModel.TYPE_CATALOGPAGE ? View.VISIBLE : View.GONE);
-        navigationBarView.setVisibility(tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE ? View.VISIBLE : View.GONE);
+        navigationBarView.setVisibility((tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE) || ((tabModel.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE) && presentationModel.source.boardModel.searchPagination) ? View.VISIBLE : View.GONE);
         searchBarView.setVisibility(View.GONE);
         setNavigationCatalogBar();
     }
@@ -1550,6 +1577,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         }
     }
     
+    public Intent setIntentExtras(Intent sendIntent) {
+        return adapter.setIntentExtras(lastFocusedView, sendIntent);
+    }
+    
     private static class PostsListAdapter extends ArrayAdapter<PresentationItemModel> {
         private static final int ITEM_VIEW_TYPE_NORMAL = 0;
         private static final int ITEM_VIEW_TYPE_HIDDEN = 1;
@@ -1655,8 +1686,8 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             public boolean unreadFrameIsVisible = false;
             
             public JellyBeanSpanFixTextView headerView;
-            public TextView stickyClosedThreadView;
-            public boolean stickyClosedThreadIsVisible = false;
+            public TextView threadConditionView;
+            public boolean threadConditionIsVisible = false;
             public View deletedPostView;
             public boolean deletedPostViewIsVisible = false;
             public TextView dateView;
@@ -1690,6 +1721,40 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             public boolean postsCountIsVisible = false;
         }
         
+        public Intent setIntentExtras(View v, Intent sendIntent) {
+            if (v == null) return sendIntent;
+            Object tag = v.getTag();
+            if ((tag != null) && (tag instanceof PostViewTag)) {
+                String quote = getSelectedText((PostViewTag) tag);
+                SendPostModel sendReplyModel = fragment().getSendPostModel();
+                sendReplyModel.password = null;
+                PresentationItemModel item = fragment().adapter.getItem(((PostViewTag) tag).position);
+                String postNumber = item.sourceModel.number;
+                MainApplication instance = MainApplication.getInstance();
+                ChanModule chan = instance.getChanModule(sendReplyModel.chanName);
+                UrlPageModel model = new UrlPageModel();
+                model.type = model.TYPE_THREADPAGE;
+                model.chanName = sendReplyModel.chanName;
+                model.boardName = sendReplyModel.boardName;
+                model.threadNumber = sendReplyModel.threadNumber;
+                model.postNumber = postNumber;
+                String postURI = chan.buildUrl(model);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(fragment().getString(R.string.intent_overchan_send_post_model), sendReplyModel);
+                bundle.putString(fragment().getString(R.string.intent_overchan_quote_text), quote);
+                bundle.putString(fragment().getString(R.string.intent_overchan_post_number), postNumber);
+                bundle.putString(fragment().getString(R.string.intent_overchan_post_uri), postURI);
+                sendIntent.putExtra(fragment().getString(R.string.intent_overchan_extras), bundle);
+            }
+            return sendIntent;
+        }
+        
+        private String getSelectedText(PostViewTag tag) {
+            int start = tag.commentView.getSelectionStart();
+            int end = tag.commentView.getSelectionEnd();
+            return tag.commentView.getText().subSequence(start, end).toString();
+        }
+
         @Override
         public int getCount() {
             return currentCount;
@@ -1841,14 +1906,26 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 tag.unreadFrame.setOnClickListener(onUnreadFrameListener);
                 tag.unreadFrame.setOnLongClickListener(onUnreadFrameListener);
                 tag.headerView = (JellyBeanSpanFixTextView) view.findViewById(R.id.post_header);
-                tag.stickyClosedThreadView = (TextView) view.findViewById(R.id.post_sticky_closed_thread);
+                tag.threadConditionView = (TextView) view.findViewById(R.id.post_thread_condition);
                 tag.deletedPostView = view.findViewById(R.id.post_deleted_mark);
                 tag.dateView = (TextView) view.findViewById(R.id.post_date);
                 tag.badgeViewContainer = (LinearLayout) view.findViewById(R.id.post_badge_container);
                 tag.badgeText = (TextView) view.findViewById(R.id.post_badge_title);
                 tag.multiThumbnailsViewContainer = (LinearLayout) view.findViewById(R.id.post_multi_thumbnails_container);
                 tag.singleThumbnailView = view.findViewById(R.id.post_thumbnail);
+                View thumbnailImage = tag.singleThumbnailView.findViewById(R.id.post_thumbnail_image);
+                setViewSize(thumbnailImage, MainApplication.getInstance().settings.getPostThumbnailSize());
+                TextView size = (TextView) tag.singleThumbnailView.findViewById(R.id.post_thumbnail_attachment_size);
+                size.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
+                TextView type = (TextView) tag.singleThumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
+                type.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
                 tag.commentView = (ClickableLinksTextView) view.findViewById(R.id.post_comment);
+                tag.commentView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        if (hasFocus) lastFocusedView = view;
+                    }
+                });
                 tag.showFullTextView = (TextView) view.findViewById(R.id.post_show_full_text);
                 tag.repliesView = (JellyBeanSpanFixTextView) view.findViewById(R.id.post_replies);
                 tag.postsCountView = (TextView) view.findViewById(R.id.post_posts_count);
@@ -1860,9 +1937,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         @Override
                         public void onClick() {
                             try {
-                                int start = tag.commentView.getSelectionStart();
-                                int end = tag.commentView.getSelectionEnd();
-                                String quote = tag.commentView.getText().subSequence(start, end).toString();
+                                String quote = getSelectedText(tag);
                                 fragment().openReply(tag.position, true, quote);
                             } catch (Exception e) {
                                 Logger.e(TAG, e);
@@ -2024,6 +2099,12 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 for (int i=tag.multiThumbnailsInflatedCount; i<attachmentsCount; ++i) {
                     int curLayout = i / currentThumbnailsInRowCount;
                     tag.multiThumbnails[i] = inflater.inflate(R.layout.post_thumbnail, tag.multiThumbnailsRows[curLayout], false);
+                    View thumbnailImage = tag.multiThumbnails[i].findViewById(R.id.post_thumbnail_image);
+                    setViewSize(thumbnailImage, MainApplication.getInstance().settings.getPostThumbnailSize());
+                    TextView size = (TextView) tag.multiThumbnails[i].findViewById(R.id.post_thumbnail_attachment_size);
+                    size.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
+                    TextView type = (TextView) tag.multiThumbnails[i].findViewById(R.id.post_thumbnail_attachment_type);
+                    type.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
                     ((ViewGroup.MarginLayoutParams)tag.multiThumbnails[i].getLayoutParams()).setMargins(0, 0, fragment().thumbnailMargin, 0);
                     tag.multiThumbnailsRows[curLayout].addView(tag.multiThumbnails[i]);
                     ++tag.multiThumbnailsInflatedCount;
@@ -2170,16 +2251,16 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         tag.postsCountIsVisible = false;
                     }
                 }
-                if (model.stickyClosedString != null) {
-                    tag.stickyClosedThreadView.setText(model.stickyClosedString);
-                    if (!tag.stickyClosedThreadIsVisible) {
-                        tag.stickyClosedThreadView.setVisibility(View.VISIBLE);
-                        tag.stickyClosedThreadIsVisible = true;
+                if (model.threadConditionString != null) {
+                    tag.threadConditionView.setText(model.threadConditionString);
+                    if (!tag.threadConditionIsVisible) {
+                        tag.threadConditionView.setVisibility(View.VISIBLE);
+                        tag.threadConditionIsVisible = true;
                     }
                 } else {
-                    if (tag.stickyClosedThreadIsVisible) {
-                        tag.stickyClosedThreadView.setVisibility(View.GONE);
-                        tag.stickyClosedThreadIsVisible = false;
+                    if (tag.threadConditionIsVisible) {
+                        tag.threadConditionView.setVisibility(View.GONE);
+                        tag.threadConditionIsVisible = false;
                     }
                 }
             }
@@ -2308,8 +2389,11 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             thumbnailView.setOnClickListener(onAttachmentClickListener);
             thumbnailView.setTag(attachment);
             ImageView thumbnailPic = (ImageView) thumbnailView.findViewById(R.id.post_thumbnail_image);
+            setViewSize(thumbnailPic, MainApplication.getInstance().settings.getPostThumbnailSize());
             TextView size = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_size);
+            size.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
             TextView type = (TextView) thumbnailView.findViewById(R.id.post_thumbnail_attachment_type);
+            type.setMaxWidth(MainApplication.getInstance().settings.getPostThumbnailSize());
             setImageViewSpoiler(thumbnailPic, attachment.isSpoiler || fragment.staticSettings.maskPictures);
             switch (attachment.type) {
                 case AttachmentModel.TYPE_IMAGE_GIF:
@@ -2355,7 +2439,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 fragment.bitmapCache.asyncGet(
                         hash,
                         attachment.thumbnail,
-                        fragment.resources.getDimensionPixelSize(R.dimen.post_thumbnail_size),
+                        fragment.settings.getPostThumbnailSize(),
                         fragment.chan,
                         fragment.tabModel.type == TabModel.TYPE_LOCAL ? fragment.localFile : null,
                         imagesDownloadTask,
@@ -2533,7 +2617,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     private void setNavigationCatalogBar() {
         if (presentationModel == null) return;
-        if (tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE) {
+        if ((tabModel.pageModel.type == UrlPageModel.TYPE_BOARDPAGE) || (tabModel.pageModel.type == UrlPageModel.TYPE_SEARCHPAGE)) {
             View.OnClickListener navigationBarOnClickListener = new NavigationBarOnClickListener(this);
             for (int id : new int[] {R.id.board_navigation_previous, R.id.board_navigation_next, R.id.board_navigation_page }) {
                 navigationBarView.findViewById(id).setOnClickListener(navigationBarOnClickListener);
@@ -2565,7 +2649,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         @Override
         public void onClick(View v) {
             final UrlPageModel model = new UrlPageModel();
-            model.type = UrlPageModel.TYPE_BOARDPAGE;
+            model.type = fragmentRef.get().tabModel.pageModel.type;//UrlPageModel.TYPE_BOARDPAGE;
+            if (model.type == UrlPageModel.TYPE_SEARCHPAGE)
+                model.searchRequest = fragmentRef.get().tabModel.pageModel.searchRequest;
             model.chanName = fragmentRef.get().chan.getChanName();
             model.boardName = fragmentRef.get().tabModel.pageModel.boardName;
             switch (v.getId()) {
@@ -2703,6 +2789,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         model.type = UrlPageModel.TYPE_SEARCHPAGE;
                         model.boardName = tabModel.pageModel.boardName;
                         model.searchRequest = field.getText().toString();
+                        model.boardPage = presentationModel.source.boardModel.firstPage;
                         UrlHandler.open(model, activity);
                     } else {
                         int highlightColor = ThemeUtils.getThemeColor(activity.getTheme(), R.attr.searchHighlightBackground, Color.RED);
@@ -3356,7 +3443,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     
     @SuppressLint("InlinedApi")
     private void openGridGallery() {
-        final int tnSize = resources.getDimensionPixelSize(R.dimen.post_thumbnail_size);
+        final int tnSize = settings.getPostThumbnailSize();
         
         class GridGalleryAdapter extends ArrayAdapter<Triple<AttachmentModel, String, String>>
                 implements View.OnClickListener, AbsListView.OnScrollListener {
@@ -3395,6 +3482,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     tnImage.setLayoutParams(new FrameLayout.LayoutParams(tnSize, tnSize, Gravity.CENTER));
                     tnImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                     tnImage.setId(R.id.post_thumbnail_image);
+                    setViewSize(tnImage, MainApplication.getInstance().settings.getPostThumbnailSize());
                     ((FrameLayout) convertView).addView(tnImage);
                 }
                 convertView.setTag(getItem(position).getLeft());
@@ -3451,6 +3539,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 AttachmentModel attachment = getItem(position).getLeft();
                 String attachmentHash = getItem(position).getMiddle();
                 ImageView tnImage = (ImageView) view.findViewById(R.id.post_thumbnail_image);
+                setViewSize(tnImage, MainApplication.getInstance().settings.getPostThumbnailSize());
                 if (attachment.thumbnail == null || attachment.thumbnail.length() == 0) {
                     tnImage.setTag(Boolean.TRUE);
                     tnImage.setImageResource(Attachments.getDefaultThumbnailResId(attachment.type));

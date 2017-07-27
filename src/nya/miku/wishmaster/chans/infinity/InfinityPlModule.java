@@ -37,7 +37,7 @@ public class InfinityPlModule extends InfinityModule {
     private static final String CHAN_NAME = "8ch.pl";
     private static final String DEFAULT_DOMAIN = "8ch.pl";
     private static final String ONION_DOMAIN = "8ch.vichandcxw4gm3wy.onion";
-    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN };
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "vichan.net" };
     
     public InfinityPlModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -89,6 +89,9 @@ public class InfinityPlModule extends InfinityModule {
                 postEntityBuilder.addFile(images[i], model.attachments[i], model.randomHash);
             }
         }
+        if (needNewThreadCaptcha) {
+            postEntityBuilder.addString("captcha_text", model.captchaAnswer).addString("captcha_cookie", newThreadCaptchaId);
+        }
         
         UrlPageModel refererPage = new UrlPageModel();
         refererPage.chanName = getChanName();
@@ -105,7 +108,8 @@ public class InfinityPlModule extends InfinityModule {
                 HttpRequestModel.builder().setPOST(postEntityBuilder.build()).setCustomHeaders(customHeaders).setNoRedirect(true).build();
         JSONObject json = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, listener, task, false);
         if (json.has("error")) {
-            String error = json.getString("error");
+            String error = json.optString("error");
+            if (error.equals("true") && json.optBoolean("banned")) throw new Exception("You are banned! ;_;");
             if (error.contains("To post on 8chan over Tor, you must use the hidden service for security reasons."))
                 throw new Exception("To post on 8chan over Tor, you must use the onion domain.");
             throw new Exception(error);

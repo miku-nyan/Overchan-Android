@@ -32,6 +32,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -42,15 +44,23 @@ import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
+import nya.miku.wishmaster.api.models.BadgeIconModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
+import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
 import nya.miku.wishmaster.api.util.WakabaReader;
+import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
+import nya.miku.wishmaster.lib.org_json.JSONArray;
+import nya.miku.wishmaster.lib.org_json.JSONException;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public abstract class AbstractInstant0chan extends AbstractKusabaModule {
     public AbstractInstant0chan(SharedPreferences preferences, Resources resources) {
@@ -68,6 +78,32 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
     }
     
     @Override
+    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
+        String url = getUsingUrl() + "boards10.json";
+        try {
+            JSONArray json = downloadJSONArray(url, oldBoardsList != null, listener, task);
+            if (json == null) return oldBoardsList;
+            List<SimpleBoardModel> list = new ArrayList<>();
+            for (int i=0; i<json.length(); ++i) {
+                String currentCategory = json.getJSONObject(i).optString("name");
+                JSONArray boards = json.getJSONObject(i).getJSONArray("boards");
+                for (int j=0; j<boards.length(); ++j) {
+                    SimpleBoardModel model = new SimpleBoardModel();
+                    model.chan = getChanName();
+                    model.boardName = boards.getJSONObject(j).getString("dir");
+                    model.boardDescription = boards.getJSONObject(j).optString("desc", model.boardName);
+                    model.boardCategory = currentCategory;
+                    model.nsfw = model.boardName.equals("b") || currentCategory.equalsIgnoreCase("adult");
+                    list.add(model);
+                }
+            }
+            return list.toArray(new SimpleBoardModel[list.size()]);
+        } catch (JSONException e) {
+            return new SimpleBoardModel[0];
+        }
+    }
+    
+    @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
         model.timeZoneId = "GMT+3";
@@ -76,6 +112,7 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
         model.allowReport = BoardModel.REPORT_SIMPLE;
         model.allowNames = !shortName.equals("b");
         model.allowEmails = false;
+        model.catalogAllowed = true;
         return model;
     }
     
@@ -90,6 +127,83 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
             stream = new SequenceInputStream(new ByteArrayInputStream("<form id=\"delform\">".getBytes()), stream);
         }
         return new Instant0chanReader(stream, canCloudflare());
+    }
+    
+    @Override
+    public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList) throws Exception {
+        String url = getUsingUrl() + boardName + "/catalog.json";
+        JSONArray response = downloadJSONArray(url, oldList != null, listener, task);
+        if (response == null) return oldList;
+        ThreadModel[] threads = new ThreadModel[response.length()];
+        for (int i = 0; i < threads.length; ++i) {
+            threads[i] = mapCatalogThreadModel(response.getJSONObject(i), boardName);
+        }
+        return threads;
+    }
+    
+    private ThreadModel mapCatalogThreadModel(JSONObject json, String boardName) {
+        ThreadModel model = new ThreadModel();
+        model.threadNumber = json.optString("id", null);
+        if (model.threadNumber == null) throw new RuntimeException();
+        model.postsCount = json.optInt("reply_count", -2) + 1;
+        model.attachmentsCount = json.optInt("images", -2) + 1;
+        model.isClosed = json.optInt("locked", 0) != 0;
+        model.isSticky = json.optInt("stickied", 0) != 0;
+        
+        PostModel opPost = new PostModel();
+        opPost.number = model.threadNumber;
+        opPost.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(json.optString("name")));
+        opPost.subject = StringEscapeUtils.unescapeHtml4(json.optString("subject"));
+        opPost.comment = json.optString("message");
+        opPost.trip = json.optString("tripcode");
+        opPost.timestamp = json.optLong("timestamp") * 1000;
+        opPost.parentThread = model.threadNumber;
+        
+        String ext = json.optString("file_type", "");
+        if (!ext.isEmpty()) {
+            AttachmentModel attachment = new AttachmentModel();
+            switch (ext) {
+                case "jpg":
+                case "jpeg":
+                case "png":
+                    attachment.type = AttachmentModel.TYPE_IMAGE_STATIC;
+                    break;
+                case "gif":
+                    attachment.type = AttachmentModel.TYPE_IMAGE_GIF;
+                    break;
+                case "mp3":
+                case "ogg":
+                    attachment.type = AttachmentModel.TYPE_AUDIO;
+                    break;
+                case "webm":
+                case "mp4":
+                    attachment.type = AttachmentModel.TYPE_VIDEO;
+                    break;
+                case "you":
+                    attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    break;
+                default:
+                    attachment.type = AttachmentModel.TYPE_OTHER_FILE;
+            }
+            attachment.width = json.optInt("image_w", -1);
+            attachment.height = json.optInt("image_h", -1);
+            attachment.size = -1;
+            String fileName = json.optString("file", "");
+            if (!fileName.isEmpty()) {
+                if (ext.equals("you")) {
+                    attachment.thumbnail = (useHttps() ? "https" : "http")
+                            + "://img.youtube.com/vi/" + fileName + "/default.jpg";
+                    attachment.path = (useHttps() ? "https" : "http")
+                            + "://youtube.com/watch?v=" + fileName;
+                } else {
+                    attachment.thumbnail = "/" + boardName + "/thumb/" + fileName + "s." + ext;
+                    attachment.path = "/" + boardName + "/src/" + fileName + "." + ext;
+                }
+                opPost.attachments = new AttachmentModel[] { attachment };
+            }
+        }
+        model.posts = new PostModel[] { opPost };
+        return model;
     }
     
     @Override
@@ -152,9 +266,42 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
         return "Удалить";
     }
     
+    @Override
+    public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
+        if (!model.chanName.equals(getChanName())) throw new IllegalArgumentException("wrong chan");
+        if (model.type == UrlPageModel.TYPE_CATALOGPAGE) return getUsingUrl() + model.boardName + "/catalog.html";
+        return WakabaUtils.buildUrl(model, getUsingUrl());
+    }
+    
+    @Override
+    public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());
+        if (urlPath == null) throw new IllegalArgumentException("wrong domain");
+        int catalogIndex = url.indexOf("/catalog.html");
+        if (catalogIndex > 0) {
+            try {
+                String path = url.substring(0, catalogIndex);
+                UrlPageModel model = new UrlPageModel();
+                model.chanName = getChanName();
+                model.type = UrlPageModel.TYPE_CATALOGPAGE;
+                model.boardName = path.substring(path.lastIndexOf('/') + 1);
+                model.catalogType = 0;
+                return model;
+            } catch (Exception e) {}
+        }
+        return WakabaUtils.parseUrlPath(urlPath, getChanName());
+    }
+    
+    @Override
+    public String fixRelativeUrl(String url) {
+        if (url.startsWith("//")) return (useHttps() ? "https:" : "http:") + url;
+        return super.fixRelativeUrl(url);
+    }
+    
     @SuppressLint("SimpleDateFormat")
     protected static class Instant0chanReader extends KusabaReader {
         private static final Pattern PATTERN_EMBEDDED = Pattern.compile("<div (?:[^>]*)data-id=\"([^\"]*)\"(?:[^>]*)>", Pattern.DOTALL);
+        private static final Pattern PATTERN_TABULATION = Pattern.compile("^\\t{2,}", Pattern.MULTILINE);
         private static final DateFormat DATE_FORMAT;
         static {
             DateFormatSymbols symbols = new DateFormatSymbols();
@@ -181,6 +328,7 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
         @Override
         protected void postprocessPost(PostModel post) {
             super.postprocessPost(post);
+            post.comment = RegexUtils.replaceAll(post.comment, PATTERN_TABULATION , "");
             
             Matcher matcher = PATTERN_EMBEDDED.matcher(post.comment);
             while (matcher.find()) {
@@ -197,6 +345,7 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
                 if (url != null) {
                     AttachmentModel attachment = new AttachmentModel();
                     attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    attachment.size = -1;
                     attachment.path = url;
                     attachment.thumbnail = div.contains("youtube") ? ("http://img.youtube.com/vi/" + id + "/default.jpg") : null;
                     int oldCount = post.attachments != null ? post.attachments.length : 0;
@@ -205,6 +354,24 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
                     attachments[oldCount] = attachment;
                     post.attachments = attachments;
                 }
+            }
+        }
+        
+        @Override
+        protected void parseThumbnail(String imgTag) {
+            if (imgTag.contains("class=\"_country_\"")) {
+                int start, end;
+                if ((start = imgTag.indexOf("src=\"")) != -1 && (end = imgTag.indexOf('\"', start + 5)) != -1) {
+                    BadgeIconModel iconModel = new BadgeIconModel();
+                    iconModel.source = imgTag.substring(start + 5, end);
+                    int currentIconsCount = currentPost.icons == null ? 0 : currentPost.icons.length;
+                    BadgeIconModel[] newIconsArray = new BadgeIconModel[currentIconsCount + 1];
+                    for (int i=0; i<currentIconsCount; ++i) newIconsArray[i] = currentPost.icons[i];
+                    newIconsArray[currentIconsCount] = iconModel;
+                    currentPost.icons = newIconsArray;
+                }
+            } else {
+                super.parseThumbnail(imgTag);
             }
         }
     }

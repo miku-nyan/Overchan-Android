@@ -94,7 +94,7 @@ public class IOUtils {
     /**
      * Модифицирует выходной поток, добавляет отображение прогресса в ProgressListener и возможность отмены загрузки CancellableTask.
      * Может принимать null в качестве одного (или нескольких) параметров, в этом случае данный объект просто не будут привязан.
-     * @param in исходный поток
+     * @param out исходный поток
      * @param listener интерфейс отслеживания прогресса
      * @param task задача, отмена которой прервёт поток
      * @return модифицированный поток
@@ -291,5 +291,36 @@ public class IOUtils {
      */
     public static class InterruptedStreamException extends IOException {
         private static final long serialVersionUID = 1L;
+    }
+
+    public static class CountingOutputStream extends FilterOutputStream {
+        private long size = 0;
+
+        public CountingOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void write(byte[] buffer) throws IOException {
+            out.write(buffer, 0, buffer.length);
+            size += buffer.length;
+        }
+
+        @Override
+        public void write(byte[] buffer, int offset, int count) throws IOException {
+            out.write(buffer, offset, count);
+            size += count;
+        }
+
+        @Override
+        public void write(int oneByte) throws IOException {
+            out.write(oneByte);
+            size++;
+        }
+
+        public long getSize() {
+            return this.size;
+        }
+
     }
 }

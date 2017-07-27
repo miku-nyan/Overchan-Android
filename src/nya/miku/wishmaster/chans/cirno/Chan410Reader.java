@@ -79,4 +79,11 @@ public class Chan410Reader extends WakabaReader {
             }
         }
     }
+    
+    @Override
+    protected void parseThumbnail(String imgTag) {
+        super.parseThumbnail(imgTag);
+        if (imgTag.contains("/css/locked.gif")) currentThread.isClosed = true;
+        if (imgTag.contains("/css/sticky.gif")) currentThread.isSticky = true;
+    }
 }

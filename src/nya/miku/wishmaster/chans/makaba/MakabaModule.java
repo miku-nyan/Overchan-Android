@@ -169,6 +169,10 @@ public class MakabaModule extends CloudflareChanModule {
         mobileAPIPref.setDefaultValue(true);
         group.addPreference(mobileAPIPref);
     }
+
+    public boolean getCaptchaAutoUpdatePreference(){
+        return preferences.getBoolean(getSharedKey(PREF_KEY_CAPTCHA_AUTO_UPDATE), false);
+    }
     
     /** Добавить категорию настроек домена (в т.ч. https) */
     private void addDomainPreferences(PreferenceGroup group) {
@@ -212,6 +216,7 @@ public class MakabaModule extends CloudflareChanModule {
     public void addPreferencesOnScreen(final PreferenceGroup preferenceScreen) {
         addMobileAPIPreference(preferenceScreen);
         addCloudflareRecaptchaFallbackPreference(preferenceScreen);
+        addCaptchaAutoUpdatePreference(preferenceScreen);
         addDomainPreferences(preferenceScreen);
         addProxyPreferences(preferenceScreen);
     }
@@ -323,7 +328,7 @@ public class MakabaModule extends CloudflareChanModule {
             throws Exception {
         Exception last = null;
         for (String url : new String[] {
-                domainUrl + "makaba/makaba.fcgi?task=catalog&board=" + boardName + "&filter=" + CATALOG_TYPES[catalogType] + "&json=1",
+                domainUrl + boardName + "/" + CATALOG_TYPES[catalogType] + ".json",
                 domainUrl + boardName + "/catalog.json"
         }) {
             try {
@@ -335,15 +340,15 @@ public class MakabaModule extends CloudflareChanModule {
                     JSONObject curThread = threads.getJSONObject(i);
                     ThreadModel model = new ThreadModel();
                     model.threadNumber = curThread.getString("num");
+                    model.postsCount = curThread.optInt("posts_count", -2) + 1;
                     try {
-                        model.postsCount = curThread.getInt("posts_count") + 1;
                         model.attachmentsCount = curThread.getInt("files_count");
                         model.attachmentsCount += curThread.getJSONArray("files").length();
-                        model.isSticky = curThread.getInt("sticky") != 0;
-                        model.isClosed = curThread.getInt("closed") != 0;
                     } catch (Exception e) {
                         Logger.e(TAG, e);
-                    } 
+                    }
+                    model.isSticky = curThread.optInt("sticky") != 0;
+                    model.isClosed = curThread.optInt("closed") != 0;
                     model.posts = new PostModel[] { mapPostModel(curThread, boardName) };
                     result[i] = model;
                 }
@@ -455,32 +460,42 @@ public class MakabaModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        String response;
-        String url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha" + (threadNumber != null ? "&action=thread" : "") + ("&board=" + boardName);
-        try {
-            response = HttpStreamer.getInstance().getStringFromUrl(url, HttpRequestModel.DEFAULT_GET, httpClient, null, task, true);
-            if (task != null && task.isCancelled()) throw new Exception("interrupted");
-            if (response.startsWith("DISABLED") || response.startsWith("VIP")) {
+        String url = domainUrl + "api/captcha/2chaptcha/id?board=" + boardName + (threadNumber != null ? "&thread=" + threadNumber : "");
+        JSONObject response = downloadJSONObject(url, false, listener, task);
+        switch (response.optInt("result", -1)) {
+            case 1: //Enabled
+                String id = response.optString("id");
+                url = domainUrl + "api/captcha/2chaptcha/image/" + id;
+                CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
+                captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
+                captchaId = id;
+                return captchaModel;
+            case 2: //VIP
+            case 3: //Disabled
                 captchaId = null;
                 return null;
-            } else if (!response.startsWith("CHECK")) {
+            case 0: //Fail
+                throw new Exception(response.optString("description"));
+            default:
                 throw new Exception("Invalid captcha response");
-            }
-        } catch (HttpWrongStatusCodeException e) {
-            checkCloudflareError(e, url);
-            throw e;
         }
-        
-        String id = response.substring(response.indexOf('\n') + 1);
-        url = domainUrl + "makaba/captcha.fcgi?type=2chaptcha&action=image&id=" + id;
-        CaptchaModel captchaModel = downloadCaptcha(url, listener, task);
-        captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
-        captchaId = id;
-        return captchaModel;
     }
-
+    
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
+        if (captchaId != null) {
+            String checkCaptchaUrl = domainUrl + "api/captcha/2chaptcha/check/" + captchaId + "?value=" + model.captchaAnswer;
+            JSONObject captchaResult;
+            try {
+                captchaResult = downloadJSONObject(checkCaptchaUrl, false, listener, task);
+                if (captchaResult.getInt("result") == 0) {
+                    throw new Exception(captchaResult.getString("description"));
+                }
+            } catch (JSONException e) {
+                Logger.e(TAG, e);
+            }
+        }
+        
         String url = domainUrl + "makaba/posting.fcgi?json=1";
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("task", "post").
@@ -595,7 +610,7 @@ public class MakabaModule extends CloudflareChanModule {
                 if (model.boardPage != 0) url.append(model.boardPage).append(".html");
                 break;
             case UrlPageModel.TYPE_CATALOGPAGE:
-                url.append("makaba.fcgi?task=catalog&board=").append(model.boardName).append("&filter=").append(CATALOG_TYPES[model.catalogType]);
+                url.append(model.boardName).append("/").append(CATALOG_TYPES[model.catalogType]).append(".html");
                 break;
             case UrlPageModel.TYPE_SEARCHPAGE:
                 if (model.searchRequest.startsWith(HASHTAG_PREFIX)) {
@@ -627,22 +642,13 @@ public class MakabaModule extends CloudflareChanModule {
         UrlPageModel model = new UrlPageModel();
         model.chanName = CHAN_NAME;
         try {
-            if (path.startsWith("makaba/makaba.fcgi?") && path.contains("task=catalog") && path.contains("board=")) {
+            if (path.contains("/catalog")) {
                 model.type = UrlPageModel.TYPE_CATALOGPAGE;
-                
-                String boardName = path.substring(path.indexOf("board=") + 6);
-                if (boardName.indexOf("&") != -1) boardName = boardName.substring(0, boardName.indexOf("&"));
-                model.boardName = boardName;
-                
-                if (path.indexOf("filter=") == -1) {
-                    model.catalogType = 0;
-                } else {
-                    String catalogType = path.substring(path.indexOf("filter=") + 7);
-                    if (catalogType.indexOf("&") != -1) catalogType = catalogType.substring(0, catalogType.indexOf("&"));
-                    
-                    model.catalogType = Arrays.asList(CATALOG_TYPES).indexOf(catalogType);
-                    model.catalogType = model.catalogType == -1 ? 0 : model.catalogType;
-                }
+                Matcher matcher = Pattern.compile("(.+?)/(catalog(?:_.+?)?)\\.html").matcher(path);
+                if (!matcher.find()) throw new Exception();
+                model.boardName = matcher.group(1);
+                int index = Arrays.asList(CATALOG_TYPES).indexOf(matcher.group(2));
+                model.catalogType = index == -1 ? 0 : index;
             } else if (path.startsWith("makaba/makaba.fcgi?") && path.contains("task=hashtags") && path.contains("board=")) {
                 model.type = UrlPageModel.TYPE_SEARCHPAGE;
                 String boardName = path.substring(path.indexOf("board=") + 6);

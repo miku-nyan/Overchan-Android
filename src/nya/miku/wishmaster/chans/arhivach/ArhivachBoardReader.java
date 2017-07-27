@@ -1,42 +1,53 @@
+/*
+ * Overchan Android (Meta Imageboard Client)
+ * Copyright (C) 2014-2016  miku-nyan <https://github.com/miku-nyan>
+ *     
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package nya.miku.wishmaster.chans.arhivach;
 
-import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.ThreadModel;
+import nya.miku.wishmaster.api.util.CryptoUtils;
 
 /**
  * Created by Kalaver <Kalaver@users.noreply.github.com> on 03.07.2015.
  */
 
-@SuppressLint("SimpleDateFormat")
 public class ArhivachBoardReader implements Closeable {
-    //private static final String TAG = "ArhivachBoardReader";
     
-    private static final DateFormat CHAN_DATEFORMAT;
-    static {
-        DateFormatSymbols chanSymbols = new DateFormatSymbols();
-        chanSymbols.setShortWeekdays(new String[] { "", "Вск", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Суб" });
-
-        CHAN_DATEFORMAT = new SimpleDateFormat("dd/MM/yy EEE HH:mm:ss", chanSymbols);
-        CHAN_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-    }
+    private static final Pattern DATE_PATTERN = Pattern.compile("(?:(\\d+)\\s+)?(\\w+)\\s+(?:(\\d+):(\\d+)|(\\d{4}))");
+    private static final String[] MONTH_STRINGS = new String[] { "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря" };
+    private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("GMT");
     
     private static final Pattern URL_PATTERN =
             Pattern.compile("((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
@@ -64,7 +75,7 @@ public class ArhivachBoardReader implements Closeable {
             "<a".toCharArray(),
             "<img".toCharArray(),
 
-            "<div class=\"thread_text\">".toCharArray(),
+            "<div class=\"thread_text\"".toCharArray(),
 
             "<a".toCharArray(),
 
@@ -186,6 +197,8 @@ public class ArhivachBoardReader implements Closeable {
             if (currentPost.comment == null) currentPost.comment = "";
             if (currentPost.email == null) currentPost.email = "";
             if (currentPost.trip == null) currentPost.trip = "";
+            currentPost.comment = CryptoUtils.fixCloudflareEmails(currentPost.comment);
+            currentPost.subject = CryptoUtils.fixCloudflareEmails(currentPost.subject);
             postsBuf.add(currentPost);
         }
         initPostModel();
@@ -246,11 +259,11 @@ public class ArhivachBoardReader implements Closeable {
         String commentData = readUntilSequence(FILTERS_CLOSE[FILTER_END_COMMENT]);
         matcher = Pattern.compile("<b>(.*)</b>\\s*&mdash;\\s*").matcher(commentData);
         if (matcher.find()) {
-            currentPost.subject = matcher.group(1);
+            currentPost.subject = StringEscapeUtils.unescapeHtml4(matcher.group(1));
             currentPost.comment = commentData.substring(matcher.group(0).length());
-        } else
+        } else {
             currentPost.comment = commentData;
-        
+        }
     }
     
     private void parseOmittedString(String omitted) {
@@ -304,18 +317,47 @@ public class ArhivachBoardReader implements Closeable {
         }
     }
     
-    protected void parseDate(String date) {
-        //TODO: Implement date parser
-        /*
-        if (date.length() > 0) {
-            try {
-                currentPost.timestamp = CHAN_DATEFORMAT.parse(date).getTime();
-            } catch (Exception e) {
-                currentPost.timestamp = Calendar.getInstance().getTimeInMillis();
-                Logger.e(TAG, "cannot parse date; make sure you choose the right DateFormat for this chan", e);
+    private void parseDate(String date) {
+        Matcher matcher = DATE_PATTERN.matcher(date);
+        if (matcher.matches()) {
+            int day, month, year, hour, minute;
+            Calendar calendar = Calendar.getInstance(TIME_ZONE);
+            
+            String dayString = matcher.group(1);
+            String monthString = matcher.group(2);
+            if (dayString == null) {
+                if (monthString.equalsIgnoreCase("вчера")) {
+                    calendar.add(Calendar.DAY_OF_MONTH, -1);
+                }
+                day = calendar.get(Calendar.DAY_OF_MONTH);
+                month = calendar.get(Calendar.MONTH);
+            } else {
+                day = Integer.parseInt(dayString);
+                month = MONTH_STRINGS.length - 1;
+                while (!monthString.equalsIgnoreCase(MONTH_STRINGS[month])
+                        && (month > 0)) {
+                    --month;
+                }
             }
+            
+            String yearString = matcher.group(5);
+            if (yearString == null) {
+                hour = Integer.parseInt(matcher.group(3));
+                minute = Integer.parseInt(matcher.group(4));
+                year = calendar.get(Calendar.YEAR);
+            } else {
+                hour = 0;
+                minute = 0;
+                year = Integer.parseInt(yearString);
+            }
+            
+            calendar.set(Calendar.DAY_OF_MONTH, day);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+            currentPost.timestamp = calendar.getTimeInMillis();
         }
-        */
     }
     
     private void skipUntilSequence(char[] sequence) throws IOException {

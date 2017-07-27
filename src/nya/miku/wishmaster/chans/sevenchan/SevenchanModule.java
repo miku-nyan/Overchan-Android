@@ -54,7 +54,7 @@ public class SevenchanModule extends AbstractKusabaModule {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "7ch", "Site Discussion", "7chan & Related Services", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ch7", "Channel7 & Radio7", "7chan & Related Services", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "irc", "Internet Relay Circlejerk", "7chan & Related Services", true),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "777", "/selfhelp/", "Premium Content", true),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "777", "Trump", "Premium Content", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Random", "Premium Content", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "banner", "Banners", "Premium Content", true),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fl", "Flash", "Premium Content", true),

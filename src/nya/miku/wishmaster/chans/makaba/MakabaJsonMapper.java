@@ -67,9 +67,9 @@ public class MakabaJsonMapper {
         model.catalogAllowed = true;
         model.catalogTypeDescriptions = new String[] {
                 resources.getString(R.string.makaba_catalog_standart),
-                resources.getString(R.string.makaba_catalog_last_reply),
+                //resources.getString(R.string.makaba_catalog_last_reply),
                 resources.getString(R.string.makaba_catalog_num),
-                resources.getString(R.string.makaba_catalog_image_size)
+                //resources.getString(R.string.makaba_catalog_image_size)
         };
         model.firstPage = 0;
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
@@ -150,6 +150,7 @@ public class MakabaJsonMapper {
         }
         model.isSticky = getIntSafe(postsArray.getJSONObject(0), "sticky", 0) != 0;
         model.isClosed = getIntSafe(postsArray.getJSONObject(0), "closed", 0) != 0;
+        model.isCyclical = getIntSafe(postsArray.getJSONObject(0), "endless", 0) != 0;
         return model;
     }
     
@@ -197,7 +198,7 @@ public class MakabaJsonMapper {
                 model.comment = model.comment + "<br/><em><font color=\"red\">(Автор этого поста был предупрежден.)</font></em>";
                 break;
         }
-        
+        if (NO_SUBJECTS_BOARDS.indexOf(boardName) >= 0) model.subject = "";
         return model;
     }
     
@@ -209,6 +210,8 @@ public class MakabaJsonMapper {
             model.height = source.getInt("height");
             model.thumbnail = fixAttachmentPath(source.getString("thumbnail"), boardName);
             model.path = fixAttachmentPath(source.getString("path"), boardName);
+            String originalName = source.optString("fullname");
+            if (originalName.length() > 0) model.originalName = originalName;
             model.type = AttachmentModel.TYPE_IMAGE_STATIC;
             String pathLower = model.path.toLowerCase(Locale.US);
             if (pathLower.endsWith(".gif")) model.type = AttachmentModel.TYPE_IMAGE_GIF;

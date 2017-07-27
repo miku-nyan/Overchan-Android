@@ -23,7 +23,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 
-import java.io.OutputStream;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractVichanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -33,54 +32,53 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.http.streamer.HttpWrongStatusCodeException;
 
 public class VichanModule extends AbstractVichanModule {
     private static final String CHAN_NAME = "pl.vichan.net";
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Radom", " ", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cp", "Chłodne Pasty", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "id", "Inteligentne dyskusje", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "int", "True International", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r+oc", "Prośby + Oryginalna zawartość", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "slav", "Słowianie", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "veto", "Wolne! Nie pozwalam!", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "waifu", "Waifu i husbando", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "wiz", "Mizoginia", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "btc", "Biznes i ekonomia", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "c", "Informatyka, Elektronika, Gadżety", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "c++", "Zaawansowana informatyka", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fso", "Motoryzacja", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Hobby i zainteresowania", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "kib", "Kibice", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ku", "Kuchnia", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lsd", "Substancje psychoaktywne", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "psl", "Polityka", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sci", "Nauka", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "trv", "Podróże", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "Gry video i online", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Anime i Manga", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ac", "Komiks i animacja", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "az", "Azja", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fr", "Filozofia & religia", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "hk", "Historia & Kultura", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "Literatura", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mu", "Muzyka", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tv", "Filmy i seriale", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vp", "Pokémon", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "x", "Wróżbita Maciej", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "med", "Medyczny", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pr", "Prawny", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pro", "Problemy i protipy", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "psy", "Psychologia", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sex", "Seks i związki", " ", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "soc", "Socjalizacja i atencja", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sr", "Samorozwój", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "swag", "Styl i wygląd", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "trap", "Transseksualizm", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "chan", "Chany i ich kultura", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "meta", "Administracyjny", " ", false),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mit", "Mitomania", " ", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Radom", "Ogólne", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "cp", "Chłodne Pasty", "Ogólne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "id", "Inteligentne dyskusje", "Ogólne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "int", "True International", "Ogólne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "r+oc", "Prośby + Oryginalna zawartość", "Ogólne", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "slav", "Słowianie", "Ogólne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "veto", "Wolne! Nie pozwalam!", "Ogólne", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "waifu", "Waifu i husbando", "Ogólne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "wiz", "Mizoginia", "Ogólne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "btc", "Biznes i ekonomia", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "c", "Informatyka, Elektronika, Gadżety", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "c++", "Zaawansowana informatyka", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fso", "Motoryzacja", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Hobby i zainteresowania", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "kib", "Kibice", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ku", "Kuchnia", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lsd", "Substancje psychoaktywne", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "psl", "Polityka", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sci", "Nauka", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "trv", "Podróże", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "Gry video i online", "Tematyczne", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Anime i Manga", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ac", "Komiks i animacja", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "az", "Azja", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "fr", "Filozofia & religia", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "hk", "Historia & Kultura", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "lit", "Literatura", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mu", "Muzyka", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "tv", "Filmy i seriale", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vp", "Pokémon", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "x", "Wróżbita Maciej", "Kultura", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "med", "Medyczny", "Życiowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pr", "Prawny", "Życiowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "pro", "Problemy i protipy", "Życiowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "psy", "Psychologia", "Życiowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sex", "Seks i związki", "Życiowe", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "soc", "Socjalizacja i atencja", "Życiowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sr", "Samorozwój", "Życiowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "swag", "Styl i wygląd", "Życiowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "trap", "Transseksualizm", "Życiowe", true),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "chan", "Chany i ich kultura", "Chanowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "meta", "Administracyjny", "Chanowe", false),
+            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "mit", "Mitomania", "Chanowe", true),
     };
 
     public VichanModule(SharedPreferences preferences, Resources resources) {
@@ -120,6 +118,7 @@ public class VichanModule extends AbstractVichanModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
+        model.attachmentsMaxCount = 4;
         model.allowCustomMark = true;
         model.customMarkDescription = "Spoiler";
         return model;
@@ -129,19 +128,6 @@ public class VichanModule extends AbstractVichanModule {
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         super.sendPost(model, listener, task);
         return null;
-    }
-    
-    @Override
-    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
-        try {
-            super.downloadFile(url, out, listener, task);
-        } catch (HttpWrongStatusCodeException e) {
-            if (url.contains("/thumb/") && url.endsWith(".jpg") && e.getStatusCode() == 404) {
-                super.downloadFile(url.substring(0, url.length() - 3) + "gif", out, listener, task);
-            } else {
-                throw e;
-            }
-        }
     }
     
     @Override

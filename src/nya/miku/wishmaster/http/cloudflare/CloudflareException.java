@@ -39,10 +39,10 @@ public class CloudflareException extends InteractiveException {
     
     private static final String SERVICE_NAME = "Cloudflare";
     private static final String COOKIE_NAME = "cf_clearance";
-    private static final String RECAPTCHA_KEY = "6LfOYgoTAAAAAInWDVTLSc8Yibqp-c9DaLimzNGM";
+    private static final String RECAPTCHA_KEY = "6LfBixYUAAAAABhdHynFUIMA_sa4s-XsJvnjtgB0";
     
     private static final Pattern PATTERN_STOKEN = Pattern.compile("stoken=\"?([^\"&]+)");
-    private static final Pattern PATTERN_ID = Pattern.compile("stoken=\"?([^\"&]+)");
+    private static final Pattern PATTERN_ID = Pattern.compile("data-ray=\"?([^\"&]+)");
     
     private boolean recaptcha;
     private String url;

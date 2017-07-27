@@ -20,7 +20,7 @@ package nya.miku.wishmaster.http;
 
 public class HttpConstants {
     
-    public static final String USER_AGENT_STRING = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0";
+    public static final String USER_AGENT_STRING = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0";
     public static final int DEFAULT_HTTP_TIMEOUT = 30 * 1000;
     
 }

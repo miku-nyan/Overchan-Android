@@ -40,7 +40,7 @@ import android.graphics.drawable.Drawable;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
-import nya.miku.wishmaster.api.AbstractChanModule;
+import nya.miku.wishmaster.api.CloudflareChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -60,7 +60,7 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
-public class Chan420Module extends AbstractChanModule {
+public class Chan420Module extends CloudflareChanModule {
     
     static final String CHAN_NAME = "420chan.org";
     
@@ -88,11 +88,13 @@ public class Chan420Module extends AbstractChanModule {
     }
     
     private boolean useHttps() {
-        return false;
+        return useHttps(true);
     }
     
     @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addHttpsPreference(preferenceGroup, true);
+        addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }
     

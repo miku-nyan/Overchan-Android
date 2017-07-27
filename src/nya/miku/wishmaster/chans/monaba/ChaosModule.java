@@ -16,41 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nya.miku.wishmaster.chans.clairews;
+package nya.miku.wishmaster.chans.monaba;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.interfaces.CancellableTask;
+import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
-import nya.miku.wishmaster.api.util.ChanModels;
-import nya.miku.wishmaster.chans.nullchan.AbstractInstant0chan;
 
-public class ClairewsModule extends AbstractInstant0chan {
-    private static final String CHAN_NAME = "claire.ws";
-    private static final String DOMAIN = "claire.ws";
-    private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "sg", "steins;gate", "Boards", true),
-            ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "video;games", "Boards", false)
-    };
+public class ChaosModule extends AbstractMonabaChan {
+    static final String CHAN_NAME = "chaos.cpu";
+    private static final String DOMAIN = "chaos.cyberpunk.us";
     
-    public ClairewsModule(SharedPreferences preferences, Resources resources) {
+    public ChaosModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
     }
     
+    @Override
     public String getChanName() {
         return CHAN_NAME;
-    }
-    
-    @Override
-    public String getDisplayingName() {
-        return "Kurisu (claire.ws)";
-    }
-    
-    @Override
-    public Drawable getChanFavicon() {
-        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_clairews, null);
     }
     
     @Override
@@ -59,18 +47,22 @@ public class ClairewsModule extends AbstractInstant0chan {
     }
     
     @Override
-    protected boolean canHttps() {
-        return true;
+    public String getDisplayingName() {
+        return "Хаосач";
     }
     
     @Override
-    protected boolean canCloudflare() {
-        return true;
+    public Drawable getChanFavicon() {
+        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_lain, null);
     }
     
     @Override
-    protected SimpleBoardModel[] getBoardsList() {
-        return BOARDS;
+    public SimpleBoardModel[] getBoardsList(ProgressListener listener, CancellableTask task, SimpleBoardModel[] oldBoardsList) throws Exception {
+        return ChaosBoards.getBoardsList();
     }
     
+    @Override
+    public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
+        return ChaosBoards.getBoard(shortName);
+    }
 }

@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_post_number_search_header">%1$s (тред %2$s)</string>
     <string name="postitem_sticky_thread">Прикріплений тред</string>
     <string name="postitem_closed_thread">Закритий тред</string>
+    <string name="postitem_cyclical_thread">Циклічний тред</string>
     <string name="postitem_deleted_mark">Стертий пост</string>
     <plurals name="postitem_posts_quantity">
         <item quantity="one">%d пост</item>
@@ -596,6 +597,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Gurochan</item>
         <item>Tomorrow</item>
         <item>Mikuba</item>
+        <item>Dark Mint</item>
         <item>Користувацька</item>
     </string-array>
     <string name="pref_font_size_title">Розмір літер</string>
@@ -620,4 +622,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>45\uff05</item>
         <item>50\uff05</item>
     </string-array>
+    <string name="pref_captcha_auto_update">Автоматичне оновлення капчі</string>
+    <string name="app_settings_exporting">Експорт</string>
+    <string name="app_settings_importing">Імпорт</string>
+    <string name="app_settings_import_completed">Імпорт успішно завершений</string>
+    <string name="app_settings_export_completed">Експорт успішно завершений</string>
+    <string name="app_import_overwrite_warning">УВАГА!</string>
+    <string name="app_import_overwrite_warning_message">Всі дані будуть безповоротно перезаписані</string>
+    <string name="pref_key_settings_import_title">Імпорт</string>
+    <string name="pref_key_settings_import_overwrite_title">Затирати</string>
+    <string name="pref_key_settings_import_overwrite_summary">Затирати існуючі дані при імпорті</string>
+    <string name="pref_key_settings_ie_title">Імпорт та експорт налаштувань</string>
+    <string name="pref_key_settings_export_title">Експорт</string>
+    <string name="mark_code">Код</string>
+    <string name="pref_post_thumbnail_scale_title">Розмір ескізів</string>
+    <string name="pref_key_post_thumbnail_scale_toast">Рекомендується очистити кеш</string>
+    <string name="newtab_select_local_directory">Вказати розташування каталогу</string>
+    <string name="pref_scroll_to_active_tab_summary">Прокручувати до активної вкладки при закритті неактивній вкладки</string>
+    <string name="pref_scroll_to_active_tab_title">Прокрутка до активної вкладки</string>
 </resources>

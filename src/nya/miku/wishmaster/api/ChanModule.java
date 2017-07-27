@@ -140,7 +140,19 @@ public interface ChanModule {
      * @return список постов, удовлетворяющих поисковому запросу
      */
     PostModel[] search(String boardName, String searchRequest, ProgressListener listener, CancellableTask task) throws Exception;
-    
+
+    /**
+     * Поиск по доске.<br>
+     * Если на данной имиджборде нет досок, предоставляющих функцию поиска, может бросать {@link UnsupportedOperationException}.
+     * @param boardName название доски (напр, "b", "int")
+     * @param searchRequest модель поискового запроса
+     * @param page страница
+     * @param listener интерфейс отслеживания прогресса (может принимать null)
+     * @param task интерфейс отменяемой задачи
+     * @return список постов, удовлетворяющих поисковому запросу
+     */
+    PostModel[] search(String boardName, String searchRequest,  int page, ProgressListener listener, CancellableTask task) throws Exception;
+
     /**
      * Получить новую капчу для отправки поста (в виде модели {@link CaptchaModel}).<br>
      * Если на данной имиджборде все доски Read-Only ({@link BoardModel#readonlyBoard}), может бросать {@link UnsupportedOperationException}.

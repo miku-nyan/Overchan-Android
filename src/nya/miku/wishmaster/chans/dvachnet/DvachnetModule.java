@@ -24,17 +24,23 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpHeaders;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
-
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.preference.EditTextPreference;
+import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.InputType;
+import android.text.TextUtils;
 import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractWakabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -58,7 +64,9 @@ import nya.miku.wishmaster.lib.org_json.JSONObject;
 public class DvachnetModule extends AbstractWakabaModule {
     
     static final String CHAN_NAME = "dva-ch.net";
-    private static final String DOMAIN = "dva-ch.net";
+    private static final String DEFAULT_DOMAIN = "dva-ch.com";
+    private static final String DOMAINS_HINT = "dva-ch.com, 2ch.rip";
+    private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, "2ch.rip" };
     private static final SimpleBoardModel[] BOARDS = new SimpleBoardModel[] {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "b", "Бред", "Обсуждения", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "d", "Дискуссии о Два.ч ", "Обсуждения", false),
@@ -115,8 +123,11 @@ public class DvachnetModule extends AbstractWakabaModule {
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "h", "Хентай", "Взрослым", true),
             ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ho", "Прочий хентай", "Взрослым", true)
     };
+    private static final String PREF_KEY_DOMAIN = "PREF_KEY_DOMAIN";
+    private static final Pattern ERROR_PATTERN = Pattern.compile("<h1[^>]*>(.*?)</h1>");
     
     private Map<String, BoardModel> boardsMap = new HashMap<>();
+    
     private String captchaId = "";
     
     public DvachnetModule(SharedPreferences preferences, Resources resources) {
@@ -130,7 +141,7 @@ public class DvachnetModule extends AbstractWakabaModule {
     
     @Override
     public String getDisplayingName() {
-        return "Два.ч (dva-ch.net)";
+        return "Два.ч (dva-ch.com)";
     }
     
     @Override
@@ -140,7 +151,18 @@ public class DvachnetModule extends AbstractWakabaModule {
     
     @Override
     protected String getUsingDomain() {
-        return DOMAIN;
+        String domain = preferences.getString(getSharedKey(PREF_KEY_DOMAIN), DEFAULT_DOMAIN);
+        return TextUtils.isEmpty(domain) ? DEFAULT_DOMAIN : domain;
+    }
+    
+    @Override
+    protected String[] getAllDomains() {
+        String domain = getUsingDomain();
+        for (String d : DOMAINS) if (domain.equals(d)) return DOMAINS;
+        String[] domains = new String[DOMAINS.length + 1];
+        for (int i=0; i<DOMAINS.length; ++i) domains[i] = DOMAINS[i];
+        domains[DOMAINS.length] = domain;
+        return domains;
     }
     
     @Override
@@ -151,6 +173,25 @@ public class DvachnetModule extends AbstractWakabaModule {
     @Override
     protected boolean canHttps() {
         return true;
+    }
+    
+    private void addDomainPreference(PreferenceGroup group) {
+        Context context = group.getContext();
+        EditTextPreference domainPref = new EditTextPreference(context);
+        domainPref.setTitle(R.string.pref_domain);
+        domainPref.setSummary(resources.getString(R.string.pref_domain_summary, DOMAINS_HINT));
+        domainPref.setDialogTitle(R.string.pref_domain);
+        domainPref.setKey(getSharedKey(PREF_KEY_DOMAIN));
+        domainPref.getEditText().setHint(DEFAULT_DOMAIN);
+        domainPref.getEditText().setSingleLine();
+        domainPref.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        group.addPreference(domainPref);
+    }
+    
+    @Override
+    public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        addDomainPreference(preferenceGroup);
+        super.addPreferencesOnScreen(preferenceGroup);
     }
     
     @Override
@@ -254,7 +295,8 @@ public class DvachnetModule extends AbstractWakabaModule {
                 addString("comment", model.comment).
                 addString("captcha_id", captchaId).
                 addString("captcha_value", model.captchaAnswer).
-                addString("password", model.password);
+                addString("password", model.password).
+                addString("json", "1");
         if (model.attachments != null && model.attachments.length > 0)
             postEntityBuilder.addFile("image", model.attachments[0], model.randomHash);
         
@@ -273,21 +315,13 @@ public class DvachnetModule extends AbstractWakabaModule {
                 ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
                 IOUtils.copyStream(response.stream, output);
                 String htmlResponse = output.toString("UTF-8");
-                if (!htmlResponse.contains("<blockquote")) {
-                    int start = htmlResponse.indexOf("<h1 style=\"text-align: center\">");
-                    if (start != -1) {
-                        int end = htmlResponse.indexOf("</h1>", start + 31);
-                        if (end != -1) {
-                            throw new Exception(htmlResponse.substring(start + 31, end).trim());
-                        }
-                    }
-                    start = htmlResponse.indexOf("<h1>");
-                    if (start != -1) {
-                        int end = htmlResponse.indexOf("</h1>", start + 4);
-                        if (end != -1) {
-                            throw new Exception(htmlResponse.substring(start + 4, end).trim());
-                        }
-                    }
+                Matcher errorMatcher = ERROR_PATTERN.matcher(htmlResponse);
+                if (errorMatcher.find()) {
+                    throw new Exception(errorMatcher.group(1).trim());
+                }
+                JSONObject jsonResponse = new JSONObject(htmlResponse);
+                if (jsonResponse.optString("message_title").equalsIgnoreCase("Ошибка")) {
+                    throw new Exception(jsonResponse.optString("message", "Ошибка"));
                 }
             } else throw new Exception(response.statusCode + " - " + response.statusReason);
         } finally {

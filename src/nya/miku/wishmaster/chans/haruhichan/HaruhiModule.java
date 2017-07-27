@@ -98,6 +98,7 @@ public class HaruhiModule extends AbstractVichanModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel model = super.getBoard(shortName, listener, task);
+        model.attachmentsMaxCount = 4;
         model.allowEmails = false;
         return model;
     }

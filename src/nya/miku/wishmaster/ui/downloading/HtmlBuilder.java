@@ -71,7 +71,7 @@ public class HtmlBuilder implements Closeable {
     private static final String[] CSS = new String[] { "Futaba", "Photon", "Burichan", "Gurochan" };
     private static final String[] CSS_LINKS = new String[] { "futaba.css", "photon.css", "burichan.css", "gurochan.css" };
     
-    private static final Pattern A_HREF_PATTERN = Pattern.compile("<a\\s+(?:[^>]*?\\s+)?href=\"([^\"]*)\"");
+    private static final Pattern A_HREF_PATTERN = Pattern.compile("<a\\s+(?:[^>]*?\\s+)?href=\"([^\"]*)\"", Pattern.CASE_INSENSITIVE);
     
     private static final String CSS_FORMAT_1 = "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" title=\"%s\" /> ";
     private static final String CSS_FORMAT_2 = "<link rel=\"alternate stylesheet\" type=\"text/css\" href=\"%s\" title=\"%s\" />";

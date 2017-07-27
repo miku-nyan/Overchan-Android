@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_post_number_search_header">%1$s (thread %2$s)</string>
     <string name="postitem_sticky_thread">Thread is sticky</string>
     <string name="postitem_closed_thread">Thread is closed</string>
+    <string name="postitem_cyclical_thread">Cyclical thread</string>
     <string name="postitem_deleted_mark">Post is deleted</string>
     <plurals name="postitem_posts_quantity">
         <item quantity="one">%d post</item>
@@ -583,6 +584,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Gurochan</item>
         <item>Tomorrow</item>
         <item>Mikuba</item>
+        <item>Dark Mint</item>
         <item>Custom</item>
     </string-array>
     <string name="pref_font_size_title">Text size</string>
@@ -607,4 +609,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>45\uff05</item>
         <item>50\uff05</item>
     </string-array>
+    <string name="pref_captcha_auto_update">Auto-update CAPTCHA</string>
+    <string name="mark_code">Code</string>
+    <string name="pref_key_settings_ie_title">Preferences import/export</string>
+    <string name="pref_key_settings_export_title">Export</string>
+    <string name="pref_key_settings_import_overwrite_title">Overwrite</string>
+    <string name="pref_key_settings_import_overwrite_summary">Overwrite existing data when importing</string>
+    <string name="pref_key_settings_import_title">Import</string>    
+    <string name="app_settings_exporting">Exporting</string>
+    <string name="app_settings_export_completed">Export to file successfully completed</string>
+    <string name="app_settings_import_completed">Import successfully completed</string>
+    <string name="app_settings_importing">Importing</string>
+    <string name="app_import_overwrite_warning">Warning!</string>
+    <string name="app_import_overwrite_warning_message">All data will be irreversibly overwritten</string>
+    <string name="pref_post_thumbnail_scale_title">Post thumbnail size</string>
+    <string name="pref_key_post_thumbnail_scale_toast">It\'s recommended to clear cache after thumbnail scale has been changed</string>
+    <string name="newtab_select_local_directory">Specify directory location</string>
+    <string name="pref_scroll_to_active_tab_summary">Scroll to the active tab when closing inactive tab</string>
+    <string name="pref_scroll_to_active_tab_title">Scroll to the active tab</string>
 </resources>

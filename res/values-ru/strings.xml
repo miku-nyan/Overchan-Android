@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="postitem_post_number_search_header">%1$s (тред %2$s)</string>
     <string name="postitem_sticky_thread">Тред закреплен</string>
     <string name="postitem_closed_thread">Обсуждение закрыто</string>
+    <string name="postitem_cyclical_thread">Цикличный тред</string>
     <string name="postitem_deleted_mark">Сообщение удалено</string>
     <plurals name="postitem_posts_quantity">
         <item quantity="one">%d сообщение</item>
@@ -592,6 +593,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>Gurochan</item>
         <item>Tomorrow</item>
         <item>Mikuba</item>
+        <item>Dark Mint</item>
         <item>Пользовательская</item>
     </string-array>
     <string name="pref_font_size_title">Размер текста</string>
@@ -616,4 +618,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>45\uff05</item>
         <item>50\uff05</item>
     </string-array>
+    <string name="pref_captcha_auto_update">Автоматическое обновление капчи</string>
+    <string name="app_settings_exporting">Экспорт</string>
+    <string name="app_settings_importing">Импорт</string>
+    <string name="app_settings_import_completed">Импорт успешно завершен</string>
+    <string name="app_settings_export_completed">Экспорт успешно завершен</string>
+    <string name="app_import_overwrite_warning">Внимание!</string>
+    <string name="app_import_overwrite_warning_message">Все данные будут необратимо перезаписаны</string>
+    <string name="pref_key_settings_import_title">Импорт</string>
+    <string name="pref_key_settings_import_overwrite_title">Перезапись</string>
+    <string name="pref_key_settings_import_overwrite_summary">Перезапись существующих данных при импорте</string>
+    <string name="pref_key_settings_ie_title">Импорт и экспорт настроек</string>
+    <string name="pref_key_settings_export_title">Экспорт</string>
+    <string name="mark_code">Код</string>
+    <string name="pref_post_thumbnail_scale_title">Размер эскизов</string>
+    <string name="pref_key_post_thumbnail_scale_toast">Рекомендуется очистить кэш</string>
+    <string name="newtab_select_local_directory">Указать расположение каталога</string>
+    <string name="pref_scroll_to_active_tab_title">Прокрутка до активной вкладки</string>
+    <string name="pref_scroll_to_active_tab_summary">Прокручивать до активной вкладки при закрытии неактивной вкладки</string>
 </resources>

@@ -165,6 +165,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:background="@null"
                 android:src="@drawable/mark_spoiler"
                 android:contentDescription="@string/mark_spoiler" />
+            <ImageButton
+                android:id="@+id/postform_mark_code"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp"
+                android:background="@null"
+                android:src="@drawable/mark_code"
+                android:contentDescription="@string/mark_code" />
         </LinearLayout>
         
         <EditText 

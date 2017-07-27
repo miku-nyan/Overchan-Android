@@ -244,6 +244,18 @@ public class AutohideActivity extends ListActivity {
                     (TextUtils.isEmpty(this.boardName) || boardName == this.boardName || boardName.equals(this.boardName)) &&
                     (TextUtils.isEmpty(this.threadNumber) || threadNumber == this.threadNumber || threadNumber.equals(this.threadNumber)));
         }
+
+        public int hashCode() {
+            int result = 7;
+            result += result * 37 + (TextUtils.isEmpty(this.regex) ? 0 : this.regex.hashCode());
+            result += result * 37 + (TextUtils.isEmpty(this.chanName) ? 0 : this.chanName.hashCode());
+            result += result * 37 + (TextUtils.isEmpty(this.boardName) ? 0 : this.boardName.hashCode());
+            result += result * 37 + (TextUtils.isEmpty(this.threadNumber) ? 0 : this.threadNumber.hashCode());
+            result += result * 37 + (this.inComment ? 0 : 1);
+            result += result * 37 + (this.inSubject ? 0 : 1);
+            result += result * 37 + (this.inName ? 0 : 1);
+            return result;
+        }
     }
     
     public static class CompiledAutohideRule extends AutohideRule {

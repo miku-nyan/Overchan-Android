@@ -46,5 +46,7 @@ public class ThreadModel implements Serializable {
     @Tag(4) public boolean isSticky;
     /** Отметка о закрытом треде (должно принимать true, если обсуждение закрыто). */
     @Tag(5) public boolean isClosed;
+    /** Отметка о цикличном треде (должно принимать true, если старые посты вытесняются новыми при превышении лимита). */
+    @Tag(6) public boolean isCyclical;
     
 }
