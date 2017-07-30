@@ -125,6 +125,7 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.ernstchan.ErnstModule",
             "nya.miku.wishmaster.chans.nullchan.NullchanoneModule",
             "nya.miku.wishmaster.chans.depreschan.DepresModule",
+            "nya.miku.wishmaster.chans.endchan.EndChanModule",
     };
     
     private static MainApplication instance;
