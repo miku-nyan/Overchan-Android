@@ -77,7 +77,7 @@ public class LolifoxModule extends InfinityModule {
 
     @Override
     public Drawable getChanFavicon() {
-        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_brchan, null);
+        return ResourcesCompat.getDrawable(resources, R.drawable.favicon_lolifox, null);
     }
 
     @Override
