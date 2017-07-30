@@ -41,6 +41,7 @@ public class EndChanModule extends AbstractLynxChanModule {
     });
     private static final String DOMAINS_HINT = "endchan.xyz, endchan.net, infinow.net (cached), endchan5doxvprs5.onion, s6424n4x4bsmqs27.onion, endchan.i2p";
     private static final String TAG = "EndChanModule";
+    private static final String DISPLAYING_NAME = "EndChan";
     private static final String CHAN_NAME = "endchan.xyz";
     private static final String DEFAULT_DOMAIN = "endchan.xyz";
     private static final String PREF_KEY_DOMAIN = "domain";
@@ -110,7 +111,7 @@ public class EndChanModule extends AbstractLynxChanModule {
 
     @Override
     public String getDisplayingName() {
-        return CHAN_NAME;
+        return DISPLAYING_NAME;
     }
 
     protected boolean canHttps() {
