@@ -466,7 +466,8 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus && chan instanceof AbstractChanModule && ((AbstractChanModule) chan).getCaptchaAutoUpdatePreference()) {
-                    updateCaptcha(false);
+                    if (captchaField.getText().length() == 0)
+                        updateCaptcha(false);
                 }
             }
         });
