@@ -84,7 +84,6 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.cirno.CirnoModule",
             "nya.miku.wishmaster.chans.cirno.MikubaModule",
             "nya.miku.wishmaster.chans.dobrochan.DobroModule",
-            "nya.miku.wishmaster.chans.dvach.DvachModule",
             "nya.miku.wishmaster.chans.sevenchan.SevenchanModule",
             "nya.miku.wishmaster.chans.infinity.InfinityPlModule",
             "nya.miku.wishmaster.chans.cirno.NowereModule",
