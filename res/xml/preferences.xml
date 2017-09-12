@@ -169,6 +169,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 android:title="@string/pref_gallery_nativegif_title"
                 android:summary="@string/pref_gallery_nativegif_summary" />
         </PreferenceScreen>
+        
+        <ListPreference
+            android:key="@string/pref_key_post_thumbnail_scale"
+            android:title="@string/pref_post_thumbnail_scale_title"
+            android:dialogTitle="@string/pref_post_thumbnail_scale_title"
+            android:entries="@array/pref_post_thumbnail_scale_choices"
+            android:entryValues="@array/pref_post_thumbnail_scale_values"
+            android:defaultValue="@string/pref_post_thumbnail_scale_value_default" />
     </PreferenceCategory>
     
     <PreferenceCategory
@@ -249,6 +257,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:key="@string/pref_key_pin_markup"
             android:title="@string/pref_pin_markup_title"
             android:summary="@string/pref_pin_markup_summary" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_key_scroll_to_active_tab"
+            android:title="@string/pref_scroll_to_active_tab_title"
+            android:summary="@string/pref_scroll_to_active_tab_summary" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_downloads" >
@@ -366,6 +380,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <Preference
             android:key="@string/pref_key_clear_subscriptions"
             android:title="@string/pref_clear_subscriptions_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="@string/pref_key_settings_ie"
+        android:title="@string/pref_key_settings_ie_title" >
+
+        <Preference
+            android:key="@string/pref_key_settings_export"
+            android:title="@string/pref_key_settings_export_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_settings_import_overwrite"
+            android:title="@string/pref_key_settings_import_overwrite_title"
+            android:summary="@string/pref_key_settings_import_overwrite_summary"/>
+
+        <Preference
+            android:key="@string/pref_key_settings_import"
+            android:title="@string/pref_key_settings_import_title" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_cache">

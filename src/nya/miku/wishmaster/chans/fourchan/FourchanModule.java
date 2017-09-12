@@ -328,8 +328,8 @@ public class FourchanModule extends CloudflareChanModule {
         return useHttps(true);
     }
     
-    private boolean useNewRecaptcha() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
+    private boolean useNewRecaptcha(boolean newThread) {
+        return newThread || preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA), NEW_RECAPTCHA_DEFAULT);
     }
     
     private boolean newRecaptchaFallback() {
@@ -448,7 +448,7 @@ public class FourchanModule extends CloudflareChanModule {
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
         if (usingPasscode) return null;
-        if (useNewRecaptcha()) {
+        if (useNewRecaptcha(threadNumber == null)) {
             recaptcha = null;
             return null;
         } else {
@@ -464,7 +464,7 @@ public class FourchanModule extends CloudflareChanModule {
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String recaptcha2 = Recaptcha2solved.pop(RECAPTCHA_KEY);
         if (!usingPasscode) {
-            if (useNewRecaptcha()) {
+            if (useNewRecaptcha(model.threadNumber == null)) {
                 if (recaptcha2 == null) throw Recaptcha2.obtain(
                         (useHttps() ? "https://" : "http://") + "4chan.org/", RECAPTCHA_KEY, null, CHAN_NAME, newRecaptchaFallback());
             } else if (recaptcha == null) throw new Exception("Invalid captcha");
@@ -479,7 +479,7 @@ public class FourchanModule extends CloudflareChanModule {
                 addString("pwd", model.password);
         if (model.threadNumber != null) postEntityBuilder.addString("resto", model.threadNumber);
         if (!usingPasscode) {
-            if (useNewRecaptcha()) {
+            if (useNewRecaptcha(model.threadNumber == null)) {
                 postEntityBuilder.addString("g-recaptcha-response", recaptcha2);
             } else {
                 postEntityBuilder.addString("recaptcha_challenge_field", recaptcha.challenge).

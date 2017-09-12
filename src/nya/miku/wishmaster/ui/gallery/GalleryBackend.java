@@ -266,7 +266,7 @@ public class GalleryBackend extends Service {
                 bmp = bitmapCache.getFromContainer(hash, localFile);
             }
             if (bmp == null && url != null && url.length() != 0) {
-                bmp = bitmapCache.download(hash, url, getResources().getDimensionPixelSize(R.dimen.post_thumbnail_size), chan, tnDownloadingTask);
+                bmp = bitmapCache.download(hash, url, settings.getPostThumbnailSize(), chan, tnDownloadingTask);
             }
             return bmp;
         }

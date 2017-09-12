@@ -129,7 +129,7 @@ public class FourchanJsonMapper {
             if (attachment.size > 0) attachment.size = Math.round(attachment.size / 1024f);
             attachment.width = object.optInt("w", -1);
             attachment.height = object.optInt("h", -1);
-            attachment.originalName = object.optString("filename", "") + ext;
+            attachment.originalName = StringEscapeUtils.unescapeHtml4(object.optString("filename")) + ext;
             attachment.isSpoiler = object.optInt("spoiler") == 1;
             long tim = object.optLong("tim");
             if (tim != 0) {

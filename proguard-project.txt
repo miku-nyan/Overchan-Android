@@ -10,3 +10,5 @@
 -keep class sun.nio.ch.** { *; }
 -keep class sun.misc.** { *; }
 -keep class java.beans.** { *; }
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses

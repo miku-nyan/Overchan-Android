@@ -57,7 +57,8 @@ import android.text.style.StyleSpan;
  *
  */
 public class PresentationItemModel {
-    static final Pattern REPLY_LINK_FULL_PATTERN = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)(?:.*?)</a>", Pattern.DOTALL);
+    static final Pattern REPLY_LINK_FULL_PATTERN =
+            Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\w+)(?:.*?)</a>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     
     public static final String ALL_REFERENCES_URI = "references://all?from=";
     public static final String POST_REFERER = "refpost://";

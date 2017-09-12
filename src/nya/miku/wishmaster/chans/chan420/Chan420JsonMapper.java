@@ -30,6 +30,7 @@ import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
+import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.lib.org_json.JSONArray;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
@@ -90,7 +91,7 @@ public class Chan420JsonMapper {
         model.allowDeletePosts = false;
         model.allowDeleteFiles = false;
         model.allowReport = BoardModel.REPORT_WITH_COMMENT;
-        model.allowNames = !boardName.equals("b");
+        model.allowNames = !boardName.equals("b") && !boardName.equals("420");
         model.allowSubjects = true;
         model.allowSage = true;
         model.allowEmails = false;
@@ -108,21 +109,21 @@ public class Chan420JsonMapper {
     public static PostModel mapPostModel(JSONObject object, String boardName) {
         PostModel model = new PostModel();
         model.number = Long.toString(object.getLong("no"));
-        model.name = StringEscapeUtils.unescapeHtml4(object.optString("name", "Anonymous").replaceAll("</?span[^>]*?>", ""));
-        model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
-        model.comment = object.optString("com", "");
+        model.name = StringEscapeUtils.unescapeHtml4(toUtf8(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous"))));
+        model.subject = StringEscapeUtils.unescapeHtml4(toUtf8(object.optString("sub", "")));
+        model.comment = toUtf8(object.optString("com", ""));
         model.email = null;
         model.trip = object.optString("trip", "");
         model.op = false;
         String id = object.optString("id", "");
         model.sage = id.equalsIgnoreCase("Heaven");
-        if (!id.equals("")) model.name += (" ID:" + id);
+        if (!id.isEmpty()) model.name += (" ID:" + id);
         model.timestamp = object.getLong("time") * 1000;
         model.parentThread = object.optString("resto", "0");
         if (model.parentThread.equals("0")) model.parentThread = model.number;
         model.comment = toHtml(model.comment, boardName, model.parentThread);
         String ext = object.optString("ext", "");
-        if (!ext.equals("")) {
+        if (!ext.isEmpty()) {
             AttachmentModel attachment = new AttachmentModel();
             switch (ext) {
                 case ".jpg":
@@ -150,8 +151,13 @@ public class Chan420JsonMapper {
             attachment.isSpoiler = object.optInt("spoiler") == 1;
             long tim = object.optLong("filename");
             if (tim != 0) {
-                attachment.thumbnail = "/" + boardName + "/thumb/" + Long.toString(tim) + "s.jpg";
                 attachment.path = "/" + boardName + "/src/" + Long.toString(tim) + ext;
+                if ((attachment.type == AttachmentModel.TYPE_IMAGE_STATIC || attachment.type == AttachmentModel.TYPE_IMAGE_GIF)
+                        && attachment.width == object.optInt("tn_w", 0) && attachment.height == object.optInt("tn_h", 0)) {
+                    attachment.thumbnail = attachment.path; // Image equal or smaller than 200x200 pixels
+                } else {
+                    attachment.thumbnail = "/" + boardName + "/thumb/" + Long.toString(tim) + "s.jpg";
+                }
             } else {
                 String filename = attachment.originalName;
                 try {
@@ -193,4 +199,13 @@ public class Chan420JsonMapper {
         
         return com;
     }
+    
+    private static String toUtf8(String text) {
+        try {
+            return new String(text.getBytes("Windows-1252"), "UTF-8");
+        } catch (Exception e) {
+            return text;
+        }
+    }
+    
 }

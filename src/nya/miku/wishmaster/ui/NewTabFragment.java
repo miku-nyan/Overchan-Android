@@ -19,6 +19,7 @@
 package nya.miku.wishmaster.ui;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.List;
 
 import nya.miku.wishmaster.R;
@@ -30,6 +31,7 @@ import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.lib.dslv.DragSortController;
 import nya.miku.wishmaster.lib.dslv.DragSortListView;
 import nya.miku.wishmaster.ui.tabs.LocalHandler;
+import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -64,6 +66,7 @@ import android.widget.Toast;
 public class NewTabFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String TAG = "NewTabFragment";
     private static final int REQUEST_FILE = 500;
+    private static final int REQUEST_DIR = 501;
     
     private MainActivity activity;
     private Resources resources;
@@ -240,6 +243,7 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             
             {
                 add(new Object());
+                add(new Object());
                 for (Database.SavedThreadEntry entity : MainApplication.getInstance().database.getSavedThreads()) {
                     File file = new File(entity.filepath);
                     if (file.exists()) add(entity);
@@ -249,26 +253,34 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View v;
-                if (position == 0) {
-                    v = convertView == null ? inflater.inflate(android.R.layout.simple_list_item_1, parent, false) : convertView;
-                    TextView tv = (TextView) v.findViewById(android.R.id.text1);
-                    tv.setText(R.string.newtab_select_local_file);
-                } else {
-                    Database.SavedThreadEntry item = (Database.SavedThreadEntry) getItem(position);
-                    v = convertView == null ? inflater.inflate(android.R.layout.simple_list_item_2, parent, false) : convertView;
-                    TextView t1 = (TextView) v.findViewById(android.R.id.text1);
-                    TextView t2 = (TextView) v.findViewById(android.R.id.text2);
-                    t1.setSingleLine();
-                    t2.setSingleLine();
-                    t1.setEllipsize(TextUtils.TruncateAt.END);
-                    t2.setEllipsize(TextUtils.TruncateAt.START);
-                    t1.setText(item.title);
-                    t2.setText(item.filepath);
-                    ChanModule chan = MainApplication.getInstance().getChanModule(item.chan);
-                    if (chan != null) {
-                        t1.setCompoundDrawablesWithIntrinsicBounds(chan.getChanFavicon(), null, null, null);
-                        t1.setCompoundDrawablePadding(drawablePadding);
-                    }
+                TextView tv;
+                switch (position) {
+                    case 0:
+                        v = convertView == null ? inflater.inflate(android.R.layout.simple_list_item_1, parent, false) : convertView;
+                        tv = (TextView) v.findViewById(android.R.id.text1);
+                        tv.setText(R.string.newtab_select_local_file);
+                        break;
+                    case 1:
+                        v = convertView == null ? inflater.inflate(android.R.layout.simple_list_item_1, parent, false) : convertView;
+                        tv = (TextView) v.findViewById(android.R.id.text1);
+                        tv.setText(R.string.newtab_select_local_directory);
+                        break;
+                    default:
+                        Database.SavedThreadEntry item = (Database.SavedThreadEntry) getItem(position);
+                        v = convertView == null ? inflater.inflate(android.R.layout.simple_list_item_2, parent, false) : convertView;
+                        TextView t1 = (TextView) v.findViewById(android.R.id.text1);
+                        TextView t2 = (TextView) v.findViewById(android.R.id.text2);
+                        t1.setSingleLine();
+                        t2.setSingleLine();
+                        t1.setEllipsize(TextUtils.TruncateAt.END);
+                        t2.setEllipsize(TextUtils.TruncateAt.START);
+                        t1.setText(item.title);
+                        t2.setText(item.filepath);
+                        ChanModule chan = MainApplication.getInstance().getChanModule(item.chan);
+                        if (chan != null) {
+                            t1.setCompoundDrawablesWithIntrinsicBounds(chan.getChanFavicon(), null, null, null);
+                            t1.setCompoundDrawablePadding(drawablePadding);
+                        }
                 }
                 return v;
             }
@@ -280,22 +292,23 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
 
             @Override
             public int getItemViewType(int position) {
-                return position == 0 ? HEAD_ITEM : NORMAL_ITEM;
+                return position <= 1 ? HEAD_ITEM : NORMAL_ITEM;
             }
         };
         
-        if (savedThreadsAdapter.getCount() == 1) {
-            selectFile();
-            return;
-        }
         DialogInterface.OnClickListener listListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    selectFile();
-                } else {
-                    Database.SavedThreadEntry item = (Database.SavedThreadEntry) savedThreadsAdapter.getItem(which);
-                    LocalHandler.open(item.filepath, activity);
+                switch (which) {
+                    case 0:
+                        selectFile();
+                        break;
+                    case 1:
+                        selectDirectory();
+                        break;
+                    default:
+                        Database.SavedThreadEntry item = (Database.SavedThreadEntry) savedThreadsAdapter.getItem(which);
+                        LocalHandler.open(item.filepath, activity);
                 }
             }
         };
@@ -313,12 +326,53 @@ public class NewTabFragment extends Fragment implements AdapterView.OnItemClickL
         selectFile.putExtra(FileDialogActivity.START_PATH, MainApplication.getInstance().settings.getDownloadDirectory().getAbsolutePath());
         startActivityForResult(selectFile, REQUEST_FILE);
     }
+        
+    private void selectDirectory() {
+        Intent selectFile = new Intent(activity, FileDialogActivity.class);
+        selectFile.putExtra(FileDialogActivity.SELECTION_MODE, FileDialogActivity.SELECTION_MODE_OPEN);
+        selectFile.putExtra(FileDialogActivity.CAN_SELECT_DIR, true);
+        selectFile.putExtra(FileDialogActivity.FORMAT_FILTER, new String[] { ".zip", ".mhtml", ".html" });
+        selectFile.putExtra(FileDialogActivity.START_PATH, MainApplication.getInstance().settings.getDownloadDirectory().getAbsolutePath());
+        startActivityForResult(selectFile, REQUEST_DIR);
+    }
+    
+    private File[] listFiles(File path, final String[] ext, final boolean includeDirs){
+        return path.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String filename) {
+                boolean result = false;
+                for (String s : ext) if ((result = result || filename.endsWith(s))) break;
+                result = result || (includeDirs && (new File(dir.getAbsolutePath(), filename)).isDirectory());
+                return  result;
+            }
+        });
+    }
+    
+    private void addSavedThreads(File[] files) {
+        for (File file : files) {
+            if (file.isDirectory()) {
+                addSavedThreads(listFiles(file, new String[] {".html"}, false));
+            } else {
+                TabModel model = LocalHandler.getTabModel(file.getAbsolutePath(), activity.getResources());
+                if (model != null) {
+                    MainApplication.getInstance().database.addSavedThread(model.pageModel.chanName, model.title, model.localFilePath);
+                }
+            }
+        }
+    }
     
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_FILE && resultCode == Activity.RESULT_OK) {
-            String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
-            LocalHandler.open(path, activity);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_FILE) {
+                String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
+                LocalHandler.open(path, activity);
+            }
+            if (requestCode == REQUEST_DIR) {
+                File path = new File(data.getStringExtra(FileDialogActivity.RESULT_PATH));
+                if (path.isDirectory()) addSavedThreads(listFiles(path, new String[] {".html", ".zip", ".mhtml"}, true));
+            }
         }
     }
     

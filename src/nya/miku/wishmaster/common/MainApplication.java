@@ -41,6 +41,7 @@ import nya.miku.wishmaster.ui.downloading.DownloadingLocker;
 import nya.miku.wishmaster.ui.presentation.Subscriptions;
 import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import nya.miku.wishmaster.ui.settings.Wifi;
+import nya.miku.wishmaster.ui.tabs.TabModel;
 import nya.miku.wishmaster.ui.tabs.TabsState;
 import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 
@@ -83,9 +84,7 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.cirno.CirnoModule",
             "nya.miku.wishmaster.chans.cirno.MikubaModule",
             "nya.miku.wishmaster.chans.dobrochan.DobroModule",
-            "nya.miku.wishmaster.chans.dvach.DvachModule",
             "nya.miku.wishmaster.chans.sevenchan.SevenchanModule",
-            "nya.miku.wishmaster.chans.wakachan.WakachanModule",
             "nya.miku.wishmaster.chans.infinity.InfinityPlModule",
             "nya.miku.wishmaster.chans.cirno.NowereModule",
             "nya.miku.wishmaster.chans.cirno.Chan410Module",
@@ -95,15 +94,13 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.allchan.AllchanModule",
             "nya.miku.wishmaster.chans.ponyach.PonyachModule",
             "nya.miku.wishmaster.chans.uchan.UchanModule",
-            "nya.miku.wishmaster.chans.sich.SichModule",
-            "nya.miku.wishmaster.chans.nullchan.NullchanccModule",
+            "nya.miku.wishmaster.chans.nullchan.NullchanclubModule",
             "nya.miku.wishmaster.chans.nullchan.NullchaneuModule",
             "nya.miku.wishmaster.chans.nullchan.Null_chanModule",
             "nya.miku.wishmaster.chans.dvachnet.DvachnetModule",
             "nya.miku.wishmaster.chans.mentachsu.MentachsuModule",
             "nya.miku.wishmaster.chans.synch.SynchModule",
             "nya.miku.wishmaster.chans.inach.InachModule",
-            "nya.miku.wishmaster.chans.clairews.ClairewsModule",
             "nya.miku.wishmaster.chans.kurisach.KurisachModule",
             "nya.miku.wishmaster.chans.chan10.Chan10Module",
             "nya.miku.wishmaster.chans.haruhichan.HaruhiModule",
@@ -112,10 +109,24 @@ public class MainApplication extends Application {
             "nya.miku.wishmaster.chans.tohnochan.TohnoChanModule",
             "nya.miku.wishmaster.chans.chan76.Chan76Module",
             "nya.miku.wishmaster.chans.dfwk.DFWKModule",
+            "nya.miku.wishmaster.chans.newnullchan.NewNullchanModule",
             "nya.miku.wishmaster.chans.anonfm.AnonFmModule",
             "nya.miku.wishmaster.chans.makaba.MakabaModule",
             "nya.miku.wishmaster.chans.arhivach.ArhivachModule",
             "nya.miku.wishmaster.chans.samachan.SamachanModule",
+            "nya.miku.wishmaster.chans.tumbach.TumbachModule",
+            "nya.miku.wishmaster.chans.wizchan.WizchanModule",
+            "nya.miku.wishmaster.chans.infinity.BrchanModule",
+            "nya.miku.wishmaster.chans.infinity.LolifoxModule",
+            "nya.miku.wishmaster.chans.lampach.LampachModule",
+            "nya.miku.wishmaster.chans.kropyvach.KropyvachModule",
+            "nya.miku.wishmaster.chans.mentachnet.MentachnetModule",
+            "nya.miku.wishmaster.chans.hispachan.HispachanModule",
+            "nya.miku.wishmaster.chans.ernstchan.ErnstModule",
+            "nya.miku.wishmaster.chans.nullchan.NullchanoneModule",
+            "nya.miku.wishmaster.chans.depreschan.DepresModule",
+            "nya.miku.wishmaster.chans.endchan.EndChanModule",
+            "nya.miku.wishmaster.chans.diochan.DiochanModule",
     };
     
     private static MainApplication instance;
@@ -138,6 +149,8 @@ public class MainApplication extends Application {
     
     public TabsState tabsState;
     public TabsSwitcher tabsSwitcher;
+    
+    public List<TabModel> pagesToOpen = null;
     
     public List<ChanModule> chanModulesList;
     private Map<String, Integer> chanModulesIndex;
@@ -287,6 +300,7 @@ public class MainApplication extends Application {
     }
     
     private void clearCaches() {
+        if (isGalleryProcess()) return;
         pagesCache.clearLru();
         bitmapCache.clearLru();
         draftsCache.clearLru();

@@ -197,6 +197,7 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
                 if (url != null) {
                     AttachmentModel attachment = new AttachmentModel();
                     attachment.type = AttachmentModel.TYPE_OTHER_NOTFILE;
+                    attachment.size = -1;
                     attachment.path = url;
                     attachment.thumbnail = div.contains("youtube") ? ("http://img.youtube.com/vi/" + id + "/default.jpg") : null;
                     int oldCount = post.attachments != null ? post.attachments.length : 0;
@@ -207,6 +208,12 @@ public abstract class AbstractInstant0chan extends AbstractKusabaModule {
                 }
             }
         }
+    }
+
+    @Override
+    public String fixRelativeUrl(String url) {
+        if (url.startsWith("//")) return (useHttps() ? "https:" : "http:") + url;
+        return super.fixRelativeUrl(url);
     }
     
 }

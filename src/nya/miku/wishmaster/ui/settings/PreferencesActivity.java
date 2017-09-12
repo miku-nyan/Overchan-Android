@@ -24,8 +24,10 @@ import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
+import nya.miku.wishmaster.lib.FileDialogActivity;
 import nya.miku.wishmaster.ui.BoardsListFragment;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
+import nya.miku.wishmaster.ui.CompatibilityUtils;
 import nya.miku.wishmaster.ui.NewTabFragment;
 import nya.miku.wishmaster.ui.tabs.TabsTrackerService;
 import nya.miku.wishmaster.ui.tabs.UrlHandler;
@@ -49,10 +51,14 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.Toast;
 
+import java.io.File;
+
 //отсутствует альтернатива, поддерживающая API 4 
 @SuppressWarnings("deprecation")
 
 public class PreferencesActivity extends PreferenceActivity {
+    private static final int REQUEST_CODE_SELECT_SETTINGS_FILE = 1;
+    
     private static final String TAG = "PreferencesActivity";
     
     public static boolean needUpdateChansScreen = false;
@@ -136,7 +142,28 @@ public class PreferencesActivity extends PreferenceActivity {
                 return true;
             }
         });
-        
+        final Preference exportPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_settings_export));
+        exportPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                SettingsExporter.Export(MainApplication.getInstance().settings.getDownloadDirectory(), PreferencesActivity.this);
+                return true;
+            }
+        });
+        final Preference importPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_settings_import));
+        importPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (!CompatibilityUtils.hasAccessStorage(PreferencesActivity.this)) return true;
+                Intent selectFile = new Intent(PreferencesActivity.this, FileDialogActivity.class);
+                selectFile.putExtra(FileDialogActivity.CAN_SELECT_DIR, false);
+                selectFile.putExtra(FileDialogActivity.START_PATH, MainApplication.getInstance().settings.getDownloadDirectory().toString());
+                selectFile.putExtra(FileDialogActivity.SELECTION_MODE, FileDialogActivity.SELECTION_MODE_OPEN);
+                selectFile.putExtra(FileDialogActivity.FORMAT_FILTER, new String[] { "json" });
+                startActivityForResult(selectFile, REQUEST_CODE_SELECT_SETTINGS_FILE);
+                return true;
+            }
+        });
         Preference aboutPreference = getPreferenceManager().findPreference(getString(R.string.pref_key_about_version));
         try {
             String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -174,6 +201,16 @@ public class PreferencesActivity extends PreferenceActivity {
             ((PreferenceGroup) getPreferenceManager().findPreference(getString(R.string.pref_key_cat_advanced))).
                     removePreference(certificatesPreference);
         }
+
+        ListPreference thumbnailScalePreference = 
+                (ListPreference) getPreferenceManager().findPreference(getString(R.string.pref_key_post_thumbnail_scale));
+        thumbnailScalePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Toast.makeText(PreferencesActivity.this, R.string.pref_key_post_thumbnail_scale_toast, Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
         
         getPreferenceManager().findPreference(getString(R.string.pref_key_autohide)).setOnPreferenceClickListener(
                 new Preference.OnPreferenceClickListener() {
@@ -220,14 +257,14 @@ public class PreferencesActivity extends PreferenceActivity {
         
         getPreferenceManager().findPreference(getString(R.string.pref_key_theme)).setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if (getString(R.string.pref_theme_value_custom).equals(newValue)) {
-                    startActivity(new Intent(PreferencesActivity.this, CustomThemeListActivity.class));
-                    return false;
-                }
-                return true;
-            }
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        if (getString(R.string.pref_theme_value_custom).equals(newValue)) {
+                            startActivity(new Intent(PreferencesActivity.this, CustomThemeListActivity.class));
+                            return false;
+                        }
+                        return true;
+                    }
         });
         
         sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -424,6 +461,30 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
             });
             chansCat.addPreference(rearrange);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SELECT_SETTINGS_FILE) {
+            final String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
+            DialogInterface.OnClickListener onClickYes = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SettingsImporter.Import(new File(path), MainApplication.getInstance().settings.getImportOverwrite(), PreferencesActivity.this);
+                }
+            };
+            if (MainApplication.getInstance().settings.getImportOverwrite()) {
+                new AlertDialog.Builder(this).
+                        setTitle(R.string.app_import_overwrite_warning).
+                        setMessage(R.string.app_import_overwrite_warning_message).
+                        setPositiveButton(android.R.string.yes, onClickYes).
+                        setNegativeButton(android.R.string.no, null).
+                        show();
+            } else {
+                SettingsImporter.Import(new File(path), MainApplication.getInstance().settings.getImportOverwrite(), this);
+            }
         }
     }
     

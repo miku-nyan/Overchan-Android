@@ -51,11 +51,12 @@ public class OwlchanModule extends AbstractKusabaModule {
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "art", "Рисовач", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "o", "Оэкаки", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ussr", "СССР", "Общее", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vg", "Видеоигры", "Общее", false),
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rf", "Убежище", "Общее", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "a", "Аниме", "Японская культура", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "vn", "Визуальные новеллы", "Японская культура", false),
         ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ra", "OwlChan Radio", "Радио", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ph", "Философия", "На пробу", false),
-        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "rf", "Убежище", "На пробу", false)
+        ChanModels.obtainSimpleBoardModel(CHAN_NAME, "ph", "Философия", "На пробу", false) //?
     };
     private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "png", "gif" };
     
@@ -134,11 +135,12 @@ public class OwlchanModule extends AbstractKusabaModule {
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         BoardModel board = super.getBoard(shortName, listener, task);
         switch (shortName) {
-            case "d": board.defaultUserName = "Ольга Дмитриевна"; break;
-            case "a": board.defaultUserName = "Рена"; break;
+            case "a": board.defaultUserName = "竜宮 レナ"; break;
             case "b": board.defaultUserName = "Семён"; break;
             case "es": board.defaultUserName = "Пионер"; break;
-            case "izd": board.defaultUserName = "Писатель"; break;
+            case "vg": board.defaultUserName = "Bridget"; break;
+            case "rf": board.defaultUserName = "Тацухиро Сато"; break;
+            case "izd": board.defaultUserName = "И. С. Тургенев"; break;
             case "art": board.defaultUserName = "Художник-кун"; break;
             case "ussr": board.defaultUserName = "Товарищ"; break;
             default: board.defaultUserName = "Аноним"; break;
@@ -148,6 +150,8 @@ public class OwlchanModule extends AbstractKusabaModule {
         board.readonlyBoard = shortName.equals("o");
         board.requiredFileForNewThread = !shortName.equals("d");
         board.allowNames = !shortName.equals("b");
+        board.allowCustomMark = true;
+        board.customMarkDescription = "Спойлер";
         board.attachmentsFormatFilters = ATTACHMENT_FORMATS;
         board.markType = BoardModel.MARK_BBCODE;
         return board;

@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.util.URLPathEncoder;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
@@ -104,7 +105,32 @@ public class HttpStreamer {
      * @throws HttpRequestException исключение, если не удалось выполнить запрос
      */
     public HttpResponseModel getFromUrl(String url, HttpRequestModel requestModel, HttpClient httpClient, ProgressListener listener,
-            CancellableTask task) throws HttpRequestException {
+                                        CancellableTask task) throws HttpRequestException {
+        return getFromUrl(url, requestModel, httpClient, listener, task, 0);
+    }
+
+    /**
+     * HTTP запрос по адресу. После завершения работы с запросом, необходимо выполнить метод release() модели ответа!
+     * Если по данному адресу предполагаются запросы с заголовком If-Modified-Since, в случае ошибки при дальнейшем чтении из потока
+     * необходимо очистить соответствующию запись в таблице времён Modified ({@link #removeFromModifiedMap(String)})!
+     * @param url адрес страницы
+     * @param requestModel модель запроса (может принимать null, по умолчанию GET без проверки If-Modified)
+     * @param httpClient HTTP клиент, исполняющий запрос
+     * @param listener интерфейс отслеживания прогресса (может принимать null)
+     * @param task задача, отмена которой прервёт поток (может принимать null)
+     * @param offset начало байтового диапазона
+     * @return модель содержит поток и другие данные HTTP ответа
+     * @throws HttpRequestException исключение, если не удалось выполнить запрос
+     */
+    public HttpResponseModel getFromUrl(String url, HttpRequestModel requestModel, HttpClient httpClient, ProgressListener listener,
+                                        CancellableTask task, long offset) throws HttpRequestException {
+        String uri = url;
+        try {
+            uri = new URLPathEncoder().encode(url);
+        } catch (Exception e) {
+            Logger.e(TAG, e.getMessage());
+        }
+
         if (requestModel == null) requestModel = HttpRequestModel.DEFAULT_GET;
         
         //подготавливаем Request
@@ -118,10 +144,10 @@ public class HttpStreamer {
             RequestBuilder requestBuilder = null;
             switch (requestModel.method) {
                 case HttpRequestModel.METHOD_GET:
-                    requestBuilder = RequestBuilder.get().setUri(url);
+                    requestBuilder = RequestBuilder.get().setUri(uri);
                     break;
                 case HttpRequestModel.METHOD_POST:
-                    requestBuilder = RequestBuilder.post().setUri(url).setEntity(requestModel.postEntity);
+                    requestBuilder = RequestBuilder.post().setUri(uri).setEntity(requestModel.postEntity);
                     break;
                 default:
                     throw new IllegalArgumentException("Incorrect type of HTTP Request");
@@ -133,11 +159,12 @@ public class HttpStreamer {
             }
             if (requestModel.checkIfModified && requestModel.method == HttpRequestModel.METHOD_GET) {
                 synchronized (ifModifiedMap) {
-                    if (ifModifiedMap.containsKey(url)) {
-                        requestBuilder.addHeader(new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE, ifModifiedMap.get(url)));
+                    if (ifModifiedMap.containsKey(uri)) {
+                        requestBuilder.addHeader(new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE, ifModifiedMap.get(uri)));
                     }
                 }
             }
+            if (offset > 0) requestBuilder.addHeader("Range", "bytes=" + offset + "-");
             request = requestBuilder.setConfig(requestConfigBuilder).build();
         } catch (Exception e) {
             Logger.e(TAG, e);
@@ -198,7 +225,7 @@ public class HttpStreamer {
             responseModel.response = response;
             if (lastModifiedValue != null) {
                 synchronized (ifModifiedMap) {
-                    ifModifiedMap.put(url, lastModifiedValue);
+                    ifModifiedMap.put(uri, lastModifiedValue);
                 }
             }
         } catch (Exception e) {
@@ -375,25 +402,50 @@ public class HttpStreamer {
     public void downloadFileFromUrl(String url, OutputStream out, HttpRequestModel requestModel, HttpClient httpClient, ProgressListener listener,
             CancellableTask task, boolean anyCode) throws IOException, HttpRequestException, HttpWrongStatusCodeException {
         HttpResponseModel responseModel = null;
+        IOUtils.CountingOutputStream content_stream = new IOUtils.CountingOutputStream(out);
+        long downloaded_size = 0; // сколько загружено в предыдущем запросе
+        long content_length = 0;  // сколько загружено в текущем запросе
         try {
-            responseModel = getFromUrl(url, requestModel, httpClient, listener, task);
-            if (responseModel.statusCode == 200) {
-                IOUtils.copyStream(responseModel.stream, out);
-            } else {
-                if (anyCode) {
-                    byte[] html = null;
+            for (int i = 0; i < 5; i++) {
+                downloaded_size = content_stream.getSize();
+                responseModel = getFromUrl(url, requestModel, httpClient, listener, task, downloaded_size);
+                content_length = responseModel.contentLength;
+                if ((responseModel.statusCode == 200) || (responseModel.statusCode == 206)) {
                     try {
-                        ByteArrayOutputStream byteStream = new ByteArrayOutputStream(1024);
-                        IOUtils.copyStream(responseModel.stream, byteStream);
-                        html = byteStream.toByteArray();
-                    } catch (Exception e) {
-                        Logger.e(TAG, e);
+                        IOUtils.copyStream(responseModel.stream, content_stream);
+                        break;
+                    } catch (IOException e) {
+                        if (((content_length + downloaded_size) != content_stream.getSize()) && (content_length != -1)) {
+                            Header accept_ranges_header = null;
+                            for (Header header : responseModel.headers) {
+                                if ("Accept-Ranges".equalsIgnoreCase(header.getName())) {
+                                    accept_ranges_header = header;
+                                    break;
+                                }
+                            }
+                            if (((accept_ranges_header == null) || (!accept_ranges_header.getValue().toLowerCase().contains("bytes"))) && (responseModel.statusCode != 206)) {
+                                throw e;
+                            }
+                        } else throw e;
                     }
-                    throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode+" - "+responseModel.statusReason, html);
                 } else {
-                    throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode+" - "+responseModel.statusReason);
+                    if (anyCode) {
+                        byte[] html = null;
+                        try {
+                            ByteArrayOutputStream byteStream = new ByteArrayOutputStream(1024);
+                            IOUtils.copyStream(responseModel.stream, byteStream);
+                            html = byteStream.toByteArray();
+                        } catch (Exception e) {
+                            Logger.e(TAG, e);
+                        }
+                        throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason, html);
+                    } else {
+                        throw new HttpWrongStatusCodeException(responseModel.statusCode, responseModel.statusCode + " - " + responseModel.statusReason);
+                    }
                 }
             }
+            if (((content_length + downloaded_size) != content_stream.getSize()) && (content_length != -1))
+                throw new IOException("Content-length mismatch");
         } catch (Exception e) {
             if (responseModel != null) removeFromModifiedMap(url);
             throw e;

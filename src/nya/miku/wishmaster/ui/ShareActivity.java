@@ -49,7 +49,12 @@ import android.widget.Toast;
 
 public class ShareActivity extends ListActivity {
     private static final String TAG = "ShareActivity";
-    
+
+    private SendPostModel sendReplyModel;
+    private String quote;
+    private String postNumber;
+    private String postURI;
+    private boolean shareText = false;
     private File selectedFile;
     
     @Override
@@ -64,7 +69,7 @@ public class ShareActivity extends ListActivity {
         super.onNewIntent(intent);
         handleIntent(intent);
     }
-    
+
     private void handleIntent(Intent intent) {
         ArrayAdapter<Pair<TabModel, SerializablePage>> adapter = new ArrayAdapter<Pair<TabModel, SerializablePage>>(this, 0) {
             private final int drawablePadding = (int) (getResources().getDisplayMetrics().density * 5 + 0.5f);
@@ -117,6 +122,32 @@ public class ShareActivity extends ListActivity {
             finish();
             return;
         }
+        if (intent.getType().equalsIgnoreCase("text/plain")) {
+            handleText(intent);
+        } else {
+            if (!handleFile(intent)) {
+                Toast.makeText(this, R.string.postform_cannot_attach, Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+        }
+        setListAdapter(adapter);
+    }
+
+    private void handleText(Intent intent) {
+        Bundle bundle = intent.getBundleExtra(getString(R.string.intent_overchan_extras));
+        if (bundle != null) {
+            sendReplyModel = (SendPostModel) bundle.getSerializable(getString(R.string.intent_overchan_send_post_model));
+            quote = bundle.getString(getString(R.string.intent_overchan_quote_text));
+            postNumber = bundle.getString(getString(R.string.intent_overchan_post_number));
+            postURI = bundle.getString(getString(R.string.intent_overchan_post_uri));
+        } else {
+            quote = intent.getStringExtra(Intent.EXTRA_TEXT);
+        }
+        shareText = quote != null;
+    }
+    
+    private boolean handleFile(Intent intent) {
         selectedFile = null;
         if (intent != null) {
             Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
@@ -127,12 +158,43 @@ public class ShareActivity extends ListActivity {
                 }
             }
         }
-        if (selectedFile == null) {
-            Toast.makeText(this, R.string.postform_cannot_attach, Toast.LENGTH_LONG).show();
-            finish();
-            return;
+        return selectedFile != null;
+    }
+    
+    private void insertQuoteText(BoardModel boardModel, SendPostModel draft) {
+        String insertion = "";
+        String quotedComment = quote;
+        if (sendReplyModel != null) {
+            quotedComment = quotedComment.replaceAll("(\n+)", "$1>");
+            if (boardModel.chan.equals(sendReplyModel.chanName) && boardModel.boardName.equals(sendReplyModel.boardName)) {
+                insertion = ">>" + postNumber + "\n";
+            } else {
+                insertion = postURI + "\n";
+            }
         }
-        setListAdapter(adapter);
+        insertion += (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
+        int sendReplyModelPos = draft.commentPosition;
+        if (sendReplyModelPos > 0) {
+            draft.comment = draft.comment.substring(0, sendReplyModelPos) +
+                    insertion + draft.comment.substring(sendReplyModelPos);
+        } else {
+            draft.comment = insertion + draft.comment;
+        }
+        draft.commentPosition = sendReplyModelPos + insertion.length();
+    }
+    
+    private boolean attachFile(BoardModel boardModel, SendPostModel draft){
+        int attachmentsCount = draft.attachments == null ? 0 : draft.attachments.length;
+        ++attachmentsCount;
+        if (attachmentsCount > boardModel.attachmentsMaxCount) {
+            Toast.makeText(this, R.string.postform_max_attachments, Toast.LENGTH_LONG).show();
+            return false;
+        }
+        File[] attachments = new File[attachmentsCount];
+        for (int i=0; i<(attachmentsCount-1); ++i) attachments[i] = draft.attachments[i];
+        attachments[attachmentsCount-1] = selectedFile;
+        draft.attachments = attachments;
+        return true;
     }
     
     @Override
@@ -155,17 +217,14 @@ public class ShareActivity extends ListActivity {
         }
         
         BoardModel boardModel = item.getRight().boardModel;
-        int attachmentsCount = draft.attachments == null ? 0 : draft.attachments.length;
-        ++attachmentsCount;
-        if (attachmentsCount > boardModel.attachmentsMaxCount) {
-            Toast.makeText(this, R.string.postform_max_attachments, Toast.LENGTH_LONG).show();
-            finish();
-            return;
+        if (shareText) {
+            insertQuoteText(boardModel, draft);
+        } else {
+            if (!attachFile(boardModel, draft)) { 
+                finish();
+                return;
+            }
         }
-        File[] attachments = new File[attachmentsCount];
-        for (int i=0; i<(attachmentsCount-1); ++i) attachments[i] = draft.attachments[i];
-        attachments[attachmentsCount-1] = selectedFile;
-        draft.attachments = attachments;
         
         if (PostingService.isNowPosting()) {
             Toast.makeText(this, R.string.posting_now_posting, Toast.LENGTH_LONG).show();
@@ -176,6 +235,7 @@ public class ShareActivity extends ListActivity {
         addPostIntent.putExtra(PostingService.EXTRA_PAGE_HASH, item.getLeft().hash);
         addPostIntent.putExtra(PostingService.EXTRA_BOARD_MODEL, item.getRight().boardModel);
         addPostIntent.putExtra(PostingService.EXTRA_SEND_POST_MODEL, draft);
+        addPostIntent.setFlags(addPostIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
         finish();
         startActivity(addPostIntent);
     }

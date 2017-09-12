@@ -25,6 +25,8 @@ import java.util.List;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.lib.org_json.JSONObject;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -115,12 +117,34 @@ public class Database {
             }
         };
     }
+
+    public void importHidden(HiddenEntry[] hidden, Boolean overwrite){
+        if (overwrite)
+            clearHidden();
+        dbHelper.getWritableDatabase().beginTransaction();
+        for (HiddenEntry entry : hidden) {
+            addHidden(
+                    entry.chan,
+                    entry.board,
+                    entry.thread,
+                    entry.post,
+                    !overwrite
+            );
+        }
+        dbHelper.getWritableDatabase().setTransactionSuccessful();
+        dbHelper.getWritableDatabase().endTransaction();
+    }
     
     public void addHidden(String chan, String board, String thread, String post) {
-        if (isHidden(chan, board, thread, post)) {
-            Logger.d(TAG, "entry is already exists");
-            return;
-        }
+        addHidden(chan, board, thread, post, true);
+    }
+    
+    public void addHidden(String chan, String board, String thread, String post, Boolean check_existence) {
+        if (check_existence) 
+            if (isHidden(chan, board, thread, post)) {
+                Logger.d(TAG, "entry is already exists");
+                return;
+            }
         ContentValues value = new ContentValues(4);
         value.put(COL_CHAN, fixNull(chan));
         value.put(COL_BOARD, fixNull(board));
@@ -145,6 +169,63 @@ public class Database {
         return result;
     }
     
+    public static class HiddenEntry {
+        public final String chan;
+        public final String board;
+        public final String thread;
+        public final String post;
+        public HiddenEntry(JSONObject json) {
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.thread = json.getString("thread");
+            this.post = json.getString("post");
+        }
+        
+        public HiddenEntry(String chan, String board, String thread, String post) {
+            this.chan = chan;
+            this.board = board;
+            this.thread = thread;
+            this.post = post;
+        }
+        
+        public String getChan(){
+            return this.chan;    
+        }
+
+        public String getBoard(){
+            return this.board;    
+        }
+
+        public String getThread(){
+            return this.thread;    
+        }
+        
+        public String getPost(){
+            return this.post;    
+        }
+    }
+
+    public List<HiddenEntry> getHidden() {
+        List<HiddenEntry> list = new ArrayList<HiddenEntry>();
+        Cursor c = dbHelper.getReadableDatabase().query(TABLE_HIDDEN, null, null, null, null, null, null, null);
+        if (c != null && c.moveToFirst()) {
+            int chanIndex = c.getColumnIndex(COL_CHAN);
+            int boardIndex = c.getColumnIndex(COL_BOARD);
+            int threadIndex = c.getColumnIndex(COL_THREAD);
+            int postIndex = c.getColumnIndex(COL_POST);
+            do {
+                list.add(new HiddenEntry(c.getString(chanIndex), c.getString(boardIndex),
+                        c.getString(threadIndex), c.getString(postIndex)));
+            } while (c.moveToNext());
+        }
+        if (c != null) c.close();
+        return list;
+    }
+    
+    public void clearHidden(){
+        dbHelper.recreateHidden();
+    }
+
     /* *********************** HISTORY *********************** */
     
     public static class HistoryEntry {
@@ -155,6 +236,16 @@ public class Database {
         public final String title;
         public final String url;
         public final long date;
+        public HistoryEntry(JSONObject json){
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.boardPage = json.getString("boardPage");
+            this.thread = json.getString("thread");
+            this.title = json.getString("title");
+            this.url = json.getString("url");
+            this.date = json.getLong("date");
+        }
+        
         public HistoryEntry(String chan, String board, String boardPage, String thread, String title, String url, long date) {
             this.chan = chan;
             this.board = board;
@@ -164,10 +255,63 @@ public class Database {
             this.url = url;
             this.date = date;
         }
+
+        public String getChan(){
+            return this.chan;
+        }
+        
+        public String getBoard(){
+            return this.board;
+        }
+        
+        public String getBoardPage(){
+            return this.boardPage;
+        }
+        
+        public String getThread(){
+            return this.thread;
+        }
+        
+        public String getTitle(){
+            return this.title;
+        }
+        
+        public String getUrl(){
+            return this.url;
+        }
+        
+        public long   getDate(){
+            return this.date;
+        }
+    }
+
+    public void importHistory(HistoryEntry[] history, Boolean overwrite){
+        if (overwrite) 
+            clearHistory();
+        dbHelper.getWritableDatabase().beginTransaction();
+        for (HistoryEntry entry : history) {
+            addHistory(
+                    entry.chan,
+                    entry.board,
+                    entry.boardPage,
+                    entry.thread,
+                    entry.title,
+                    entry.url,
+                    entry.date,
+                    !overwrite
+            );
+        }
+        dbHelper.getWritableDatabase().setTransactionSuccessful();
+        dbHelper.getWritableDatabase().endTransaction();
     }
     
     public void addHistory(String chan, String board, String boardPage, String thread, String title, String url) {
-        removeHistory(chan, board, boardPage, thread);
+        addHistory(chan, board, boardPage, thread, title, url, System.currentTimeMillis(), true);
+    }
+
+    public void addHistory(String chan, String board, String boardPage, String thread, String title, String url, Long date, Boolean check_existence) {
+        if (check_existence)
+            removeHistory(chan, board, boardPage, thread);
         ContentValues values = new ContentValues(6);
         values.put(COL_CHAN, fixNull(chan));
         values.put(COL_BOARD, fixNull(board));
@@ -175,7 +319,7 @@ public class Database {
         values.put(COL_THREAD, fixNull(thread));
         values.put(COL_TITLE, fixNull(title));
         values.put(COL_URL, fixNull(url));
-        values.put(COL_DATE, System.currentTimeMillis());
+        values.put(COL_DATE, date);
         dbHelper.getWritableDatabase().insert(TABLE_HISTORY, null, values);
     }
     
@@ -211,20 +355,53 @@ public class Database {
     
     /* *********************** FAVORITES *********************** */
     
-    public class FavoritesEntry {
+    public static class FavoritesEntry {
         public final String chan;
         public final String board;
         public final String boardPage;
         public final String thread;
         public final String title;
         public final String url;
-        private FavoritesEntry(String chan, String board, String boardPage, String thread, String title, String url) {
+        public FavoritesEntry(JSONObject json) {
+            this.chan = json.getString("chan");
+            this.board = json.getString("board");
+            this.boardPage = json.getString("boardPage");
+            this.thread = json.getString("thread");
+            this.title = json.getString("title");
+            this.url = json.getString("url");
+        }
+
+        public FavoritesEntry(String chan, String board, String boardPage, String thread, String title, String url) {
             this.chan = chan;
             this.board = board;
             this.boardPage = boardPage;
             this.thread = thread;
             this.title = title;
             this.url = url;
+        }
+        
+        public String getChan(){
+            return this.chan;
+        }
+        
+        public String getBoard(){
+            return this.board;
+        }
+        
+        public String getBoardPage(){
+            return this.boardPage;
+        }
+        
+        public String getThread(){
+            return this.thread;
+        }
+        
+        public String getTitle(){
+            return this.title;
+        }
+        
+        public String getUrl(){
+            return this.url;
         }
     }
     
@@ -234,9 +411,33 @@ public class Database {
         if (c != null) c.close();
         return r;
     }
-    
+
+    public void importFavorites(FavoritesEntry[] favorite, Boolean overwrite){
+        if (overwrite)
+            clearFavorites();
+        dbHelper.getWritableDatabase().beginTransaction();
+        for (FavoritesEntry entry : favorite) {
+            addFavorite(
+                    entry.chan,
+                    entry.board,
+                    entry.boardPage,
+                    entry.thread,
+                    entry.title,
+                    entry.url,
+                    !overwrite
+            );
+        }
+        dbHelper.getWritableDatabase().setTransactionSuccessful();
+        dbHelper.getWritableDatabase().endTransaction();
+    }
+
     public void addFavorite(String chan, String board, String boardPage, String thread, String title, String url) {
-        removeFavorite(chan, board, boardPage, thread);
+        addFavorite(chan, board, boardPage, thread, title, url, true);
+    }
+
+    public void addFavorite(String chan, String board, String boardPage, String thread, String title, String url, Boolean check_existence) {
+        if (check_existence)
+            removeFavorite(chan, board, boardPage, thread);
         ContentValues values = new ContentValues(6);
         values.put(COL_CHAN, fixNull(chan));
         values.put(COL_BOARD, fixNull(board));
@@ -358,7 +559,7 @@ public class Database {
     
     public List<SavedThreadEntry> getSavedThreads() {
         List<SavedThreadEntry> list = new ArrayList<SavedThreadEntry>();
-        Cursor c = dbHelper.getReadableDatabase().query(TABLE_SAVED, null, null, null, null, null, BaseColumns._ID + " desc", "200");
+        Cursor c = dbHelper.getReadableDatabase().query(TABLE_SAVED, null, null, null, null, null, BaseColumns._ID + " desc", null);
         if (c != null && c.moveToFirst()) {
             int chanIndex = c.getColumnIndex(COL_CHAN);
             int titleIndex = c.getColumnIndex(COL_TITLE);
@@ -433,6 +634,11 @@ public class Database {
             getWritableDatabase().execSQL(dropTable(TABLE_FAVORITES));
             getWritableDatabase().execSQL(createTable(TABLE_FAVORITES,
                     new String[] { COL_CHAN, COL_BOARD, COL_BOARDPAGE, COL_THREAD, COL_TITLE, COL_URL }));
+        }
+
+        public void recreateHidden() {
+            getWritableDatabase().execSQL(dropTable(TABLE_HIDDEN));
+            getWritableDatabase().execSQL(createTable(TABLE_HIDDEN, new String[] { COL_CHAN, COL_BOARD, COL_THREAD, COL_POST }));
         }
     }
 }

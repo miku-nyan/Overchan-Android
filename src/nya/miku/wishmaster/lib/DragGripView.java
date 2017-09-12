@@ -36,6 +36,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 
+@SuppressWarnings("ResourceType")
 public class DragGripView extends View {
     private static final int[] ATTRS = new int[]{
             android.R.attr.gravity,

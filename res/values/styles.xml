@@ -284,5 +284,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item name="searchHighlightBackground">#EF0FFF</item>
         <item name="subscriptionBackground">#CCCCCC</item>
     </style>
+
+    <style name="Theme_Dark_Mint" parent="@style/Theme_Dark_Base">
+        <item name="materialPrimary">#1abc9c</item>
+        <item name="materialPrimaryDark">#16a085</item>
+        <item name="android:textColorPrimary">#eeeeee</item>
+        <item name="activityRootBackground">#1e1e1e</item>
+        <item name="sidebarBackground">#cc212121</item>
+        <item name="sidebarSelectedItem">@drawable/sidebar_selected_dark_mint</item>
+        <item name="listSeparatorBackground">#16a085</item>
+        <item name="postUnreadOverlay">#7f6a7f3f</item>
+        <item name="postBackground">#2d2d2d</item>
+        <item name="postForeground">#d9d9d9</item>
+        <item name="postIndexForeground">#6aa848</item>
+        <item name="postIndexOverBumpLimit">#c41e3a</item>
+        <item name="postNumberForeground">#16a085</item>
+        <item name="postNameForeground">#6e937b</item>
+        <item name="postOpForeground">#008000</item>
+        <item name="postSageForeground">#993333</item>
+        <item name="postTripForeground">#219349</item>
+        <item name="postTitleForeground">#c0c0c0</item>
+        <item name="postQuoteForeground">#b9ee6e</item>
+        <item name="spoilerForeground">#d8d8d8</item>
+        <item name="spoilerBackground">#001300</item>
+        <item name="urlLinkForeground">#16a085</item>
+        <item name="itemInfoForeground">#a4a4a4</item>
+        <item name="searchHighlightBackground">#616161</item>
+        <item name="subscriptionBackground">#37474f</item>
+    </style>
     
 </resources>

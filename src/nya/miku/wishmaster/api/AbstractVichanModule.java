@@ -74,8 +74,10 @@ import android.content.res.Resources;
 public abstract class AbstractVichanModule extends AbstractWakabaModule {
     private static final Pattern ATTACHMENT_EMBEDDED_LINK = Pattern.compile("<a[^>]*href=\"([^\">]*)\"[^>]*>");
     private static final Pattern ATTACHMENT_EMBEDDED_THUMB = Pattern.compile("<img[^>]*src=\"([^\">]*)\"[^>]*>");
-    
+    private static final Pattern COMMENT_HEADING_PATTERN = Pattern.compile("<span[^>]*class=\"heading\">(.*?)</span>");
     private static final Pattern ERROR_PATTERN = Pattern.compile("<h2 [^>]*>(.*?)</h2>");
+    
+    private static final String[] ATTACHMENT_KEYS = new String[] { "file", "file2", "file3", "file4", "file5" };
     
     public AbstractVichanModule(SharedPreferences preferences, Resources resources) {
         super(preferences, resources);
@@ -155,12 +157,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             JSONArray curArray = response.getJSONObject(i).getJSONArray("threads");
             for (int j=0, clen=curArray.length(); j<clen; ++j) {
                 JSONObject curThreadJson = curArray.getJSONObject(j);
-                ThreadModel curThread = new ThreadModel();
-                curThread.threadNumber = Long.toString(curThreadJson.getLong("no"));
-                curThread.postsCount = curThreadJson.optInt("replies", -2) + 1;
-                curThread.attachmentsCount = curThreadJson.optInt("images", -2) + 1;
-                curThread.isSticky = curThreadJson.optInt("sticky") == 1;
-                curThread.isClosed = curThreadJson.optInt("closed") == 1;
+                ThreadModel curThread = mapThreadModel(curThreadJson, boardName);
                 curThread.posts = new PostModel[] { mapPostModel(curThreadJson, boardName) };
                 threads.add(curThread);
             }
@@ -175,7 +172,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         curThread.attachmentsCount = opPost.optInt("images", -2) + 1;
         if (curThread.attachmentsCount >= 0) curThread.attachmentsCount += opPost.optInt("omitted_images", 0);
         curThread.isSticky = opPost.optInt("sticky") == 1;
-        curThread.isClosed = opPost.optInt("closed") == 1;
+        curThread.isClosed = opPost.optInt("locked") == 1;
         return curThread;
     }
     
@@ -185,6 +182,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         model.name = StringEscapeUtils.unescapeHtml4(RegexUtils.removeHtmlSpanTags(object.optString("name", "Anonymous")));
         model.subject = StringEscapeUtils.unescapeHtml4(object.optString("sub", ""));
         model.comment = object.optString("com", "");
+        model.comment = RegexUtils.replaceAll(model.comment, COMMENT_HEADING_PATTERN, "<font color=\"#AF0A0F\"><b>$1</b></font>");
         model.email = object.optString("email", "");
         model.trip = object.optString("trip", "");
         String capcode = object.optString("capcode", "none");
@@ -243,8 +241,9 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
     
     protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
         String ext = object.optString("ext", "");
-        if (!ext.equals("")) {
+        if (!ext.isEmpty()) {
             AttachmentModel attachment = new AttachmentModel();
+            ext = ext.toLowerCase(Locale.US);
             switch (ext) {
                 case ".jpeg":
                 case ".jpg":
@@ -278,7 +277,7 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             String tim = object.optString("tim", "");
             if (tim.length() > 0) {
                 attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
-                    ("/" + boardName + "/thumb/" + tim + ".jpg");
+                        ("/" + boardName + "/thumb/" + tim + ".jpg");
                 attachment.path = "/" + boardName + "/src/" + tim + ext;
                 return attachment;
             }
@@ -319,7 +318,9 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
             }
             if (pair.getKey().equals("file")) {
                 if (model.attachments != null && model.attachments.length > 0) {
-                    postEntityBuilder.addFile(pair.getKey(), model.attachments[0], model.randomHash);
+                    for (int i=0; i<model.attachments.length && i<ATTACHMENT_KEYS.length; ++i) {
+                        postEntityBuilder.addFile(ATTACHMENT_KEYS[i], model.attachments[i], model.randomHash);
+                    }
                 } else {
                     postEntityBuilder.addPart(pair.getKey(), new ByteArrayBody(new byte[0], ""));
                 }
@@ -471,8 +472,23 @@ public abstract class AbstractVichanModule extends AbstractWakabaModule {
         try {
             super.downloadFile(url, out, listener, task);
         } catch (HttpWrongStatusCodeException e) {
-            if (url.contains("/thumb/") && url.endsWith(".jpg") && e.getStatusCode() == 404) {
-                super.downloadFile(url.substring(0, url.length() - 3) + "png", out, listener, task);
+            if (e.getStatusCode() == 404 && url.contains("/thumb/")) {
+                String ext = url.substring(url.lastIndexOf(".")+1).toLowerCase();
+                String fileName = url.substring(0, url.lastIndexOf("."));
+                // jpg -> png -> gif -> jpeg -> throw exception
+                switch (ext) {
+                    case "jpg":
+                        downloadFile(fileName + ".png", out, listener, task);
+                        break;
+                    case "png":
+                        downloadFile(fileName + ".gif", out, listener, task);
+                        break;
+                    case "gif":
+                        downloadFile(fileName + ".jpeg", out, listener, task);
+                        break;
+                    default:
+                        throw e;
+                }
             } else {
                 throw e;
             }

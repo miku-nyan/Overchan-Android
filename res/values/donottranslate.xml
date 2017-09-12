@@ -106,6 +106,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_theme_value_gurochan">PREF_THEME_VALUE_GUROCHAN</string>
     <string name="pref_theme_value_tomorrow">PREF_THEME_VALUE_TOMORROW</string>
     <string name="pref_theme_value_mikuba">PREF_THEME_VALUE_MIKUBA</string>
+    <string name="pref_theme_value_dark_mint">PREF_THEME_VALUE_DARK_MINT</string>
     <string name="pref_theme_value_custom">PREF_THEME_VALUE_CUSTOM</string>
     <string-array name="pref_theme_values" translatable="false">
         <item>@string/pref_theme_value_futaba</item>
@@ -114,6 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_theme_value_gurochan</item>
         <item>@string/pref_theme_value_tomorrow</item>
         <item>@string/pref_theme_value_mikuba</item>
+        <item>@string/pref_theme_value_dark_mint</item>
         <item>@string/pref_theme_value_custom</item>
     </string-array>
     <string name="pref_key_font_size">PREF_KEY_FONT_SIZE</string>
@@ -150,4 +152,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <item>@string/pref_sidepanel_width_value_45percent</item>
         <item>@string/pref_sidepanel_width_value_50percent</item>
     </string-array>
+    <string name="pref_key_settings_ie">PREF_KEY_SETTINGS_IE</string>
+    <string name="pref_key_settings_export">PREF_KEY_SETTINGS_EXPORT</string>
+    <string name="pref_key_settings_import_overwrite">PREF_KEY_SETTINGS_IMPORT_OVERWRITE</string>
+    <string name="pref_key_settings_import">PREF_KEY_SETTINGS_IMPORT</string>
+    <string name="pref_key_post_thumbnail_scale">PREF_KEY_POST_THUMBNAIL_SCALE</string>
+    <string-array name="pref_post_thumbnail_scale_choices" translatable="false">
+        <item>50\uff05</item>
+        <item>100\uff05</item>
+        <item>150\uff05</item>
+        <item>200\uff05</item>
+    </string-array>
+    <string name="pref_post_thumbnail_scale_value_default">@string/pref_post_thumbnail_scale_value_100percent</string>
+    <string name="pref_post_thumbnail_scale_value_50percent">PREF_POST_THUMBNAIL_SCALE_VALUE_50PERCENT</string>
+    <string name="pref_post_thumbnail_scale_value_100percent">PREF_POST_THUMBNAIL_SCALE_VALUE_100PERCENT</string>
+    <string name="pref_post_thumbnail_scale_value_150percent">PREF_POST_THUMBNAIL_SCALE_VALUE_150PERCENT</string>
+    <string name="pref_post_thumbnail_scale_value_200percent">PREF_POST_THUMBNAIL_SCALE_VALUE_200PERCENT</string>
+    <string-array name="pref_post_thumbnail_scale_values" translatable="false">
+        <item>@string/pref_post_thumbnail_scale_value_50percent</item>
+        <item>@string/pref_post_thumbnail_scale_value_100percent</item>
+        <item>@string/pref_post_thumbnail_scale_value_150percent</item>
+        <item>@string/pref_post_thumbnail_scale_value_200percent</item>
+    </string-array>
+    <string name="intent_overchan_extras">OVERCHAN_EXTRAS</string>
+    <string name="intent_overchan_send_post_model">OVERCHAN_SEND_POST_MODEL</string>
+    <string name="intent_overchan_quote_text">OVERCHAN_QUOTE_TEXT</string>
+    <string name="intent_overchan_post_number">OVERCHAN_POST_NUMBER</string>
+    <string name="intent_overchan_post_uri">OVERCHAN_POST_URI</string>
+    <string name="pref_key_scroll_to_active_tab">PREF_KEY_SCROLL_TO_ACTIVE_TAB</string>
 </resources>

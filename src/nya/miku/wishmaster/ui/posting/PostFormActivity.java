@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import nya.miku.wishmaster.R;
+import nya.miku.wishmaster.api.AbstractChanModule;
 import nya.miku.wishmaster.api.ChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.models.BoardModel;
@@ -126,6 +127,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             case R.id.postform_mark_strike:
             case R.id.postform_mark_spoiler:
             case R.id.postform_mark_quote:
+            case R.id.postform_mark_code:
                 try {
                     switch (v.getId()) {
                         case R.id.postform_mark_bold:
@@ -145,6 +147,9 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                             break;
                         case R.id.postform_mark_quote:
                             PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_QUOTE);
+                            break;
+                        case R.id.postform_mark_code:
+                            PostFormMarkup.markup(boardModel.markType, commentField, PostFormMarkup.FEATURE_CODE);
                             break;
                     }
                 } catch (Exception e) {
@@ -301,6 +306,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     handleFile(UriFileUtils.getFile(this, imageUri));
                     break;
             }
+            saveSendPostModel();
         }
     }
     
@@ -456,6 +462,16 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 return false;
             }
         });
+        captchaField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus && chan instanceof AbstractChanModule && ((AbstractChanModule) chan).getCaptchaAutoUpdatePreference()) {
+                    if (captchaField.getText().length() == 0)
+                        updateCaptcha(false);
+                }
+            }
+        });
+
         sendButton = (Button) findViewById(R.id.postform_send_button);
         sendButton.setOnClickListener(this);
         
@@ -479,6 +495,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                 PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_UNDERLINE),
                 PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_STRIKE),
                 PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_SPOILER),
+                PostFormMarkup.hasMarkupFeature(boardModel.markType, PostFormMarkup.FEATURE_CODE),
         };
         if (markupEnabled[0] || markupEnabled[1] || markupEnabled[2] || markupEnabled[3] || markupEnabled[4] || markupEnabled[5]) {
             markLayout.setVisibility(View.VISIBLE);
@@ -488,6 +505,7 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             if (!markupEnabled[3]) markLayout.findViewById(R.id.postform_mark_underline).setVisibility(View.GONE);
             if (!markupEnabled[4]) markLayout.findViewById(R.id.postform_mark_strike).setVisibility(View.GONE);
             if (!markupEnabled[5]) markLayout.findViewById(R.id.postform_mark_spoiler).setVisibility(View.GONE);
+            if (!markupEnabled[6]) markLayout.findViewById(R.id.postform_mark_code).setVisibility(View.GONE);
         } else {
             markLayout.setVisibility(View.GONE);
         }
@@ -528,6 +546,8 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         if (boardModel.allowCustomMark) custommarkChkbox.setChecked(sendPostModel.custommark);
         captchaField.setText(sendPostModel.captchaAnswer != null ? sendPostModel.captchaAnswer : "");
         if (sendPostModel.attachments != null) {
+            attachmentsLayout.removeAllViews();
+            attachments.clear();
             for (File attachment : sendPostModel.attachments) {
                 handleFile(attachment);
             }
@@ -561,10 +581,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         }
     }
     
-    private void switchToLoadingCaptcha() {
+    private void switchToLoadingCaptcha(boolean disableCaptchaField) {
         captchaLoading.setVisibility(View.VISIBLE);
         captchaView.setVisibility(View.GONE);
-        captchaField.setEnabled(false);
+        captchaField.setEnabled(!disableCaptchaField);
         sendButton.setEnabled(false);
     }
     
@@ -603,9 +623,13 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
         switchToErrorCaptcha();
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
-    
+
     private void updateCaptcha() {
-        switchToLoadingCaptcha();
+        updateCaptcha(true);
+    }
+
+    private void updateCaptcha(boolean disableCaptchaField) {
+        switchToLoadingCaptcha(disableCaptchaField);
         if (currentTask != null) currentTask.cancel();
         MainApplication.getInstance().draftsCache.clearLastCaptcha();
         Async.runAsync(new Runnable() {
@@ -650,6 +674,12 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     public void onPause() {
         saveSendPostModel();
         super.onPause();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        readSendPostModel();
     }
     
     @Override

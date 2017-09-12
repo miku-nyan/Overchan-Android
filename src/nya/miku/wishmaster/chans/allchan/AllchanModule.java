@@ -75,7 +75,7 @@ public class AllchanModule extends CloudflareChanModule {
             "Node captcha", "Google Recaptcha 2", "Google Recaptcha 2 (fallback)", "Google Recaptcha" };
     private static final String[] CAPTCHA_TYPES_KEYS = new String[] {
             "node-captcha", "recaptcha", "recaptcha-fallback", "recaptchav1" };
-    private static final String CAPTCHA_TYPE_DEFAULT = "recaptcha";
+    private static final String CAPTCHA_TYPE_DEFAULT = "node-captcha";
     
     private static final int CAPTCHA_NODE = 1;
     private static final int CAPTCHA_RECAPTCHA = 2;
@@ -90,13 +90,14 @@ public class AllchanModule extends CloudflareChanModule {
     public static final String[] CATALOG_DESCRIPTIONS = new String[] {
             "Сортировать по дате создания", "Сортировать по дате последнего поста", "Сортировать по количеству бампов" };
     
-    private static final List<String> SFW_BOARDS = Arrays.asList("a", "cg", "d", "echo", "int", "mlp", "po", "pr", "rf", "rpg", "soc", "vg");
+    private static final List<String> SFW_BOARDS = Arrays.asList("a", "d", "po", "pr", "rpg", "s", "vg");
     private static final String[] RATINGS = new String[] { "SFW", "R-15", "R-18", "R-18G" };
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); }
     
-    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=\"quotation\">", Pattern.LITERAL);
+    private static final Pattern COMMENT_QUOTE = Pattern.compile("<span class=['\"]quotation['\"]>");
+    private static final Pattern COMMENT_CODE = Pattern.compile("<div class=['\"]code-block[^>]*>(.*?)</div>");
     
     private HashMap<String, BoardModel> boardsMap;
     
@@ -150,6 +151,7 @@ public class AllchanModule extends CloudflareChanModule {
         int i = Arrays.asList(CAPTCHA_TYPES_KEYS).indexOf(preferences.getString(getSharedKey(PREF_KEY_CAPTCHA_TYPE), CAPTCHA_TYPE_DEFAULT));
         if (i >= 0) captchaPreference.setSummary(CAPTCHA_TYPES[i]);
         preferenceGroup.addPreference(captchaPreference);
+        addPasswordPreference(preferenceGroup);
         addHttpsPreference(preferenceGroup, true);
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
@@ -212,7 +214,7 @@ public class AllchanModule extends CloudflareChanModule {
             }
             return list;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -241,7 +243,7 @@ public class AllchanModule extends CloudflareChanModule {
         model.allowNames = true;
         model.allowSubjects = true;
         model.allowSage = true;
-        model.allowEmails = true;
+        model.allowEmails = false;
         model.ignoreEmailIfSage = true;
         model.allowCustomMark = true;
         model.allowRandomHash = true;
@@ -262,14 +264,14 @@ public class AllchanModule extends CloudflareChanModule {
     @Override
     public BoardModel getBoard(String shortName, ProgressListener listener, CancellableTask task) throws Exception {
         if (boardsMap != null && boardsMap.containsKey(shortName)) return boardsMap.get(shortName);
-        String url = getUsingUrl() + "misc/board/b.json";
+        String url = getUsingUrl() + "misc/board/" + shortName + ".json";
         JSONObject json = downloadJSONObject(url, false, listener, task);
         try {
             BoardModel board = mapBoardModel(json.getJSONObject("board"));
             addToMap(board);
             return board;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -281,8 +283,7 @@ public class AllchanModule extends CloudflareChanModule {
         if (json == null) return oldList;
         try {
             try {
-                BoardModel board = mapBoardModel(json.optJSONObject("board"));
-                addToMap(board);
+                BoardModel board = getBoard(boardName, listener, task);
                 board.lastPage = Math.max(json.getInt("pageCount") - 1, 0);
             } catch (Exception e) {
                 Logger.e(TAG, e);
@@ -295,21 +296,19 @@ public class AllchanModule extends CloudflareChanModule {
             return list;
         } catch (JSONException e) {
             Logger.e(TAG, e);
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
     @Override
     public ThreadModel[] getCatalog(String boardName, int catalogType, ProgressListener listener, CancellableTask task, ThreadModel[] oldList)
             throws Exception {
-        String url = getUsingUrl() + boardName + "/catalog.json";
-        if (catalogType > 0) url += "?sort=" + CATALOG_TYPES[catalogType];
+        String url = getUsingUrl() + boardName + "/catalog" + (catalogType > 0 ? "-" + CATALOG_TYPES[catalogType] : "") + ".json";
         JSONObject json = downloadJSONObject(url, oldList != null, listener, task);
         if (json == null) return oldList;
         try {
             try {
-                BoardModel board = mapBoardModel(json.getJSONObject("board"));
-                addToMap(board);
+                getBoard(boardName, listener, task);
             } catch (Exception e) {
                 Logger.e(TAG, e);
             }
@@ -320,7 +319,7 @@ public class AllchanModule extends CloudflareChanModule {
             }
             return list;
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -361,8 +360,7 @@ public class AllchanModule extends CloudflareChanModule {
         if (json == null) return oldList;
         try {
             try {
-                BoardModel board = mapBoardModel(json.getJSONObject("board"));
-                addToMap(board);
+                getBoard(boardName, listener, task);
             } catch (Exception e) {
                 Logger.e(TAG, e);
             }
@@ -370,7 +368,7 @@ public class AllchanModule extends CloudflareChanModule {
             if (oldList == null) return newList;
             return ChanModels.mergePostsLists(Arrays.asList(oldList), Arrays.asList(newList));
         } catch (JSONException e) {
-            throw new Exception(json.getString("errorDescription"));
+            throw new Exception(json.getString("message"));
         }
     }
     
@@ -393,6 +391,11 @@ public class AllchanModule extends CloudflareChanModule {
             }
         }
         model.name = RegexUtils.removeHtmlTags(name);
+        String extra = json.optString("extraData");
+        if (extra.indexOf(" /") > 0) {
+            extra = "(" + extra + ")";
+            model.name = model.name.length() > 0 ? (model.name + " " + extra) : extra;
+        }
         String subject = json.optString("subject");
         if (!subject.startsWith("<a href")) {
             model.subject = RegexUtils.removeHtmlTags(subject);
@@ -401,12 +404,23 @@ public class AllchanModule extends CloudflareChanModule {
             model.subject = "";
         }
         String text = RegexUtils.replaceAll(json.optString("text"), COMMENT_QUOTE, "<span class=\"unkfunc\">");
+        text = RegexUtils.replaceAll(text, COMMENT_CODE, "<code>$1</code>");
         model.comment = model.comment != null ? (model.comment + text) : text;
         model.email = json.optString("email");
-        model.trip = json.optString("tripCode");
+        model.trip = json.optString("tripcode");
+        JSONObject user = json.optJSONObject("user");
+        if (user != null) {
+            String level = user.optString("level");
+            if (level.equals("SUPERUSER")) model.trip += "## Admin";
+            else if (level.equals("ADMIN") || level.equals("MODER")) model.trip += "## Mod";    
+        }
         model.icons = null;
         model.op = json.optBoolean("isOp");
-        model.sage = model.email.toLowerCase(Locale.US).contains("sage");
+        JSONObject options = json.optJSONObject("options");
+        model.sage = options.optBoolean("sage") || model.email.toLowerCase(Locale.US).equals("sage");
+        if (options.optBoolean("bannedFor")) {
+            model.comment += "<br/><br/><font color=\"red\">Потребитель был запрещен для этого столба</font>";
+        }
         try {
             model.timestamp = DATE_FORMAT.parse(json.optString("createdAt")).getTime();
         } catch (Exception e) {
@@ -535,13 +549,13 @@ public class AllchanModule extends CloudflareChanModule {
                 break;
         }
         postEntityBuilder.
-                addString("email", model.sage ? "sage" : model.email).
                 addString("name", model.name).
                 addString("subject", model.subject).
                 addString("text", model.comment).
                 addString("signAsOp", model.custommark ? "true" : "false").
                 addString("password", model.password).
                 addString("markupMode", "EXTENDED_WAKABA_MARK,BB_CODE");
+        if (model.sage) postEntityBuilder.addString("sage", "true");
         String rating = (model.icon >= 0 && model.icon < RATINGS.length) ? RATINGS[model.icon] : "SFW";
         if (model.attachments != null && model.attachments.length > 0) {
             for (int i=0; i<model.attachments.length; ++i) {
@@ -560,7 +574,7 @@ public class AllchanModule extends CloudflareChanModule {
                 return getUsingUrl() + model.boardName + "/res/" + result.getInt("threadNumber") + ".html";
             }
         } catch (JSONException e) {
-            throw new Exception(result.getString("errorDescription"));
+            throw new Exception(result.getString("message"));
         }
     }
     
@@ -577,7 +591,7 @@ public class AllchanModule extends CloudflareChanModule {
                             addString("password", model.password);
                     HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
                     JSONObject result = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, false);
-                    String error = result.optString("errorDescription");
+                    String error = result.optString("message");
                     if (error.length() > 0) throw new Exception(error);
                 }
             }
@@ -589,7 +603,7 @@ public class AllchanModule extends CloudflareChanModule {
                     addString("password", model.password);
             HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
             JSONObject result = HttpStreamer.getInstance().getJSONObjectFromUrl(url, request, httpClient, null, task, false);
-            String error = result.optString("errorDescription");
+            String error = result.optString("message");
             if (error.length() > 0) throw new Exception(error);
         }
         return null;
@@ -618,6 +632,6 @@ public class AllchanModule extends CloudflareChanModule {
                 return model;
             } catch (Exception e) {}
         }
-        return WakabaUtils.parseUrlPath(urlPath, CHAN_NAME);
+        return WakabaUtils.parseUrlPath(urlPath.replaceAll("#\\D+", "#"), CHAN_NAME);
     }
 }

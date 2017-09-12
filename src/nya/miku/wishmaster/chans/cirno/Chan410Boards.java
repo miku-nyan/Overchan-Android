@@ -49,10 +49,9 @@ public class Chan410Boards {
         addBoard("cu", "Кулинария", "Общее", "Аноним", false);
         addBoard("dev", "Разработка", "Общее", "Стив Балмер", false);
         addBoard("r", "Радио 410", "Радио", "Аноним", false);
-        addBoard("a", "Аниме и манга", "Аниме", "Аноним", false);
+        addBoard("a", "Аниме и манга", "Аниме", "Нінгенъ", false);
         addBoard("ts", "Цундере", "Аниме", "Baka Inu", false);
         addBoard("tm", "Type-Moon", "Аниме", "Шики", false);
-        addBoard("gnx", "Gainax", "На пробу", "Ноно", false);
         addBoard("ci", "Городская жизнь", "На пробу", "Аноним", false);
         
         SIMPLE_ARRAY = new SimpleBoardModel[LIST.size()];
@@ -109,6 +108,7 @@ public class Chan410Boards {
         
         model.firstPage = 0;
         model.lastPage = BoardModel.LAST_PAGE_UNDEFINED;
+        model.catalogAllowed = !name.equals("d");
         return model;
     }
 }

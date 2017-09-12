@@ -75,7 +75,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
      * @param position позиция вкладки в списке
      */
     public void setSelectedItem(int position) {
-        setSelectedItem(position, true);
+        setSelectedItem(position, true, true);
     }
     
     /**
@@ -84,13 +84,23 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
      * @param serialize если true, сериализовать объект состояния вкладок
      */
     public void setSelectedItem(int position, boolean serialize) {
+        setSelectedItem(position, serialize, true);
+    }
+    
+    /**
+     * Выбрать текущую вкладку (с возможностью переключения на неё)
+     * @param position позиция вкладки в списке
+     * @param serialize если true, сериализовать объект состояния вкладок
+     * @param switchTo если true, переключиться на выбранную вкладку
+     */
+    public void setSelectedItem(int position, boolean serialize, boolean switchTo) {
         selectedItem = position;
         tabsState.position = position;
         if (position >= 0) {
             tabsIdStack.addTab(getItem(position).id);
         }
         notifyDataSetChanged(serialize);
-        selectListener.onTabSelected(position);
+        if (switchTo) selectListener.onTabSelected(position);
     }
     
     /**
@@ -153,7 +163,7 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
             }
         } else {
             if (position < selectedItem) --selectedItem;
-            setSelectedItem(selectedItem); //serialize
+            setSelectedItem(selectedItem, true, MainApplication.getInstance().settings.scrollToActiveTab()); //serialize
         }
     }
     

@@ -19,10 +19,13 @@
 package nya.miku.wishmaster.chans.infinity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +42,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
@@ -46,6 +50,7 @@ import nya.miku.wishmaster.R;
 import nya.miku.wishmaster.api.AbstractVichanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
+import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
@@ -72,15 +77,26 @@ public class InfinityModule extends AbstractVichanModule {
     
     private static final String CHAN_NAME = "8chan";
     private static final String DEFAULT_DOMAIN = "8ch.net";
+    private static final String SYSTEM_DOMAIN = "sys.8ch.net";
+    private static final String MEDIA_DOMAIN = "media.8ch.net";
+    private static final String MEDIA2_DOMAIN = "media2.8ch.net";
     private static final String ONION_DOMAIN = "oxwugzccvk3dk6tj.onion";
     private static final String[] DOMAINS = new String[] { DEFAULT_DOMAIN, ONION_DOMAIN, "8chan.co" };
     
-    private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "gif", "png", "webm", "mp4", "swf" };
+    private static final String[] ATTACHMENT_FORMATS = new String[] { "jpg", "jpeg", "gif", "png", "webm", "mp4", "swf", "pdf" };
     private static final FastHtmlTagParser.TagReplaceHandler QUOTE_REPLACER = new FastHtmlTagParser.TagReplaceHandler() {
         @Override
         public FastHtmlTagParser.TagsPair replace(FastHtmlTagParser.TagsPair source) {
             if (source.openTag.equalsIgnoreCase("<p class=\"body-line ltr quote\">"))
-                return new FastHtmlTagParser.TagsPair("<blockquote class=\"unkfunc\">", "</blockquote>");
+                return new FastHtmlTagParser.TagsPair("<span class=\"quote\">", "</span><br />");
+            return null;
+        }
+    };
+    private static final FastHtmlTagParser.TagReplaceHandler PARAGRAPH_REPLACER = new FastHtmlTagParser.TagReplaceHandler() {
+        @Override
+        public FastHtmlTagParser.TagsPair replace(FastHtmlTagParser.TagsPair source) {
+            if (source.openTag.equalsIgnoreCase("<p class=\"body-line ltr \">"))
+                return new FastHtmlTagParser.TagsPair("", "<br />");
             return null;
         }
     };
@@ -95,10 +111,12 @@ public class InfinityModule extends AbstractVichanModule {
     protected static final String PREF_KEY_USE_ONION = "PREF_KEY_USE_ONION";
     
     private Map<String, BoardModel> boardsMap = new HashMap<>();
+    protected Set<String> boardsThreadCaptcha = new HashSet<>();
+    protected Set<String> boardsPostCaptcha = new HashSet<>();
     private boolean needTorCaptcha = false;
     private String torCaptchaCookie = null;
-    private boolean needNewthreadCaptcha = false;
-    private String newThreadCaptchaId = null;
+    protected boolean needNewThreadCaptcha = false;
+    protected String newThreadCaptchaId = null;
     
     
     public InfinityModule(SharedPreferences preferences, Resources resources) {
@@ -216,10 +234,10 @@ public class InfinityModule extends AbstractVichanModule {
         model.defaultUserName = json.optString("anonymous", "Anonymous");
         model.bumpLimit = json.optInt("reply_limit", 500);
         model.readonlyBoard = false;
-        model.requiredFileForNewThread = false;
+        model.requiredFileForNewThread = json.optBoolean("force_image_op", false);
         model.allowDeletePosts = json.optBoolean("allow_delete", false);
         model.allowDeleteFiles = model.allowDeletePosts;
-        model.allowNames = true;
+        model.allowNames = !json.optBoolean("field_disable_name", false);
         model.allowSubjects = true;
         model.allowSage = true;
         model.allowEmails = true;
@@ -228,14 +246,21 @@ public class InfinityModule extends AbstractVichanModule {
         model.customMarkDescription = "Spoiler";
         model.allowRandomHash = true;
         model.allowIcons = false;
-        model.attachmentsMaxCount = json.optBoolean("disable_images", false) ? 0 : 5;
+        model.attachmentsMaxCount = json.optBoolean("disable_images", false) ? 0 : json.optInt("max_images", 5);
         model.attachmentsFormatFilters = ATTACHMENT_FORMATS;
-        model.markType = BoardModel.MARK_NOMARK;
+        model.markType = BoardModel.MARK_INFINITY;
         model.firstPage = 1;
         model.lastPage = json.optInt("max_pages", BoardModel.LAST_PAGE_UNDEFINED);
         model.searchAllowed = false;
         model.catalogAllowed = true;
         boardsMap.put(shortName, model);
+        JSONObject captcha = json.optJSONObject("captcha");
+        if ((captcha != null) && captcha.optBoolean("enabled")) {
+            boardsPostCaptcha.add(shortName);
+            boardsThreadCaptcha.add(shortName);
+        } else if (json.optBoolean("new_thread_capt")) {
+            boardsThreadCaptcha.add(shortName);
+        }
         return model;
     }
     
@@ -244,8 +269,61 @@ public class InfinityModule extends AbstractVichanModule {
         PostModel model = super.mapPostModel(object, boardName);
         try {
             model.comment = FastHtmlTagParser.getPTagParser().replace(model.comment, QUOTE_REPLACER);
+            model.comment = FastHtmlTagParser.getPTagParser().replace(model.comment, PARAGRAPH_REPLACER);
+            model.comment = model.comment.replaceAll("<br />$", "");
         } catch (Exception e) {}
         return model;
+    }
+    
+    @Override
+    protected AttachmentModel mapAttachment(JSONObject object, String boardName, boolean isSpoiler) {
+        AttachmentModel attachment = super.mapAttachment(object, boardName, isSpoiler);
+        String ext = object.optString("ext", "");
+        String thumbnail_ext = ext;
+        if (attachment != null) {
+            String tim = object.optString("tim", "");
+            String thumbLocation = tim.length() == 64 ? "/file_store/thumb/" : "/" + boardName + "/thumb/";
+            String fileLocation = tim.length() == 64 ? "/file_store/" : "/" + boardName + "/src/";
+            if (tim.length() > 0) {
+                if(tim.length()!=64 || (tim.length() == 64 && attachment.type == AttachmentModel.TYPE_VIDEO)){
+                    thumbnail_ext = ".jpg";
+                }
+                attachment.thumbnail = isSpoiler || attachment.type == AttachmentModel.TYPE_AUDIO ? null :
+                        (thumbLocation + tim + thumbnail_ext);
+                attachment.path = fileLocation + tim + ext;
+                if (getUsingDomain().equals(DEFAULT_DOMAIN)){
+                    if (attachment.thumbnail != null) {
+                        attachment.thumbnail = fixRelativeUrl(attachment.thumbnail).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                    }
+                    attachment.path = fixRelativeUrl(attachment.path).replaceFirst(DEFAULT_DOMAIN, MEDIA_DOMAIN);
+                }
+                return attachment;
+            }
+        }
+        return attachment;
+    }
+
+    @Override
+    public void downloadFile(String url, OutputStream out, ProgressListener listener, CancellableTask task) throws Exception {
+        String fixedUrl = fixRelativeUrl(url);
+        try {
+            super.downloadFile(fixedUrl, out, listener, task);
+        } catch (HttpWrongStatusCodeException e) {
+            if (e.getStatusCode() == 404 && (url.contains("/file_store/") || url.contains("/src/"))) {
+                switch (Uri.parse(fixedUrl).getHost()) {
+                    case MEDIA_DOMAIN:
+                        downloadFile(fixedUrl.replaceFirst(MEDIA_DOMAIN, MEDIA2_DOMAIN), out, listener, task);
+                        break;
+                    case MEDIA2_DOMAIN:
+                        downloadFile(fixedUrl.replaceFirst(MEDIA2_DOMAIN, DEFAULT_DOMAIN), out, listener, task);
+                        break;
+                    default:
+                        throw e;
+                }
+            } else {
+                throw e;
+            }
+        }
     }
     
     @Override
@@ -261,6 +339,9 @@ public class InfinityModule extends AbstractVichanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        needNewThreadCaptcha = threadNumber == null ?
+                boardsThreadCaptcha.contains(boardName) :
+                    boardsPostCaptcha.contains(boardName);
         if (needTorCaptcha) {
             String url = getUsingUrl() + "dnsbls_bypass.php";
             String response =
@@ -276,10 +357,10 @@ public class InfinityModule extends AbstractVichanModule {
                 return captcha;
             }
         }
-        if (needNewthreadCaptcha) {
+        if (needNewThreadCaptcha) {
             String url = getUsingUrl() + "8chan-captcha/entrypoint.php?mode=get&extra=abcdefghijklmnopqrstuvwxyz&nojs=true";
-            HttpRequestModel request = HttpRequestModel.builder().setGET().
-                    setCustomHeaders(new Header[] { new BasicHeader(HttpHeaders.CACHE_CONTROL, "max-age=0") }).build();
+            HttpRequestModel request = HttpRequestModel.builder().setGET()
+                    .setCustomHeaders(new Header[] { new BasicHeader(HttpHeaders.CACHE_CONTROL, "max-age=0") }).build();
             String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
             Matcher base64Matcher = CAPTCHA_BASE64.matcher(response);
             Matcher captchaIdMatcher = CAPTCHA_ID.matcher(response);
@@ -315,9 +396,19 @@ public class InfinityModule extends AbstractVichanModule {
     
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
-        if (needTorCaptcha) checkCaptcha(model.captchaAnswer, task);
+        if (needTorCaptcha) {
+            checkCaptcha(model.captchaAnswer, task);
+            if (needNewThreadCaptcha) {
+                throw new Exception("DNSBL passed successfully. Please complete CAPTCHA to make your post."); 
+            }
+        }
         if (task != null && task.isCancelled()) throw new InterruptedException("interrupted");
-        String url = getUsingUrl() + "post.php";
+        String url;
+        if (DEFAULT_DOMAIN.equals(getUsingDomain())) {
+            url = (useHttps() ? "https://" : "http://") + SYSTEM_DOMAIN + "/post.php";
+        } else {
+            url = getUsingUrl() + "post.php";
+        }
         ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                 addString("name", model.name).
                 addString("email", model.sage ? "sage" : model.email).
@@ -334,9 +425,8 @@ public class InfinityModule extends AbstractVichanModule {
                 postEntityBuilder.addFile(images[i], model.attachments[i], model.randomHash);
             }
         }
-        if (needNewthreadCaptcha) {
+        if (needNewThreadCaptcha) {
             postEntityBuilder.addString("captcha_text", model.captchaAnswer).addString("captcha_cookie", newThreadCaptchaId);
-            needNewthreadCaptcha = false;
         }
         
         UrlPageModel refererPage = new UrlPageModel();
@@ -360,7 +450,10 @@ public class InfinityModule extends AbstractVichanModule {
                 ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
                 IOUtils.copyStream(response.stream, output);
                 String htmlResponse = output.toString("UTF-8");
-                if (htmlResponse.contains("<div class=\"ban\">")) {
+                if (htmlResponse.contains("dnsbls_bypass.php")) {
+                    needTorCaptcha = true;
+                    throw new Exception("Please complete your CAPTCHA. (Bypass DNSBL)");
+                } else if (htmlResponse.contains("<div class=\"ban\">")) {
                     String error = "You are banned! ;_;";
                     Matcher banReasonMatcher = BAN_REASON_PATTERN.matcher(htmlResponse);
                     if (banReasonMatcher.find()) {
@@ -382,9 +475,12 @@ public class InfinityModule extends AbstractVichanModule {
                 if (htmlResponse.contains("dnsbls_bypass.php")) {
                     needTorCaptcha = true;
                     throw new Exception("Please complete your CAPTCHA. (Bypass DNSBL)");
-                } else if (htmlResponse.contains("captcha_text") || htmlResponse.contains("entrypoint.php")) {
-                    needNewthreadCaptcha = true;
-                    throw new Exception(htmlResponse.contains("entrypoint.php") ?
+                } else if (htmlResponse.contains("/entrypoint")) {
+                    boardsThreadCaptcha.add(model.boardName);
+                    if (model.threadNumber != null) {
+                        boardsPostCaptcha.add(model.boardName);
+                    }
+                    throw new Exception(needNewThreadCaptcha ?
                             "You seem to have mistyped the verification, or your CAPTCHA expired. Please fill it out again." :
                                 "Please complete your CAPTCHA.");
                 } else if (htmlResponse.contains("<h1>Error</h1>")) {
